@@ -209,10 +209,12 @@ function renderUp(){
   if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
   $("upList").innerHTML=list.map((c,i)=>{
     const gains=Object.entries(c.d).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3)
-      .map(([s,v])=>`<span class="${v<0?"neg":"gain"}">${esc(s)} ${fv2(s,v)}</span>`).join("");
-    const cost=[c.money?uMoneyTxt(c.money):"",c.other||"",c.pans?uPansTxt(c.pans):"",c.limited?"event only":""].filter(Boolean).join(" · ")||"free";
-    return `<div class="upi"><span class="upn"><b>${esc(c.name)}</b><span class="uph">${esc(c.kind)}${c.where?" · "+esc(c.where):""}${c.recipe?" · "+esc(c.recipe):""}${c.unknown?" · some materials aren't panned":""}</span></span>
-      <span class="upg">${gains}</span><span class="upc">${esc(cost)}</span>
+      .map(([s,v])=>`<span class="${v<0?"neg":"gain"}">${esc(s)} <b>${fv2(s,v)}</b></span>`).join("");
+    const money=c.money?uMoneyTxt(c.money):c.other||(c.limited?"event":"");
+    const grind=c.pans?uPansTxt(c.pans):"";
+    const meta=c.kind+(c.where?" · "+c.where:"")+(c.recipe?" · "+c.recipe:"")+(c.unknown?" · some materials aren't panned":"");
+    return `<div class="upi"><span class="upn"><b>${esc(c.name)}</b><span class="uph" title="${esc(meta)}">${esc(meta)}</span><span class="upg">${gains}</span></span>
+      <span class="upm">${esc(money)}</span><span class="upp">${esc(grind)}</span>
       <button type="button" class="btn sm" data-uptry="${i}">Try it</button></div>`}).join("");
   UPLAST=list}
 const fv2=(s,v)=>(v<0?"−":"+")+(PCT.has(s)?fmt(Math.abs(v),1)+"%":fmt(Math.abs(v),Math.abs(v)<10?1:0));
