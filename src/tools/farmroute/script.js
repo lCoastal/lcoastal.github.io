@@ -12,16 +12,19 @@ function parse(txt){const out=[],bad=[];
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;d.style.cssText="position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40";document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 let LAST=null;
 // lock: freeze the stops, their order and what goes where, so ticking items doesn't reshuffle the route
-function drawLock(){const on=!!S.lock;const b=$("lockBtn");b.setAttribute("aria-pressed",String(on));b.innerHTML=on?"🔒 Route locked":"🔓 Lock route";
+function drawLock(){const on=!!(S.mode==="custom"?curList().lock:S.lock);const b=$("lockBtn");b.setAttribute("aria-pressed",String(on));b.innerHTML=on?"🔒 Route locked":"🔓 Lock route";
   b.title=on?"Click to unlock. The route will re-plan around what you still need.":"Keep the stops, their order and what you collect where exactly as they are now, even as you tick items off.";
   b.style.cssText=on?"background:var(--accent);border-color:var(--accent);color:var(--bg)":"";
   $("lockNote").hidden=!on;$("lockNote").textContent="Locked: stops stay in place as you tick items off. Odds still update if you change your stats. Unlock to re-plan."}
 function render(){
-  if(document.activeElement!==$("paste"))$("paste").value=S.txt;
-  const {items,bad}=parse(S.txt);
-  $("parseInfo").innerHTML=!S.txt.trim()?"":`Found ${items.length} mineral${items.length===1?"":"s"}.`+(bad.length?` <span style="color:var(--neg)">Couldn't match: ${bad.map(esc).join(", ")}.</span>`:"");
-  if(!items.length){$("specials").hidden=true;$("sum").innerHTML="";$("stops").innerHTML='<div class="empty">Paste your museum above, or press Use my Museum Planner board.</div>';$("issues").hidden=true;LAST=null;return}
-  const R=RT.plan(items.map(it=>({...it,c:S.got[it.m.n]?0:1})),{lock:S.lock});LAST=R;
+  const cm=S.mode==="custom";drawMode();
+  let items,got,lock;
+  if(cm){const L=curList();items=customItems(L);got=L.got;lock=L.lock;drawCustom()}
+  else{if(document.activeElement!==$("paste"))$("paste").value=S.txt;
+    const p=parse(S.txt);items=p.items;got=S.got;lock=S.lock;
+    $("parseInfo").innerHTML=!S.txt.trim()?"":`Found ${items.length} mineral${items.length===1?"":"s"}.`+(p.bad.length?` <span style="color:var(--neg)">Couldn't match: ${p.bad.map(esc).join(", ")}.</span>`:"")}
+  if(!items.length){$("specials").hidden=true;$("sum").innerHTML="";$("stops").innerHTML=cm?'<div class="empty">Tick some minerals above to build your custom route.</div>':'<div class="empty">Paste your museum above, or press Use my Museum Planner board.</div>';$("issues").hidden=true;LAST=null;drawLock();return}
+  const R=RT.plan(items.map(it=>({...it,c:got[it.key||it.m.n]?0:1})),{lock});LAST=R;
   drawLock();
   const done=R.T.filter(t=>!t.c).length;
   $("sum").innerHTML=RT.sumHTML(R,`<div><span class="lab">Collected</span><b>${done} / ${R.T.length}</b><span class="hint">items on the route</span></div>`);
@@ -30,14 +33,59 @@ function render(){
   $("specials").hidden=!(R.special&&R.special.length);$("specialList").innerHTML=RT.specialHTML(R);
   $("issues").hidden=!R.issues.length;$("issueList").innerHTML=R.issues.map(x=>`<li>${x}</li>`).join("");
 }
+// ---- custom route: choose modifiers at the top, tick them per mineral ----
+// S.cl: saved custom routes [{id,name,mods:[...],picks:{Mineral:[modifier,...]},got:{},lock}], S.cc: the open one
+const CMODS=["None",...RT.MODS.filter(u=>u!=="None")];const modName=u=>u==="None"?"Any":u;
+const cid=()=>"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const CN_A=["Shiny","Lucky","Molten","Frozen","Glowing","Ancient","Golden","Radiant","Hidden","Swift","Prismatic","Stormy","Crystal","Royal","Sunlit","Moonlit"],CN_B=["Run","Haul","Route","Trip","Hunt","Loop","Grind","Sweep","Circuit","Trek"];
+const cname=()=>CN_A[Math.random()*CN_A.length|0]+" "+CN_B[Math.random()*CN_B.length|0];
+const newList=()=>({id:cid(),name:cname(),mods:["None"],picks:{},got:{}});
+function curList(){if(!Array.isArray(S.cl)||!S.cl.length){S.cl=[newList()];S.cc=S.cl[0].id}let L=S.cl.find(x=>x.id===S.cc);if(!L){L=S.cl[0];S.cc=L.id}return L}
+const RORD=RT.RARS;
+function customItems(L){const out=[];Object.entries(L.picks||{}).forEach(([n,us])=>{const m=MIN[n.toLowerCase()];if(!m)return;(us||[]).forEach(u=>{if(L.mods.includes(u))out.push({m,u,key:n+"|"+u})})});
+  return out.sort((a,b)=>RORD.indexOf(a.m.r)-RORD.indexOf(b.m.r)||a.m.n.localeCompare(b.m.n)||CMODS.indexOf(a.u)-CMODS.indexOf(b.u))}
+let cRar="",cArm=0;
+function drawMode(){const cm=S.mode==="custom";document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.mode==="custom")===cm)));$("modeMuseum").hidden=cm;$("modeCustom").hidden=!cm}
+function shownMins(L){const q=$("cQ").value.trim().toLowerCase();const only=$("cOnly").checked;
+  return P.mins.filter(m=>(!cRar||m.r===cRar)&&(!q||m.n.toLowerCase().includes(q)||(m.ch||[]).some(c=>String(c[0]).toLowerCase().includes(q)))&&(!only||((L.picks[m.n]||[]).some(u=>L.mods.includes(u)))))
+    .sort((a,b)=>RORD.indexOf(a.r)-RORD.indexOf(b.r)||a.n.localeCompare(b.n))}
+function drawCustom(){const L=curList();
+  $("cList").innerHTML=S.cl.map(x=>`<option value="${esc(x.id)}"${x.id===L.id?" selected":""}>${esc(x.name||"Untitled route")}</option>`).join("");
+  if(document.activeElement!==$("cName"))$("cName").value=L.name||"";
+  $("cDel").textContent=cArm?"Click again to delete":"Delete";
+  $("cMods").innerHTML=CMODS.map(u=>`<button type="button" class="chip" data-cmod="${esc(u)}" aria-pressed="${L.mods.includes(u)}">${esc(modName(u))}</button>`).join("");
+  $("cRar").innerHTML=["",...RORD].map(r=>`<button type="button" class="chip" data-crar="${r}" aria-pressed="${cRar===r}"${r?` style="color:${cRar===r?"var(--bg)":rc(r)}"`:""}>${r||"All"}</button>`).join("");
+  const mods=CMODS.filter(u=>L.mods.includes(u));const list=shownMins(L);
+  if(!mods.length){$("cGrid").innerHTML='<div class="none">Pick at least one modifier above.</div>';$("cInfo").textContent="";return}
+  const on=(n,u)=>(L.picks[n]||[]).includes(u);
+  let body="",last="";list.forEach(m=>{if(m.r!==last){last=m.r;body+=`<tr class="rg" style="--rc:${rc(m.r)}"><td colspan="${mods.length+1}">${m.r}</td></tr>`}
+    const any=mods.some(u=>on(m.n,u));
+    body+=`<tr${any?' class="on"':""}><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}<b data-mineral="${esc(m.n)}">${esc(m.n)}</b></span></td>${mods.map(u=>`<td><input type="checkbox" data-pick="${esc(m.n)}" data-u="${esc(u)}" aria-label="${esc(m.n)}: ${esc(modName(u))}"${on(m.n,u)?" checked":""}></td>`).join("")}</tr>`});
+  const head=`<tr><th>Mineral</th>${mods.map(u=>{const all=list.length&&list.every(m=>on(m.n,u));return `<th><label title="Tick ${esc(modName(u))} for every mineral shown"><span>${esc(modName(u))}</span><input type="checkbox" data-colall="${esc(u)}"${all?" checked":""} aria-label="${esc(modName(u))} for every mineral shown"></label></th>`}).join("")}</tr>`;
+  $("cGrid").innerHTML=list.length?`<table class="fr-grid"><thead>${head}</thead><tbody>${body}</tbody></table>`:'<div class="none">No minerals match.</div>';
+  const n=customItems(L).length;$("cInfo").textContent=n?`${n} item${n===1?"":"s"} on this route.`:""}
+document.addEventListener("click",e=>{const t=e.target;
+  const md=t.closest("[data-mode]");if(md){S.mode=md.dataset.mode;cArm=0;save();render();return}
+  const cm=t.closest("[data-cmod]");if(cm){const L=curList(),u=cm.dataset.cmod;L.mods=L.mods.includes(u)?L.mods.filter(x=>x!==u):[...L.mods,u];delete L.lock;save();render();return}
+  const cr=t.closest("[data-crar]");if(cr){cRar=cr.dataset.crar;drawCustom();return}});
+$("modeCustom").addEventListener("change",e=>{const t=e.target,L=curList();
+  if(t.dataset.pick){const n=t.dataset.pick,u=t.dataset.u;const a=new Set(L.picks[n]||[]);if(t.checked)a.add(u);else{a.delete(u);delete L.got[n+"|"+u]}if(a.size)L.picks[n]=[...a];else delete L.picks[n];save();render();return}
+  if(t.dataset.colall){const u=t.dataset.colall;shownMins(L).forEach(m=>{const a=new Set(L.picks[m.n]||[]);if(t.checked)a.add(u);else{a.delete(u);delete L.got[m.n+"|"+u]}if(a.size)L.picks[m.n]=[...a];else delete L.picks[m.n]});save();render();return}
+  if(t.id==="cList"){S.cc=t.value;cArm=0;save();render();return}
+  if(t.id==="cOnly"){drawCustom();return}});
+$("cQ").addEventListener("input",()=>drawCustom());
+$("cName").addEventListener("input",()=>{curList().name=$("cName").value;save();const o=$("cList").selectedOptions[0];if(o)o.textContent=$("cName").value||"Untitled route"});
+$("cNew").onclick=()=>{const L=newList();curList();S.cl.push(L);S.cc=L.id;cArm=0;save();render();$("cName").focus();$("cName").select()};
+$("cDel").onclick=()=>{if(!cArm){cArm=1;drawCustom();setTimeout(()=>{if(cArm){cArm=0;if(S.mode==="custom")drawCustom()}},4000);return}
+  cArm=0;const L=curList();S.cl=S.cl.filter(x=>x.id!==L.id);if(!S.cl.length)S.cl=[newList()];S.cc=S.cl[0].id;save();render();toast(`Deleted “${L.name||"Untitled route"}”`)};
 $("rtSet").insertAdjacentHTML("beforeend",RT.settingsHTML(true));RT.bind($("rtSet"),render);
 let tm=null;$("paste").addEventListener("input",()=>{S.txt=$("paste").value;clearTimeout(tm);tm=setTimeout(()=>{save();render()},250)});
-document.addEventListener("change",e=>{const c=e.target.closest("[data-got]");if(!c)return;if(c.checked)S.got[c.dataset.got]=1;else delete S.got[c.dataset.got];save();render()});
+document.addEventListener("change",e=>{const c=e.target.closest("[data-got]");if(!c)return;const g=S.mode==="custom"?curList().got:S.got;if(c.checked)g[c.dataset.got]=1;else delete g[c.dataset.got];save();render()});
 $("example").onclick=()=>{S.txt="Exotic: Vineheart (Iridescent)\nMythic: Inferlume (Iridescent), Chrysoberyl (Iridescent)\nLegendary: Diamond (Iridescent), Catseye (Iridescent), Firefly Stone (Iridescent)\nEpic: Emerald (Iridescent), Osmium (Iridescent), Ammonite Fossil (Iridescent)\nRare: Peridot (Iridescent), Jade (Iridescent), Diopside (Iridescent)\nUncommon: Coral (Iridescent), Malachite (Iridescent), Nickel (Iridescent)\nCommon: Copper (Iridescent), Obsidian (Iridescent), Pyrite (Iridescent)";S.got={};delete S.lock;save();render()};
 $("fromPlanner").onclick=()=>{let bd=null;try{bd=JSON.parse(localStorage.getItem("mp-board")||"null")}catch(e){}
   if(!bd){$("parseInfo").textContent="Your Museum Planner board is empty. Fill it in on the Museum Planner first.";return}
   S.txt=RT.RARS.map(r=>r+": "+((bd[r]||[]).map(x=>x&&x.m?x.m+(x.u&&x.u!=="None"?" ("+x.u+")":""):"empty").join(", "))).join("\n");S.got={};delete S.lock;save();render()};
-$("lockBtn").onclick=()=>{if(S.lock)delete S.lock;else if(LAST)S.lock=RT.lockOf(LAST);save();render()};
+$("lockBtn").onclick=()=>{const o=S.mode==="custom"?curList():S;if(o.lock)delete o.lock;else if(LAST)o.lock=RT.lockOf(LAST);save();render()};
 // ---- save the route as an image (same dark style as the museum images) ----
 async function routeImage(R){const W=1200,PAD=40,F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
   try{await document.fonts.ready}catch(e){}

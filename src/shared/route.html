@@ -46,6 +46,8 @@
 </style>
 <script>
 const RT=(()=>{
+// an item is tracked (ticked, locked) by its key: the mineral name, or name|modifier when a list has the same mineral more than once
+const KEY=t=>t.key||t.m.n;
 const RARS=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
 const PROG=Object.keys(P.reqs||{});const EVENT_AREAS=["Haunted Creek","North Pole"];
 const TIMED={"Infernal Heart":"Only open from :15 to :45 each hour. Check the Event Clock and arrive at :15.","Timelocked Sanctuary":"Only open from :45 to :15 each hour. Arrive at :45 to get the full 30 minutes."};
@@ -117,7 +119,7 @@ function plan(items,opt={}){const L=Math.max(1,+st.luck||1),n=Math.max(1,Math.sq
   const as=new Map();
   if(opt.lock&&opt.lock.order){// locked: keep the saved stops, order and who goes where; only odds and ticks update
     const order=[...opt.lock.order];
-    T.forEach(t=>{let z=opt.lock.as[t.m.n];if(!z||!t.cands[z]){z=order.find(o=>t.cands[o])||Object.entries(t.cands).sort((a,b)=>b[1]-a[1])[0][0];if(!order.includes(z))order.push(z)}as.set(t,z)});
+    T.forEach(t=>{let z=opt.lock.as[KEY(t)];if(!z||!t.cands[z]){z=order.find(o=>t.cands[o])||Object.entries(t.cands).sort((a,b)=>b[1]-a[1])[0][0];if(!order.includes(z))order.push(z)}as.set(t,z)});
     const cost=z=>st.stats?eAll(T.filter(t=>as.get(t)===z).map(t=>({p:t.cands[z],c:t.c}))):0;
     const zones=order.map(z=>{const ts=T.filter(t=>as.get(t)===z);return {z,ts,pans:ts.some(t=>t.c>0)?cost(z):0,open:ts.some(t=>t.c>0)}}).filter(z=>z.ts.length);
     return {zones,issues,T,locked,special,frozen:true}}
@@ -178,7 +180,7 @@ function stopsHTML(R,opts={}){const zs=R.zones;let k=0;
     if(st.stats&&slow&&left.length>1&&eAll([{p:slow.cands[Z.z],c:slow.c}])>Z.pans*.7)tips.push(`<b>Most of the wait is ${esc(slow.m.n)}.</b> The others usually come well before it.`);
     const need=t=>opts.tick?"":t.c>0?`Need ${fmt(t.c,0)}`:"Done";
     const row=(t,req)=>{const p=t.cands[Z.z];const g=!t.c;const T2=opts.tick?"label":"div";
-      return `<${T2} class="rt-t${g?" got":""}${req?"":" opt"}${opts.tick?"":" nock"}">${opts.tick?`<input type="checkbox" data-got="${esc(t.m.n)}"${g?" checked":""}>`:""}<span class="rt-tn">${t.m.ic?`<img src="${t.m.ic}" alt="">`:""}<span><span data-mineral="${esc(t.m.n)}">${esc(t.m.n)}</span>${t.u&&t.u!=="None"?` · <b>${esc(t.u)}</b>`:""}${tag(t,Z,req)}${t.lunar?`<span class="rt-time" title="${esc("Time-gated: Lunar only rolls at night.\nPan here after dark, or it won't drop at all.")}">Night only</span>`:""}<small><span class="rt-rr" style="--rc:${rc(t.m.r)}">${esc(t.m.r)}</span>${need(t)?" · "+need(t):""}${req?"":" · optional here"}${opts.kg&&t.m.mu&&t.m.mu.kg?` · full boost at ${t.m.mu.kg} kg`:""}</small></span></span><span class="rt-odd">${st.stats?`${oneIn(p)}<small>${big(1/p)} pans each</small>`:`<small>${baseOdds(p)}</small>`}</span></${T2}>`};
+      return `<${T2} class="rt-t${g?" got":""}${req?"":" opt"}${opts.tick?"":" nock"}">${opts.tick?`<input type="checkbox" data-got="${esc(KEY(t))}"${g?" checked":""}>`:""}<span class="rt-tn">${t.m.ic?`<img src="${t.m.ic}" alt="">`:""}<span><span data-mineral="${esc(t.m.n)}">${esc(t.m.n)}</span>${t.u&&t.u!=="None"?` · <b>${esc(t.u)}</b>`:""}${tag(t,Z,req)}${t.lunar?`<span class="rt-time" title="${esc("Time-gated: Lunar only rolls at night.\nPan here after dark, or it won't drop at all.")}">Night only</span>`:""}<small><span class="rt-rr" style="--rc:${rc(t.m.r)}">${esc(t.m.r)}</span>${need(t)?" · "+need(t):""}${req?"":" · optional here"}${opts.kg&&t.m.mu&&t.m.mu.kg?` · full boost at ${t.m.mu.kg} kg`:""}</small></span></span><span class="rt-odd">${st.stats?`${oneIn(p)}<small>${big(1/p)} pans each</small>`:`<small>${baseOdds(p)}</small>`}</span></${T2}>`};
     return `<article class="rt-stop${fin?" fin":""}"><div class="rt-sh"><h3><span class="rt-num">${fin?"✓":k}</span><span data-location="${esc(b)}" class="lk">${esc(Z.z)}</span></h3>
       <div class="rt-est">${fin?"Done":st.stats?`Expected pans<b>${big(Z.pans)}</b>${dur(Z.pans)}`:`Items here<b>${left.length}</b>`}</div></div>
       <div class="rt-items">${Z.ts.map(t=>row(t,true)).join("")}${extra.map(t=>row(t,false)).join("")}</div>
@@ -218,6 +220,6 @@ function bind(root,onChange){
   return sync}
 // chance per pan of one mineral (with modifier u) at one location, for any stats o={luck,mb,cap,mag}
 function rate(m,loc,u,o){if(!LOC[loc])return 0;const L=Math.max(1,+o.luck||1),n=Math.max(1,Math.sqrt(Math.max(1,+o.cap||1)));const e=shares(loc,L)[m.n]||0;const pm=modChance(u,o);return 1-Math.pow(1-e*pm,n)}
-function lockOf(R){const as={};R.zones.forEach(z=>z.ts.forEach(t=>as[t.m.n]=z.z));return {order:R.zones.map(z=>z.z),as}}
+function lockOf(R){const as={};R.zones.forEach(z=>z.ts.forEach(t=>as[KEY(t)]=z.z));return {order:R.zones.map(z=>z.z),as}}
 return {oneIn,dur,rate,locOK,whyOut,PROG,EVENT_AREAS,SPECIAL,BASE,big,lockOf,st,saveSt,plan,stopsHTML,specialHTML,sumHTML,routeText,settingsHTML,bind,MODS,RARS,eAll}})();
 </script>

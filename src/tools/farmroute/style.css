@@ -8,3 +8,24 @@
 textarea{width:100%;box-sizing:border-box;min-height:190px;resize:vertical;font:13px/1.5 var(--f-mono);padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);color:var(--fg)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .hint{font-size:12.5px;color:var(--muted);margin:0}
+.fr-tabs{display:flex;gap:6px;margin-bottom:10px}
+.fr-name{display:flex;flex-direction:column;gap:4px;margin:6px 0 10px}
+.fr-name input,.fr-filt input[type=search]{padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--sunk);color:var(--fg);font:inherit;min-width:0}
+.fr-mods{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
+.fr-filt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 8px}
+.fr-filt input[type=search]{flex:1 1 200px}
+.fr-rar{display:flex;flex-wrap:wrap;gap:4px}
+.fr-rar .chip{padding:3px 9px;font-size:12px}
+.fr-grid{width:100%;border-collapse:collapse;font-size:13.5px}
+.fr-grid th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:6px 6px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+.fr-grid th:first-child{text-align:left}
+.fr-grid th label{display:inline-flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.fr-grid td{padding:4px 6px;border-bottom:1px solid var(--line);text-align:center}
+.fr-grid td:first-child{text-align:left}
+.fr-grid input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);cursor:pointer}
+.fr-grid .rg td{padding:10px 6px 4px;font:700 11px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--rc);border-bottom:2px solid var(--rc);text-align:left}
+.fr-grid .mn{display:flex;align-items:center;gap:8px}
+.fr-grid .mn img{width:26px;height:26px;object-fit:contain}
+.fr-grid tr.on .mn b{color:var(--accent)}
+.fr-grid .none{padding:14px;color:var(--muted);text-align:center}
+@media (max-width:560px){.fr-grid th{font-size:10.5px;letter-spacing:.03em;padding:5px 2px;vertical-align:bottom}.fr-grid th label span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}.fr-grid td{padding:4px 2px}.fr-grid .mn{gap:6px}.fr-grid .mn img{width:22px;height:22px}.fr-grid .mn b{overflow-wrap:anywhere;font-size:13px}}

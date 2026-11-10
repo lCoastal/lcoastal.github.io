@@ -18,10 +18,21 @@
   </header>
   <p class="disc" role="note"><b>Not exact:</b> the route, odds and pan counts are estimates from a simplified model of the game. They don't account for everything, like enchants, events, weather, item weight or hidden game rules, so your real grind can be quite different.</p>
   <div class="two">
-    <section class="card"><div class="row" style="justify-content:space-between"><h2>Your museum</h2><span class="row"><button type="button" class="btn" id="fromPlanner">Use my Museum Planner board</button><button type="button" class="btn" id="example">Example</button></span></div>
+    <section class="card"><div class="fr-tabs" role="group" aria-label="Route from"><button type="button" class="chip" data-mode="museum">My museum</button><button type="button" class="chip" data-mode="custom">Custom route</button></div>
+      <div id="modeMuseum"><div class="row" style="justify-content:space-between"><h2>Your museum</h2><span class="row"><button type="button" class="btn" id="fromPlanner">Use my Museum Planner board</button><button type="button" class="btn" id="example">Example</button></span></div>
       <textarea id="paste" spellcheck="false" aria-label="Museum loadout" placeholder="Exotic: Vineheart (Iridescent)&#10;Mythic: Inferlume (Iridescent), Chrysoberyl (Iridescent)&#10;Legendary: Diamond, Catseye&#10;…"></textarea>
       <p class="hint">Paste the text from the Museum Planner's Copy as text button, or type one line per rarity: <code>Rarity: Mineral (Modifier), Mineral</code>. Leave the modifier off if any version will do.</p>
-      <p class="hint" id="parseInfo"></p></section>
+      <p class="hint" id="parseInfo"></p></div>
+      <div id="modeCustom" hidden>
+        <div class="row" style="justify-content:space-between"><h2>Custom route</h2><span class="row"><select id="cList" aria-label="Saved custom routes"></select><button type="button" class="btn" id="cNew">New</button><button type="button" class="btn" id="cDel">Delete</button></span></div>
+        <label class="fr-name"><span class="lab">Name</span><input type="text" id="cName" maxlength="60" autocomplete="off" aria-label="Custom route name"></label>
+        <span class="lab">Modifiers to farm</span>
+        <div class="fr-mods" id="cMods"></div>
+        <p class="hint">Pick the modifiers you're after, then tick them next to each mineral you want. <b>Any</b> means any version of that mineral will do.</p>
+        <div class="fr-filt"><input type="search" id="cQ" placeholder="Search minerals or locations…" aria-label="Search minerals or locations" autocomplete="off"><div class="fr-rar" id="cRar"></div><label class="ck"><input type="checkbox" id="cOnly"> Ticked only</label></div>
+        <div id="cGrid"></div>
+        <p class="hint" id="cInfo"></p>
+      </div></section>
     <section class="card" id="rtSet"><h2>Your stats</h2></section>
   </div>
   <section class="card"><div class="row" style="justify-content:space-between"><h2>Your route</h2><span class="row"><button type="button" class="btn" id="lockBtn" aria-pressed="false"></button><button type="button" class="btn" id="imgRoute">Save as image</button><button type="button" class="btn" id="copyRoute">Copy route</button></span></div>
