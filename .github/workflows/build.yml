@@ -29,8 +29,9 @@ jobs:
           if git diff --quiet -- index.html; then
             echo "index.html already up to date"
           else
-            git config user.name "github-actions[bot]"
-            git config user.email "41898733+github-actions[bot]@users.noreply.github.com"
+            # commit as lCoastal (GitHub's private no-reply address) so only lCoastal shows as a contributor
+            git config user.name "lCoastal"
+            git config user.email "195131617+lCoastal@users.noreply.github.com"
             git add index.html
             git commit -m "Rebuild index.html"
             git push
