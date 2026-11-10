@@ -13,13 +13,12 @@
 <div class="wrap">
   <header>
     <h1>Modifier Odds</h1>
-    <p class="lede">Your chance of every ore modifier from your Modifier Boost and luck.<br>Estimates built on the wiki's stat guide and its community drop counts.</p>
+    <p class="lede">Your chance of every ore modifier from your Modifier Boost.<br>Estimates built on the wiki's stat guide and its community drop counts.</p>
   </header>
-  <p class="disc" role="note"><b>Not exact:</b> these are estimates built from community drop counts and a simplified model. They don't account for everything, like enchants, events, weather, Size Boost or hidden game rules, so your real odds can be quite different.</p>
+  <p class="disc" role="note"><b>Not exact:</b> these are estimates built from community drop counts and a simplified model. They don't account for everything, like enchants, events, weather, Size Boost or hidden game rules, so your real odds can be quite different. Luck isn't counted. It does change modifier odds a little, but by how much isn't known yet, so it's left out until it's been tested.</p>
   <section class="card">
     <div class="inputs">
       <label class="fld"><span class="lab">Modifier Boost (panel %)</span><input type="number" id="mb" min="0" value=""></label>
-      <label class="fld"><span class="lab">Luck</span><input type="number" id="luck" min="0" value=""></label>
       <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" value=""></label>
       <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
     </div>
@@ -32,7 +31,8 @@
   <section class="card"><div style="display:flex;justify-content:flex-end"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="big" id="sum"></div><div class="tw" id="tbl"></div></section>
   <section class="card"><h2>How this is worked out</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
-      <li>Effective Modifier Boost = your panel Modifier Boost × 2 for a Solar Magnifier × 2 for a Modifier Surge. Luck adds a little too: up to +500, from min(50, luck ÷ 1000) × 10.</li>
+      <li>Effective Modifier Boost = your panel Modifier Boost × 2 for a Solar Magnifier × 2 for a Modifier Surge.</li>
+      <li>Which modifier you get starts from the game's modifier weights (Shiny 1, Pure 0.8, Glowing 0.5, Scorching 0.25, Irradiated 0.1, Iridescent 0.02, Cosmic 0.005, Mutated 0.001, Lunar 0.00025, Perfect 0.0001): each one's chance is its weight ÷ the total. Luck isn't counted. It does change modifier odds a little, but by how much isn't known yet, so it's left out until it's been tested.</li>
       <li>How many ores get a modifier rises with effective Modifier Boost and tops out at about 99.4% around 1,700–1,900. The Solar Magnifier only helps here.</li>
       <li>Which modifier you get follows the community's measured shares for Perfect, Mutated, Cosmic and Iridescent, interpolated between test points. The common modifiers fill the rest in their usual proportions. Beyond the highest test point (≈6,700) shares are held where they were measured.</li>
       <li>Treasured only comes from treasure chests, Voidtorn from Void tools or The Void, Electrified from Thunderstorms and Crystalline from geodes or Crystal Touch, so they aren't listed. Purity rune removes modifiers entirely.</li>
