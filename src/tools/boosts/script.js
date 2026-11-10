@@ -53,14 +53,14 @@ function render(){
     sec.innerHTML=`<div class="rh"><h2>${r}</h2><span>${SLOTS[r]} museum slot${SLOTS[r]>1?"s":""} · ${rows.length} mineral${rows.length===1?"":"s"}</span></div>`;
     if(!rows.length){const p=document.createElement("p");p.className="empty";p.textContent=stat==="All"?"No matches.":`No ${r} mineral boosts ${stat}.`;sec.appendChild(p);list.appendChild(sec);return}
     const tw=document.createElement("div");tw.className="tw";
-    tw.innerHTML=`<table><thead><tr><th>Mineral</th><th>Boost at max size</th><th class="w">Max size at</th></tr></thead><tbody>${rows.map(d=>`<tr class="${best!==null&&val(d)===best?"top":""}"><td class="n" data-mineral="${d[0]}"><span class="mn">${ICONS[d[0]]?`<img src="${ICONS[d[0]]}" alt="" width="26" height="26" loading="lazy">`:""}${d[0]}</span></td><td><div class="b">${d[3].map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fmt(v)}</em></span>`).join("")}</div></td><td class="w">${d[2]} kg</td></tr>`).join("")}</tbody></table>`;
+    tw.innerHTML=`<table><thead><tr><th>Mineral</th><th>Max boost</th><th class="w">Max boost at</th></tr></thead><tbody>${rows.map(d=>`<tr class="${best!==null&&val(d)===best?"top":""}"><td class="n" data-mineral="${d[0]}"><span class="mn">${ICONS[d[0]]?`<img src="${ICONS[d[0]]}" alt="" width="26" height="26" loading="lazy">`:""}${d[0]}</span></td><td><div class="b">${d[3].map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fmt(v)}</em></span>`).join("")}</div></td><td class="w">${d[2]} kg</td></tr>`).join("")}</tbody></table>`;
     sec.appendChild(tw);list.appendChild(sec);
   });
 }
 // ---- save as image: what's shown (search, stat and sort included), rarities in two balanced columns, mutations underneath ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 const IMGC={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6"};
-const imgTitle=()=>stat==="All"?"Mineral boosts at max size":stat+" boosts at max size";
+const imgTitle=()=>stat==="All"?"Mineral max boosts":"Max "+stat+" boosts";
 async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
   const W=1700,PAD=40,GAP=30,CW=(W-PAD*2-GAP)/2;
   const meas=document.createElement("canvas").getContext("2d");
@@ -94,7 +94,7 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
       const meta=`${SLOTS[s.r]} museum slot${SLOTS[s.r]>1?"s":""} · ${s.rows.length} mineral${s.rows.length===1?"":"s"}`;c.font=`13px ${F}`;c.fillStyle="#98a2ad";c.fillText(meta,x0+CW-c.measureText(meta).width,y+24);
       c.fillStyle=col;c.fillRect(x0,y+34,CW,2);y+=44;
       const th=s.h-44-24;c.fillStyle="#1c2126";rr(x0,y,CW,th,8);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(x0,y,CW,th,8);c.stroke();
-      c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";c.fillText("MINERAL",x0+12,y+18);c.fillText("BOOST AT MAX SIZE",x0+12+250,y+18);const mt="MAX SIZE AT";c.fillText(mt,x0+CW-12-c.measureText(mt).width,y+18);
+      c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";c.fillText("MINERAL",x0+12,y+18);c.fillText("MAX BOOST",x0+12+250,y+18);const mt="MAX BOOST AT";c.fillText(mt,x0+CW-12-c.measureText(mt).width,y+18);
       y+=28;
       s.rows.forEach((o,i)=>{c.strokeStyle="#2d343b";c.beginPath();c.moveTo(x0,y);c.lineTo(x0+CW,y);c.stroke();
         const mid=y+20;let tx=x0+12;const ic=icons[o.d[0]];if(ic){c.drawImage(ic,tx,mid-12,24,24);tx+=32}
