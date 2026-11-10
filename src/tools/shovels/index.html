@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Shovels</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style data-file="style.css"></style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Prospecting Shovels</h1>
+    <p class="lede">Every shovel with its dig strength, dig speed and toughness.<br>Toughness decides which digsites you can dig in. Open a shovel to compare it with the one before.</p>
+  </header>
+  <section class="filters" aria-label="Filters">
+    <input id="q" class="search" type="search" placeholder="Search shovels…" aria-label="Search shovels" autocomplete="off">
+    <button type="button" class="chip" id="favBtn" aria-pressed="false">★ Favourites</button>
+    <button type="button" class="chip" id="ownBtn" aria-pressed="false">✓ Owned</button>
+    <button type="button" class="chip" id="evBtn" aria-pressed="true">Show limited-time</button>
+    <label class="mobsort"><span class="count">Sort</span><select id="mSort" aria-label="Sort by"></select></label>
+    <button type="button" class="chip dirb" id="dirBtn" aria-label="Sort direction"></button>
+    <span class="count" id="count" aria-live="polite"></span>
+  </section>
+  <div id="list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+
+<div class="scrim" id="scrim" hidden><div class="page" id="page" role="dialog" aria-modal="true" aria-labelledby="pname"></div></div>
+
+<script data-file="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Equipment</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Prospecting Equipment</h1>
+    <p class="lede">Every ring, necklace and charm with its stats, recipe and price.<br>Open one for its full stats at 5★, 6★ and Prismatic, to compare it, or to add it to your crafting checklist.</p>
+  </header>
+  <section class="filters" aria-label="Filters">
+    <div class="frow">
+      <input id="q" type="search" placeholder="Search equipment, stats or materials…" aria-label="Search equipment" autocomplete="off">
+      <select id="lvl" aria-label="Show values at"><option value="5">Values: 5★ max</option><option value="6" selected>Values: 6★ max</option><option value="p">Values: Prismatic</option></select>
+      <select id="sort" aria-label="Sort by"><option value="rarity">Sort: rarity</option><option value="price">Sort: price</option><option value="type">Sort: type</option><option value="name">Sort: name</option></select>
+      <button type="button" class="chip dirb" id="dir" aria-label="Sort direction"></button>
+    </div>
+    <div class="frow" id="slots" hidden><span class="lab">Type</span></div>
+    <div class="frow" id="stats" hidden><span class="lab">Has stat</span></div>
+    <div class="frow" id="matchRow" hidden><span class="lab">Match</span><button type="button" class="chip sm" data-match="all" title="Show items that have every stat you picked">All picked</button><button type="button" class="chip sm" data-match="any" title="Show items that have at least one of the stats you picked">Any picked</button></div>
+    <div class="frow" id="rars"><span class="lab">Rarity</span></div>
+    <div class="frow"><span class="lab">Show</span>
+      <button type="button" class="chip" id="moreF" aria-expanded="false"></button>
+      <button type="button" class="chip" id="fFav" aria-pressed="false">★ Favourites</button>
+      <button type="button" class="chip" id="fOwn" aria-pressed="false">✓ Owned</button>
+      <button type="button" class="chip" id="fEv" aria-pressed="true"></button>
+      <button type="button" class="chip" id="fBpTag" aria-pressed="true" title="Show or hide the Blueprint tag on items">Blueprint tags</button>
+      <button type="button" class="chip" id="unhide" hidden></button>
+      <select id="fBp" aria-label="Filter by blueprint"><option value="">Blueprint: any</option><option value="yes">Needs a blueprint</option><option value="no">No blueprint needed</option></select>
+      <span class="count" id="count" aria-live="polite"></span></div>
+  </section>
+  <div id="list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<div class="scrim" id="scrim" hidden><div class="page" id="page" role="dialog" aria-modal="true" aria-labelledby="pname"></div></div>
+
+<script data-file="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Museum Farm Route</title>
+
+%%COMMON%%
+%%ROUTE%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Museum Farm Route</h1>
+    <p class="lede">Paste your museum loadout and get a farming route: which zones to go to, in what order, what to collect at each one and when to move on.<br>Minerals that share a zone are grouped so you never farm the same place twice.</p>
+  </header>
+  <p class="disc" role="note"><b>Not exact:</b> the route, odds and pan counts are estimates from a simplified model of the game. They don't account for everything, like enchants, events, weather, item weight or hidden game rules, so your real grind can be quite different.</p>
+  <div class="two">
+    <section class="card"><div class="row" style="justify-content:space-between"><h2>Your museum</h2><span class="row"><button type="button" class="btn" id="fromPlanner">Use my Museum Planner board</button><button type="button" class="btn" id="example">Example</button></span></div>
+      <textarea id="paste" spellcheck="false" aria-label="Museum loadout" placeholder="Exotic: Vineheart (Iridescent)&#10;Mythic: Inferlume (Iridescent), Chrysoberyl (Iridescent)&#10;Legendary: Diamond, Catseye&#10;…"></textarea>
+      <p class="hint">Paste the text from the Museum Planner's Copy as text button, or type one line per rarity: <code>Rarity: Mineral (Modifier), Mineral</code>. Leave the modifier off if any version will do.</p>
+      <p class="hint" id="parseInfo"></p></section>
+    <section class="card" id="rtSet"><h2>Your stats</h2></section>
+  </div>
+  <section class="card"><div class="row" style="justify-content:space-between"><h2>Your route</h2><span class="row"><button type="button" class="btn" id="lockBtn" aria-pressed="false"></button><button type="button" class="btn" id="imgRoute">Save as image</button><button type="button" class="btn" id="copyRoute">Copy route</button></span></div>
+    <p class="hint" id="lockNote" hidden></p>
+    <div class="rt-sum" id="sum"></div>
+    <div class="rt-stops" id="stops"></div>
+  </section>
+  <section class="card" id="specials" hidden><h2>Special cases</h2><p class="hint">These mutations are time-gated, event-only or come from somewhere other than normal panning, so they get their own steps instead of a stop on the route.</p><div class="rt-items" id="specialList"></div></section>
+  <section class="card" id="issues" hidden style="border-left:4px solid var(--warn)"><h2>Not on the route</h2><ul class="rt-issues" id="issueList"></ul></section>
+  <section class="card"><h2>How the route is worked out</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+      <li>For every mineral it works out your chance per pan in each zone it drops in, using the same luck model as Luck Odds (about √capacity minerals per pan) and the modifier chances from Modifier Odds.</li>
+      <li>It then shares zones out so minerals that drop in the same place are collected together. A mineral moves to a slightly worse zone if you'll be there anyway, because it's then almost free.</li>
+      <li>"Expected pans" for a stop is the average number of pans to get <b>every</b> item on it, not just the first. Luck swings a lot, so about 1 in 3 runs take longer than this.</li>
+      <li>Tick an item when you get it and the route updates. Weight isn't counted: an item gives its full museum boost only at its max weight, so you may want a heavier one later.</li>
+      <li>Your stats and area settings are shared with the route on the Crafting Checklist.</li>
+    </ul></section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

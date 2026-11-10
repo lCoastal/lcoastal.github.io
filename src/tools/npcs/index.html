@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>NPC Directory</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>NPC Directory</h1>
+    <p class="lede">Every NPC by area, what they do and which quests they give.<br>Click a quest to see it in the Quest Tracker.</p>
+  </header>
+  <section class="filters"><input type="search" id="q" placeholder="Search NPCs, e.g. alchemist or druid…" aria-label="Search NPCs" autocomplete="off"><select id="rg" aria-label="Area"><option value="">All areas</option></select><button type="button" class="chip" id="onlyQ" aria-pressed="false">Gives quests</button><span class="count" id="count"></span></section>
+  <div id="list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

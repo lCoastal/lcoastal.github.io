@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Event Clock</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Event Clock</h1>
+    <p class="lede">Live timers for the next event roll and the areas that only open part of each hour.<br>Below is every event and what it does.</p>
+  </header>
+  <div class="timers" id="timers" aria-live="off"></div>
+  <p class="hint" id="tz"></p>
+  <div class="filters"><input type="search" id="q" placeholder="Search events or effects, e.g. luck…" aria-label="Search events" autocomplete="off"><button type="button" class="chip" id="onlyReg" aria-pressed="false">Regular events only</button></div>
+  <div id="evs" style="display:flex;flex-direction:column;gap:10px"></div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+# Rebuilds index.html from src/ whenever src/ or build.mjs changes, and commits it.
+# GitHub Pages then serves the new index.html as usual.
+name: Build index.html
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "build.mjs"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node build.mjs
+      - name: Commit index.html if it changed
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "index.html already up to date"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898733+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git commit -m "Rebuild index.html"
+            git push
+          fi

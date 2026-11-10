@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Stat Calculator</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h1>Stat Calculator</h1>
+      <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" id="resetAll">Reset everything</button><button type="button" class="btn" id="toBuild">Send to Build Sheets</button><button type="button" class="btn" id="fromBuild">Load a build sheet…</button></span></div>
+    <p class="lede">Pick your pan, shovel, jewelry, museum and boosts to see your stat panel.<br>Uses the wiki's formula: (gear + flat bonuses) × (1 + every boost added together), with events multiplying luck at the end.</p>
+  </header>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+      <section class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h2>Tools <button type="button" class="rst" data-reset="tools">Reset</button></h2>
+        <label class="ck"><input type="checkbox" id="ownedOnly"> Only show items I own</label></div>
+        <div class="grid2 tools2"><div class="tcol"><div class="fld"><span class="lab">Pan</span><button type="button" class="pick" data-pick="pan" aria-haspopup="listbox"></button></div>
+          <label class="fld sub"><span class="lab">Pan enchant</span><select id="panEn"></select></label><label class="fld sub"><span class="lab">Trinket</span><select id="trinket"></select></label></div>
+          <div class="tcol"><div class="fld"><span class="lab">Shovel</span><button type="button" class="pick" data-pick="shovel" aria-haspopup="listbox"></button></div>
+          <label class="fld sub"><span class="lab">Shovel enchant</span><select id="shEn"></select></label></div></div><p class="hint" id="enNote"></p></section>
+      <section class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h2>Jewelry <button type="button" class="rst" data-reset="jewelry">Reset</button></h2>
+        <span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="seg" role="group" aria-label="Set every slot's stars"><button type="button" data-all="0">No ★</button><button type="button" data-all="5">All 5★</button><button type="button" data-all="6">All 6★</button></span><select id="allMut" aria-label="Set every slot's mutation"><option value="">Set all mutations…</option></select></span></div>
+        <p class="hint">Stars set the stat range (0★ uses the same range as 5★), quality is where the roll lands inside it (0% worst, 100% best), and the mutation multiplies the result on top.<br>This is a planner, so quality is spread evenly over every stat. In game a 50% item isn't always 50% on each stat: it could be 100% luck and 0% sell boost, which still averages out to 50%.</p>
+        <div id="slots"></div></section>
+      <section class="card"><h2>Museum <button type="button" class="rst" data-reset="museum">Reset</button></h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end"><label class="fld" style="flex:1;min-width:220px"><span class="lab">Museum boosts from</span><select id="mus"></select></label><button type="button" class="btn" id="musCopy">Edit a copy here</button></div>
+        <p class="hint" id="musTxt"></p><div id="musEd"></div></section>
+      <section class="card"><h2>Boosts <button type="button" class="rst" data-reset="boosts">Reset</button></h2>
+        <div class="rowc">
+          <label class="ck"><input type="checkbox" data-b="luckTotem"> Luck Totem</label>
+          <label class="ck"><input type="checkbox" data-b="strTotem"> Strength Totem</label>
+          <label class="ck"><input type="checkbox" data-b="lumTotem"> Luminant Totem</label>
+          <label class="ck"><input type="checkbox" data-b="cookie"> XP Cookie</label>
+          <label class="ck"><input type="checkbox" data-b="sun"> Sunblessed / Abyssal rune</label>
+          <label class="ck"><input type="checkbox" data-b="solo"> Solitude rune</label>
+          <label class="ck"><input type="checkbox" data-b="purity"> Purity rune (+1× luck, no modifiers)</label>
+          <label class="ck"><input type="checkbox" data-b="vet"> Veteran rune (+0.25× luck in a fully mastered region)</label></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="lab">Other runes</span><span id="runeList" class="rowc"></span><button type="button" class="btn" id="runePage">Pick on the Runes page</button></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="lab">Potions</span><select id="potAdd" aria-label="Add a potion"><option value="">Add a potion…</option></select><button type="button" class="btn" id="potMoney" title="Adds every potion you can buy with money, except the Traveling Merchant's ones">Add all money potions</button><button type="button" class="btn" id="potClear">Clear</button><button type="button" class="btn" id="potShow" aria-pressed="true" aria-controls="potList" title="Only hides the list. Active potions still count in your stats.">Hide potions</button></div><div id="potList" class="rowc"></div><span class="hint" id="potHid" hidden></span></div>
+        <div class="rowc">
+          <label class="num">Friendship Totem, players nearby <input type="number" min="-1" max="19" data-n="friendTotem" aria-describedby="ftH"></label>
+          <label class="num">Friends online <input type="number" min="0" max="5" data-n="friends"></label>
+          <label class="num">Location mastery <select data-n="mastery"><option value="0">None</option><option value="0.15">+0.15×</option><option value="0.2">+0.20×</option><option value="0.25">+0.25×</option></select></label></div>
+        <p class="hint" id="ftH">Friendship Totem: −1 = no totem, 0 = just you (+0.4×), each extra player adds +0.2×.</p>
+        <div class="rowc">
+          <label class="num">Flat luck (quests, potions) <input type="number" min="0" data-n="flatLuck"></label>
+          <label class="num">Flat dig strength <input type="number" min="0" data-n="flatDig"></label></div>
+        <div class="rowc"><span class="lab">Events</span>
+          <label class="ck"><input type="checkbox" data-b="meteor"> Meteor shower ×2 luck</label>
+          <label class="ck"><input type="checkbox" data-b="weather"> Weather event ×1.5 luck</label></div></section>
+    </div>
+    <div class="res" style="display:flex;flex-direction:column;gap:14px">
+      <section class="card" aria-live="polite"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">Your stats</h2><button type="button" class="btn" id="cpStats">Copy my stats</button><button type="button" class="btn" id="toImg">Save as image</button></div>
+        <div class="iso"><span class="lab">Counting</span><span id="isoChips" class="isoc"></span></div><p class="hint" id="isoNote" hidden></p><div id="out"></div></section>
+      <section class="card"><div class="bkh"><h2>Detailed stats breakdown</h2><label class="ck bkt"><input type="checkbox" id="showBrk"> Show breakdown</label></div><div id="brkBody"><p class="hint">Every stat and where it comes from. Each source shows how much that stat drops if you take it away. Click a source to count only that part.</p><div id="parts"></div></div></section>
+    </div>
+  </div>
+  <div class="picker" id="picker" hidden><div class="pl"><input id="pkQ" type="search" placeholder="Search…" aria-label="Search items" autocomplete="off" role="combobox" aria-controls="pkList" aria-expanded="true"><div class="pklist" id="pkList" role="listbox"></div></div><div class="pvp" id="pkPv" aria-live="polite"></div></div>
+<div class="tip" id="tip" hidden></div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

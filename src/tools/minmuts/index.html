@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Mineral Mutations</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Mineral Mutations</h1>
+    <p class="lede">Every mutation a mineral can roll (the game calls them modifiers): what it sells for, how rare it is, what it adds in the museum and how to get it.<br>Pick a mineral to see what each mutation would sell it for.</p>
+  </header>
+  <section class="card">
+    <div class="top"><h2>Price and museum check</h2><button type="button" class="btn" id="toOdds">See your odds in Modifier Odds</button></div>
+    <div class="pick">
+      <label class="fld"><span class="lab">Mineral</span><input type="text" id="min" placeholder="e.g. Gold" autocomplete="off"></label>
+      <label class="fld"><span class="lab">Weight (kg)</span><input type="number" id="kg" min="0" step="0.1" value="1"></label>
+      <label class="fld"><span class="lab">Museum values for</span><select id="rar"></select></label>
+    </div>
+    <p class="hint" id="pinfo"></p>
+  </section>
+  <div class="filters">
+    <input type="search" id="q" placeholder="Search mutations, stats or how to get them…" aria-label="Search mutations" autocomplete="off">
+    <span id="kinds" style="display:flex;gap:6px;flex-wrap:wrap"></span>
+    <select id="sort" aria-label="Sort by"><option value="rare">Sort: rarity</option><option value="sell">Sort: sell value</option><option value="name">Sort: name</option></select>
+    <button type="button" class="chip dirb" id="dir" aria-label="Sort direction"></button>
+    <button type="button" class="btn" id="toImg">Save as image</button>
+  </div>
+  <div id="list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <section class="card"><h2>Good to know</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+      <li>A mutation multiplies the mineral's sell price. A 2 kg Gold with Scorching sells for 2 × Gold's price per kg × 2.</li>
+      <li>In the museum, a mutated mineral adds a small boost on top of the mineral's own boost. How big depends on the mineral's rarity, from +0.005× for Common up to +0.08× for Exotic, per stat. Treasured counts double.</li>
+      <li>Modifier Boost (from pans, enchants and jewelry) raises how many minerals get a mutation and makes the rarer ones more likely. The Solar Magnifier and the Modifier Surge event help too.</li>
+      <li>The Purity rune gives every mineral the Purified mutation, which adds nothing. Event mutations only sell at 1× and give no museum boost.</li>
+    </ul></section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

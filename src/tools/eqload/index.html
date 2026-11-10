@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Equipment Loadouts</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Equipment Loadouts</h1>
+    <p class="lede">Lay out your rings, necklace and charm like the in-game equipment screen.<br>Set stars, quality and mutations, see the totals, compare loadouts, and save or share them.</p>
+  </header>
+  <section class="card">
+    <div class="bar">
+      <select id="sel" aria-label="Saved loadouts"></select>
+      <button type="button" class="btn" id="bNew">New loadout</button>
+      <button type="button" class="btn" id="bDup">Duplicate</button>
+      <button type="button" class="btn" id="bDel">Delete</button>
+      <span class="sp"></span>
+      <button type="button" class="btn" id="bCopy">Copy as text</button>
+      <button type="button" class="btn pri" id="bImg">Save as image</button>
+    </div>
+    <label class="fld" style="display:flex;flex-direction:column;gap:4px"><span class="lab">Loadout name</span><input type="text" id="name" class="namei" autocomplete="off" maxlength="60"></label>
+    <div class="own" role="group" aria-label="Ring slots you have">
+      <span class="lab">Your ring slots</span>
+      <label>Normal slots <input type="number" id="nRings" min="0" max="6"></label>
+      <label title="Rings 7 and 8 are unlocked together with Robux"><input type="checkbox" id="oRobux"> Robux</label>
+    </div>
+  </section>
+  <div class="main">
+    <section class="eqp" id="panel" aria-label="Equipment"></section>
+    <section class="card">
+      <h2>Summary</h2>
+      <div class="sum" id="sum"></div>
+      <p class="hint" id="sumNote"></p>
+    </section>
+  </div>
+  <section class="card">
+    <h2>Notes</h2>
+    <textarea class="notes" id="notes" placeholder="e.g. Swap Ring of the Stars for a Sun's Gift at night"></textarea>
+  </section>
+  <section class="card">
+    <div class="bar"><h2 style="margin:0">Compare</h2><span class="sp"></span><label class="lab" for="cmpSel">With</label><select id="cmpSel" aria-label="Compare with"></select></div>
+    <div id="cmp"></div>
+  </section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="ov" id="ov" hidden><div class="pick" role="dialog" aria-modal="true" aria-labelledby="pkT">
+  <div class="ph"><h2 id="pkT">Pick</h2><button type="button" class="btn" id="pkX">Close</button></div>
+  <div class="opts">
+    <input type="search" id="pkQ" placeholder="Search…" aria-label="Search equipment" autocomplete="off" style="flex:1;min-width:160px">
+    <label>Stars <select id="pkL"><option value="6">6★</option><option value="5">5★</option></select></label>
+    <label>Quality <input type="number" id="pkP" min="0" max="100" step="1">%</label>
+    <label>Mutation <select id="pkM"></select></label>
+  </div>
+  <div class="plist" id="pkList"></div>
+  <div class="acts"><button type="button" class="btn" id="pkClear">Empty this slot</button></div>
+</div></div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

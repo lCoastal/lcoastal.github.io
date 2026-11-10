@@ -1,0 +1,32 @@
+
+/* Layout: sluice picker and points left on top, one row per upgrade with a tier slider, totals on the right */
+.split{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr);gap:14px;align-items:start}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.top{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.top select{min-width:220px}
+.pts{display:flex;align-items:baseline;gap:6px;font-family:var(--f-mono);font-size:1.3rem}
+.pts small{font-family:var(--f-body);font-size:12px;color:var(--muted)}
+.pts.over{color:var(--neg)}
+.up{display:grid;grid-template-columns:150px minmax(0,1fr) 120px;gap:6px 14px;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line)}
+.up:last-child{border-bottom:0}
+@media (max-width:600px){.up{grid-template-columns:1fr 1fr}.up .rng{grid-column:1/3}}
+.up b{display:block;font-size:14.5px}
+.up .c{font-size:12px;color:var(--muted)}
+.rng{display:flex;align-items:center;gap:8px}
+.rng input[type=range]{flex:1;accent-color:var(--accent)}
+.rng output{font-family:var(--f-mono);min-width:56px;text-align:right}
+.mat{display:inline-flex;align-items:center;gap:5px;font-size:12.5px}
+.mat img{width:20px;height:20px;object-fit:contain}
+.gain{font-family:var(--f-mono);font-size:13px;text-align:right;color:var(--accent)}
+.sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px}
+.sw input{width:18px;height:18px;accent-color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.st{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.st b{display:block;font-family:var(--f-mono);font-size:1.2rem;font-weight:500}
+.st small{font-family:var(--f-mono);font-size:12px;color:var(--accent)}
+.costs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.costs li{display:flex;justify-content:space-between;gap:8px}
+.costs .mono{white-space:nowrap}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.perks{display:flex;flex-wrap:wrap;gap:6px}
+.perks span{font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--accent);color:var(--accent)}

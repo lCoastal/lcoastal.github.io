@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Build Sheets</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=Chakra+Petch:wght@600;700&display=swap">
+<style data-file="style.css"></style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="app">Prospecting Build Sheets</h1>
+    <p class="lede">Write full builds the way the community guides lay them out: museum slots with modifiers, equipment with notes, runes, pan and shovel. The sheet on the right updates as you type, and every build can be saved, downloaded and imported again.</p>
+  </header>
+
+  <div class="topbar">
+    <select id="buildSel" aria-label="Saved builds"></select>
+    <button class="btn" id="bNew" type="button">New build</button>
+    <button class="btn" id="bDup" type="button">Duplicate</button>
+    <button class="btn" id="bDel" type="button">Delete</button>
+    <span class="sp"></span>
+    <button class="btn primary" id="bImg" type="button">Save as image</button>
+    <details class="smenu pt-noacts" id="sMenu"><summary class="btn">Sheet <span aria-hidden="true">▾</span></summary><div class="smpop" role="menu">
+      <button class="smi" id="bDl" type="button" role="menuitem">Download sheet<small>Save this build as a file you can share or import later</small></button>
+      <label class="smi" for="imp" role="menuitem">Import sheet<small>Open a sheet file someone sent you</small></label>
+      <button class="smi" id="bCalc" type="button" role="menuitem">Open in Stat Calculator<small>Load this build's gear into the calculator</small></button>
+    </div></details>
+    <input id="imp" type="file" accept=".html,text/html" hidden>
+    <button class="btn" id="bHideP" type="button" aria-pressed="false" title="Hide the sheet preview to give the editor more room">Hide preview</button>
+    <div class="tabs" role="group" aria-label="View"><button class="btn" id="tEdit" type="button" aria-pressed="true">Edit</button><button class="btn" id="tPrev" type="button" aria-pressed="false">Preview</button></div>
+  </div>
+
+  <div class="split" id="split" data-view="edit">
+    <div class="editor" id="editor"></div>
+    <div class="previewcol"><div class="vtoggle" role="group" aria-label="Show the build as"><span>Show as</span><button type="button" data-view="table">Sheet</button><button type="button" data-view="text">Text</button></div><div id="sheet"></div></div>
+  </div>
+
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script data-file="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Dredge Master Planner</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Dredge Master Planner</h1>
+    <p class="lede">Type in the three things the Dredge Master wants and how many of each.<br>It finds where to pan and what luck cap to use, keeping as much as possible in one place.</p>
+  </header>
+  <p class="disc" role="note"><b>Estimates:</b> built on the same luck model as Luck Odds. Modifiers, Size Boost, enchants, events and weather aren't counted, so real numbers can differ.</p>
+  <section class="card">
+    <div class="inputs">
+      <label class="fld"><span class="lab">Your luck</span><input type="number" id="luck" min="1"></label>
+      <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1"></label>
+      <label class="fld"><span class="lab">Pans per hour (optional)</span><input type="number" id="pph" min="0" placeholder="Leave empty for pans only"></label>
+      <div class="fld"><label class="ck" style="display:inline-flex;gap:6px;align-items:center;font-size:13px" title="Count the time walking to another zone. Off by default."><input type="checkbox" id="walkOn" style="width:16px;height:16px;accent-color:var(--accent)"> Count walking between zones</label><input type="number" id="trav" min="0" aria-label="Moving zones costs (pans)" title="How many pans' worth of time walking to another zone costs you. Higher keeps more in one place." placeholder="Pans per move, e.g. 50"></div>
+      <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
+    </div>
+  </section>
+  <section class="card">
+    <h2>What the Dredge Master wants</h2>
+    <div class="want" id="want"></div>
+    <p class="hint">Only minerals with known drop rates can be planned. Leave a row empty if he asked for fewer things.</p>
+  </section>
+  <section class="card" aria-live="polite">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">The plan</h2><button type="button" class="btn" id="toImg">Save as image</button></div>
+    <div id="plan"></div>
+  </section>
+  <section class="card"><h2>How this is worked out</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+      <li>Every zone and every luck cap below your luck (plus no cap) is tried. A pan holds about √capacity minerals, so you find about <code>√capacity × chance</code> of a mineral per pan.</li>
+      <li>When several things are farmed in the same place they come in at the same time, so that stop takes as long as its slowest item.</li>
+      <li>Every way of grouping the items is compared: all in one place, two stops, or one stop each. If you turn on walking between zones, each extra stop adds the walking time you set. Either way, if fewer stops is within 15% of the best, fewer stops is picked so you don't have to keep moving.</li>
+      <li>The Void is only used when an item doesn't drop anywhere else, because its loot pool changes.</li>
+    </ul></section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

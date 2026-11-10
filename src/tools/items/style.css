@@ -1,0 +1,36 @@
+
+/* Layout: three tabs of reference cards */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.tabs button{font:600 14px var(--f-body);padding:9px 14px;border:1px solid transparent;border-bottom:0;border-radius:8px 8px 0 0;background:transparent;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--fg);border-color:var(--line);border-bottom:1px solid var(--panel)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.it{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--ac,var(--accent));border-radius:9px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.it b{font-family:var(--f-display);font-size:1.05rem}
+.it .src{font-size:12px;color:var(--muted)}
+.it p{margin:0;font-size:13.5px}
+.it .d{font-style:italic;color:var(--muted);font-size:13px}
+.fx{display:flex;flex-wrap:wrap;gap:4px}
+.fx span{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--kc,var(--accent)) 50%,var(--line));color:var(--kc,var(--accent));white-space:nowrap}
+.fx span.t{border-color:var(--line);color:var(--muted)}
+.cost{font-family:var(--f-mono);font-size:13px}
+.rq{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--warn) 50%,var(--line));color:var(--warn)}
+.qlink{font:inherit;font-size:12px;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+#p-trn:not([hidden]){display:flex}
+.grp{font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:6px 0 0}
+table.sl{border-collapse:collapse;font-size:13.5px}
+table.sl td,table.sl th{padding:4px 14px 4px 0;text-align:left;border-bottom:1px dashed var(--line)}
+table.sl th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters input{flex:1;min-width:180px}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:6px 12px;font-size:13px;cursor:pointer;color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
+/* Meteor Shards are pink in game */
+:root{--shard:#c2187a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--shard:#ff6ec7}}
+:root[data-theme="dark"]{--shard:#ff6ec7}
+.cost .cm{color:var(--fg)}.cost .cs{color:var(--shard)}
+.ck{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer;white-space:nowrap}
+.filters .ck input,.ck input{width:16px;height:16px;flex:none;min-width:0;accent-color:var(--accent);margin:0}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40}

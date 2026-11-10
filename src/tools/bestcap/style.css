@@ -1,0 +1,62 @@
+
+/* Layout: search + filters on top, then every mineral with each zone it drops in and the luck cap that finds it most often */
+.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-left:4px solid var(--neg);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
+.disc b{font-weight:700}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bar input[type=search]{flex:1 1 240px;min-width:0}
+.bar .ac{flex:1 1 240px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:6px 12px;font-size:13px;cursor:pointer;color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
+.rf{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rb{display:inline-flex;align-items:center;gap:7px;font:500 12.5px var(--f-body);padding:5px 11px 5px 8px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
+.rb .bx{width:14px;height:14px;border-radius:4px;border:1.5px solid var(--rc);display:grid;place-items:center;flex:none;box-sizing:border-box}
+.rb[aria-pressed="true"] .bx{background:var(--rc)}
+.rb[aria-pressed="true"] .bx::after{content:"";width:4px;height:7px;border:solid var(--bg);border-width:0 2px 2px 0;transform:translate(0,-1px) rotate(45deg)}
+.rb[aria-pressed="false"]{color:var(--muted)}
+.rb[aria-pressed="false"] .bx{opacity:.55}
+.rb:hover{border-color:var(--muted)}
+.rlink{border:0;background:none;color:var(--accent);font:600 12.5px var(--f-body);cursor:pointer;padding:5px 4px}
+.rlink:disabled{color:var(--muted);opacity:.5;cursor:default}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+table.o{width:100%;border-collapse:collapse;font-size:13.5px}
+table.o th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.o td{padding:8px 10px;border-bottom:1px dashed var(--line);vertical-align:middle}
+table.o tr.first td{border-top:1px solid var(--line)}
+table.o tbody tr:first-child td{border-top:0}
+table.o td.num{font-family:var(--f-mono);white-space:nowrap}
+.mn{display:flex;align-items:center;gap:8px}
+.mn img{width:28px;height:28px;object-fit:contain}
+.mn b{font-weight:600}
+.cap{display:inline-block;font:600 13px var(--f-mono);padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var(--accent) 16%,transparent);border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);color:var(--fg);white-space:nowrap}
+.cap.none{font-family:var(--f-body);background:var(--sunk);border-color:var(--line)}
+.gain{color:var(--accent)}
+.same{color:var(--muted)}
+.more{text-align:center;margin-top:10px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40}
+.ck{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer;white-space:nowrap}
+.ck input{width:16px;height:16px;accent-color:var(--accent);margin:0}
+.lfld{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lfld input{width:130px}
+.cmp small{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+.worse{color:var(--neg)}
+td.bl b{font:500 13.5px var(--f-mono)}
+td.bl .hi{font:13px var(--f-body);color:var(--muted);white-space:nowrap}
+td.bl small{display:block;font-size:11.5px;color:var(--muted);font-family:var(--f-mono)}
+@media (max-width:980px){
+  table.o thead{display:none}
+  table.o,table.o tbody{display:block}
+  table.o tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;padding:10px 0;border-bottom:1px dashed var(--line)}
+  table.o tr.first{border-top:1px solid var(--line);margin-top:4px}
+  table.o td{display:block;border:0!important;padding:0}
+  table.o td.mcell{grid-column:1/3}
+  table.o td.mcell:empty{display:none}
+  table.o td.zcell{grid-column:1/3}
+  table.o td[data-l]::before{content:attr(data-l);display:block;font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+}
+.fx{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--muted)}
+.fx h3{margin:0;font:600 12px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--fg)}
+.fx p{margin:0}
+.fx code{font-family:var(--f-mono);font-size:13px;color:var(--fg);background:none;padding:0;overflow-wrap:anywhere}
+.fx .row{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;align-items:baseline}
+@media (max-width:600px){.fx .row{grid-template-columns:1fr}}

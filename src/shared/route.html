@@ -1,0 +1,223 @@
+<style>
+/* shared farm-route pieces (Museum Farm Route + Crafting Checklist) */
+.rt-inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
+.rt-fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rt-fld input,.rt-fld select{width:100%;box-sizing:border-box}
+.rt-row{display:flex;gap:8px 14px;flex-wrap:wrap;align-items:center}
+.rt-ck{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer}
+.rt-ck input{width:16px;height:16px;accent-color:var(--accent)}
+.rt-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}
+.rt-sum div{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-width:0}
+.rt-sum b{display:block;font-family:var(--f-mono);font-size:1.2rem;font-weight:500}
+.rt-sum .hint{font-size:12.5px;color:var(--muted)}
+.rt-stops{display:flex;flex-direction:column;gap:10px}
+.rt-stop{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.rt-stop.fin{opacity:.6;border-left-color:var(--line)}
+.rt-sh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.rt-sh h3{margin:0;font-family:var(--f-display);font-size:1.15rem;display:flex;align-items:center;gap:10px}
+.rt-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;font:700 14px var(--f-body);flex:none}
+.rt-stop.fin .rt-num{background:var(--muted)}
+.rt-est{text-align:right;font-size:12.5px;color:var(--muted)}
+.rt-est b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-weight:500;color:var(--fg)}
+.rt-items{display:flex;flex-direction:column;gap:6px}
+.rt-t{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sunk)}
+.rt-t.nock{grid-template-columns:minmax(0,1fr) auto}
+.rt-only{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:999px;background:var(--warn);color:var(--bg);margin-left:6px;vertical-align:1px}
+.rt-rec,.rt-extra,.rt-time{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px;cursor:help}
+.rt-only{cursor:help}
+.rt-rec{background:var(--accent);color:var(--bg)}
+.rt-extra{border:1px solid var(--line);color:var(--muted)}
+.rt-time{border:1px solid var(--c-epic);color:var(--c-epic)}
+.rt-t.opt{border-style:dashed}
+.rt-t.got{opacity:.55}
+.rt-t.got .rt-tn{text-decoration:line-through}
+.rt-t input{width:17px;height:17px;accent-color:var(--accent)}
+.rt-tn{display:flex;align-items:center;gap:8px;min-width:0;font-size:13.5px}
+.rt-tn img{width:22px;height:22px;object-fit:contain;flex:none}
+.rt-tn small{display:block;font-size:12px;color:var(--muted)}
+.rt-odd{font-family:var(--f-mono);font-size:12.5px;text-align:right;white-space:nowrap}
+.rt-odd small{display:block;color:var(--muted);font-family:var(--f-body)}
+.rt-tips{margin:0;padding-left:18px;font-size:13px;display:flex;flex-direction:column;gap:3px}
+.rt-tips b{font-weight:600}
+.rt-swap{font-size:13px;padding:7px 10px;border-radius:8px;border:1px dashed var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
+.rt-rr{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--rc)}
+.rt-issues{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+@media (max-width:520px){.rt-t{grid-template-columns:auto minmax(0,1fr)}.rt-t.nock{grid-template-columns:minmax(0,1fr)}.rt-odd{grid-column:-2;text-align:left}}
+</style>
+<script>
+const RT=(()=>{
+const RARS=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
+const PROG=Object.keys(P.reqs||{});const EVENT_AREAS=["Haunted Creek","North Pole"];
+const TIMED={"Infernal Heart":"Only open from :15 to :45 each hour. Check the Event Clock and arrive at :15.","Timelocked Sanctuary":"Only open from :45 to :15 each hour. Arrive at :45 to get the full 30 minutes."};
+// route settings are shared by every page that plans a route
+const st={stats:true,luck:1000,mb:250,cap:100,pph:"",far:"",void:false,evt:false,mag:false,ord:"quick"};
+try{Object.assign(st,JSON.parse(localStorage.getItem("pt-route")||"{}"))}catch(e){}
+// luck / capacity / pans per hour are shared with the other tools that ask for them
+(()=>{try{const y=window.parent.ptYou.get();["luck","cap","pph"].forEach(k=>{if(y[k]!==undefined&&y[k]!==null&&y[k]!=="")st[k]=y[k]})}catch(e){}})();
+const saveSt=()=>{try{localStorage.setItem("pt-route",JSON.stringify(st))}catch(e){}try{window.parent.ptYou.set({luck:st.luck,cap:st.cap,pph:st.pph})}catch(e){}};
+// drop model (same as Luck Odds)
+const LOC={};P.mins.forEach(m=>(m.ch||[]).forEach(c=>{const p=parseFloat(String(c[1]).replace(/[%,]/g,""))/100;if(!(p>0))return;(LOC[c[0]]=LOC[c[0]]||[]).push({m,p})}));
+const cache={};
+// a spot like "X (inside Firefly Zones)" only lists the minerals that change there; fill in the rest from X itself
+function fullList(loc){const b=baseLoc(loc);const own=LOC[loc]||[];let out;
+  if(b!==loc&&LOC[b])out=LOC[b].filter(x=>!own.some(y=>y.m===x.m)).concat(own);
+  // a place like "The Void" that only lists one mineral itself: its real pool is the one listed under its variants
+  else if(own.length<2){const seen=new Set();out=[];Object.keys(LOC).filter(v=>v!==loc&&baseLoc(v)===loc).forEach(v=>LOC[v].concat(own).forEach(x=>{if(!seen.has(x.m)){seen.add(x.m);out.push(x)}}))}
+  else out=[...own];
+  // with only one mineral known there's no drop table to work from, so leave the spot out instead of calling it 100%
+  return out.length<2?[]:out}
+function shares(loc,L){const k=loc+"|"+L;if(cache[k])return cache[k];const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;
+  const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);const out={};
+  list.forEach(x=>{const lo=c/tot,hi=(c+x.p)/tot;c+=x.p;out[x.m.n]=0.25*f(lo,hi,1)+0.25*f(lo,hi,Math.max(1,L/2))+0.5*f(lo,hi,Math.max(1,L))});return cache[k]=out}
+// modifier model (same as Modifier Odds)
+const BASE={Perfect:.003736,Lunar:.009341,Mutated:.03736,Cosmic:.1868,Iridescent:.7473,Irradiated:3.736,Scorching:9.341,Glowing:18.68,Pure:29.89,Shiny:37.36};
+const MEAS={Perfect:[[1,.0037],[1900,.38],[6700,1.2]],Mutated:[[1,.037],[1900,2.8],[6700,10]],Cosmic:[[1,.187],[1900,13],[6700,29]],Iridescent:[[1,.75],[1900,24],[6700,20]]};
+// mutations you can't get from normal panning: [tag, how to get it ({n} = mineral name), show where the mineral drops?]
+const SPECIAL={Treasured:["Treasure only","Every mineral inside a treasure chest is Treasured, and it never comes from normal panning. Open treasure chests instead, and keep any Treasured {n} you find.",false],
+  Voidtorn:["Void only","Only from The Void, the Galactic Pan or Galactic Shovel, or a shovel with the Voidtouched enchant. With one of those tools, pan {n} wherever it drops.",true],
+  Electrified:["Event only","Only drops while a Thunderstorm is running, and that's an admin-only event. Pan for {n} whenever a Thunderstorm starts.",true],
+  Crystalline:["Geodes or Crystal Touch","Every mineral from a geode is Crystalline. A Crystal Touch shovel (or Geothermal, indirectly) also makes about 1 in 10 minerals Crystalline while you pan {n}.",true],
+  Purified:["Purity rune","Every mineral is Purified while the Purity rune is equipped. Equip it and pan {n} wherever it drops. It adds nothing to the museum.",true],
+  Ghostly:["Halloween only","Only during the Halloween event, at Haunted Creek.",false],Spooky:["Halloween only","Only during the Halloween event, at Haunted Creek or during Hallows' Eve.",false],
+  Jolly:["Christmas only","Only during the Christmas event, at the North Pole.",false],Charming:["Valentine's only","Only during the Valentine's event, during Rose Rain.",false],Rosy:["Valentine's only","Only during the Valentine's event, during Rose Rain.",false],
+  Hearthflame:["Summer only","Only during the Summer event, during Night of the Bonfire.",false],Summer:["Summer only","Only during the Summer event.",false],Tidal:["Summer only","Only during the Summer event, panning at a beach inside Shifting Tides circles.",false]};
+const MODS=[...Object.keys(BASE),...Object.keys(SPECIAL),"None"];
+function interp(pts,x){x=Math.max(1,x);if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i];if(x<=x1){const t=(Math.log(x)-Math.log(x0))/(Math.log(x1)-Math.log(x0));return Math.exp(Math.log(y0)+t*(Math.log(y1)-Math.log(y0)))}}return pts[0][1]}
+const anyMod=e=>Math.min(.994,e<=1000?e*.00066:.66+(e-1000)*.000485);
+function modChance(u,o){if(!u||u==="None")return 1;if(!(u in BASE))return 0;o=o||st;
+  const mb=Math.max(0,+o.mb||0),lk=Math.max(0,+o.luck||0),add=Math.min(50,lk/1000)*10;const effAny=mb*(o.mag?2:1)+add,effW=Math.max(1,mb+add);
+  const s={};let rare=0;["Perfect","Mutated","Cosmic","Iridescent"].forEach(k=>{s[k]=interp(MEAS[k],effW);rare+=s[k]});
+  const g=Math.sqrt((s.Perfect/BASE.Perfect)*(s.Mutated/BASE.Mutated));s.Lunar=BASE.Lunar*g;rare+=s.Lunar;
+  const rest=Math.max(0,100-rare),cm=["Irradiated","Scorching","Glowing","Pure","Shiny"],cb=cm.reduce((a,k)=>a+BASE[k],0);cm.forEach(k=>s[k]=rest*BASE[k]/cb);
+  return anyMod(effAny)*s[u]/100}
+// expected pans until every item has dropped its needed count: items [{p (per pan), c (count)}]
+function erl(c,x){let term=Math.exp(-x),sum=term;for(let k=1;k<c;k++){term*=x/k;sum+=term}return 1-sum}
+function eAll(it){it=it.filter(x=>x.c>0);if(!it.length)return 0;const l=it.map(x=>({r:-Math.log(1-Math.min(x.p,.999999)),c:Math.min(x.c,400)}));
+  if(l.length===1)return Math.max(1,l[0].c/l[0].r);
+  const lo=Math.log(1e-3/Math.max(...l.map(x=>x.r))),hi=Math.log(Math.max(...l.map(x=>(3*x.c+40)/x.r))),N=360,h=(hi-lo)/N;let s=0;
+  for(let i=0;i<=N;i++){const t=Math.exp(lo+i*h);let pr=1;for(const x of l)pr*=erl(x.c,x.r*t);s+=(i===0||i===N?.5:1)*(1-pr)*t}return Math.max(1,s*h)}
+const whyOut=loc=>{const b=baseLoc(loc);if(/The Void/.test(loc)&&!st.void)return "void";if(EVENT_AREAS.includes(b)&&!st.evt)return "event";
+  if(st.far){const fi=PROG.indexOf(st.far),i=PROG.indexOf(b);if(i>fi&&!EVENT_AREAS.includes(b)&&b!=="The Void")return "locked"}return ""};
+const locOK=loc=>{const b=baseLoc(loc);if(/The Void/.test(loc)&&!st.void)return false;if(EVENT_AREAS.includes(b)&&!st.evt)return false;
+  if(st.far){const fi=PROG.indexOf(st.far),i=PROG.indexOf(b);if(i>fi&&!EVENT_AREAS.includes(b)&&b!=="The Void")return false}return true};
+// items: [{m, u, c}] where c = how many still needed (0 = done, kept for display)
+function plan(items,opt={}){const L=Math.max(1,+st.luck||1),n=Math.max(1,Math.sqrt(Math.max(1,+st.cap||1)));const issues=[];const T=[];const locked=[];const special=[];
+  items.forEach(it=>{const nm=esc(it.m.n)+(it.u&&it.u!=="None"?" ("+esc(it.u)+")":"");
+    if(SPECIAL[it.u]){special.push(it);return}
+    const pm=st.stats?modChance(it.u):1;if(!(pm>0)){issues.push(`<b>${nm}</b>: unknown modifier.`);return}
+    const cands={},base={};(it.m.ch||[]).forEach(c=>{if(!LOC[c[0]]||!locOK(c[0]))return;const bp=parseFloat(String(c[1]).replace(/[%,]/g,""))/100;base[c[0]]=bp;
+      if(st.stats){const e=shares(c[0],L)[it.m.n]||0;const p=1-Math.pow(1-e*pm,n);if(p>0)cands[c[0]]=p}else if(bp>0)cands[c[0]]=bp});
+    if(!Object.keys(cands).length){const all=[...new Set((it.m.ch||[]).map(c=>baseLoc(c[0])))];const why=[...new Set((it.m.ch||[]).map(c=>whyOut(c[0])).filter(Boolean))];
+      const lockedZ=[...new Set((it.m.ch||[]).filter(c=>whyOut(c[0])==="locked").map(c=>baseLoc(c[0])))];
+      if(!all.length)issues.push(`<b>${nm}</b>: no drop location is listed for it.`);
+      else if(lockedZ.length){locked.push(it);const near=[...lockedZ].sort((x,y)=>PROG.indexOf(x)-PROG.indexOf(y))[0];
+        issues.push(`<b>${nm}</b>: <span style="color:var(--neg)">not reachable yet.</span> It drops in ${esc(lockedZ.join(", "))}, ${lockedZ.length>1?"all":"which is"} further than ${esc(st.far)}. ${lockedZ.length>1?`The nearest one to unlock is <b>${esc(near)}</b>.`:`Unlock <b>${esc(near)}</b> first.`}${why.includes("void")?" It can also come from The Void if you turn on Include The Void.":""}${why.includes("event")?" It also drops in an event area (turn on Include event areas).":""}`)}
+      else issues.push(`<b>${nm}</b>: only drops in ${esc(all.join(", "))}${why.includes("void")?", so turn on Include The Void":""}${why.includes("event")?(why.includes("void")?" or":", so turn on")+" Include event areas":""}.`);return}
+    T.push({...it,cands,lunar:it.u==="Lunar"})});
+  const as=new Map();
+  if(opt.lock&&opt.lock.order){// locked: keep the saved stops, order and who goes where; only odds and ticks update
+    const order=[...opt.lock.order];
+    T.forEach(t=>{let z=opt.lock.as[t.m.n];if(!z||!t.cands[z]){z=order.find(o=>t.cands[o])||Object.entries(t.cands).sort((a,b)=>b[1]-a[1])[0][0];if(!order.includes(z))order.push(z)}as.set(t,z)});
+    const cost=z=>st.stats?eAll(T.filter(t=>as.get(t)===z).map(t=>({p:t.cands[z],c:t.c}))):0;
+    const zones=order.map(z=>{const ts=T.filter(t=>as.get(t)===z);return {z,ts,pans:ts.some(t=>t.c>0)?cost(z):0,open:ts.some(t=>t.c>0)}}).filter(z=>z.ts.length);
+    return {zones,issues,T,locked,special,frozen:true}}
+  if(!st.stats){// no stats: fewest stops. Repeatedly take the zone that covers the most remaining items (ties: better base odds)
+    let rem=T.filter(t=>t.c>0);const all=[...new Set(T.flatMap(t=>Object.keys(t.cands)))];
+    while(rem.length){let best=null,bc=-1,bs=-1;all.forEach(z=>{const cov=rem.filter(t=>t.cands[z]);const sc=cov.reduce((s,t)=>s+Math.log10(1e12*t.cands[z]),0);if(cov.length>bc||(cov.length===bc&&sc>bs)){best=z;bc=cov.length;bs=sc}});
+      rem.filter(t=>t.cands[best]).forEach(t=>as.set(t,best));rem=rem.filter(t=>!t.cands[best])}
+    T.filter(t=>!t.c).forEach(t=>as.set(t,[...as.values()].find(z=>t.cands[z])||Object.entries(t.cands).sort((a,b)=>b[1]-a[1])[0][0]));
+    const zones=[...new Set(T.map(t=>as.get(t)))].map(z=>{const ts=T.filter(t=>as.get(t)===z);return {z,ts,pans:0,open:ts.some(t=>t.c>0)}});
+    const pi=z=>{const i=PROG.indexOf(baseLoc(z.z));return i<0?999:i};
+    zones.sort((a,b)=>(!a.open)-(!b.open)||(st.ord==="prog"?pi(a)-pi(b):0)||b.ts.filter(t=>t.c>0).length-a.ts.filter(t=>t.c>0).length||pi(a)-pi(b));
+    return Object.assign(finalize(zones,as,null,T,issues,locked),{special})}
+  T.forEach(t=>as.set(t,Object.entries(t.cands).sort((a,b)=>b[1]-a[1])[0][0]));
+  const cost=z=>eAll(T.filter(t=>as.get(t)===z).map(t=>({p:t.cands[z],c:t.c})));
+  for(let pass=0;pass<40;pass++){let moved=false;
+    for(const t of T){if(!t.c)continue;const cur=as.get(t);const curC=cost(cur);as.set(t,null);const curW=cost(cur);let best=cur,bestD=0;
+      for(const z of Object.keys(t.cands)){if(z===cur)continue;const before=cost(z);as.set(t,z);const after=cost(z);as.set(t,null);const d=(after-before)-(curC-curW);if(d<bestD-1e-6){bestD=d;best=z}}
+      as.set(t,best);if(best!==cur)moved=true}
+    if(!moved)break}
+  const zones=[...new Set(T.map(t=>as.get(t)))].map(z=>{const ts=T.filter(t=>as.get(t)===z);return {z,ts,pans:cost(z),open:ts.some(t=>t.c>0)}});
+  const pi=z=>{const i=PROG.indexOf(baseLoc(z.z));return i<0?999:i};
+  if(st.ord==="prog")zones.sort((a,b)=>pi(a)-pi(b)||a.pans-b.pans);else zones.sort((a,b)=>a.pans-b.pans);
+  zones.sort((a,b)=>(!a.open)-(!b.open));
+  return Object.assign(finalize(zones,as,z=>eAll(T.filter(t=>as.get(t)===z).map(t=>({p:t.cands[z],c:t.c}))),T,issues,locked),{special})}
+const baseOdds=p=>`base ${p>=.5?fmt(p*100,0)+"%":"1 in "+fmt(Math.round(1/p),0)} per mineral`;
+// Each item is required at the LAST stop on the route that drops it; at earlier stops it's a bonus pick-up.
+// So every stop only asks for what you can't get later, and you move on as soon as you have those.
+function finalize(zones,as,cost,T,issues,locked){const order=zones.map(z=>z.z);
+  T.forEach(t=>{if(!t.c)return;let li=-1;order.forEach((z,i)=>{if(t.cands[z])li=i});if(li>=0)as.set(t,order[li])});
+  const out=order.map(z=>{const ts=T.filter(t=>as.get(t)===z);return {z,ts,pans:cost&&ts.some(t=>t.c>0)?cost(z):0,open:ts.some(t=>t.c>0)}}).filter(z=>z.ts.length);
+  out.sort((a,b)=>(!a.open)-(!b.open));
+  return {zones:out,issues,T,locked}}
+const oneIn=p=>!st.stats?baseOdds(p):p>=.5?fmt(p*100,0)+"% per pan":`~1 in ${fmt(Math.round(1/p),0)} pans`;
+const dur=p=>{const pph=+st.pph;if(!(pph>0))return "";const h=p/pph;return h<1?fmt(Math.max(1,h*60),0)+" min":h<48?fmt(h,1)+" h":fmt(h/24,1)+" days"};
+const big=p=>p<1e4?fmt(p,0):p<1e6?fmt(p/1e3,1)+"k":p<1e9?fmt(p/1e6,1)+"M":fmt(p/1e9,1)+"B";
+// opts.tick: show a "got it" checkbox per item (data-got); otherwise show "need N"
+function stopsHTML(R,opts={}){const zs=R.zones;let k=0;
+  const stopNo=new Map();{let n=0;zs.forEach(o=>{if(o.open||R.frozen)stopNo.set(o.z,++n)})}
+  const lbl=o=>(stopNo.get(o.z)?"Stop "+stopNo.get(o.z)+": ":"")+o.z;
+  const where=t=>zs.filter(o=>t.cands[o.z]);
+  const best=t=>where(t).reduce((a,o)=>!a||t.cands[o.z]>t.cands[a.z]?o:a,null);
+  const tag=(t,Z,req)=>{const w=where(t);const nm=t.m.n;
+    if(w.length<=1)return `<span class="rt-only" title="${esc(`No other stop on this route drops ${nm}.\nGet it before you move on.`)}">Only on this stop</span>`;
+    const bz=best(t);const rest=w.filter(o=>o.z!==Z.z);const list="\nAlso drops at:\n"+rest.map(o=>lbl(o)+" ("+oneIn(t.cands[o.z])+")").join("\n");
+    const last=w[w.length-1];
+    if(bz.z===Z.z)return `<span class="rt-rec" title="${esc(`Recommended: this is your best chance for ${nm} on the route (${oneIn(t.cands[Z.z])}).`+(req?"":`\nTry to get it here. If you move on without it, you can still get it at ${lbl(last)}.`)+list)}">Recommended</span>`;
+    return `<span class="rt-extra" title="${esc(`Extra: ${nm} drops here too, but it's more common at ${lbl(bz)} (${oneIn(t.cands[bz.z])}).`+(req?"\nThis is the last stop that has it, so get it before you finish.":"\nKeep it if it drops, but don't wait for it here.")+list)}">Extra</span>`};
+  return zs.map((Z,idx)=>{const left=Z.ts.filter(t=>t.c>0);const fin=!left.length;if(!fin||R.frozen)k++;const b=baseLoc(Z.z);
+    const extra=fin?[]:zs.slice(idx+1).flatMap(o=>o.ts.filter(t=>t.c>0&&t.cands[Z.z]));
+    const slow=left.length?left.reduce((a,c)=>a.c/a.cands[Z.z]>c.c/c.cands[Z.z]?a:c):null;
+    const next=zs.slice(idx+1).find(o=>o.ts.some(t=>t.c>0));
+    const tips=[];
+    if(TIMED[b])tips.push(`<b>Timed area.</b> ${TIMED[b]}`);
+    if(/inside Firefly/.test(Z.z))tips.push("<b>Stand inside the Firefly Zones</b>: these odds only apply there.");
+    if(/outside Firefly/.test(Z.z))tips.push("<b>Stay outside the Firefly Zones</b> for these odds.");
+    if(/The Void/.test(Z.z))tips.push("<b>The Void's loot pool changes</b>, so only farm here while these minerals are in it.");
+    if([...left,...extra].some(t=>t.lunar))tips.push("<b>Lunar only drops at night.</b> Do this stop at night, or do daytime stops first and come back.");
+    if(st.stats&&slow&&left.length>1&&eAll([{p:slow.cands[Z.z],c:slow.c}])>Z.pans*.7)tips.push(`<b>Most of the wait is ${esc(slow.m.n)}.</b> The others usually come well before it.`);
+    const need=t=>opts.tick?"":t.c>0?`Need ${fmt(t.c,0)}`:"Done";
+    const row=(t,req)=>{const p=t.cands[Z.z];const g=!t.c;const T2=opts.tick?"label":"div";
+      return `<${T2} class="rt-t${g?" got":""}${req?"":" opt"}${opts.tick?"":" nock"}">${opts.tick?`<input type="checkbox" data-got="${esc(t.m.n)}"${g?" checked":""}>`:""}<span class="rt-tn">${t.m.ic?`<img src="${t.m.ic}" alt="">`:""}<span><span data-mineral="${esc(t.m.n)}">${esc(t.m.n)}</span>${t.u&&t.u!=="None"?` · <b>${esc(t.u)}</b>`:""}${tag(t,Z,req)}${t.lunar?`<span class="rt-time" title="${esc("Time-gated: Lunar only rolls at night.\nPan here after dark, or it won't drop at all.")}">Night only</span>`:""}<small><span class="rt-rr" style="--rc:${rc(t.m.r)}">${esc(t.m.r)}</span>${need(t)?" · "+need(t):""}${req?"":" · optional here"}${opts.kg&&t.m.mu&&t.m.mu.kg?` · full boost at ${t.m.mu.kg} kg`:""}</small></span></span><span class="rt-odd">${st.stats?`${oneIn(p)}<small>${big(1/p)} pans each</small>`:`<small>${baseOdds(p)}</small>`}</span></${T2}>`};
+    return `<article class="rt-stop${fin?" fin":""}"><div class="rt-sh"><h3><span class="rt-num">${fin?"✓":k}</span><span data-location="${esc(b)}" class="lk">${esc(Z.z)}</span></h3>
+      <div class="rt-est">${fin?"Done":st.stats?`Expected pans<b>${big(Z.pans)}</b>${dur(Z.pans)}`:`Items here<b>${left.length}</b>`}</div></div>
+      <div class="rt-items">${Z.ts.map(t=>row(t,true)).join("")}${extra.map(t=>row(t,false)).join("")}</div>
+      ${tips.length&&!fin?`<ul class="rt-tips">${tips.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}
+      ${fin?"":`<div class="rt-swap"><b>Move on</b> once you have ${left.map(t=>(t.c>1?fmt(t.c,0)+"× ":"")+esc(t.m.n)).join(", ")}${next?`, then go to <b>${esc(next.z)}</b>`:". That's the last stop"}.${extra.length?` Items marked optional can wait for a later stop.`:""}</div>`}</article>`}).join("")}
+function specialHTML(R){return (R.special||[]).map(it=>{const [tag,how,showWhere]=SPECIAL[it.u];const zs=[...new Set((it.m.ch||[]).map(c=>baseLoc(c[0])))];
+  return `<div class="rt-t nock" style="grid-template-columns:minmax(0,1fr)"><span class="rt-tn">${it.m.ic?`<img src="${it.m.ic}" alt="">`:""}<span><span data-mineral="${esc(it.m.n)}">${esc(it.m.n)}</span> · <b>${esc(it.u)}</b><span class="rt-time" title="${esc(`${it.u} can't come from normal panning, so it isn't on the route.`)}">${esc(tag)}</span>
+    <small style="font-size:13px;color:var(--fg);margin-top:3px">${esc(how.replace(/\{n\}/g,it.m.n))}${showWhere&&zs.length?` <span class="muted">${esc(it.m.n)} drops in ${esc(zs.join(", "))}.</span>`:""}</small></span></span></div>`}).join("")}
+function sumHTML(R,doneLbl){const open=R.zones.filter(z=>z.open);const total=open.reduce((s,z)=>s+z.pans,0);
+  const lk=R.locked&&R.locked.length?`<div style="grid-column:1/-1;border-color:var(--neg);background:color-mix(in srgb,var(--neg) 8%,transparent)"><span class="lab" style="color:var(--neg)">Not doable yet</span><span style="display:block;font-size:13.5px;margin-top:2px">${R.locked.length} item${R.locked.length>1?"s":""} only drop${R.locked.length>1?"":"s"} in areas past ${esc(st.far)}: ${R.locked.map(t=>esc(t.m.n)).join(", ")}. You can farm the rest now; see the list below for what to unlock.</span></div>`:"";
+  return lk+`<div><span class="lab">Stops left</span><b>${open.length}</b><span class="hint">${R.zones.length-open.length?`${R.zones.length-open.length} finished`:"zones to visit"}</span></div>${doneLbl||""}
+    ${st.stats?`<div><span class="lab">Expected pans left</span><b>${big(total)}</b><span class="hint">${dur(total)||"add pans per hour to see time"}</span></div>`:""}`}
+function routeText(R){return R.zones.filter(z=>z.open).map((z,i)=>`${i+1}. ${z.z}: `+z.ts.filter(t=>t.c>0).map(t=>(t.c>1?t.c+"× ":"")+t.m.n+(t.u&&t.u!=="None"?" ("+t.u+")":"")).join(", ")).join("\n")}
+// settings block
+function settingsHTML(withMod){return `<div class="rt-row"><label class="rt-ck"><input type="checkbox" data-rt="stats"> <b>Use my stats</b></label><span class="hint" style="font-size:12.5px;color:var(--muted)">Turn off to just see which minerals share a zone, with the fewest stops.</span></div>
+  <div class="rt-inputs">
+  <label class="rt-fld rt-s"><span class="lab">Luck</span><input type="number" data-rt="luck" min="1"></label>
+  ${withMod?`<label class="rt-fld rt-s"><span class="lab">Modifier Boost (%)</span><input type="number" data-rt="mb" min="0"></label>`:""}
+  <label class="rt-fld rt-s"><span class="lab">Capacity</span><input type="number" data-rt="cap" min="1"></label>
+  <label class="rt-fld rt-s"><span class="lab">Pans per hour</span><input type="number" data-rt="pph" min="0" placeholder="optional"></label>
+  <label class="rt-fld"><span class="lab">Furthest area unlocked</span><select data-rt="far"><option value="">Everything</option>${PROG.filter(z=>!EVENT_AREAS.includes(z)&&z!=="The Void").map(z=>`<option>${esc(z)}</option>`).join("")}</select></label></div>
+  <div class="rt-row"><label class="rt-ck"><input type="checkbox" data-rt="void"> Include The Void</label><label class="rt-ck"><input type="checkbox" data-rt="evt"> Include event areas</label>${withMod?`<label class="rt-ck rt-s"><input type="checkbox" data-rt="mag"> Solar Magnifier down</label>`:""}
+  <span class="rt-row" style="gap:6px"><span class="lab">Order</span><button type="button" class="chip" data-rto="quick">${"Quickest stops first"}</button><button type="button" class="chip" data-rto="prog">Follow the map</button></span>
+  <button type="button" class="btn rt-s" data-rtcalc>Use my Stat Calculator stats</button></div>`}
+function bind(root,onChange){
+  const sync=()=>{root.querySelectorAll("[data-rt]").forEach(el=>{const k=el.dataset.rt;if(el.type==="checkbox")el.checked=!!st[k];else if(document.activeElement!==el)el.value=st[k]??""});
+    root.querySelectorAll("[data-rto]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.rto===st.ord)));
+    root.querySelectorAll(".rt-s").forEach(el=>el.hidden=!st.stats);const q=root.querySelector('[data-rto="quick"]');if(q)q.textContent=st.stats?"Quickest stops first":"Most items first"};
+  let tm=null;
+  root.addEventListener("input",e=>{const el=e.target.closest("[data-rt]");if(!el||el.type==="checkbox"||el.tagName==="SELECT")return;st[el.dataset.rt]=el.value;clearTimeout(tm);tm=setTimeout(()=>{saveSt();onChange()},250)});
+  root.addEventListener("change",e=>{const el=e.target.closest("[data-rt]");if(!el)return;st[el.dataset.rt]=el.type==="checkbox"?el.checked:el.value;saveSt();sync();onChange()});
+  root.addEventListener("click",async e=>{const o=e.target.closest("[data-rto]");if(o){st.ord=o.dataset.rto;saveSt();sync();onChange();return}
+    if(e.target.closest("[data-rtcalc]")){let t=null;try{t=await window.parent.ptGetTotals()}catch(x){}if(!t)return;st.luck=Math.round(t.Luck||st.luck);st.mb=Math.round(t["Modifier Boost"]||0);st.cap=Math.round(t.Capacity)||st.cap;saveSt();sync();onChange()}});
+  sync();
+  // when this page is shown again, pick up luck/capacity changed in another tool
+  const prev=window.ptRefresh;window.ptRefresh=()=>{try{const y=window.parent.ptYou.get();let ch=false;["luck","cap","pph"].forEach(k=>{if(y[k]!==undefined&&y[k]!==null&&y[k]!==""&&String(y[k])!==String(st[k])){st[k]=y[k];ch=true}});if(ch){sync();onChange()}}catch(e){}if(prev)prev()};
+  return sync}
+// chance per pan of one mineral (with modifier u) at one location, for any stats o={luck,mb,cap,mag}
+function rate(m,loc,u,o){if(!LOC[loc])return 0;const L=Math.max(1,+o.luck||1),n=Math.max(1,Math.sqrt(Math.max(1,+o.cap||1)));const e=shares(loc,L)[m.n]||0;const pm=modChance(u,o);return 1-Math.pow(1-e*pm,n)}
+function lockOf(R){const as={};R.zones.forEach(z=>z.ts.forEach(t=>as[t.m.n]=z.z));return {order:R.zones.map(z=>z.z),as}}
+return {oneIn,dur,rate,locOK,whyOut,PROG,EVENT_AREAS,SPECIAL,BASE,big,lockOf,st,saveSt,plan,stopsHTML,specialHTML,sumHTML,routeText,settingsHTML,bind,MODS,RARS,eAll}})();
+</script>

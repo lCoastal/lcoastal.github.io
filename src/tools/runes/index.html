@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Runes</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Runes</h1>
+    <p class="lede">All 22 runes, what they do and where to find them.<br>Build a rune loadout for your level and send it to the Stat Calculator.</p>
+  </header>
+  <section class="card load" aria-labelledby="lh">
+    <div class="lrow" style="justify-content:space-between"><h2 id="lh">Your rune loadout</h2>
+      <span class="lrow"><label class="lab" for="lvl">Your level</label><input type="number" id="lvl" min="1" max="999"><button type="button" class="btn" id="clr">Clear</button><button type="button" class="btn" id="toImg">Save as image</button><button type="button" class="btn" id="toBuild">Add to Build Sheet</button><button type="button" class="btn pri" id="toCalc">Use in Stat Calculator</button></span></div>
+    <div class="slots" id="slots"></div>
+    <p class="hint">Rune slots unlock at levels 1, 10, 20, 30 and 40. Only luck, walk speed and speed runes change numbers in the calculator; the rest are listed as notes.</p>
+  </section>
+  <div class="filters"><input type="search" id="q" placeholder="Search runes or locations…" aria-label="Search runes" autocomplete="off"><button type="button" class="chip" id="fFav" aria-pressed="false">★ Favourites</button><button type="button" class="chip" id="fOwn" aria-pressed="false">✓ Owned</button></div>
+  <div id="list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

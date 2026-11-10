@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Compare Builds</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Compare Builds</h1>
+    <p class="lede">Put in the luck and capacity of two or more builds, pick a mineral, and see how many pans each build needs to find it.<br>Uses the same luck model as Luck Odds.</p>
+  </header>
+  <p class="disc" role="note"><b>Not exact:</b> these are estimates from a simplified model. Modifiers, Size Boost, enchants, events and weather aren't counted, and a pan is assumed to hold about √capacity minerals. Add pans per hour to compare time, since bigger pans usually take longer.</p>
+  <section class="card">
+    <div class="top"><h2>Your builds</h2><button type="button" class="btn" id="addB">Add build</button></div>
+    <div class="blds" id="blds"></div>
+  </section>
+  <section class="card">
+    <div class="top"><h2>Mineral</h2><button type="button" class="btn" id="toImg">Save as image</button></div>
+    <div class="pickrow"><input id="mq" type="search" placeholder="Type a mineral, e.g. Astral Spore" aria-label="Mineral"><select id="zone" aria-label="Where you pan"></select></div>
+    <label class="ck" title="Each build pans at the luck cap (or no cap) that finds this mineral most often, like Best Luck Cap"><input type="checkbox" id="useCap"> Use each build's best luck cap</label>
+    <div class="big" id="sum"></div>
+    <div class="tw" id="tbl"></div>
+  </section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 05/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

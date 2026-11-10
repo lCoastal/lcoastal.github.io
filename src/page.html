@@ -1,0 +1,116 @@
+<!--
+  Prospecting Toolkit — all the tools I use for the Roblox game Prospecting, in one page.
+  Minerals, equipment, pans/shovels/sluices, museum boosts, build sheets, luck + modifier
+  odds, farm routes... the lot. Every bit of data is baked right into this file so it loads
+  instantly and keeps working offline once your browser's cached it.
+
+  Made and kept up to date by @__coastal. Spotted a wrong number or something the game
+  changed? Message me on Discord (link's in the footer at the bottom of any tool) and I'll
+  sort it out.
+
+  How it's put together:
+    - styling + light/dark theme at the top
+    - the shell (top bar, slide-out menu, search, recently-viewed, settings) in the first script
+    - every tool is its own little self-contained page, loaded into a frame only when you open it
+-->
+<title>Prospecting Toolkit</title>
+
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+/>
+<style>
+@@css shell/styles.css@@
+</style>
+
+<header class="bar">
+  <button class="burger" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="brand"><small>Prospecting Toolkit</small><b id="curName">Build Sheets</b></div>
+  <button class="sbtn" id="sBtn" type="button" aria-label="Search everything"><span class="mag"></span></button>
+  <div class="srch" id="srch" role="search">
+    <span class="mag" aria-hidden="true"></span>
+    <input
+      id="sIn"
+      type="search"
+      placeholder="Search minerals, gear, locations, codes…"
+      aria-label="Search everything"
+      autocomplete="off"
+      role="combobox"
+      aria-expanded="false"
+      aria-controls="sRes"
+      aria-autocomplete="list"
+    />
+    <div class="res" id="sRes" role="listbox" hidden></div>
+  </div>
+</header>
+<div class="hubbar" id="hubbar" role="tablist" hidden></div>
+<main id="main">
+  <div class="skel" id="skel" aria-hidden="true" hidden>
+    <div class="sk h"></div>
+    <div class="sk l"></div>
+    <div class="sk bar"></div>
+    <div class="skg">
+      <div class="sk c"></div>
+      <div class="sk c"></div>
+      <div class="sk c"></div>
+    </div>
+    <div class="sk row"></div>
+    <div class="sk row"></div>
+    <div class="sk row"></div>
+    <div class="sk row"></div>
+  </div>
+</main>
+<div class="scrim" id="scrim" hidden></div>
+<div class="pickdlg" id="pickDlg" role="dialog" aria-modal="true" aria-labelledby="pickH" hidden>
+  <div class="pdbox">
+    <div class="pdh"><b id="pickH">Load which build sheet?</b><button type="button" class="x">Cancel</button></div>
+    <p>Its pan, shovel, enchants, jewelry and museum replace the calculator's. Your boosts stay as they are.</p>
+    <ul></ul>
+  </div>
+</div>
+<nav class="drawer" id="drawer" aria-label="Tools" hidden>
+  <h2>Tools <button type="button" id="closeBtn">Close</button></h2>
+</nav>
+
+<script>
+  // Every picture in the toolkit, one per line as  "Kind: Name": "data:image/...",
+  // Tools and data below refer to them as %%IMG:Kind: Name%%, filled in when the page loads.
+  const PT_IMG = {
+@@images@@
+  };
+</script>
+<script>
+  const ptImg = (s) => s.replace(/%%IMG:([^%]+)%%/g, (m, k) => PT_IMG[k] || "");
+  const PT_PARTS = {
+@@parts@@
+  };
+  const TOOLS = {
+@@tools@@
+  };
+  for (const k in TOOLS)
+    TOOLS[k] = ptImg(
+      TOOLS[k]
+        .split("%%COMMON%%")
+        .join(PT_PARTS.COMMON)
+        .split("%%ROUTE%%")
+        .join(PT_PARTS.ROUTE)
+        .split("%%MINS%%")
+        .join(PT_PARTS.MINS),
+    );
+  window.PTDATA = (function fix(o) {
+    if (typeof o === "string") return o.indexOf("%%IMG:") < 0 ? o : ptImg(o);
+    if (Array.isArray(o)) {
+      for (let i = 0; i < o.length; i++) o[i] = fix(o[i]);
+      return o;
+    }
+    if (o && typeof o === "object") {
+      for (const k in o) o[k] = fix(o[k]);
+    }
+    return o;
+  })({
+@@data@@
+  });
+@@js@@
+</script>

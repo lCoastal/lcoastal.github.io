@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Mutations &amp; Enchants</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="ttl">Gear Mutations</h1>
+    <p class="lede"></p>
+  </header>
+  <div class="tabs" role="tablist" aria-label="Sections" hidden>
+    <button type="button" role="tab" id="tab-mut" aria-controls="p-mut">Gear mutations</button>
+    <button type="button" role="tab" id="tab-pan" aria-controls="p-pan">Pan enchants</button>
+    <button type="button" role="tab" id="tab-sh" aria-controls="p-sh">Shovel enchants</button>
+  </div>
+
+  <section id="p-mut" role="tabpanel" aria-labelledby="tab-mut" style="display:flex;flex-direction:column;gap:14px">
+    <div class="card"><div class="top"><h2>What each mutation does</h2><button type="button" class="btn" id="imgMut">Save as image</button></div><p class="muted" style="margin:0;font-size:13px">A mutation multiplies every stat on the item. Some also add a flat bonus on top. Each item can only have one mutation, and it's kept when you reforge or merge to 6★.</p><div class="mcards" id="mcards"></div></div>
+    <div class="card"><h2>Chance per roll at the Mutation Forge</h2><p class="muted" style="margin:0;font-size:13px">The forge at Frozen Peak rerolls the mutation using the item's catalyst. Putting in more catalysts makes the better mutations more likely. These are the odds without any event running.</p><div class="tw"><table class="t heat" id="chance"></table></div><p class="muted" style="margin:10px 0 0;font-size:12.5px;border-left:3px solid var(--accent);padding:6px 10px;background:var(--sunk);border-radius:6px"><b>How to read this:</b> these odds go by <b>how many</b> catalysts you put in, with no event running. Events can change them. A Prismatic Catalyst applies Prismatic directly, and a Festive Catalyst applies Festive.</p></div>
+    <div class="card"><div class="top"><h2>Which catalyst each item needs</h2><button type="button" class="btn" id="imgCat">Save as image</button></div>
+      <div class="tool"><input type="search" id="catQ" placeholder="Search equipment or catalyst…" aria-label="Search catalysts" autocomplete="off"><select id="catM" aria-label="Catalyst"></select><select id="catS" aria-label="Sort by"><option value="er">Sort: item rarity</option><option value="en">Sort: item name</option><option value="cn">Sort: catalyst</option></select></div>
+      <div class="cfr"><span class="lab">Slot</span><span class="chips" id="catSlot"></span></div>
+      <div class="cfr"><span class="lab">Item rarity</span><span class="chips" id="catER"></span></div>
+      <div class="cfr"><span class="muted" id="catN" style="font-size:13px"></span><button type="button" class="btn" id="catClr">Clear filters</button></div>
+      <div class="tw"><table class="t cards" id="cats"></table></div></div>
+  </section>
+
+  <section id="p-pan" role="tabpanel" aria-labelledby="tab-pan" style="display:flex;flex-direction:column;gap:14px" hidden>
+    <div class="card"><div class="top"><h2>Pan enchants</h2><div class="tr"><span class="seg" role="group" aria-label="Show odds as" title="How odds are written"><button type="button" data-ofmt="pct">%</button><button type="button" data-ofmt="one">1 in</button></span><button type="button" class="btn" id="imgPan">Save as image</button></div></div>
+      <p class="muted" style="margin:0;font-size:13px">Enchant at the altar behind the Alchemist in Fortune River with Aurorite, Aetherite or Aetherium. A “1.2× Pan Luck” enchant only multiplies the pan's own luck, not your other gear. One enchant per pan.</p>
+      <div class="tool"><label class="lab" for="panSel">Preview on</label><select id="panSel"></select><label class="ck" style="display:inline-flex;gap:6px;align-items:center;font-size:14px"><input type="checkbox" id="onlyAeth"> Only show Aetherium enchants</label></div>
+      <div class="hidl" id="panHid"></div>
+      <div class="tw"><table class="t cards" id="pans"></table></div></div>
+  </section>
+
+  <section id="p-sh" role="tabpanel" aria-labelledby="tab-sh" style="display:flex;flex-direction:column;gap:14px" hidden>
+    <div class="card"><div class="top"><h2>Shovel enchants</h2><div class="tr"><span class="seg" role="group" aria-label="Show odds as" title="How odds are written"><button type="button" data-ofmt="pct">%</button><button type="button" data-ofmt="one">1 in</button></span><button type="button" class="btn" id="imgSh">Save as image</button></div></div>
+      <p class="muted" style="margin:0;font-size:13px">Enchant at the altar in the Azuralite Oasis with Aetherite or Aetherium. Enchants marked “Seed of Light” only show up after you finish The Seed of Light quest there. Apart from Toughened, shovel enchants change how digging works instead of adding stats.</p>
+      <div class="hidl" id="shHid"></div>
+      <div class="tw"><table class="t cards" id="shovels"></table></div></div>
+  </section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

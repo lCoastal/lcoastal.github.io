@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Modifier Odds</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Modifier Odds</h1>
+    <p class="lede">Your chance of every ore modifier from your Modifier Boost and luck.<br>Estimates built on the wiki's stat guide and its community drop counts.</p>
+  </header>
+  <p class="disc" role="note"><b>Not exact:</b> these are estimates built from community drop counts and a simplified model. They don't account for everything, like enchants, events, weather, Size Boost or hidden game rules, so your real odds can be quite different.</p>
+  <section class="card">
+    <div class="inputs">
+      <label class="fld"><span class="lab">Modifier Boost (panel %)</span><input type="number" id="mb" min="0" value=""></label>
+      <label class="fld"><span class="lab">Luck</span><input type="number" id="luck" min="0" value=""></label>
+      <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" value=""></label>
+      <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
+    </div>
+    <div class="tg2">
+      <label class="ck"><input type="checkbox" id="mag"> Solar Magnifier down (×2, only for how many ores get one)</label>
+      <label class="ck"><input type="checkbox" id="surge"> Modifier Surge event (×2)</label>
+      <label class="ck"><input type="checkbox" id="night"> Night (Lunar can drop)</label>
+    </div>
+  </section>
+  <section class="card"><div style="display:flex;justify-content:flex-end"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="big" id="sum"></div><div class="tw" id="tbl"></div></section>
+  <section class="card"><h2>How this is worked out</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+      <li>Effective Modifier Boost = your panel Modifier Boost × 2 for a Solar Magnifier × 2 for a Modifier Surge. Luck adds a little too: up to +500, from min(50, luck ÷ 1000) × 10.</li>
+      <li>How many ores get a modifier rises with effective Modifier Boost and tops out at about 99.4% around 1,700–1,900. The Solar Magnifier only helps here.</li>
+      <li>Which modifier you get follows the community's measured shares for Perfect, Mutated, Cosmic and Iridescent, interpolated between test points. The common modifiers fill the rest in their usual proportions. Beyond the highest test point (≈6,700) shares are held where they were measured.</li>
+      <li>Treasured only comes from treasure chests, Voidtorn from Void tools or The Void, Electrified from Thunderstorms and Crystalline from geodes or Crystal Touch, so they aren't listed. Purity rune removes modifiers entirely.</li>
+    </ul></section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

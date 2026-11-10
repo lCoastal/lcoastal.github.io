@@ -1,0 +1,56 @@
+
+/* Layout: three tabs (gear mutations, pan enchants, shovel enchants), each a reference table with a small tool on top */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:0}
+.tabs button{font:600 14px var(--f-body);padding:9px 14px;border:1px solid transparent;border-bottom:0;border-radius:8px 8px 0 0;background:transparent;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--fg);border-color:var(--line);border-bottom:1px solid var(--panel)}
+.tw{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.t th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.t td{padding:8px 10px;border-bottom:1px dashed var(--line);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+table.t .r{text-align:right;font-family:var(--f-mono);white-space:nowrap}
+table.t .nm{font-weight:600;font-size:14px;white-space:nowrap}
+.fx{display:flex;flex-wrap:wrap;gap:4px}
+.fx .sk{font-weight:700}
+.fx span{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);white-space:nowrap}
+.fx span.up{color:var(--fg);border-color:color-mix(in srgb,var(--sc,var(--fg)) 45%,var(--line));background:color-mix(in srgb,var(--sc,var(--fg)) 8%,var(--sunk))}
+.fx span.dn{color:var(--neg);border-color:color-mix(in srgb,var(--neg) 40%,var(--line))}
+.mcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.mc{border:1px solid var(--line);border-top:4px solid var(--mc);border-radius:8px;background:var(--panel);padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.mc b{font-family:var(--f-display);font-size:1.1rem}
+.mc .x{font-family:var(--f-mono);font-size:1.4rem}
+.mc small{font-size:12px;color:var(--muted)}
+.heat td.h{text-align:center;font-family:var(--f-mono);font-size:12px;background:color-mix(in srgb,var(--accent) var(--p),transparent)}
+.tool{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.tool select,.tool input[type=search]{min-width:200px}
+.tool input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent)}
+.lockt{font-size:12px;font-weight:600;white-space:nowrap}
+.lockt.l{color:var(--warn)}
+.lockt.u{color:var(--accent)}
+.mat{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.mat img{width:22px;height:22px;object-fit:contain}
+.top{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+.tr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cfr{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}.cfr .lab{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:104px}.cfr .chips{display:flex;flex-wrap:wrap;gap:6px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:var(--panel);color:var(--fg);padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
+.top h2{margin:0}
+.hb{font:600 12px var(--f-body);padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--sunk);color:var(--muted);cursor:pointer;white-space:nowrap}
+.hb:hover{color:var(--fg)}
+.hidl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.hidl:empty{display:none}
+.hidl .hb{color:var(--fg)}
+.best td{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+@media (max-width:700px){
+  table.t.cards thead{display:none}
+  table.t.cards,table.t.cards tbody{display:block}
+  table.t.cards tr{display:flex;flex-wrap:wrap;gap:6px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  table.t.cards td{display:block;border:0;padding:0}
+  table.t.cards td.full{flex:1 1 100%}
+  table.t.cards td[data-l]::before{content:attr(data-l)" ";font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+#cats tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+#cats td.nm{grid-column:1/-1;font-weight:600;display:flex;align-items:center;gap:6px;min-width:0}
+#cats td:nth-child(3){justify-self:end;text-align:right}
+}

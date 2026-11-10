@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Museum Boosts</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style data-file="style.css"></style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Prospecting Museum Boosts</h1>
+    <p class="lede">Every mineral's museum boost at full size, and the weight it needs to get there.<br>Pick a stat to see what boosts it.<br>The one giving the most in each rarity is marked.</p>
+  </header>
+
+  <div class="controls">
+    <input id="q" class="search" type="search" placeholder="Search minerals…" aria-label="Search minerals">
+    <div class="chips" id="chips" role="group" aria-label="Filter by boost"></div>
+  </div>
+
+  <div id="list"></div>
+
+  <section class="modsec" style="--rc:var(--accent)">
+    <div class="rh"><h2>Mutations</h2><span>bonus per stat, by mineral rarity</span></div>
+    <p class="note">A modifier adds its bonus to every stat it lists, on top of the mineral's own boost.<br>The bonus does not depend on the mineral's weight.<span class="small">Ghostly, Spooky, Jolly, Charming, Rosy, Summer, Tidal, Hearthflame and Purified give no museum bonus.</span></p>
+    <div class="tw" id="mods"></div>
+  </section>
+
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+
+<script data-file="script.js"></script>
+
+</body>
+</html>

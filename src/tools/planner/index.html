@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Museum Planner</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style data-file="style.css"></style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Prospecting Museum Planner</h1>
+    <p class="lede">Pick a mineral and a mutation for each display.<br>Every option shows what it gives, and hovering or focusing one previews how your totals change.<br>Values assume each mineral is at or above its max-boost weight.</p>
+  </header>
+
+  <section class="saved" aria-labelledby="savedh">
+    <div class="savedtop">
+      <h2 id="savedh">My loadouts</h2>
+      <form class="saveform" id="saveform">
+        <input id="lname" class="name" type="text" maxlength="40" placeholder="Name this board" aria-label="Loadout name">
+        <button class="btn primary" type="submit">Save loadout</button>
+      </form>
+    </div>
+    <div id="savedlist" class="savedlist"></div>
+    <div class="bar">
+      <button class="btn primary" id="imgCur" type="button">Save as image</button>
+      <button class="btn" id="dlCur" type="button">Download current board</button>
+      <label class="btn" for="imp">Import a downloaded loadout</label>
+      <input id="imp" type="file" accept=".html,text/html" hidden>
+      <button class="btn" id="copy" type="button">Copy as text</button>
+      <button class="btn" id="pClear" type="button">Clear board</button>
+    </div>
+  </section>
+
+  <div class="grid">
+    <div class="board" id="board"></div>
+    <aside class="totals" aria-live="polite">
+      <h2>Museum total</h2>
+      <div id="tot"></div>
+      <p class="hint" id="filled"></p>
+    </aside>
+  </div>
+
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+
+<div class="scrim" id="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ptitle">
+    <div class="sh"><h3 id="ptitle">Choose</h3><button class="btn" id="pclose" type="button">Close</button></div>
+    <div class="sorts" id="sorts"></div>
+    <div class="opts" id="opts"></div>
+    <div class="preview" id="pview"></div>
+  </div>
+</div>
+
+<script data-file="script.js"></script>
+
+</body>
+</html>

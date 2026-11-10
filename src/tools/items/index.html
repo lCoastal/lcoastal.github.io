@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Potions &amp; Totems</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="ttl">Potions &amp; Totems</h1>
+    <p class="lede">Every potion and totem: what it does, how long it lasts and where to buy it.<br>Potions can be switched on in the Stat Calculator's Boosts. Runes have their own page.</p>
+  </header>
+  <div class="tabs" role="tablist" aria-label="Sections" hidden><button type="button" role="tab" id="t-pot" aria-controls="p-pot">Potions</button><button type="button" role="tab" id="t-tot" aria-controls="p-tot">Totems</button><button type="button" role="tab" id="t-trn" aria-controls="p-trn">Trinkets</button></div>
+  <section id="p-pot" role="tabpanel" aria-labelledby="t-pot" style="display:flex;flex-direction:column;gap:10px"><div class="filters"><input type="search" id="pq" placeholder="Search potions or stats, e.g. luck…" aria-label="Search potions" autocomplete="off"><span class="seg" role="group" aria-label="Paid with" title="Show potions bought with money, with Meteor Shards, or both"><button type="button" data-cur="both">Both</button><button type="button" data-cur="money">Money</button><button type="button" data-cur="shards">Shards</button></span><label class="ck"><input type="checkbox" id="hideTM"> Hide Traveling Merchant</label><button type="button" class="btn" id="potImg">Save as image</button></div><div id="pots" style="display:flex;flex-direction:column;gap:10px"></div></section>
+  <section id="p-tot" role="tabpanel" aria-labelledby="t-tot" hidden><div class="grid" id="tots"></div><p class="hint" style="margin-top:10px">Totem bonuses add to your boost pile, so a 2× totem plus another 2× boost is 3×, not 4×. The Starcrusher shovel makes totems 25% stronger.</p></section>
+  <section id="p-trn" role="tabpanel" aria-labelledby="t-trn" hidden style="flex-direction:column;gap:10px">
+    <div class="card"><h2>How trinkets work</h2><p class="hint">A trinket is a pan accessory with its own perk. Open your Prospector Kit, go to Pans, and press the orange “Trinket” button under Equipped to pick one. Each pan holds one trinket, and you can swap it at any time.</p></div>
+    <div class="grid" id="trns"></div></section>
+  <section id="p-run" hidden aria-hidden="true" style="display:flex;flex-direction:column;gap:10px">
+    <div class="card"><h2>Rune slots</h2><p class="hint">Runes go in the Equipment section of the Prospector Kit. Levelling up unlocks more slots.</p><table class="sl" id="slots"></table></div>
+    <div class="grid" id="runes"></div></section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

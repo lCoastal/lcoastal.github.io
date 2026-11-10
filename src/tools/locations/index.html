@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Locations</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style data-file="style.css"></style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Prospecting Locations</h1>
+    <p class="lede">Every digsite with its toughness, recommended luck, level gate, NPCs and what to know before you go.<br>Pick a location to see every mineral that drops there.</p>
+  </header>
+  <div class="tcopy" role="group" aria-label="Copy locations by toughness"><span class="lab">Copy locations with toughness</span><select id="tSel" aria-label="Toughness"></select><label class="ck"><input type="checkbox" id="tBelow"> and lower (everything that shovel can dig)</label><button type="button" id="tCopy">Copy list</button><span class="cnt" id="tCnt"></span></div>
+  <div class="mpick"><select id="mpick" aria-label="Location"></select></div>
+  <div class="split">
+    <nav class="side" id="side" aria-label="Locations"></nav>
+    <div class="detail" id="detail"></div>
+  </div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+
+<script data-file="script.js"></script>
+
+</body>
+</html>

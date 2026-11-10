@@ -1,0 +1,31 @@
+
+/* Layout: filters, then quests grouped by location; each quest card has tickable steps */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.filters input[type=search]{flex:1;min-width:180px}
+.count{font-size:13px;color:var(--muted)}
+.loc{display:flex;flex-direction:column;gap:8px}
+.lh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.lh h2{font-family:var(--f-display);font-size:1.15rem;margin:0}
+.lbar{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.lbar .bar{width:120px;height:6px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);overflow:hidden}
+.lbar .bar i{display:block;height:100%;background:var(--accent)}
+.qs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.q{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.q.done{border-left-color:var(--accent);opacity:.75}
+.qh{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.qh b{font-family:var(--f-display);font-size:1.02rem;line-height:1.2}
+.qh .npc{font-size:12px;color:var(--muted)}
+.qsub{font-size:13px;color:var(--muted);font-style:italic;margin:0}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+.steps label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;cursor:pointer}
+.steps input{width:16px;height:16px;margin-top:2px;flex:none;accent-color:var(--accent)}
+.steps .ok span{text-decoration:line-through;color:var(--muted)}
+.rw{font-size:12.5px;display:flex;flex-wrap:wrap;gap:4px}
+.rw span{padding:1px 8px;border-radius:999px;background:var(--sunk);border:1px solid var(--line)}
+.rw .bp{border-color:#3f7fd6;color:#3f7fd6}
+.rw .buff{border-color:var(--accent);color:var(--accent)}
+.mlink{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.donebtn{font-size:12px;padding:4px 9px;border-radius:7px;border:1px solid var(--line);background:var(--panel);cursor:pointer;white-space:nowrap}
+.infmsg{margin:8px 0 0;padding:8px 12px;border-radius:8px;border:1px solid var(--ev);background:color-mix(in srgb,var(--ev) 12%,transparent);color:var(--fg);font-size:13px;font-weight:600;font-style:italic;transition:opacity .4s}
+.infmsg.out{opacity:0}
+.q.done .donebtn{background:var(--accent);color:var(--bg);border-color:var(--accent)}

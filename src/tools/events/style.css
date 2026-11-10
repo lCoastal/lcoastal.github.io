@@ -1,0 +1,23 @@
+
+/* Layout: live timers on top (next event roll, timed areas), then every event with its effects */
+.timers{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.tm{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--tc,var(--accent));border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.tm .lab{color:var(--muted)}
+.tm b{font-family:var(--f-display);font-size:1.15rem}
+.tm .cd{font-family:var(--f-mono);font-size:1.9rem;line-height:1.1}
+.tm .st{font-size:13px;font-weight:600}
+.tm .st.open{color:var(--accent)}
+.tm .st.shut{color:var(--muted)}
+.tm .bar{height:6px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);overflow:hidden}
+.tm .bar i{display:block;height:100%;background:var(--tc,var(--accent))}
+.tm small{font-size:12px;color:var(--muted)}
+.ev{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.e{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.e b{font-family:var(--f-display);font-size:1.05rem}
+.e p{margin:0;font-size:13px;color:var(--muted)}
+.e ul{margin:0;padding-left:18px;font-size:13.5px}
+.e .lk2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters input{flex:1;min-width:180px}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.grp{font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:4px 0 0}

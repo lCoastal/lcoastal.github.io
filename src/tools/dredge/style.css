@@ -1,0 +1,37 @@
+
+/* Layout: your stats, the three things the Dredge Master wants, then the plan (fewest stops that still finish fast) */
+.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-left:4px solid var(--neg);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
+.disc b{font-weight:700}
+.inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld input{width:100%;box-sizing:border-box}
+#trav:disabled{opacity:.45;cursor:not-allowed}
+.want{display:flex;flex-direction:column;gap:8px}
+.wrow{display:grid;grid-template-columns:28px minmax(0,1fr) 120px;gap:8px;align-items:center}
+.wrow .n{font:700 14px var(--f-mono);color:var(--muted);text-align:center}
+.wrow input{width:100%;box-sizing:border-box}
+.wrow .ac{flex:none;width:100%}
+.wrow .ok{grid-column:2/4;font-size:12px;color:var(--muted);margin-top:-4px}
+.wrow .ok.bad{color:var(--neg)}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.stops{display:flex;flex-direction:column;gap:10px}
+.stop{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:9px;background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.stop .sh{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}
+.stop .sh b{font-family:var(--f-display);font-size:1.1rem}
+.stop .num{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--bg);font:700 13px var(--f-body);margin-right:8px}
+.cap{display:inline-block;font:600 13px var(--f-mono);padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var(--accent) 16%,transparent);border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);white-space:nowrap}
+.cap.none{font-family:var(--f-body);background:var(--sunk);border-color:var(--line)}
+.items{display:flex;flex-direction:column;gap:4px}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:center;font-size:13.5px;padding:6px 0;border-top:1px dashed var(--line)}
+.item:first-child{border-top:0}
+.item .mn{display:flex;align-items:center;gap:8px;min-width:0}
+.item .mn img{width:26px;height:26px;object-fit:contain;flex:none}
+.item .v{font-family:var(--f-mono);text-align:right;white-space:nowrap}
+.item .sub{grid-column:1/3;font-size:12px;color:var(--muted)}
+.tot{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.tot div{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.tot b{display:block;font-family:var(--f-mono);font-size:1.15rem;font-weight:500}
+.alt{font-size:13px;color:var(--muted);margin:0}
+.alt b{color:var(--fg)}
+.empty{color:var(--muted);font-size:14px}
+@media (max-width:520px){.wrow{grid-template-columns:22px minmax(0,1fr) 84px}}

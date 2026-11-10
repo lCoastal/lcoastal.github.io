@@ -1,0 +1,29 @@
+
+/* Layout: a price-and-museum picker on top, filters, then one card per mutation */
+.pick{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;align-items:end}
+@media (max-width:640px){.pick{grid-template-columns:1fr 1fr}.pick .fld:first-child{grid-column:1/-1}}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld input,.fld select{width:100%;box-sizing:border-box}
+.fld .ac{flex:none;width:100%}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters input{flex:1;min-width:180px}
+.dirb{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.grp{font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:6px 0 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.m{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--mc);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.mh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.mh b{font-family:var(--f-display);font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--mc);box-shadow:0 0 8px var(--mc);flex:none}
+.tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);white-space:nowrap}
+.nums{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.nums div{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:0}
+.nums b{display:block;font-family:var(--f-mono);font-size:1.05rem;font-weight:500;overflow-wrap:anywhere}
+.nums .lab{display:block}
+.row{font-size:13px;margin:0}
+.row .lab{margin-right:6px}
+.mus{display:flex;flex-wrap:wrap;gap:6px}
+.mus span{font-size:12.5px;padding:3px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));color:var(--accent)}
+.mus em{font-style:normal;font-family:var(--f-mono)}
+.look{font-size:13px;color:var(--muted);margin:0;font-style:italic}
+.top{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}

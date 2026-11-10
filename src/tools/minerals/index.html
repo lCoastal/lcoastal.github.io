@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Minerals</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style data-file="style.css"></style>
+
+<script>if(window.PT_POPUP){document.documentElement.classList.add("pt-popup")}</script>
+<style>.pt-popup,.pt-popup body{background:transparent!important}.pt-popup .wrap{display:none!important}</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Prospecting Minerals</h1>
+    <p class="lede">Every mineral with its rarity, value, museum boost and best place to find it.<br>Open a mineral to see every drop location, its odds and every recipe that uses it.</p>
+  </header>
+
+  <section class="filters" aria-label="Filters">
+    <div class="frow">
+      <input id="q" class="search" type="search" placeholder="Search minerals or equipment…" aria-label="Search minerals or equipment">
+      <select id="loc" aria-label="Location"><option value="">All locations</option></select>
+      <select id="sort" aria-label="Sort by">
+        <option value="rarity">Sort: rarity</option>
+        <option value="value">Sort: value</option>
+        <option value="name">Sort: name</option>
+      </select>
+      <button type="button" class="chip dirb" id="dir" aria-label="Sort direction"></button>
+    </div>
+    <div class="frow" id="rar"><span class="lab">Rarity</span></div>
+    <div class="frow" id="stat"><span class="lab">Museum boost</span></div>
+    <span class="count" id="count" aria-live="polite"></span>
+  </section>
+
+  <div class="list" id="list"></div>
+
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+
+<div class="scrim" id="scrim" hidden><div class="page" id="page" role="dialog" aria-modal="true" aria-labelledby="pname"></div></div>
+
+<script data-file="script.js"></script>
+
+</body>
+</html>

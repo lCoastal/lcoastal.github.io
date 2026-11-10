@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Crafting Checklist</title>
+
+%%COMMON%%
+%%ROUTE%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Crafting Checklist</h1>
+    <p class="lede">Pick what you want to craft and it adds up every material you need.<br>Type in how many you already have to see what's left and where to farm it.</p>
+  </header>
+  <div class="split">
+    <section class="card" aria-labelledby="gh">
+      <h2 id="gh">What you're crafting</h2>
+      <div class="add"><input id="addIn" type="search" placeholder="Add equipment, e.g. Otherworldly Ring" aria-label="Add equipment to craft" autocomplete="off"><button type="button" class="btn pri" id="addBtn">Add</button></div>
+      <div class="add"><input id="addMin" type="search" placeholder="Or add a mineral you need, e.g. Vineheart" aria-label="Add a mineral" autocomplete="off"><input id="addMinQ" type="number" min="1" value="1" style="width:70px;flex:none" aria-label="How many"><button type="button" class="btn" id="addMinBtn">Add</button></div>
+      <div id="goals"></div>
+      <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><span class="muted" style="font-size:12.5px">6★ = merge two 5★ at the Magma Forge, so it needs 2 crafts.</span><button type="button" class="x" id="clear">Clear all</button></div>
+    </section>
+    <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+      <section class="card"><div class="sum" id="sum"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="lab" id="pLab">Progress</span>
+          <span class="seg" role="group" aria-label="Progress measured by"><button type="button" data-pm="effort">By effort</button><button type="button" data-pm="count">By item count</button></span></div>
+        <div class="bar" role="progressbar" aria-labelledby="pLab" aria-valuemin="0" aria-valuemax="100" id="pbarW"><i id="pbar" style="width:0"></i></div>
+        <p class="muted" style="margin:0;font-size:12.5px" id="pNote"></p></section>
+      <section class="card" aria-labelledby="pieH"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 id="pieH">What's left</h2>
+          <button type="button" class="chip" id="pieBtn" aria-pressed="true" aria-controls="pie">Show chart</button></div>
+        <div id="pie" class="pie"></div></section>
+      <section class="card" aria-labelledby="mh">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 id="mh">Materials</h2>
+          <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="chip" id="hideDone" aria-pressed="false">Hide finished</button><button type="button" class="btn" id="toImg">Save as image</button></span></div>
+        <div class="tw" id="mats"></div>
+      </section>
+    </div>
+  </div>
+  <section class="card" id="routeCard" aria-labelledby="rh"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 id="rh">Where to farm, in order</h2><button type="button" class="btn" id="copyRoute">Copy route</button></div>
+    <p class="muted" style="margin:0;font-size:13px">A step-by-step route for everything still left above: which zone to go to, what to collect there and when to move on. Minerals that share a zone are grouped. Your stats and area settings are shared with the Museum Farm Route.</p>
+    <div id="rtSet" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="rt-sum" id="rtSum"></div>
+    <div class="rt-stops" id="rtStops"></div>
+    <ul class="rt-issues" id="rtIssues"></ul>
+  </section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

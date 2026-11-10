@@ -1,0 +1,17 @@
+export default [
+  ["None", [], 1, ""],
+  ["Perfect", ["Luck", "Capacity", "Size Boost"], 1, "~1 in 26,764"],
+  ["Treasured", ["Luck"], 2, "Treasure chests only"],
+  ["Lunar", ["Dig Speed", "Shake Speed", "Walk Speed"], 1, "Night only, ~1 in 10,705"],
+  ["Voidtorn", ["Luck", "Capacity"], 1, "The Void / Galactic tools / Voidtouched"],
+  ["Mutated", ["Luck", "Dig Strength", "Modifier Boost"], 1, "~1 in 2,676"],
+  ["Cosmic", ["Capacity", "Shake Strength"], 1, "~1 in 535"],
+  ["Electrified", ["Dig Speed", "Shake Speed"], 1, "Thunderstorm event only"],
+  ["Iridescent", ["Luck"], 1, "~1 in 134"],
+  ["Irradiated", ["Modifier Boost"], 1, "~1 in 27"],
+  ["Crystalline", ["Size Boost"], 1, "Geodes / Crystal Touch shovel"],
+  ["Scorching", ["Dig Strength"], 1, "~1 in 11"],
+  ["Glowing", ["Shake Speed"], 1, "~1 in 5"],
+  ["Pure", ["Dig Speed"], 1, "~1 in 3"],
+  ["Shiny", ["Shake Strength"], 1, "~1 in 3"],
+];

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Best Luck Cap</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Best Luck Cap</h1>
+    <p class="lede">Every mineral, every zone it drops in, and the luck cap that finds it most often there.</p>
+  </header>
+  <p class="disc" role="note"><b>Estimates:</b> worked out with the same luck model as Luck Odds, using the luck you type in: a cap only does something if it's below your luck (then you pan at the cap), and no cap means you pan at your own luck. Abyssal Depth is only listed for minerals that drop nowhere else. Real drops can differ.</p>
+  <section class="card">
+    <div class="bar">
+      <input type="search" id="q" placeholder="Search a mineral or zone" aria-label="Search a mineral or zone">
+      <span class="lfld"><label class="lab" for="luck">Your luck</label><input type="number" id="luck" min="1"><button type="button" class="btn" id="fromCalc">Use my Stat Calculator luck</button></span>
+      <label class="ck" title="Show each mineral only in the zone where you'd find it most often. The Void is left out unless it's the only place."><input type="checkbox" id="bestOnly">Only show best zone</label>
+      <button type="button" class="btn" id="toImg">Save as image</button>
+      <span class="seg" role="group" aria-label="Sort"><button type="button" data-sort="rar">Rarest first</button><button type="button" data-sort="az">A–Z</button></span>
+    </div>
+    <div class="rf" id="rarF" role="group" aria-label="Rarities to show"></div>
+    <p class="hint" id="count"></p>
+    <table class="o"><thead><tr><th>Mineral</th><th>Zone</th><th>Best luck cap</th><th title="The exact luck that finds this mineral most often here, if you could set any number">Best luck</th><th>Chance per mineral</th><th>Compared to your luck</th></tr></thead><tbody id="rows"></tbody></table>
+    <div class="more" id="more"></div>
+  </section>
+  <section class="card"><h2>How this is worked out</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+      <li>More luck pulls rarer minerals into each roll, which also pushes less rare ones out. So each mineral has a luck where it shows up most often, and going past it makes it rarer again.</li>
+      <li>For every zone, each cap setting below your luck (1 up to 100,000) is tried against no cap, and the one that gives that mineral the best chance is shown. Caps at or above your luck do nothing, so they count as no cap.</li>
+      <li>"Best luck" is the exact luck that finds it most often there, if you could set any number. The caps only come in fixed steps, so this shows where the real peak sits between them.</li>
+      <li>"Compared to your luck" is how much more often you'd find it with that cap than panning uncapped at your luck.</li>
+      <li>The rarest minerals in a zone only get better with more luck, so for those, no cap is best.</li>
+    </ul>
+    <div class="fx">
+      <h3>The formula</h3>
+      <p>For one zone, list its minerals from rarest to most common, with drop shares <code>p₁, p₂, …, pₙ</code> (as fractions that add up to 1). For the mineral in spot <code>k</code>:</p>
+      <div class="row"><span>Everything rarer</span><code>a = p₁ + p₂ + … + pₖ₋₁</code></div>
+      <div class="row"><span>Up to and including it</span><code>b = a + pₖ</code></div>
+      <div class="row"><span>Best of L rolls</span><code>f(L) = (1 − a)<sup>L</sup> − (1 − b)<sup>L</sup></code></div>
+      <div class="row"><span>Per mineral</span><code>P = ¼·f(1) + ¼·f(max(1, L ÷ 2)) + ½·f(max(1, L))</code></div>
+      <div class="row"><span>Per pan (capacity C)</span><code>1 − (1 − P)<sup>√C</sup></code></div>
+      <div class="row"><span>Pans on average</span><code>1 ÷ (per pan chance)</code></div>
+      <div class="row"><span>With a luck cap</span><code>L = min(your luck, cap)</code></div>
+      <div class="row"><span>Quick estimate</span><code>L₀ = ln( ln(1 − b) ÷ ln(1 − a) ) ÷ ln( (1 − a) ÷ (1 − b) )</code></div>
+      <div class="row"><span>Best luck (exact)</span><code>the L where ⅛·g(L ÷ 2) + ½·g(L) = 0</code></div>
+      <div class="row"><span>where</span><code>g(x) = (1 − a)<sup>x</sup>·ln(1 − a) − (1 − b)<sup>x</sup>·ln(1 − b)</code></div>
+      <p>That equation has no neat closed form, so the tool solves it numerically. <code>L₀</code> is where the full-luck part alone peaks; the real peak sits a bit above it, usually around <code>1.2 × L₀</code>. The quarter of rolls at half luck are still climbing when the full-luck rolls peak, so they drag the peak to the right, but they only pull with ⅛ of the strength (a quarter of the rolls, moving half as fast) against the full-luck rolls' ½. For most minerals that lands at 1.18–1.25 × L₀; a mineral far more common than everything rarer than it can go up to about 1.5 × L₀. The quarter at luck 1 never changes, so it doesn't move the peak. The rarest mineral in a zone has <code>a = 0</code>, so it has no peak: higher luck is always better.</p>
+    </div></section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

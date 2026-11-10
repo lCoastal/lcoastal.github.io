@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Quest Tracker</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Quest Tracker</h1>
+    <p class="lede">Every quest by location, with its steps and rewards.<br>Tick steps off as you go; Ctrl+click a mineral in a step to open it.</p>
+  </header>
+  <section class="filters" aria-label="Filters">
+    <input type="search" id="q" placeholder="Search quests, NPCs, minerals or rewards…" aria-label="Search quests" autocomplete="off">
+    <select id="loc" aria-label="Location"><option value="">All locations</option></select>
+    <button type="button" class="chip" id="hideDone" aria-pressed="false">Hide finished</button>
+    <button type="button" class="chip" id="onlyBp" aria-pressed="false">Blueprint rewards</button>
+    <button type="button" class="chip" id="onlyBuff" aria-pressed="false">Permanent buffs</button>
+    <span class="count" id="count"></span>
+  </section>
+  <div id="list" style="display:flex;flex-direction:column;gap:18px"></div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

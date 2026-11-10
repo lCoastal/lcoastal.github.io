@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Toolkit Settings</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Settings</h1>
+    <p class="lede">How every tool in the toolkit looks and behaves. Changes apply straight away and are saved in this browser.</p>
+  </header>
+  <section class="card set"><h2>Appearance</h2>
+    <div class="srow stk"><div class="stx"><b>Theme</b><span>Auto follows your device or the app. Light and Dark always use that theme.</span></div><div class="seg" id="thm" role="group" aria-label="Theme"><button type="button" data-t="auto">Auto</button><button type="button" data-t="light">Light</button><button type="button" data-t="dark">Dark</button></div></div>
+    <div class="srow stk"><div class="stx"><b>Accent colour</b><span>The colour of buttons, switches, links and highlights in every tool.</span><span class="accn" id="accN"></span></div><div class="sws" id="acc" role="radiogroup" aria-label="Accent colour"></div></div>
+  </section>
+  <section class="card set"><h2>Display</h2>
+    <div class="srow"><div class="stx"><b>Compact view</b><span>Tighter tables, cards and chips, so more fits on screen.</span></div><button type="button" class="sw" role="switch" data-k="compact" aria-label="Compact view"></button></div>
+    <div class="srow"><div class="stx"><b>Short numbers</b><span>Shows big numbers in short form. On a computer, hover one to see the full number.</span><span class="ex pt-noshort" id="ex1"></span></div><button type="button" class="sw" role="switch" data-k="short" aria-label="Short numbers"></button></div>
+    <div class="srow sub"><div class="stx"><b>Decimal places</b><span>The most decimals a short number shows. Trailing zeros are dropped.</span><span class="ex pt-noshort" id="ex2"></span></div><div class="seg" id="dec" role="group" aria-label="Decimal places"><button type="button" data-d="0">0</button><button type="button" data-d="1">1</button><button type="button" data-d="2">2</button><button type="button" data-d="3">3</button></div></div>
+  </section>
+  <section class="card set"><h2>Browsing</h2>
+    <div class="srow"><div class="stx"><b>Remember scroll position</b><span>Opening a tool again takes you back to where you were in it.</span></div><button type="button" class="sw" role="switch" data-k="scroll" aria-label="Remember scroll position"></button></div>
+    <div class="srow stk"><div class="stx"><b>Image buttons</b><span>What Save as image does in every tool. Copy puts the picture on your clipboard, ready to paste into Discord.</span></div><div class="seg pt-noacts" id="imgm" role="group" aria-label="What image buttons do"><button type="button" data-m="copy">Copy</button><button type="button" data-m="both">Both</button><button type="button" data-m="save">Save</button></div></div>
+    <div class="srow stk"><div class="stx"><b>Recently viewed</b><span>How many minerals, equipment, gear and runes the top of the menu remembers. Remove one with its ×.</span></div><div class="seg" id="rec" role="group" aria-label="Recently viewed items to keep"><button type="button" data-r="0">Off</button><button type="button" data-r="4">4</button><button type="button" data-r="8">8</button><button type="button" data-r="12">12</button><button type="button" data-r="16">16</button></div></div>
+    <div class="srow stk"><div class="stx"><b>Search shortcut</b><span>Opens the search box from any tool. Use one key, or two pressed together.</span><span class="hkmsg" id="hkMsg" role="status"></span></div><div class="hkc"><kbd id="hkNow"></kbd><button type="button" class="btn" id="hkSet">Change</button><button type="button" class="hkr" id="hkReset">Reset</button></div></div>
+    <p class="note">To clear every saved build, checklist and setting, use Reset everything at the bottom of the menu.</p>
+  </section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 06/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Luck Odds</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Luck Odds</h1>
+    <p class="lede">Estimated chances of finding each mineral with your luck.<br>These are estimates built on how the wiki describes luck, not exact game numbers.</p>
+  </header>
+  <p class="disc" role="note"><b>Not exact:</b> these are estimates from a simplified model of the game. They don't account for everything, like modifiers, Size Boost, enchants, events, weather or hidden game rules, so your real odds can be quite different.</p>
+  <section class="card">
+    <div class="inputs">
+      <label class="fld"><span class="lab">Your luck</span><input type="number" id="luck" min="1" value=""></label>
+      <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" value=""></label>
+      <label class="fld"><span class="lab" title="Leave empty to just see how many pans it takes on average">Pans per hour (optional)</span><input type="number" id="pph" min="0" placeholder="Leave empty for average pans only"></label>
+      <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
+    </div>
+    <p class="hint" id="perPan"></p>
+  </section>
+  <section class="card">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+      <span class="seg" role="group" aria-label="Show chances as" title="How chances are written"><button type="button" data-fmt="one">1 in</button><button type="button" data-fmt="pct">%</button><button type="button" data-fmt="both">Both</button></span>
+      <span style="display:flex;gap:8px;align-items:center;flex:1 1 300px;min-width:0;justify-content:flex-end"><input id="pick" type="search" placeholder="Type a location or mineral…" aria-label="Location or mineral"><button type="button" class="btn" id="toImg">Save as image</button></span>
+    </div>
+    <div class="rf" id="rarF" role="group" aria-label="Rarities to show"></div>
+    <div class="big" id="sum"></div>
+    <div class="tw" id="tbl"></div>
+  </section>
+  <section class="card" id="simCard"><div class="top"><h2>Pan simulator</h2><span class="hint" id="simWhere"></span></div>
+    <p class="hint" style="margin:0">Pans for you using the chances above, with your luck and capacity. Just for fun, real pans can go very differently.</p>
+    <div class="simb"><span class="lab">Pan</span><button type="button" class="btn" data-sim="10">10</button><button type="button" class="btn" data-sim="100">100</button><button type="button" class="btn" data-sim="1000">1,000</button><button type="button" class="btn" data-sim="10000">10,000</button><span class="simc"><input type="number" id="simN" min="1" max="100000" step="1" placeholder="Custom" aria-label="Custom number of pans"><button type="button" class="btn pri" id="simGo">Pan</button></span></div>
+    <div id="simOut"></div>
+  </section>
+  <section class="card"><h2>How this is worked out</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+      <li>Each mineral slot in a pan rolls three ways: half the time at your full luck, a quarter of the time at half your luck, and a quarter of the time as if your luck were 1. That's why commons never disappear.</li>
+      <li>At a given luck, the rarity roll is the best of that many tries, so rarer ores gain share as luck grows. The base rates are the drop chances listed for each location.</li>
+      <li>On average a pan holds about √capacity minerals, which is how per-pan chances are worked out.</li>
+      <li>Size Boost, modifiers and enchants that change drops (like Mythical) aren't counted. Treat these as rough guides.</li>
+    </ul>
+    <div class="fx">
+      <h3>The formula</h3>
+      <p>For one zone, list its minerals from rarest to most common, with drop shares <code>p₁, p₂, …, pₙ</code> (as fractions that add up to 1). For the mineral in spot <code>k</code>:</p>
+      <div class="row"><span>Everything rarer</span><code>a = p₁ + p₂ + … + pₖ₋₁</code></div>
+      <div class="row"><span>Up to and including it</span><code>b = a + pₖ</code></div>
+      <div class="row"><span>Best of L rolls</span><code>f(L) = (1 − a)<sup>L</sup> − (1 − b)<sup>L</sup></code></div>
+      <div class="row"><span>Per mineral</span><code>P = ¼·f(1) + ¼·f(max(1, L ÷ 2)) + ½·f(max(1, L))</code></div>
+      <div class="row"><span>Per pan (capacity C)</span><code>1 − (1 − P)<sup>√C</sup></code></div>
+      <div class="row"><span>Pans on average</span><code>1 ÷ (per pan chance)</code></div>
+    </div></section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

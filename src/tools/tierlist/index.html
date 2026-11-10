@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Prospecting Tier List</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Tier List</h1>
+    <p class="lede">Rank minerals, equipment or runes. Drag them into a row, or tap one and then tap a row. Hold Ctrl and click (or press and hold on a phone) to grab several at once, then tap a row to move them together. Click a row's label to rename it, recolour it, move it or delete it.</p>
+  </header>
+  <section class="card">
+    <div class="bar"><span class="seg" role="group" aria-label="What to rank"><button type="button" data-k="m">Minerals</button><button type="button" data-k="e">Equipment</button><button type="button" data-k="r">Runes</button></span><input type="text" id="ttl" placeholder="Name your list, e.g. Best museum minerals" aria-label="List name" maxlength="60"><button type="button" class="btn" id="clr">Clear</button><button type="button" class="btn" id="imp">Import text</button><button type="button" class="btn" id="cpy">Copy as text</button><button type="button" class="btn" id="toImg">Save as image</button></div>
+    <div class="impbox" id="impBox" hidden><label class="lab" for="impTx">Paste a tier list</label><textarea id="impTx" rows="6" placeholder="Best museum minerals&#10;S: Bloodstone, Astral Spore&#10;A: Celestium&#10;Skip: Gold, Copper"></textarea><p class="hint2">One row per line, written as <b>Row name: item, item</b>. A first line without a colon becomes the list name. It works out minerals, equipment or runes by itself.</p><div class="impb"><button type="button" class="btn pri" id="impGo">Load list</button><button type="button" class="btn" id="impNo">Cancel</button></div></div>
+    <div class="tiers" id="tiers"></div>
+    <div class="rowbar"><button type="button" class="btn" id="addRow">+ Add row</button><button type="button" class="btn ghost" id="rstRows">Reset rows</button></div>
+    <div class="roweditor" id="rowEd" hidden></div>
+    <p class="hint2" id="selHint">Tip: tap an item to pick it up, then tap a row to drop it. Hold Ctrl and click, or press and hold on a phone, to pick several at once.</p>
+  </section>
+  <section class="card">
+    <div class="pooltop"><h2 style="margin:0">Not ranked yet <span class="cnt" id="pcnt"></span></h2><input type="search" id="q" placeholder="Find an item…" aria-label="Find an item" autocomplete="off"></div>
+    <div class="chips" id="tf"></div>
+    <div class="chips" id="rf"></div>
+    <div class="pool" id="pool" data-row=""></div>
+  </section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 07/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+
+</body>
+</html>

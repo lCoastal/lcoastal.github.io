@@ -1,0 +1,16 @@
+
+/* Layout: search + region filter, then NPC cards grouped by region with their quests */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.filters input{flex:1;min-width:180px}
+.count{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.n{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.n b{font-family:var(--f-display);font-size:1.08rem}
+.n p{margin:0;font-size:13px;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tags span{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;border:1px solid var(--line)}
+.tags .q{border-color:var(--accent);color:var(--accent)}
+.tags .s{border-color:var(--c-legendary);color:var(--c-legendary)}
+.ql{font-size:13px;margin:0;padding-left:18px}
+.ql button{font:inherit;background:none;border:0;padding:0;color:var(--fg);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;cursor:pointer;text-align:left}
+.rg{font-family:var(--f-display);font-size:1.15rem;margin:6px 0 0}

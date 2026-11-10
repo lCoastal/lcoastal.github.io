@@ -1,0 +1,32 @@
+
+/* Layout: goal + limits on the left, the suggested museum and its totals on the right */
+.split{display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.wt{display:grid;grid-template-columns:120px minmax(0,1fr) 34px;gap:8px;align-items:center;font-size:13.5px}
+.wt input[type=range]{width:100%;accent-color:var(--accent)}
+.wt output{font-family:var(--f-mono);text-align:right}
+.ck{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer}
+.ck input{width:16px;height:16px;accent-color:var(--accent)}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px 10px}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.band{border:1px solid var(--rc);border-left-width:5px;border-radius:8px;overflow:hidden}
+.band h3{margin:0;padding:6px 12px;font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--rc);background:var(--sunk);border-bottom:1px solid var(--rc)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.slot{display:flex;gap:8px;align-items:center;padding:8px 12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:0}
+.slot img{width:34px;height:34px;object-fit:contain;flex:none}
+.slot>div{flex:1;min-width:0}
+.skipb{flex:none;margin-left:auto;font:600 11.5px var(--f-body);padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
+.skipb:hover{border-color:var(--neg);color:var(--neg)}
+.skipped{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1px dashed var(--line);border-radius:8px;font-size:12.5px}
+.skipped .chip{font-size:12px;padding:3px 10px}
+.slot b{display:block;font-size:14px}
+.slot span{font-size:12px;color:var(--muted)}
+.slot em{font-style:normal;font-family:var(--f-mono);color:var(--accent)}
+.slot .neg{color:var(--neg)}
+.tot{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.tot div{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;justify-content:space-between;gap:8px;font-size:13.5px}
+.tot b{font-family:var(--f-mono);font-weight:500}
+.tot .neg b{color:var(--neg)}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40}
