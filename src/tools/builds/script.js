@@ -233,6 +233,7 @@ function renderEditor(){
   <div class="row"><label class="field"><span>Modifier</span><select class="inp" id="f-mod">${opts(modList.filter(m=>m!=="None"),b.mod)}</select></label>
   <label class="field"><span>Fallback modifier</span><select class="inp" id="f-modFallback">${opts(["",...modList.filter(m=>m!=="Any"&&m!=="None")],b.modFallback)}</select></label></div>
   <p class="hint">Click a slot’s box to see every mineral with what it gives; hover one to preview the museum total. Add more than one to a slot to list choices; the first one counts in the total.</p>
+  <div class="row" style="margin-bottom:8px"><button class="btn sm" type="button" data-act="mymuseum" title="Fill these slots and the modifier from your current board on the Museum Planner page">Use my Museum Planner board</button></div>
   <div class="mtot"><div class="mtoth"><b>Museum total</b><span>first mineral in each slot + main modifier, at max weight</span></div><div class="mtotv" id="mtot"></div></div>`;
   const mname=n=>BY[n.toLowerCase()]?BY[n.toLowerCase()][0]:n;
   ORDER.forEach(r=>{const sl=b.museum[r];
@@ -380,6 +381,16 @@ ed.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;
   else if(a==="addring6"){if(!Array.isArray(b.rings6))b.rings6=[];b.rings6.push({count:"",mut:"",name:"",note:""})}
   else if(a==="rmring6")b.rings6.splice(+t.dataset.i,1);
   else if(a==="addex")b.extras.push({label:"",name:"",note:""});
+  else if(a==="mymuseum"){let bd=null;try{bd=JSON.parse(localStorage.getItem("mp-board")||"null")}catch(e){}
+    const real=x=>x&&x.m&&x.m!=="Any";
+    if(!bd||!ORDER.some(r=>(bd[r]||[]).some(real))){toast("Your Museum Planner board is empty. Fill it on the Museum Planner page first.");return}
+    // the planner has a modifier per slot, a build has one main modifier (+ fallback): use the most common ones
+    const cnt={};
+    b.museum=Object.fromEntries(ORDER.map(r=>[r,Array.from({length:SLOTS[r]},(_,i)=>{const x=(bd[r]||[])[i];if(!real(x))return {m:[],pick:1,join:"|",mark:"",span:1};
+      if(x.u&&x.u!=="None"&&MODS[x.u])cnt[x.u]=(cnt[x.u]||0)+1;const d=BY[String(x.m).toLowerCase()];return {m:[d?d[0]:x.m],pick:1,join:"|",mark:"",span:1}})]));
+    const mods=Object.entries(cnt).sort((x,y)=>y[1]-x[1]).map(x=>x[0]);
+    if(mods.length){b.mod=mods[0];b.modFallback=mods[1]||""}
+    toast(mods.length>1?`Museum filled from your Museum Planner board (modifiers: ${mods[0]}, fallback ${mods[1]})`:"Museum filled from your Museum Planner board")}
   else if(a==="myrunes"){let sel=[];try{sel=(JSON.parse(localStorage.getItem("pr-s")||"{}").sel)||[]}catch(e){}if(!sel.length){toast("Your Runes loadout is empty. Pick runes on the Runes page first.");return}b.runeSlots=Array.from({length:5},(_,i)=>sel[i]||"");syncRunes(b);toast("Runes filled from your loadout")}
   else if(a==="rmex")b.extras.splice(+t.dataset.i,1);
   else if(a==="rmpic")delete b.pic;
