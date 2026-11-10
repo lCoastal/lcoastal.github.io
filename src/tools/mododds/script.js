@@ -2,22 +2,24 @@
 const $=id=>document.getElementById(id);
 let S={mb:"",cap:"",mag:false,surge:false,night:false};try{Object.assign(S,JSON.parse(localStorage.getItem("pmo-s")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("pmo-s",JSON.stringify(S))}catch(e){}};
-// base share among modified ores (wiki) + measured shares at higher effective MB (community counts, % of modified ores)
 // the game's modifier weights; a modifier's base share is its weight ÷ the total (Treasured, Voidtorn, event ones etc. are 0 here)
 const WEIGHT={Shiny:1,Pure:.8,Glowing:.5,Scorching:.25,Irradiated:.1,Iridescent:.02,Cosmic:.005,Mutated:.001,Lunar:.00025,Perfect:.0001};
 const WSUM=Object.values(WEIGHT).reduce((a,b)=>a+b,0);
 const BASE=Object.fromEntries(Object.entries(WEIGHT).map(([k,w])=>[k,w/WSUM*100]));
-const MEAS={Perfect:[[1,.0037],[1900,.38],[6700,1.2]],Mutated:[[1,.037],[1900,2.8],[6700,10]],Cosmic:[[1,.187],[1900,13],[6700,29]],Iridescent:[[1,.75],[1900,24],[6700,20]]};
 const PRICE={Perfect:24,Lunar:14,Mutated:9,Cosmic:6,Iridescent:3.5,Irradiated:2.5,Scorching:2,Glowing:1.6,Pure:1.35,Shiny:1.2};
 const MUSE=Object.fromEntries(P.mods.map(m=>[m[0],m[1].join(", ")]));
-// log-log interpolation between measured points
-function interp(pts,x){x=Math.max(1,x);if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i];if(x<=x1){const t=(Math.log(x)-Math.log(x0))/(Math.log(x1)-Math.log(x0));return Math.exp(Math.log(y0)+t*(Math.log(y1)-Math.log(y0)))}}return pts[0][1]}
 // share of ores that get any modifier (piecewise fit of the wiki chart)
 const anyMod=e=>Math.min(.994,e<=1000?e*.00066:.66+(e-1000)*.000485);
-function shares(eff){const s={};let rare=0;["Perfect","Mutated","Cosmic","Iridescent"].forEach(k=>{s[k]=interp(MEAS[k],eff);rare+=s[k]});
-  // Lunar sits between Perfect and Mutated: scale it by their average growth
-  if(S.night){const g=Math.sqrt((s.Perfect/BASE.Perfect)*(s.Mutated/BASE.Mutated));s.Lunar=BASE.Lunar*g;rare+=s.Lunar}
-  const rest=Math.max(0,100-rare);const common=["Irradiated","Scorching","Glowing","Pure","Shiny"];const cb=common.reduce((a,k)=>a+BASE[k],0);common.forEach(k=>s[k]=rest*BASE[k]/cb);return s}
+// Which modifier you get works like luck does for minerals: the game rolls more than once and keeps the rarest
+// modifier, rarest first by the game's weights. Fitted on two datasets (5.97x and 8.97x Modifier Boost):
+// strength L = 14.5 x Modifier Boost (x), and a third of ores roll once, a quarter at half strength, the rest at full.
+const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
+const MOD_K=14.535,MOD_MIX=[.338,.268,.394];
+function modShares(eff,night){const list=MODW.filter(([k])=>night||k!=="Lunar");const tot=list.reduce((a,x)=>a+x[1],0);
+  const f=N=>{let a=0;const o={};list.forEach(([k,w])=>{const p=w/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-p),N);a+=p});return o};
+  const L=Math.max(1,MOD_K*Math.max(0,eff)/100),parts=[f(1),f(Math.max(1,L/2)),f(L)];const s={};
+  list.forEach(([k])=>s[k]=100*(MOD_MIX[0]*parts[0][k]+MOD_MIX[1]*parts[1][k]+MOD_MIX[2]*parts[2][k]));return s}
+function shares(eff){return modShares(eff,S.night)}
 const oneInP=p=>p<=0?"—":p>=.5?fmt(p*100,1)+"%":`~1 in ${fmt(Math.round(1/p),0)}`;
 // luck isn't counted: it affects modifier odds a little, but how much is unknown (needs testing)
 function calcAll(){const mb=Math.max(0,+S.mb||0);
