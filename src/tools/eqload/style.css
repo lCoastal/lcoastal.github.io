@@ -17,7 +17,7 @@
 .toprow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .rings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 @media (max-width:520px){.rings{grid-template-columns:repeat(2,minmax(0,1fr))}.tile:not(.big) img{width:48%;margin-top:14px}.tile.big img{width:64px}.tile.big{min-height:120px}}
-.tile{position:relative;aspect-ratio:1/1;min-height:0;border-radius:12px;border:2px solid var(--tc,#3a444d);background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--tc,#3a444d) 22%,#1b2127),#12161a 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:6px;box-sizing:border-box;color:#e6e9ec;font:inherit;text-align:center;overflow:hidden}
+.tile{position:relative;aspect-ratio:1/1;min-height:0;border-radius:12px;border:2px solid var(--tc,#3a444d);background:#161b20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;padding:6px;box-sizing:border-box;color:#e6e9ec;font:inherit;text-align:center;overflow:hidden}
 .tile:hover,.tile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tile.big{aspect-ratio:auto;min-height:150px;flex-direction:row;justify-content:flex-start;gap:12px;padding:10px 12px;text-align:left}
 .tile img{width:62%;max-width:84px;aspect-ratio:1/1;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
