@@ -52,14 +52,6 @@ export default [
   },
   {
     rg: "Crystal Caverns",
-    n: "Crystal Caverns",
-    t: "4",
-    npc: "Security Guard, Clyde, Head Researcher, Miner, Mad Scientist",
-    d: "Some wiki pages list drops for the Crystal Caverns area as a whole.",
-    x: [],
-  },
-  {
-    rg: "Crystal Caverns",
     n: "Azuralite Oasis",
     t: "5",
     npc: "Botanist",

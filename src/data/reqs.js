@@ -5,7 +5,6 @@ export default {
   "Fortune River Delta": { luck: null, level: null, access: null },
   "Sunset Beach": { luck: null, level: null, access: null },
   "Crystal Cavern River": { luck: null, level: 15, access: null },
-  "Crystal Caverns": { luck: null, level: 15, access: null },
   "Azuralite Oasis": { luck: null, level: 15, access: null },
   "Volcanic Sands": { luck: 200, level: 20, access: null },
   "Volcanic Springs": { luck: 200, level: 20, access: null },
