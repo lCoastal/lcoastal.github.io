@@ -334,12 +334,14 @@ function openSugg(inp){
   list.sort((a,c)=>Math.max(...c[3].map(x=>x[1]))-Math.max(...a[3].map(x=>x[1]))||a[0].localeCompare(c[0]));
   const box=sbox(inp);
   if(!list.length){box.innerHTML=`<div class="spv">No ${r.toLowerCase()} mineral matches “${esc(inp.value)}”.</div>`;box.hidden=false;inp.setAttribute("aria-expanded","true");SG={inp,items:[],hot:-1};return}
-  box.innerHTML=`<div class="slist">${list.map((d,k)=>{const lc=d[0].toLowerCase();const here=inSlot.includes(lc);const other=usedAt[lc];const dis=here||!!other;const u=picOf("Mineral",d[0]);return `<button type="button" class="sopt${dis?" taken":""}" role="option" data-mineral="${esc(d[0])}" id="so-${r}-${i}-${k}" data-name="${esc(d[0])}"${dis?' aria-disabled="true"':""}>${u?`<img class="si" src="${u}" alt="">`:'<span class="si"></span>'}<b>${esc(d[0])}</b><span class="kgs">${d[2]} kg for max</span><span class="g">${here?"<span>Already in this slot</span>":other?`<span>Already in slot ${other}</span>`:gainsHTML(d[3])}</span></button>`}).join("")}</div><div class="spv" id="spv-${r}-${i}"><b>Hover a mineral to preview the museum total</b></div>`;
+  box.innerHTML=`<div class="slist">${list.map((d,k)=>{const lc=d[0].toLowerCase();const here=inSlot.includes(lc);const other=usedAt[lc];const dis=here||!!other;const u=picOf("Mineral",d[0]);return `<button type="button" class="sopt${dis?" taken":""}" role="option" data-mineral="${esc(d[0])}" id="so-${r}-${i}-${k}" data-name="${esc(d[0])}"${dis?' aria-disabled="true"':""}>${u?`<img class="si" src="${u}" alt="">`:'<span class="si"></span>'}<b>${esc(d[0])}</b><span class="kgs">${d[2]} kg for max</span><span class="g">${here?"<span>Already in this slot</span>":other?`<span>Already in slot ${other}</span>`:gainsHTML(d[3])}</span></button>`}).join("")}</div><div class="spv" id="spv-${r}-${i}" hidden></div>`;
   box.hidden=false;inp.setAttribute("aria-expanded","true");
+  // wider than a slot; keep it on screen
+  box.style.left="0px";{const rc=box.getBoundingClientRect(),over=rc.right-(document.documentElement.clientWidth-8);if(over>0)box.style.left=(-Math.min(over,rc.left-8))+"px"}
   SG={inp,items:list.map(d=>d[0]),hot:-1};
 }
 function closeSugg(){if(!SG)return;const box=sbox(SG.inp);if(box){box.hidden=true}SG.inp.setAttribute("aria-expanded","false");SG.inp.removeAttribute("aria-activedescendant");SG=null}
-function previewSugg(name){if(!SG)return;const inp=SG.inp,r=inp.dataset.r,i=+inp.dataset.i,b=getB();const pv=document.getElementById(`spv-${r}-${i}`);if(!pv)return;
+function previewSugg(name){if(!SG)return;const inp=SG.inp,r=inp.dataset.r,i=+inp.dataset.i,b=getB();const pv=document.getElementById(`spv-${r}-${i}`);if(!pv)return;pv.hidden=false;
   const before=museumTotals(b),after=museumTotals(b,{r,i,name});const ch=STATS.filter(s=>Math.abs(after[s]-before[s])>1e-9);
   const slot=b.museum[r][i];const verb=slot.m.length?`Museum total if ${esc(name)} replaces ${esc(slot.m[0])}`:`Museum total with ${esc(name)}`;
   pv.innerHTML=`<b>${verb}</b>`+(ch.length?ch.map(s=>{const d=after[s]-before[s];return `<span>${s} <em>${fx(after[s])}</em> <em class="${d>0?"":"down"}">(${d>0?"+":"−"}${r4(Math.abs(d))})</em></span>`}).join(""):"<span>No change</span>")}
@@ -350,7 +352,10 @@ ed.addEventListener("focusin",e=>{if(e.target.dataset&&e.target.dataset.act==="a
 ed.addEventListener("click",e=>{const t=e.target;if(t.dataset&&t.dataset.act==="add"&&!SG)openSugg(t)});
 ed.addEventListener("focusout",e=>{if(e.target.dataset&&e.target.dataset.act==="add")setTimeout(()=>{if(SG&&SG.inp===e.target&&document.activeElement!==e.target)closeSugg()},120)});
 ed.addEventListener("input",e=>{if(e.target.dataset.act==="add")openSugg(e.target)});
-ed.addEventListener("mouseover",e=>{const o=e.target.closest(".sopt");if(o&&SG&&o.getAttribute("aria-disabled")!=="true")previewSugg(o.dataset.name)});
+// the museum-total preview only shows while a mineral is hovered (or picked with the arrow keys)
+const hidePv=()=>{if(!SG)return;const pv=document.getElementById(`spv-${SG.inp.dataset.r}-${SG.inp.dataset.i}`);if(pv)pv.hidden=true};
+ed.addEventListener("mouseover",e=>{const o=e.target.closest(".sopt");if(!o||!SG)return;if(o.getAttribute("aria-disabled")!=="true")previewSugg(o.dataset.name);else hidePv()});
+ed.addEventListener("mouseout",e=>{const l=e.target.closest(".slist");if(l&&!l.contains(e.relatedTarget))hidePv()});
 ed.addEventListener("mousedown",e=>{if(e.target.closest(".sbox"))e.preventDefault()});
 ed.addEventListener("click",e=>{const o=e.target.closest(".sopt");if(!o||!SG)return;e.stopPropagation();if(o.getAttribute("aria-disabled")==="true")return;addMineral(SG.inp,o.dataset.name)},true);
 ed.addEventListener("keydown",e=>{const t=e.target;if(t.dataset.act!=="add")return;
