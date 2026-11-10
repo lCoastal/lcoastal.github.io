@@ -15,7 +15,7 @@ const STAT_RE=/\b(luck|capacity|size boost|sell boost|modifier boost|dig strengt
 const statKeyB=w=>{const k=w.toLowerCase().replace("walkspeed","walk speed");return Object.keys(SHX).find(x=>x.toLowerCase()===k)};
 // colour every stat name in the sheet's text (only text between tags, never inside attributes)
 const colourStats=h=>{const i=h.indexOf("</h1>");const head=i>=0?h.slice(0,i+5):"";return head+cs0(i>=0?h.slice(i+5):h)};
-const cs0=h=>h.replace(/>([^<]+)</g,(m,t)=>">"+t.replace(STAT_RE,w=>{const k=statKeyB(w);return k?`<span style="color:${SHX[k]}">${w}</span>`:w})+"<");
+const cs0=h=>h.replace(/>([^<]+)</g,(m,t)=>">"+t.replace(STAT_RE,w=>{const k=statKeyB(w);return k?`<span style="color:${SC2(k)}">${w}</span>`:w})+"<");
 const CCOL={L:"#86f34a",C:"#f0b44a",W:"#ff6b6b",D:"#ff9d7f",S:"#8ecbff",$:"#ffd21f",K:"#d6dbe0",M:"#39e06a",A:"#ff8fb1",P:"#b9a6ff","2":"#86f34a","+":"#86f34a","-":"#ff5a5a"};
 const D=[
 ["Copper","Common",60,[["Size Boost",.04]]],["Gold","Common",40,[["Sell Boost",.05]]],["Amethyst","Common",20,[["Dig Speed",.05]]],["Blue Ice","Common",40,[["Dig Speed",.05]]],["Pyrite","Common",60,[["Capacity",.05]]],["Silver","Common",40,[["Shake Speed",.05]]],["Platinum","Common",40,[["Dig Speed",.05]]],["Seashell","Common",20,[["Capacity",.05]]],["Obsidian","Common",30,[["Size Boost",.04]]],["Pearl","Common",20,[["Shake Speed",.05]]],
@@ -73,12 +73,15 @@ function slotHTML(s){
   const pick=s.m.length>1&&s.pick>1?`<span class="pick">pick ${s.pick}:</span> `:"";
   return `${codesHTML(codes)}${pick}${parts.join(s.join===">"?" &gt; ":" | ")}${s.mark?` <span class="mark">${esc(s.mark)}</span>`:""}`;
 }
-function modLabel(m){if(!m||m==="None")return"";if(m==="Any")return"Any";return `<span style="color:${MODCOL[m]||"#fff"}">${esc(m)}</span> ${codesHTML(MODS[m])}`}
-function eqName(e){return (e.mut?`<span class="mu" style="color:${EQMUT[e.mut]}">${esc(e.mut)}</span>`:"")+esc(e.name)}
+function modLabel(m){if(!m||m==="None")return"";if(m==="Any")return"Any";return `<span style="color:${MC(m)}">${esc(m)}</span> ${codesHTML(MODS[m])}`}
+function eqName(e){return (e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:"")+esc(e.name)}
 const STATN={L:"Luck",C:"Capacity",W:"Size Boost",D:"Dig Strength",S:"Dig Speed",$:"Sell Boost",K:"Walk Speed",M:"Modifier Boost",A:"Shake Strength",P:"Shake Speed"};
 let viewMode="table";try{const v=localStorage.getItem("pbs-view");if(v==="text"||v==="table")viewMode=v}catch(e){}
 // ---------- the sheet: pictures, names and readable layout ----------
 const RHX={Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
+const cvar=(pre,name,hex)=>`var(--${pre}-${String(name).toLowerCase().replace(/[^a-z0-9]+/g,"")},${hex})`;
+const RC=r=>cvar("rh",r,RHX[r]||"#a3adb8");const SC2=s=>cvar("sh",s,SHX[s]||"#e8ecf0");
+const MC=m=>cvar("mc",m,MODCOL[m]||"#e8ecf0");const EC=m=>cvar("eq",m,EQMUT[m]||"#e8ecf0");
 const PDATA=(()=>{try{return window.parent.PTDATA||null}catch(e){return null}})();
 const normN=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[^a-z0-9]/g,"");
 const PICS=(()=>{const out={Equipment:[],Pan:[],Shovel:[],Rune:[]};if(!PDATA)return out;
@@ -90,7 +93,7 @@ const picOf=(kind,name)=>{try{return window.parent.ptIcon(kind,name)||""}catch(e
 function findItem(kind,typed){const t=normN(String(typed||"").split("|")[0]);if(!t)return null;const L=PICS[kind]||[];
   return L.find(n=>normN(n)===t)||L.find(n=>normN(n).startsWith(t))||L.find(n=>normN(n).includes(t))||null}
 const imgTag=(u,cls)=>u?`<img src="${u}" alt=""${cls?` class="${cls}"`:""}>`:`<span class="ph"${cls?` class="${cls}"`:""}></span>`;
-const gainSpans=d=>d?d[3].map(([s,v])=>`<span style="color:${SHX[s]||"#fff"}">${s} ${fx(v)}</span>`).join(""):"";
+const gainSpans=d=>d?d[3].map(([s,v])=>`<span style="color:${SC2(s)}">${s} ${fx(v)}</span>`).join(""):"";
 function slotCard(s,span){
   if(!s.m.length)return `<div class="sl empty"${span>1?` style="grid-column:span ${span}"`:""}>Any mineral</div>`;
   const multi=s.m.length>1;const pick=multi&&s.pick>1?Math.min(s.pick,s.m.length):1;
@@ -98,12 +101,12 @@ function slotCard(s,span){
   const ops=s.m.map((n,i)=>{const d=BY[n.toLowerCase()];const nm=d?d[0]:n;
     return `<div class="op">${imgTag(d?picOf("Mineral",nm):"")}<span class="nm"${d?` data-mineral="${esc(nm)}"`:""}>${multi&&s.join===">"&&pick===1?`<span class="rk">${i+1}</span>`:""}${esc(nm)}</span><span class="gs">${gainSpans(d)}</span>${d?`<span class="kgl">Max boost at ${d[2]} kg</span>`:""}</div>`}).join("");
   return `<div class="sl"${span>1?` style="grid-column:span ${span}"`:""}>${how?`<span class="how">${how}</span>`:""}${ops}${s.mark?`<span class="mark">${esc(s.mark)}</span>`:""}</div>`}
-function modTag(m){if(!m||m==="None"||m==="Any")return `<span class="modtag" style="color:#c7d0d9">Any modifier</span>`;const st=(MODSTATS[m]||[[]])[0];return `<span class="modtag" style="color:${MODCOL[m]||"#fff"}">${esc(m)}</span>${st.length?`<span class="k">boosts ${st.join(", ")}</span>`:""}`}
+function modTag(m){if(!m||m==="None"||m==="Any")return `<span class="modtag" style="color:#c7d0d9">Any modifier</span>`;const st=(MODSTATS[m]||[[]])[0];return `<span class="modtag" style="color:${MC(m)}">${esc(m)}</span>${st.length?`<span class="k">boosts ${st.join(", ")}</span>`:""}`}
 function gearCard(label,kind,e,extra,rs,count){
   const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";
   const alts=String(e.name||"").split("|").map(x=>x.trim()).filter(Boolean);
   const main=alts[0]||"—";const altT=alts.slice(1);
-  const mut=e.mut?`<span class="mu" style="color:${EQMUT[e.mut]}">${esc(e.mut)}</span>`:"";
+  const mut=e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:"";
   return `<div class="gc"${rs?` data-rs="${rs}"`:""}>${u?`<img src="${u}" alt="">`:`<span class="ph">${label.ico||""}</span>`}<div class="gt"><small>${esc(label.t)}</small><b>${mut}${esc(main)}${count?`<span class="cnt">${esc(count)}</span>`:""}</b>${altT.length?`<span class="alt">or ${altT.map(esc).join(" or ")}</span>`:""}${extra||""}${e.note?`<span class="nt">${esc(e.note)}</span>`:""}</div></div>`}
 function quickChip(t,kind,name){const real=name?findItem(kind,name):null;const u=real?picOf(kind,real):"";return `<div class="qc">${u?`<img src="${u}" alt="">`:`<span class="ph"></span>`}<span><small>${t}</small><b>${esc(String(name).split("|")[0].trim())}</b></span></div>`}
 // rings: always 8 slots; each ring is shown as many times as its count; with 6 ring slots, slots 7 and 8 are locked
@@ -118,7 +121,7 @@ function ringGrid(b,v,rs){const got=ringSlots(b,v);let h=`<div class="rings8"${r
     if(i>=v){h+=`<div class="rs lock"><span class="lk">🔒</span><small>Slot ${i+1}</small><span class="lt">Locked</span></div>`;continue}
     const g=got[i];if(!g){h+=`<div class="rs empty"><small>Slot ${i+1}</small><span class="lt">Any ring</span></div>`;continue}
     const e=g.x;const real=findItem("Equipment",e.name);const u=real?picOf("Equipment",real):"";const alts=String(e.name).split("|").map(t=>t.trim()).filter(Boolean);
-    h+=`<div class="rs">${u?`<img src="${u}" alt="">`:`<span class="ph">💍</span>`}<small>Slot ${i+1}</small><b>${e.mut?`<span class="mu" style="color:${EQMUT[e.mut]}">${esc(e.mut)}</span>`:""}${esc(alts[0]||"")}</b>${g.first&&e.note?`<span class="lt">${esc(e.note)}</span>`:""}</div>`}
+    h+=`<div class="rs">${u?`<img src="${u}" alt="">`:`<span class="ph">💍</span>`}<small>Slot ${i+1}</small><b>${e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:""}${esc(alts[0]||"")}</b>${g.first&&e.note?`<span class="lt">${esc(e.note)}</span>`:""}</div>`}
   return h+`</div>`}
 function ringGrids(b){if(!(b.rings||[]).some(x=>x.name)&&!(b.rings6||[]).some(x=>x.name))return "";
   return `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:6px"><h3 style="margin:0;font:700 11px/1 inherit;letter-spacing:.12em;text-transform:uppercase;color:#97a3b0">Rings</h3>${has6(b)?`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`:""}</div>`+(has6(b)?ringGrid(b,8,"8")+ringGrid(b,6,"6"):ringGrid(b,8,""))}
@@ -131,8 +134,8 @@ function statKey(b){return JSON.stringify(calcState(b))}
 function statsHTML(b,text){const key=statKey(b);
   if(STATC.key!==key){if(statBusy!==key){statBusy=key;try{window.parent.ptBuildStats(JSON.parse(key)).then(rows=>{STATC={key,rows:rows||[]};statBusy="";if(statKey(getB())===key)renderSheet()})}catch(e){statBusy=""}}return text?"":`<div class="blk"><h3><span class="n">4</span>Your stats</h3><span class="em">Working out stats…</span></div>`}
   const rows=STATC.rows||[];if(!rows.length)return "";
-  if(text)return `<section><h2><span class="n">4</span>Your stats</h2><p class="dim" style="font-size:13px">Pan, shovel, equipment and museum only, before potions, totems and events.</p><ul>${rows.map(x=>`<li><b style="color:${SHX[x.s]||"inherit"}">${x.s}</b>: <b>${sv(x.s,x.total)}</b> <span class="gv">(${[x.tools?"pan & shovel "+sv(x.s,x.tools,1):"",x.jewelry?"equipment "+sv(x.s,x.jewelry,1):"",x.museum?"museum +"+(+x.museum.toFixed(3))+"×":""].filter(Boolean).join(", ")})</span></li>`).join("")}</ul></section>`;
-  return `<div class="blk"><h3><span class="n">4</span>Your stats</h3><div class="stt"><div class="sth"><span>Stat</span><span>Pan &amp; shovel</span><span>Equipment</span><span>Museum</span><span>Total</span></div>${rows.map(x=>`<div class="str"><b style="color:${SHX[x.s]||"#e8ecf0"}">${x.s}</b><span>${sv(x.s,x.tools,1)}</span><span>${sv(x.s,x.jewelry,1)}</span><span>${x.museum?"+"+(+x.museum.toFixed(3))+"×":'<span class="z">—</span>'}</span><span class="tt">${sv(x.s,x.total)}</span></div>`).join("")}</div><span class="em" style="font-size:12px">Pan, shovel, equipment and museum only, before potions, totems and events. Total = (pan &amp; shovel + equipment) × (1 + museum).</span></div>`}
+  if(text)return `<section><h2><span class="n">4</span>Your stats</h2><p class="dim" style="font-size:13px">Pan, shovel, equipment and museum only, before potions, totems and events.</p><ul>${rows.map(x=>`<li><b style="color:${SC2(x.s)}">${x.s}</b>: <b>${sv(x.s,x.total)}</b> <span class="gv">(${[x.tools?"pan & shovel "+sv(x.s,x.tools,1):"",x.jewelry?"equipment "+sv(x.s,x.jewelry,1):"",x.museum?"museum +"+(+x.museum.toFixed(3))+"×":""].filter(Boolean).join(", ")})</span></li>`).join("")}</ul></section>`;
+  return `<div class="blk"><h3><span class="n">4</span>Your stats</h3><div class="stt"><div class="sth"><span>Stat</span><span>Pan &amp; shovel</span><span>Equipment</span><span>Museum</span><span>Total</span></div>${rows.map(x=>`<div class="str"><b style="color:${SC2(x.s)}">${x.s}</b><span>${sv(x.s,x.tools,1)}</span><span>${sv(x.s,x.jewelry,1)}</span><span>${x.museum?"+"+(+x.museum.toFixed(3))+"×":'<span class="z">—</span>'}</span><span class="tt">${sv(x.s,x.total)}</span></div>`).join("")}</div><span class="em" style="font-size:12px">Pan, shovel, equipment and museum only, before potions, totems and events. Total = (pan &amp; shovel + equipment) × (1 + museum).</span></div>`}
 // shown text: ";" reads as ",", and a ";" at the end of a line is dropped
 const tidyT=t=>String(t).replace(/[ \t]*;[ \t]*$/gm,"").replace(/\s*;\s*/g,", ");
 const tidy=o=>{if(typeof o==="string")return tidyT(o);if(Array.isArray(o))return o.map(tidy);if(o&&typeof o==="object"){const r={};for(const k in o)r[k]=k==="pic"||k==="id"?o[k]:tidy(o[k]);return r}return o};
@@ -145,9 +148,9 @@ function sheetHTML(b0){if(viewMode==="text")return textHTML(b0);const b=tidy(b0)
   // museum
   h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3><div class="modline"><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${b.modFallback&&b.modFallback!=="None"?`<span class="k">· if you can't, use</span>${modTag(b.modFallback)}`:""}</div>`;
   ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(Math.max(1,sl[i].span||1),sl.length-i);cells+=slotCard(sl[i],sp)}
-    h+=`<div class="rrow" style="--rc:${RHX[r]}"><div class="rlab"><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slots">${cells}</div></div>`});
+    h+=`<div class="rrow" style="--rc:${RC(r)}"><div class="rlab"><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slots">${cells}</div></div>`});
   const t=museumTotals(b);const tl=STATS.filter(s=>Math.abs(t[s])>1e-9);
-  if(tl.length)h+=`<div class="tot">${tl.map(s=>`<span style="border-color:${SHX[s]}55"><span style="color:${SHX[s]}">${s}</span><em style="color:${t[s]<0?"#ef7a66":"#e8ecf0"}">${fx(t[s])}</em></span>`).join("")}</div><span class="em" style="font-size:12px">Museum total with the first choice in each slot at full weight, including the modifier.</span>`;
+  if(tl.length)h+=`<div class="tot">${tl.map(s=>`<span style="border-color:${SC2(s)}55"><span style="color:${SC2(s)}">${s}</span><em style="color:${t[s]<0?"#ef7a66":"#e8ecf0"}">${fx(t[s])}</em></span>`).join("")}</div><span class="em" style="font-size:12px">Museum total with the first choice in each slot at full weight, including the modifier.</span>`;
   const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length)h+=`<div class="xtra"><h4>Backup minerals <span>if one is hard to get</span></h4><div class="xl">${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];const u=d?picOf("Mineral",d[0]):"";return `<div class="xc" style="--rc:${d?RHX[d[1]]:"#56616c"}">${u?`<img src="${u}" alt="">`:""}<span><b style="color:var(--rc)">${esc(d?d[0]:x.n)}</b>${d?`<span class="gs">${gainSpans(d)}</span><small class="kgl">Max boost at ${d[2]} kg</small>`:""}${x.note?`<small class="xnote">${esc(x.note)}</small>`:""}</span></div>`}).join("")}</div></div>`;
   h+=`</div>`;
   // gear
@@ -177,7 +180,7 @@ function slotText(s){if(!s.m.length)return '<span class="dim">any mineral</span>
   else t=s.m.map(one).join(" <span class=\"dim\">or</span> ");
   return t+(s.mark?` <span class="mark">${esc(s.mark)}</span>`:"")}
 function textHTML(b0){const b=tidy(b0);const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
-  const modT=m=>!m||m==="None"||m==="Any"?"<b>any</b>":`<b style="color:${MODCOL[m]||"inherit"}">${esc(m)}</b>`;
+  const modT=m=>!m||m==="None"||m==="Any"?"<b>any</b>":`<b style="color:${MC(m)}">${esc(m)}</b>`;
   let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh">${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
   if(b.warning)h+=`<div class="warnbox"><b>⚠</b><span>${esc(b.warning)}</span></div>`;
   if(b.split6)h+=`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`;
@@ -185,11 +188,11 @@ function textHTML(b0){const b=tidy(b0);const notes=b.notes.split("\n").map(s=>s.
   if(notes.length)h+=`<section class="tsm"><h2>Read this first</h2><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>`;
   h+=`<section><h2><span class="n">1</span>Museum</h2><p>Use ${modT(b.mod)} modifier on every mineral${b.modFallback&&b.modFallback!=="None"?`; if you can't get it, use ${modT(b.modFallback)}`:""}. Put these in each rarity:</p><ul>`;
   ORDER.forEach(r=>{const sl=b.museum[r];const items=sl.map((s,i)=>covered(sl,i)?null:s).filter(Boolean);
-    h+=`<li><span class="r" style="color:${RHX[r]}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(s=>`<li>${slotText(s)}</li>`).join("")}</ol></li>`});
+    h+=`<li><span class="r" style="color:${RC(r)}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(s=>`<li>${slotText(s)}</li>`).join("")}</ol></li>`});
   h+=`</ul>`;
-  {const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length)h+=`<p>Backup minerals, if one is hard to get:</p><ul>${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];return `<li><b${d?` style="color:${RHX[d[1]]}"`:""}>${esc(d?d[0]:x.n)}</b>${d?` <span class="dim">(${d[1]})</span> ${d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", ")}, max boost at ${d[2]} kg`:""}${x.note?` · ${esc(x.note)}`:""}</li>`}).join("")}</ul>`}
+  {const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length)h+=`<p>Backup minerals, if one is hard to get:</p><ul>${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];return `<li><b${d?` style="color:${RC(d[1])}"`:""}>${esc(d?d[0]:x.n)}</b>${d?` <span class="dim">(${d[1]})</span> ${d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", ")}, max boost at ${d[2]} kg`:""}${x.note?` · ${esc(x.note)}`:""}</li>`}).join("")}</ul>`}
   h+=`</section>`;
-  const nm=(kind,e)=>{const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";return (u?`<img src="${u}" alt="">`:"")+(e.mut?`<span style="color:${EQMUT[e.mut]}">${esc(e.mut)}</span> `:"")+`<b>${esc(e.name)}</b>`};
+  const nm=(kind,e)=>{const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";return (u?`<img src="${u}" alt="">`:"")+(e.mut?`<span style="color:${EC(e.mut)}">${esc(e.mut)}</span> `:"")+`<b>${esc(e.name)}</b>`};
   const nt=n=>n?` <span class="dim">· ${esc(n)}</span>`:"";const eq=[];
   if(b.charm.name||b.charm.note)eq.push(`Charm: ${nm("Equipment",b.charm)}${nt(b.charm.note)}`);
   if(b.neck.name||b.neck.note)eq.push(`Necklace: ${nm("Equipment",b.neck)}${nt(b.neck.note)}`);
@@ -239,7 +242,7 @@ function renderEditor(){
   <div class="mtot"><div class="mtoth"><b>Museum total</b><span>first mineral in each slot + main modifier, at max weight</span></div><div class="mtotv" id="mtot"></div></div>`;
   const mname=n=>BY[n.toLowerCase()]?BY[n.toLowerCase()][0]:n;
   ORDER.forEach(r=>{const sl=b.museum[r];
-    h+=`<div class="rar" style="--rc:${RHX[r]}"><div class="rarh"><i></i><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slotgrid">`;
+    h+=`<div class="rar" style="--rc:${RC(r)}"><div class="rarh"><i></i><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slotgrid">`;
     sl.forEach((s,i)=>{if(covered(sl,i))return;const sp=Math.min(Math.max(1,s.span||1),sl.length-i);const maxSpan=SLOTS[r]-i;
       const how=s.m.length>1?(s.pick>1?`Pick ${Math.min(s.pick,s.m.length)}`:s.join===">"?"Best first":"Any one"):"";
       h+=`<div class="se"${sp>1?` style="grid-column:span ${sp}"`:""}><div class="seh"><span>Slot ${i+1}${sp>1?`–${i+sp}`:""}</span>${how?`<em>${how}</em>`:""}${s.mark?`<em class="mk">${esc(s.mark)}</em>`:""}</div>
@@ -254,7 +257,7 @@ function renderEditor(){
     ${XS.map((x,k)=>{const d=BY[String(x.n).toLowerCase()];const u=d?picOf("Mineral",d[0]):"";return `<div class="xrow" style="--rc:${d?RHX[d[1]]:"var(--line)"}">${u?`<img src="${u}" alt="">`:`<span class="np"></span>`}<span class="xn"><b style="color:var(--rc)">${esc(d?d[0]:x.n)}</b>${d?`<small>${d[1]} · max boost at ${d[2]} kg</small><span class="cg">${gainsHTML(d[3])}</span>`:""}</span><input class="inp" autocomplete="off" data-act="xnote" data-k="${k}" maxlength="80" value="${esc(x.note||"")}" placeholder="Note, e.g. instead of Bloodstone" aria-label="Note for ${esc(x.n)}"><button type="button" class="rmx" data-act="xrm" data-k="${k}" aria-label="Remove ${esc(x.n)}">×</button></div>`}).join("")}
     <div class="xadd"><input class="inp" id="xIn" autocomplete="off" placeholder="+ Add a backup mineral" aria-label="Add a backup mineral"><div class="xbox" id="xBox" hidden></div></div></div>`;
   h+=`</section>`;
-  const mutSel=(id,v)=>`<input class="inp mutin" readonly id="${id}" data-sg="dl-mut" value="${esc(v||"")}" placeholder="No mutation" aria-label="Equipment mutation"${v&&EQMUT[v]?` style="color:${EQMUT[v]}"`:""}>`;
+  const mutSel=(id,v)=>`<input class="inp mutin" readonly id="${id}" data-sg="dl-mut" value="${esc(v||"")}" placeholder="No mutation" aria-label="Equipment mutation"${v&&EQMUT[v]?` style="color:${EC(v)}"`:""}>`;
   const gpic=(kind,name)=>{const real=name?findItem(kind,name):null;const u=real?picOf(kind,real):"";return `<span class="gpic" data-pk="${kind}">${u?`<img src="${u}" alt="">`:""}</span>`};
   h+=`<section class="card"><h2>Equipment</h2><div class="gedits">
   <div class="ge"><div class="geh">${gpic("Equipment",b.charm.name)}<b>Charm</b></div><div class="g2"><input class="inp" autocomplete="off" id="f-charm-name" list="dl-charm" data-pk="Equipment" value="${esc(b.charm.name)}" placeholder="Charm name">${mutSel("f-charm-mut",b.charm.mut)}</div><input class="inp" autocomplete="off" id="f-charm-note" maxlength="100" value="${esc(b.charm.note)}" placeholder="Notes, e.g. fallback: Pumpkin Lord"></div>
@@ -374,7 +377,7 @@ function addMineral(t,pickName){const v=(pickName||t.value).trim();if(!v)return;
 function xList(q){q=q.trim().toLowerCase();const have=new Set((getB().extra||[]).map(x=>String(x.n).toLowerCase()));const RO=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
   return D.filter(d=>!have.has(d[0].toLowerCase())&&(!q||d[0].toLowerCase().includes(q))).sort((a,b)=>(q?(b[0].toLowerCase().startsWith(q)-a[0].toLowerCase().startsWith(q)):0)||RO.indexOf(a[1])-RO.indexOf(b[1])||a[0].localeCompare(b[0])).slice(0,8)}
 function xDraw(){const i=document.getElementById("xIn"),bx=document.getElementById("xBox");if(!i||!bx)return;const l=xList(i.value);bx.hidden=!l.length;
-  bx.innerHTML=l.map(d=>`<button type="button" class="xopt" data-xn="${esc(d[0])}" style="--rc:${RHX[d[1]]}">${picOf("Mineral",d[0])?`<img src="${picOf("Mineral",d[0])}" alt="">`:""}<b>${esc(d[0])}</b><span class="cg">${gainsHTML(d[3])}</span><small>${d[1]}</small></button>`).join("")}
+  bx.innerHTML=l.map(d=>`<button type="button" class="xopt" data-xn="${esc(d[0])}" style="--rc:${RC(d[1])}">${picOf("Mineral",d[0])?`<img src="${picOf("Mineral",d[0])}" alt="">`:""}<b>${esc(d[0])}</b><span class="cg">${gainsHTML(d[3])}</span><small>${d[1]}</small></button>`).join("")}
 function xAdd(n){const b=getB();b.extra=b.extra||[];const d=BY[String(n).toLowerCase()];if(!d)return;if(b.extra.some(x=>x.n.toLowerCase()===d[0].toLowerCase()))return;b.extra.push({n:d[0],note:""});touch();renderAll();const i=document.getElementById("xIn");if(i)i.focus()}
 ed.addEventListener("input",e=>{const t=e.target;if(t.id==="xIn"){xDraw();return}if(t.dataset.act==="xnote"){const b=getB();(b.extra[+t.dataset.k]||{}).note=t.value;touch()}},true);
 ed.addEventListener("focusin",e=>{if(e.target.id==="xIn")xDraw()});
@@ -429,13 +432,26 @@ async function saveFile(filename,data){
 document.getElementById("bImg").onclick=async()=>{
   if(typeof html2canvas!=="function"){toast("The image maker didn't load. Check your connection and try again.");return}
   const btn=document.getElementById("bImg");btn.disabled=true;const old=btn.textContent;btn.textContent="Making image…";
-  const box=document.createElement("div");box.style.cssText="position:fixed;left:-10000px;top:0;width:920px;pointer-events:none";
-  box.innerHTML=sheetHTML(getB());const sh=box.firstElementChild;sh.style.borderRadius="0";
+  // draw it off-screen at a comfortable width so the picture looks the same whatever your window size,
+  // and sit the card on a padded page so it keeps its rounded corners
+  const box=document.createElement("div");box.style.cssText="position:fixed;left:-10000px;top:0;width:980px;pointer-events:none";
+  box.innerHTML=sheetHTML(getB());const sh=box.firstElementChild;
   sh.querySelectorAll(".rtoggle").forEach(t=>t.remove());
-  const by=document.createElement("div");by.style.cssText="text-align:right;padding:8px 14px 12px;background:#12161b";const pill=document.createElement("span");pill.textContent="Made by @__coastal";pill.style.cssText="display:inline-block;padding:4px 13px;border-radius:999px;border:1px solid rgba(20,184,166,.6);background:rgba(20,184,166,.14);color:#2dd4bf;font:600 13px 'IBM Plex Sans','Segoe UI',system-ui,sans-serif";by.appendChild(pill);sh.appendChild(by);
+  const cs=getComputedStyle(sh),page=cs.getPropertyValue("--bg").trim()||"#12161b",card=cs.getPropertyValue("--card").trim(),
+    line=cs.getPropertyValue("--line").trim(),acc=cs.getPropertyValue("--acc").trim()||"#3cc2a8",dim=cs.getPropertyValue("--dim").trim();
+  const frame=document.createElement("div");
+  frame.style.cssText=`width:980px;box-sizing:border-box;padding:26px;background:${page};font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif`;
+  box.appendChild(frame);frame.appendChild(sh);
+  sh.style.background=card;sh.style.border="1px solid "+line;sh.style.borderRadius="16px";
+  const by=document.createElement("div");
+  by.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 2px 0;font-size:12.5px;color:"+dim;
+  const pill=document.createElement("span");pill.textContent="Made by @__coastal";
+  pill.style.cssText=`display:inline-block;padding:4px 13px;border-radius:999px;border:1px solid ${acc};color:${acc};font:600 12.5px "IBM Plex Sans","Segoe UI",system-ui,sans-serif`;
+  const site=document.createElement("span");site.textContent="Prospecting Toolkit";
+  by.appendChild(site);by.appendChild(pill);frame.appendChild(by);
   document.body.appendChild(box);
   try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-    window.ptNoImgTheme=true;let cv;try{cv=await html2canvas(sh,{backgroundColor:"#12161b",scale:2,useCORS:true,logging:false})}finally{window.ptNoImgTheme=false}
+    window.ptNoImgTheme=true;let cv;try{cv=await html2canvas(frame,{backgroundColor:page,scale:2,useCORS:true,logging:false})}finally{window.ptNoImgTheme=false}
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
     const b=getB();const fn=((b.name||"Build").replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Build")+".png";
     if(blob&&await saveFile(fn,blob))toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})());
