@@ -48,10 +48,11 @@ function peakLuck(r){const k=r.loc+"|"+r.m.n;if(PEAK.has(k))return PEAK.get(k);c
   const res={top:bi===N,L:L<10?Math.round(L*10)/10:L<1000?Math.round(L):Math.round(L/10)*10,eff:bv};PEAK.set(k,res);return res}
 const peakCell=r=>{const p=peakLuck(r);return p.top?`<span class="hi">Higher is better</span>`:`<b>${fmt(p.L,p.L<10?1:0)}</b><small>${oneInT(p.eff)}</small>`};
 const times=x=>(x<10?fmt(x,2):fmt(x,0))+"×";
+// why no cap wins: some minerals only get more common with more luck, so a cap never helps them
+const noCapTxt=(r,L)=>{const p=r&&peakLuck(r);if(p&&p.top)return "Never cap your luck";if(p&&p.L>L*1.02)return "Your luck is too low, don't cap";return "Your luck is best, don't cap"};
 const gain=(b,r)=>{if(b.cap==null){const L=Math.max(1,+S.luck||1),p=r&&peakLuck(r);
     // no cap wins, but if your luck is below where this mineral peaks you'd actually want more luck, not a cap
-    if(p&&!p.top&&p.L>L*1.02)return `<span class="same">Your luck is too low, don't cap</span>`;
-    return `<span class="same">Your luck is best, don't cap</span>`}
+    return `<span class="same">${noCapTxt(r,L)}</span>`}
   if(!(b.yours>0))return `<span class="gain">Only drops with a cap</span>`;const x=b.eff/b.yours;
   return x>=1.005?`<span class="gain">${times(x)} more often</span>`:`<span class="same">About the same</span>`};
 let LIMIT=60,VIEW={mins:[],by:new Map()};
@@ -140,7 +141,7 @@ async function capImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-ser
     c.fillStyle=b.cap==null?"#1c2126":"rgba(20,184,166,.16)";rr(X(520),mid-13,pw,26,13);c.fill();c.strokeStyle=b.cap==null?"#2c333a":"rgba(20,184,166,.55)";rr(X(520),mid-13,pw,26,13);c.stroke();c.fillStyle="#e6e9ec";c.fillText(ct,X(520)+11,mid+5);
     const p=peakLuck(r);if(p.top){c.fillStyle="#98a2ad";c.font=`13px ${F}`;c.fillText("Higher is better",X(670),mid+5)}else{c.fillStyle="#e6e9ec";c.font=`14px ${FM}`;c.fillText(fmt(p.L,p.L<10?1:0),X(670),mid-2);c.fillStyle="#98a2ad";c.font=`11.5px ${FM}`;c.fillText(oneInT(p.eff),X(670),mid+14)}
     c.fillStyle="#e6e9ec";c.font=`14px ${FM}`;c.fillText(oneInT(b.eff),X(850),mid+5);
-    let gt,gc="#98a2ad";if(b.cap==null){const p=peakLuck(r);gt=(p&&!p.top&&p.L>L*1.02)?"Your luck is too low, don't cap":"Your luck is best, don't cap"}else if(!(b.yours>0)){gt="Only drops with a cap";gc="#3cc2a8"}else{const v=b.eff/b.yours;if(v>=1.005){gt=times(v)+" more often";gc="#3cc2a8"}else gt="About the same"}
+    let gt,gc="#98a2ad";if(b.cap==null){const p=peakLuck(r);gt=noCapTxt(r,L)}else if(!(b.yours>0)){gt="Only drops with a cap";gc="#3cc2a8"}else{const v=b.eff/b.yours;if(v>=1.005){gt=times(v)+" more often";gc="#3cc2a8"}else gt="About the same"}
     c.fillStyle=gc;c.font=`14px ${F}`;c.fillText(fit(gt,W-PAD-X(1030)),X(1030),mid+5)});
   y+=list.length*RH;
   if(extra){c.fillStyle="#98a2ad";c.font=`italic 13px ${F}`;c.fillText(`…and ${fmt(total-list.length,0)} more. Search or filter to fit them in one image.`,PAD+12,y+22);y+=extra}
