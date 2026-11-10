@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>How It Works</title>
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>How It Works</h1>
+    <p class="lede">How the game picks your minerals, modifiers and weights, as far as my own tests show.<br>Change the numbers in each box to see what they do. These are the same models the rest of the toolkit uses.</p>
+  </header>
+  <p class="disc" role="note"><b>Heads up:</b> the game doesn't publish any of this. Everything here is worked out from my tests and the wiki, so treat it as a very good guess, not the game's code. Weight is the least certain part and is still being tested.</p>
+
+  <section class="card">
+    <h2>Luck: which mineral you get</h2>
+    <p class="txt">Every zone has a drop table. With no luck, each mineral comes up at its listed chance. Luck works like extra rolls: the game rolls the table several times and keeps the <b>rarest</b> result. So luck doesn't add a flat bonus; it pushes every pick towards the rare end of the table, and common minerals get rarer as a result.</p>
+    <p class="txt">The best fit is that a quarter of minerals roll once, a quarter roll <b>luck ÷ 2</b> times and half roll <b>luck</b> times. That's why the gain slows down: going from 100 to 1,000 luck matters far more than 10,000 to 11,000 for anything that isn't very rare.</p>
+    <div class="row"><label class="fld"><span class="lab">Your luck</span><input type="number" id="luck" min="1" value="1000"></label></div>
+    <div class="tw"><table class="t" id="luckT"></table></div>
+    <p class="note">For a mineral that's the rarest in its zone. Something with rarer minerals above it gains less, because those take the rare rolls first.</p>
+  </section>
+
+  <section class="card">
+    <h2>Capacity: how many tries per pan</h2>
+    <p class="txt">A full pan doesn't give one roll per slot. It behaves like <b>√capacity</b> separate picks, so 400 capacity is about 20 picks and 1,600 is about 40. Doubling capacity gives roughly 1.4× the picks, which is why capacity helps steadily but never explodes.</p>
+    <div class="row"><label class="fld"><span class="lab">Capacity</span><input type="number" id="cap" min="1" value="1000"></label><label class="fld"><span class="lab">Chance per pick (%)</span><input type="number" id="pick" min="0" step="0.01" value="0.1"></label></div>
+    <p class="big" id="capOut"></p>
+  </section>
+
+  <section class="card">
+    <h2>Modifiers: how often and which one</h2>
+    <p class="txt">About <b>36%</b> of panned minerals get a normal modifier, and Modifier Boost barely changes that. What it changes is <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>10.1 × Modifier Boost + 1 per 1,000 luck</b>, with a third of rolls once, a quarter at half strength and the rest at full strength.</p>
+    <div class="row"><label class="fld"><span class="lab">Modifier Boost (×)</span><input type="number" id="mb" min="0" step="0.01" value="1"></label><label class="ck"><input type="checkbox" id="night"> Night (Lunar can roll)</label></div>
+    <div class="tw"><table class="t" id="modT"></table></div>
+    <p class="note">Voidtorn, Treasured, Electrified and other event modifiers come from their own sources and sit on top of the 36%.</p>
+  </section>
+
+  <section class="card">
+    <h2>Weight: what's known so far</h2>
+    <ul class="txt" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li>Every mineral has a <b>base weight</b> (shown on its Minerals page), and its weights scale with it: a mineral with twice the base weight comes out about twice as heavy.</li>
+      <li>On top of that there's a random roll, so the same mineral can land anywhere in a fairly wide range. A good share of minerals get an extra bonus on top of that roll, which is where the heavy ones come from.</li>
+      <li><b>Luck doesn't change weight</b> at all in my tests. <b>Capacity</b> does make very heavy finds more common, because more picks means more chances at the top of the range.</li>
+      <li><b>Size Boost</b> raises weight, but not as a straight multiplier: doubling it doesn't double your weights. The exact curve still needs more testing.</li>
+    </ul>
+  </section>
+
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 10/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>

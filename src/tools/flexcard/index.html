@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Flex Card</title>
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Flex Card</h1>
+    <p class="lede">Turn a good find into a card worth posting.<br>Fill in what you found and it adds the rarity, value and odds for you.</p>
+  </header>
+  <section class="card">
+    <div class="grid">
+      <label class="fld"><span class="lab">Mineral</span><input id="min" list="mins" autocomplete="off" placeholder="Start typing…"></label>
+      <label class="fld"><span class="lab">Weight (kg)</span><input type="number" id="kg" min="0" step="0.01" placeholder="45.37"></label>
+      <label class="fld"><span class="lab">Modifier</span><select id="mod"></select></label>
+      <label class="fld"><span class="lab">Your luck</span><input type="number" id="luck" min="1" placeholder="1000"></label>
+      <label class="fld"><span class="lab">Found by (optional)</span><input id="who" maxlength="24" placeholder="Your name"></label>
+    </div>
+    <datalist id="mins"></datalist>
+    <p class="hint" id="err"></p>
+  </section>
+  <section class="card">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Your card</h2><button type="button" class="btn pri" id="save">Save image</button></div>
+    <canvas id="cv" width="1000" height="560"></canvas>
+  </section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 10/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>
