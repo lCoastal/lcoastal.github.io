@@ -94,14 +94,31 @@ function parts(st){const P2=[];if(st.pan)P2.push(["pan:","Pan: "+st.pan+(st.panE
   P2.push(["group:boosts","Boosts (totems, runes, potions, cookie…)",t=>Object.assign(t,strip(t,"boosts"))]);
   if(st.b&&(st.b.meteor||st.b.weather))P2.push(["group:events","Events",t=>{t.b=Object.assign({},t.b,{meteor:false,weather:false})}]);return P2}
 const SHOWN=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Toughness"];
+// Split each stat between its sources so the sources add up to the total.
+// Stats multiply (gear × boosts × events), so "how much it drops if you take it away" counts the overlap once per
+// source and the rows add up to more than the total. Instead each source gets its Shapley share: what it adds on
+// average over every order the sources could be added in. Exact for up to 12 sources, a fixed sample above that.
+function shares(base,full){const P=parts(base),n=P.length,memo=new Map();
+  const val=m=>{let r=memo.get(m);if(r)return r;const t=clone(base);P.forEach((p,i)=>{if(!(m>>i&1))p[2](t)});r=compute(t).tot;memo.set(m,r);return r};
+  const phi=P.map(()=>Object.fromEntries(SHOWN.map(s=>[s,0]))),all=(1<<n)-1;
+  const addMarg=(i,m,w)=>{const a=val(m|1<<i),b=val(m);SHOWN.forEach(s=>{phi[i][s]+=w*((a[s]||0)-(b[s]||0))})};
+  if(n<=12){const fact=[1];for(let k=1;k<=n;k++)fact[k]=fact[k-1]*k;
+    for(let m=0;m<=all;m++){let c=0;for(let x=m;x;x&=x-1)c++;const w=fact[c]*fact[n-c-1]/fact[n];for(let i=0;i<n;i++)if(!(m>>i&1))addMarg(i,m,w)}}
+  else{let seed=12345;const rnd=()=>{seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+    const N=400;for(let k=0;k<N;k++){const o=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[o[i],o[j]]=[o[j],o[i]]}
+      let m=0;o.forEach(i=>{addMarg(i,m,1/N);m|=1<<i})}}
+  const rows=P.map(([key,label],i)=>{const d={};SHOWN.forEach(s=>{if(Math.abs(phi[i][s])>1e-6)d[s]=phi[i][s]});return {key,label,d}});
+  // whatever you'd have with none of these sources
+  const zero=val(0),bd={};SHOWN.forEach(s=>{if(Math.abs(zero[s]||0)>1e-6)bd[s]=zero[s]});rows.push({key:null,label:"Base (without any of these)",d:bd});
+  return rows.filter(x=>Object.keys(x.d).length)}
 function renderParts(){const base=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(base,strip(base,g)));const full=compute(base);
-  const rows=parts(base).map(([key,label,rm])=>{const t=clone(base);rm(t);const r=compute(t);const d={};SHOWN.forEach(s=>{const v=full.tot[s]-r.tot[s];if(Math.abs(v)>1e-6)d[s]=v});return {key,label,d}}).filter(x=>Object.keys(x.d).length);
+  const rows=shares(base,full);
   rows.sort((a,b)=>(b.d.Luck||0)-(a.d.Luck||0));
   const fv=(s,v)=>(v<0?"−":"+")+(PCT.has(s)?fmt(Math.abs(v),1)+"%":fmt(Math.abs(v),s==="Luck"||s==="Capacity"?0:1));
   // grouped by stat: each stat, its total, then every source that adds to it, biggest first
   const tv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
   const groups=SHOWN.map(st=>({st,src:rows.filter(x=>x.d[st]).map(x=>({key:x.key,label:x.label,v:x.d[st]})).sort((a,b)=>b.v-a.v)})).filter(g=>g.src.length);
-  $("parts").innerHTML=groups.length?groups.map(g=>`<div class="bks"><div class="bkst"><b style="color:${statHex(g.st)}">${esc(g.st)}</b><span>${tv(g.st,full.tot[g.st]||0)} total</span></div>${g.src.map(x=>`<div class="pt${S.only===x.key?" on":""}" role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"><b>${esc(x.label)}</b><span class="lk2" style="color:${x.v<0?"var(--neg,#c53030)":"var(--accent)"}">${fv(g.st,x.v)}</span></div>`).join("")}</div>`).join(""):'<p class="hint">Add some gear or boosts to see where your stats come from.</p>';
+  $("parts").innerHTML=groups.length?groups.map(g=>`<div class="bks"><div class="bkst"><b style="color:${statHex(g.st)}">${esc(g.st)}</b><span>${tv(g.st,full.tot[g.st]||0)} total</span></div>${g.src.map(x=>`<div class="pt${x.key&&S.only===x.key?" on":""}"${x.key?` role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"`:""}><b>${esc(x.label)}</b><span class="lk2" style="color:${x.v<0?"var(--neg,#c53030)":"var(--accent)"}">${fv(g.st,x.v)}</span></div>`).join("")}</div>`).join(""):'<p class="hint">Add some gear or boosts to see where your stats come from.</p>';
   const on=S.showBrk!==false;$("showBrk").checked=on;$("brkBody").hidden=!on}
 $("showBrk").addEventListener("change",()=>{S.showBrk=$("showBrk").checked;save();$("brkBody").hidden=!S.showBrk});
 function renderIso(){const off=S.isoOff||[];$("isoChips").innerHTML=GROUPS.map(([g,l])=>`<button type="button" class="chip" data-iso="${g}" aria-pressed="${!off.includes(g)&&!S.only}">${l}</button>`).join("");
