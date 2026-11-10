@@ -140,7 +140,7 @@ textarea.inp{min-height:90px;resize:vertical}
 .rge .nt{grid-column:2/-1}
 .rge .x{grid-row:1;grid-column:5}
 .rge{display:grid;grid-template-columns:34px 64px minmax(0,1fr) 130px 28px;gap:6px;align-items:center;padding:5px;border-radius:9px;background:var(--sunk);border:1px solid var(--line)}
-@media (max-width:620px){.rge{grid-template-columns:34px 60px minmax(0,1fr) 28px}.rge select{grid-column:2/-2}.rge .x{grid-row:1;grid-column:4}}
+@media (max-width:620px){.rge{grid-template-columns:34px 60px minmax(0,1fr) 28px}.rge select,.rge .mutin{grid-column:2/-2}.rge .x{grid-row:1;grid-column:4}}
 .rarity{border:1px solid var(--line);border-left:4px solid var(--rc);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:8px}
 .rarity>b{font-size:13px;letter-spacing:.05em;text-transform:uppercase}
 .slotedit{display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:6px;background:var(--sunk)}
@@ -299,3 +299,5 @@ textarea.inp{min-height:90px;resize:vertical}
 .sheet .tx img{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:4px}
 @media (max-width:640px){.sheet{padding:18px 14px}.sheet .rrow{grid-template-columns:1fr}.sheet .rlab{flex-direction:row;align-items:baseline;gap:8px}.sheet .slots{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.sheet .sl{padding:7px 5px}.sheet .op{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;gap:1px}.sheet .op img,.sheet .op .ph{width:34px;height:34px;grid-row:auto}.sheet .op .nm{font-size:12px;line-height:1.2}.sheet .op .gs{font-size:10.5px;gap:0 5px;justify-content:center}.sheet .op .kgl{font-size:10px}.sheet .sl .mu,.sheet .sl .how{font-size:9.5px;text-align:center}}
 @media (max-width:330px){.sheet .slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mutin{cursor:pointer;font-weight:600}
+.mutin::placeholder{font-weight:400}
