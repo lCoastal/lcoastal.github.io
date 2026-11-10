@@ -22,7 +22,7 @@ LOCS.forEach(l=>{if(l.rg!==last){h+=`<div class="rg">${esc(l.rg)}</div>`;if(last
   h+=`<button type="button" class="lk" data-location="${esc(l.n)}" data-go="${esc(l.n)}"><span>${esc(l.n)}</span><span class="tp" title="Toughness${(REQ[l.n]||{}).luck?" · recommended luck":""}">${l.t==="None"?"no req.":"T"+esc(l.t)}${(REQ[l.n]||{}).luck?" · "+((REQ[l.n].luck>=1000)?REQ[l.n].luck/1000+"k":REQ[l.n].luck):""}</span></button>`;
   o+=`<option value="${esc(l.n)}">${esc(l.n)} · ${l.t==="None"?"no toughness needed":"Toughness "+esc(l.t)}</option>`});
 side.innerHTML=h;mp.innerHTML=o+"</optgroup>";
-side.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b&&!(e.ctrlKey||e.metaKey))openLocation(b.dataset.go)});
+side.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b&&!(e.ctrlKey||e.metaKey)){openLocation(b.dataset.go);const d=document.getElementById("detail");if(d&&d.getBoundingClientRect().top<0)d.scrollIntoView({block:"start"})}});
 mp.addEventListener("change",()=>openLocation(mp.value));
 
 function reqHtml(l){const r=REQ[l.n]||{};const t=l.t==="None"?null:parseFloat(l.t);

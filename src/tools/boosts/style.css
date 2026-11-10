@@ -14,7 +14,7 @@
   --bg:#14181c; --panel:#1c2126; --fg:#e6e9ec; --muted:#98a2ad; --line:#2d343b; --accent:#3cc2a8; --neg:#ef7a66;
   --c-common:#a3adb8; --c-uncommon:#6cc46e; --c-rare:#68a6f0; --c-epic:#b880ee; --c-legendary:#f2b53a; --c-mythic:#f0687f; --c-exotic:#f17ad6; color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5}
-.wrap{max-width:860px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+.wrap{max-width:1120px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
 h1{font-family:var(--f-display);font-size:2rem;line-height:1.1;margin:0;text-wrap:balance}
 .lede{color:var(--muted);margin:6px 0 0;max-width:65ch}
 .controls{display:flex;flex-direction:column;gap:10px}
@@ -55,3 +55,4 @@ td.s{min-width:190px}
 .incm{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--fg);cursor:pointer;white-space:nowrap}
 .incm input{width:16px;height:16px;margin:0;accent-color:var(--accent);cursor:pointer}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40}
+td.w,th.w{padding-left:8px;padding-right:8px}
