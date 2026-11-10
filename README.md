@@ -1,8 +1,7 @@
 # lcoastal.github.io
 goat level project
 
-Prospecting Toolkit by @__coastal. The live site is `index.html`, one file with every tool, picture and bit of data
-built in, so switching tools never loads anything.
+Prospecting Toolkit by @__coastal. The live site is `index.html`.
 
 **Don't edit `index.html` by hand.** Edit the files in `src/` and push. GitHub Actions rebuilds `index.html` for you.
 To build it yourself, run `node build.mjs` (needs Node 18 or newer, nothing else).
