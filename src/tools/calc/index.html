@@ -58,6 +58,13 @@
     <div class="res" style="display:flex;flex-direction:column;gap:14px">
       <section class="card" aria-live="polite"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">Your stats</h2><button type="button" class="btn" id="cpStats">Copy my stats</button><button type="button" class="btn" id="toImg">Save as image</button></div>
         <div class="iso"><span class="lab">Counting</span><span id="isoChips" class="isoc"></span></div><p class="hint" id="isoNote" hidden></p><div id="out"></div></section>
+      <section class="card"><div class="bkh"><h2>What to upgrade next</h2><label class="ck bkt"><input type="checkbox" id="showUp"> Show suggestions</label></div>
+        <div id="upBody">
+          <div class="iso"><span class="lab">Goal</span><span id="upGoal" class="isoc"></span></div>
+          <div class="iso"><span class="lab">Order</span><span id="upSort" class="isoc"></span></div>
+          <div id="upList"></div>
+          <p class="hint" id="upHint"></p>
+        </div></section>
       <section class="card"><div class="bkh"><h2>Detailed stats breakdown</h2><label class="ck bkt"><input type="checkbox" id="showBrk"> Show breakdown</label></div><div id="brkBody"><p class="hint">Every stat and where it comes from. Each source shows its share of the total, and the shares add up to the total; when two sources boost each other, the extra is split between them. Click a source to count only that part.</p><div id="parts"></div></div></section>
     </div>
   </div>

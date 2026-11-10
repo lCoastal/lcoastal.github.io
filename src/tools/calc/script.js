@@ -132,8 +132,104 @@ function resetGroup(g){if(g==="tools"){S.pan="";S.shovel="";S.panEn="";S.shEn=""
   else if(g==="boosts"){S.b={};S.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0};S.pots=[];S.runes=[]}S.only=null;save();all()}
 $("resetAll").onclick=()=>{const b=$("resetAll");if(!b.classList.contains("arm")){b.classList.add("arm");b.textContent="Reset everything?";setTimeout(()=>{b.classList.remove("arm");b.textContent="Reset everything"},2500);return}
   ["tools","jewelry","museum","boosts"].forEach(g=>resetGroup(g));S.isoOff=[];S.only=null;S.owned=false;b.classList.remove("arm");b.textContent="Reset everything";save();all()};
+// ---- what to upgrade next ----------------------------------------------------
+// Tries every pan, shovel and piece of equipment in your slots, works out what each one would add to the goal you
+// pick, and what it would cost: money from the shop, or the minerals you'd have to farm (turned into pans with the
+// same luck model as Luck Odds). Equipment is compared at 6★ and 100% quality, which is the best it can roll.
+const UGOALS=[["Luck",{Luck:1}],["Capacity",{Capacity:1}],["Luck + Size",{Luck:1,"Size Boost":1}],
+  ["Selling",{"Sell Boost":1,"Size Boost":.5,Luck:.3}],["Speed",{"Dig Speed":1,"Shake Speed":1,"Dig Strength":.5,"Shake Strength":.5}],
+  ["Everything",{Luck:1,Capacity:1,"Size Boost":.6,"Modifier Boost":.6,"Sell Boost":.4,"Dig Speed":.3,"Shake Speed":.3}]];
+// drop model, same as Luck Odds: how often each mineral comes up in each zone
+const ULOC={};P.mins.forEach(m=>(m.ch||[]).forEach(c=>{const l=c[0];const p=parseFloat(String(c[1]).replace(/[%,]/g,""))/100;if(!(p>0))return;(ULOC[l]=ULOC[l]||[]).push({m,p})}));
+function uList(loc){const b=baseLoc(loc),own=ULOC[loc]||[];let out;
+  if(b!==loc&&ULOC[b])out=ULOC[b].filter(x=>!own.some(y=>y.m===x.m)).concat(own);
+  else if(own.length<2){const seen=new Set();out=[];Object.keys(ULOC).filter(v=>v!==loc&&baseLoc(v)===loc).forEach(v=>ULOC[v].concat(own).forEach(x=>{if(!seen.has(x.m)){seen.add(x.m);out.push(x)}}))}
+  else out=[...own];
+  return out.length<2?[]:out}
+let UPANS=null,UPANSKEY="";
+// expected pans to get one of a mineral, at your luck and capacity, in the zone where it comes up most
+function pansFor(name){const L=Math.max(1,compute(effState()).tot.Luck||1),cap=Math.max(1,+S.n.cap||+S.cap||1);
+  const n=Math.max(1,Math.sqrt(Math.max(1,ucap())));const key=Math.round(L)+"|"+Math.round(n*100);
+  if(UPANSKEY!==key){UPANSKEY=key;UPANS={};
+    Object.keys(ULOC).forEach(loc=>{if(/^The Void/.test(loc))return;const list=uList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;
+      const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);
+      list.forEach(x=>{const lo=c/tot,hi=(c+x.p)/tot;c+=x.p;
+        const eff=0.25*f(lo,hi,1)+0.25*f(lo,hi,Math.max(1,L/2))+0.5*f(lo,hi,Math.max(1,L));
+        const per=1-Math.pow(1-eff,n);if(per>0)UPANS[x.m.n]=Math.min(UPANS[x.m.n]==null?Infinity:UPANS[x.m.n],1/per)})})}
+  return UPANS[name]}
+// your pan capacity: the museum and gear feed it, so read it off your own stats
+function ucap(){return Math.max(1,compute(effState()).tot.Capacity||1)}
+const uMoney=v=>{const n=typeof v==="number"?v:parseFloat(String(v||"").replace(/[^0-9.]/g,""));
+  return !isFinite(n)||n<=0?0:n};
+const uMoneyTxt=n=>n>=1e12?"$"+fmt(n/1e12,n<1e13?1:0)+"T":n>=1e9?"$"+fmt(n/1e9,n<1e10?1:0)+"B":n>=1e6?"$"+fmt(n/1e6,n<1e7?1:0)+"M":n>=1e3?"$"+fmt(n/1e3,0)+"k":"$"+fmt(n,0);
+const uPansTxt=p=>!p?"":p>=1e9?fmt(p/1e9,1)+"B pans":p>=1e6?fmt(p/1e6,1)+"M pans":p>=1e3?fmt(p/1e3,p<1e4?1:0)+"k pans":fmt(p,0)+" pans";
+// what the recipe would cost you in pans (unknown minerals are skipped and flagged)
+function recipeCost(x){let pans=0,unknown=0;(x.rec||[]).forEach(([q,n])=>{const p=pansFor(n);if(p==null)unknown++;else pans+=q*p});return {pans,unknown}}
+const uScore=(tot,w)=>Object.entries(w).reduce((a,[s,k])=>a+k*Math.log(1+Math.max(0,tot[s]||0)),0);
+function upGoal(){const g=UGOALS.find(g=>g[0]===S.upGoal)||UGOALS[0];return g}
+// every swap worth trying, with what it gives and what it costs
+function upCandidates(){
+  const base=effState(),now=compute(base),w=upGoal()[1];const s0=uScore(now.tot,w);
+  const out=[];const add=(c)=>{const t=compute(c.state).tot;const gain=uScore(t,w)-s0;if(gain<=1e-9)return;
+    const d={};Object.keys(w).forEach(s=>{const v=(t[s]||0)-(now.tot[s]||0);if(Math.abs(v)>0.01)d[s]=v});
+    if(!Object.keys(d).length)return;out.push({...c,gain,d,tot:t})};
+  // pans and shovels: straight from the shop
+  const limited=p=>/limited/i.test(p.section||"")||!uMoney(p.price);
+  G.pans.forEach(p=>{if(p.name===S.pan)return;const st=clone(base);st.pan=p.name;
+    add({kind:"Pan",name:p.name,where:p.location,money:uMoney(p.price),pans:0,limited:limited(p),state:st,apply:()=>{S.pan=p.name}})});
+  G.shovels.forEach(p=>{if(p.name===S.shovel)return;const st=clone(base);st.shovel=p.name;
+    add({kind:"Shovel",name:p.name,where:p.location,money:uMoney(p.price),pans:0,limited:limited(p),state:st,apply:()=>{S.shovel=p.name}})});
+  // equipment: the best slot for each piece you aren't already wearing
+  const worn=new Set(SLOTDEF.map(([k])=>(S.slots[k]||{}).n).filter(Boolean));
+  const best={};
+  SLOTDEF.forEach(([k,label,slot])=>{
+    EQ.filter(x=>x.slot===slot).forEach(x=>{
+      if(worn.has(x.n))return;
+      const cur=S.slots[k]||{};const st=clone(base);st.slots=Object.assign({},st.slots,{[k]:{n:x.n,l:"6",q:100,m:cur.m||"None"}});
+      const t=compute(st).tot;const g=uScore(t,w)-s0;if(g<=1e-9)return;
+      if(!best[x.n]||g>best[x.n].gain){const c=recipeCost(x);
+        best[x.n]={kind:label,name:x.n,rarity:x.r,money:x.cur==="$"?uMoney(x.price):0,
+          other:x.cur!=="$"?fmt(uMoney(x.price),0)+" "+x.cur:"",limited:!!x.ev,pans:c.pans,unknown:c.unknown,gain:g,
+          state:st,apply:()=>{S.slots[k]=Object.assign({},S.slots[k],{n:x.n,l:"6",q:100})},
+          recipe:(x.rec||[]).map(([q,n])=>q+"× "+n).join(", ")}}})});
+  Object.values(best).forEach(c=>add(c));
+  const effort=c=>Math.max(1,(c.pans||0)+(c.money||0)/1000)*(c.unknown?20:1);
+  out.forEach(c=>{c.effort=effort(c);c.value=c.gain/c.effort});
+  const keep=S.upEvent?out:out.filter(c=>!c.limited);
+  keep.sort((a,b)=>(S.upSort||"value")==="value"?b.value-a.value:b.gain-a.gain);
+  return keep}
+function renderUp(){
+  const on=S.showUp!==false;$("showUp").checked=on;$("upBody").hidden=!on;
+  $("upGoal").innerHTML=UGOALS.map(([n])=>`<button type="button" class="chip" data-ug="${esc(n)}" aria-pressed="${(S.upGoal||"Luck")===n}">${esc(n)}</button>`).join("");
+  $("upSort").innerHTML=[["value","Best for the effort"],["gain","Biggest gain"]].map(([v,n])=>`<button type="button" class="chip" data-us="${v}" aria-pressed="${(S.upSort||"value")===v}">${n}</button>`).join("");
+  $("upSort").insertAdjacentHTML("beforeend",`<button type="button" class="chip" data-uev="1" aria-pressed="${!!S.upEvent}" title="Event and limited-time gear you can't just go and get">Include event gear</button>`);
+  if(!on){$("upList").innerHTML="";$("upHint").textContent="";return}
+  const list=upCandidates().slice(0,10);
+  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality. "Pans" is roughly how many pans the recipe's minerals would take at your luck and capacity, in the best zone for each. "Best for the effort" counts $1,000 as about one pan.`;
+  if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
+  $("upList").innerHTML=list.map((c,i)=>{
+    const gains=Object.entries(c.d).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3)
+      .map(([s,v])=>`<span class="${v<0?"neg":"gain"}">${esc(s)} ${fv2(s,v)}</span>`).join("");
+    const cost=[c.money?uMoneyTxt(c.money):"",c.other||"",c.pans?uPansTxt(c.pans):"",c.limited?"event only":""].filter(Boolean).join(" · ")||"free";
+    return `<div class="upi"><span class="upn"><b>${esc(c.name)}</b><span class="uph">${esc(c.kind)}${c.where?" · "+esc(c.where):""}${c.recipe?" · "+esc(c.recipe):""}${c.unknown?" · some materials aren't panned":""}</span></span>
+      <span class="upg">${gains}</span><span class="upc">${esc(cost)}</span>
+      <button type="button" class="btn sm" data-uptry="${i}">Try it</button></div>`}).join("");
+  UPLAST=list}
+const fv2=(s,v)=>(v<0?"−":"+")+(PCT.has(s)?fmt(Math.abs(v),1)+"%":fmt(Math.abs(v),Math.abs(v)<10?1:0));
+let UPLAST=[],UPUNDO=null;
+$("showUp").addEventListener("change",()=>{S.showUp=$("showUp").checked;save();renderUp()});
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-ug]");if(g){S.upGoal=g.dataset.ug;save();renderUp();return}
+  const so=e.target.closest("[data-us]");if(so){S.upSort=so.dataset.us;save();renderUp();return}
+  const ev=e.target.closest("[data-uev]");if(ev){S.upEvent=!S.upEvent;save();renderUp();return}
+  const t=e.target.closest("[data-uptry]");if(t){const c=UPLAST[+t.dataset.uptry];if(!c)return;
+    UPUNDO=clone(S);c.apply();save();all();toastUp(`Tried ${c.name}`);return}
+  const u=e.target.closest("[data-upundo]");if(u&&UPUNDO){Object.assign(S,UPUNDO);UPUNDO=null;save();all();return}});
+function toastUp(msg){let d=document.querySelector(".uptoast");if(!d){d=document.createElement("div");d.className="uptoast";document.body.appendChild(d)}
+  d.innerHTML=`${esc(msg)} <button type="button" class="btn sm" data-upundo="1">Undo</button>`;d.hidden=false;clearTimeout(toastUp.t);toastUp.t=setTimeout(()=>{d.hidden=true},6000)}
+
 function render(){
-  renderIso();renderParts();
+  renderIso();renderParts();renderUp();
   const r=compute(effState());
   const f=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
   $("out").innerHTML=`<table class="out"><tr><th>Stat</th><th>Gear</th><th>Boost pile</th><th>Total</th></tr>${STATS.map(s=>{const show=r.base[s]||r.tot[s]||s==="Luck";if(!show)return "";
