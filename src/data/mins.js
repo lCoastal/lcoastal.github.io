@@ -3,6 +3,7 @@ export default [
     n: "Copper",
     r: "Common",
     v: "800",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Copper%%",
     ch: [
       ["Azuralite Oasis", "36.9786%", "1 in 3"],
@@ -26,6 +27,7 @@ export default [
     n: "Gold",
     r: "Common",
     v: "1,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Gold%%",
     ch: [
       ["Rubble Creek Sands", "70.3167%", "1 in 1"],
@@ -69,6 +71,7 @@ export default [
     n: "Amethyst",
     r: "Common",
     v: "3,500",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Amethyst%%",
     ch: [
       ["Rubble Creek Sands", "7.0317%", "1 in 14"],
@@ -83,6 +86,7 @@ export default [
     n: "Blue Ice",
     r: "Common",
     v: "1,500",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Blue Ice%%",
     ch: [
       ["Frozen Peak", "51.5010%", "1 in 2"],
@@ -98,6 +102,7 @@ export default [
     n: "Coral",
     r: "Uncommon",
     v: "23,000",
+    bw: 0.05,
     ic: "%%IMG:Mineral: Coral%%",
     ch: [
       ["Windswept Beach", "6.0234%", "1 in 17"],
@@ -113,6 +118,7 @@ export default [
     n: "Dinosaur Skull",
     r: "Exotic",
     v: "50,000,000",
+    bw: 0.5,
     ic: "%%IMG:Mineral: Dinosaur Skull%%",
     ch: [["Infernal Heart", "0.000001842%", "1 in 54,287,189"]],
     u: [
@@ -133,6 +139,7 @@ export default [
     n: "Cryonic Artifact",
     r: "Exotic",
     v: "100,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Cryonic Artifact%%",
     ch: [["Frozen Peak", "0.0000006438%", "1 in 155,336,658"]],
     u: [
@@ -154,6 +161,7 @@ export default [
     n: "Jade",
     r: "Rare",
     v: "40,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Jade%%",
     ch: [
       ["North Pole", "1.3963%", "1 in 72"],
@@ -177,6 +185,7 @@ export default [
     n: "Azuralite",
     r: "Rare",
     v: "120,000",
+    bw: 0.15,
     ic: "%%IMG:Mineral: Azuralite%%",
     ch: [
       ["Enchanted Ruins", "0.5837%", "1 in 171"],
@@ -194,6 +203,7 @@ export default [
     n: "Glacial Quartz",
     r: "Rare",
     v: "100,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Glacial Quartz%%",
     ch: [
       ["North Pole", "0.2234%", "1 in 448"],
@@ -209,6 +219,7 @@ export default [
     n: "Inferlume",
     r: "Mythic",
     v: "14,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Inferlume%%",
     ch: [
       ["Infernal Heart", "0.00001105%", "1 in 9,047,865"],
@@ -236,6 +247,7 @@ export default [
     n: "Flarebloom",
     r: "Mythic",
     v: "30,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Flarebloom%%",
     ch: [
       ["Infernal Heart", "0.00001105%", "1 in 9,047,865"],
@@ -260,6 +272,7 @@ export default [
     n: "Frostshard",
     r: "Mythic",
     v: "50,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Frostshard%%",
     ch: [
       ["North Pole", "0.000002234%", "1 in 44,760,456"],
@@ -279,6 +292,7 @@ export default [
     n: "Iridium",
     r: "Epic",
     v: "150,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Iridium%%",
     ch: [
       ["Rubble Creek Deposits", "0.01564%", "1 in 6,394"],
@@ -301,6 +315,7 @@ export default [
     n: "Ammonite Fossil",
     r: "Epic",
     v: "200,000",
+    bw: 0.25,
     ic: "%%IMG:Mineral: Ammonite Fossil%%",
     ch: [
       ["Windswept Beach", "0.006023%", "1 in 16,602"],
@@ -314,6 +329,7 @@ export default [
     n: "Ashvein",
     r: "Epic",
     v: "222,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Ashvein%%",
     ch: [
       ["Seashell Beach", "0.01133%", "1 in 8,824"],
@@ -329,6 +345,7 @@ export default [
     n: "Emerald",
     r: "Epic",
     v: "250,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Emerald%%",
     ch: [
       ["Fortune River", "0.004579%", "1 in 21,841"],
@@ -357,6 +374,7 @@ export default [
     n: "Golden Pearl",
     r: "Epic",
     v: "250,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Golden Pearl%%",
     ch: [
       ["Seashell Beach", "0.02266%", "1 in 4,412"],
@@ -375,6 +393,7 @@ export default [
     n: "Borealite",
     r: "Epic",
     v: "280,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Borealite%%",
     ch: [
       ["Frostbite River", "0.005150%", "1 in 19,417"],
@@ -395,6 +414,7 @@ export default [
     n: "Aurorite",
     r: "Epic",
     v: "444,444",
+    bw: 0.15,
     ic: "%%IMG:Mineral: Aurorite%%",
     ch: [
       ["Fortune River", "0.008585%", "1 in 11,648"],
@@ -423,6 +443,7 @@ export default [
     n: "Cobalt",
     r: "Epic",
     v: "250,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Cobalt%%",
     ch: [
       ["Frostbite River", "0.002575%", "1 in 38,834"],
@@ -447,6 +468,7 @@ export default [
     n: "Cinnabar",
     r: "Legendary",
     v: "900,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Cinnabar%%",
     ch: [
       ["Infernal Heart", "0.0002210%", "1 in 452,393"],
@@ -468,6 +490,7 @@ export default [
     n: "Diamond",
     r: "Legendary",
     v: "1,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Diamond%%",
     ch: [
       ["Sunset Beach", "0.0005666%", "1 in 176,478"],
@@ -498,6 +521,7 @@ export default [
     n: "Fire Opal",
     r: "Legendary",
     v: "1,600,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Fire Opal%%",
     ch: [
       ["Volcanic Springs", "0.0004388%", "1 in 227,895"],
@@ -519,6 +543,7 @@ export default [
     n: "Dragon Bone",
     r: "Legendary",
     v: "2,000,000",
+    bw: 0.25,
     ic: "%%IMG:Mineral: Dragon Bone%%",
     ch: [
       ["Infernal Heart", "0.001474%", "1 in 67,859"],
@@ -536,6 +561,7 @@ export default [
     n: "Catseye",
     r: "Legendary",
     v: "2,222,222",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Catseye%%",
     ch: [
       ["Windswept Beach", "0.0003012%", "1 in 332,039"],
@@ -561,6 +587,7 @@ export default [
     n: "Aetherite",
     r: "Legendary",
     v: "4,444,444",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Aetherite%%",
     ch: [
       ["Enchanted Ruins", "0.0002919%", "1 in 342,639"],
@@ -589,6 +616,7 @@ export default [
     n: "Aquamarine",
     r: "Legendary",
     v: "4,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Aquamarine%%",
     ch: [
       ["Starfall River", "0.0002713%", "1 in 368,639"],
@@ -609,6 +637,7 @@ export default [
     n: "Glowberry",
     r: "Uncommon",
     v: "12,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Glowberry%%",
     ch: [
       ["Enchanted Ruins", "8.7556%", "1 in 11"],
@@ -623,6 +652,7 @@ export default [
     n: "Amber",
     r: "Rare",
     v: "110,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Amber%%",
     ch: [
       ["Enchanted Ruins", "0.05837%", "1 in 1,713"],
@@ -637,6 +667,7 @@ export default [
     n: "Glowmoss",
     r: "Epic",
     v: "175,000",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Glowmoss%%",
     ch: [
       ["Enchanted Ruins", "0.0005837%", "1 in 171,320"],
@@ -652,6 +683,7 @@ export default [
     n: "Chrysoberyl",
     r: "Mythic",
     v: "21,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Chrysoberyl%%",
     ch: [
       ["Rotwood Swamp", "0.000002170%", "1 in 46,085,203"],
@@ -673,6 +705,7 @@ export default [
     n: "Firefly Stone",
     r: "Legendary",
     v: "1,500,000",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Firefly Stone%%",
     ch: [
       ["Overgrown Grotto (inside Firefly Zones)", "0.00002334%", "1 in 4,284,343"],
@@ -693,6 +726,7 @@ export default [
     n: "Gloomberry",
     r: "Rare",
     v: "80,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Gloomberry%%",
     ch: [
       ["Abyssal Depth", "0.0004847%", "1 in 206,316"],
@@ -705,6 +739,7 @@ export default [
     n: "Bone",
     r: "Epic",
     v: "200,000",
+    bw: 0.25,
     ic: "%%IMG:Mineral: Bone%%",
     ch: [
       ["Rotwood Swamp", "0.01085%", "1 in 9,217"],
@@ -723,6 +758,7 @@ export default [
     n: "Bloodstone",
     r: "Exotic",
     v: "250,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Bloodstone%%",
     ch: [
       ["Rotwood Swamp", "0.00000008680%", "1 in 1,152,130,082"],
@@ -739,6 +775,7 @@ export default [
     n: "Electrum",
     r: "Uncommon",
     v: "13,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Electrum%%",
     ch: [
       ["Starfall River", "2.7127%", "1 in 37"],
@@ -759,6 +796,7 @@ export default [
     n: "Diopside",
     r: "Rare",
     v: "99,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Diopside%%",
     ch: [
       ["Timelocked Sanctuary", "0.05425%", "1 in 1,843"],
@@ -773,6 +811,7 @@ export default [
     n: "Bismuth",
     r: "Legendary",
     v: "2,600,000",
+    bw: 0.4,
     ic: "%%IMG:Mineral: Bismuth%%",
     ch: [
       ["Timelocked Sanctuary", "0.0001628%", "1 in 614,410"],
@@ -790,6 +829,7 @@ export default [
     n: "Astral Spore",
     r: "Exotic",
     v: "400,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Astral Spore%%",
     ch: [
       ["Fungal Marsh", "0.00000006510%", "1 in 1,536,173,426"],
@@ -807,6 +847,7 @@ export default [
     n: "Gloomcap",
     r: "Legendary",
     v: "2,340,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Gloomcap%%",
     ch: [
       ["Fungal Marsh", "0.0002712%", "1 in 368,682"],
@@ -819,6 +860,7 @@ export default [
     n: "Candy Cane",
     r: "Rare",
     v: "65,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Candy Cane%%",
     ch: [
       ["North Pole", "0.05585%", "1 in 1,790"],
@@ -834,6 +876,7 @@ export default [
     n: "Eternium",
     r: "Exotic",
     v: "555,555,555",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Eternium%%",
     ch: [["Timelocked Sanctuary", "0.00000002713%", "1 in 3,686,458,325"]],
     u: [
@@ -854,6 +897,7 @@ export default [
     n: "Adamantine",
     r: "Exotic",
     v: "250,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Adamantine%%",
     ch: [["Enchanted Ruins", "0.0000001167%", "1 in 856,598,092"]],
     u: [
@@ -866,6 +910,7 @@ export default [
     n: "Depleted Shard",
     r: "Legendary",
     v: "4,500,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Depleted Shard%%",
     ch: [
       ["Astral Caverns", "0.00001040%", "1 in 9,615,981"],
@@ -884,6 +929,7 @@ export default [
     n: "Celestium",
     r: "Exotic",
     v: "800,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Celestium%%",
     ch: [["Astral Caverns", "0.000000005200%", "1 in 19,231,962,681"]],
     u: [
@@ -903,6 +949,7 @@ export default [
     n: "Aetherium",
     r: "Mythic",
     v: "44,444,444",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Aetherium%%",
     ch: [
       ["Sandstone Stream", "0.0000005690%", "1 in 175,737,277"],
@@ -920,6 +967,7 @@ export default [
     n: "Forgotten Totem",
     r: "Exotic",
     v: "42,500,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Forgotten Totem%%",
     ch: [["Seashell Beach", "0.0000002833%", "1 in 352,976,514"]],
     u: [["Waverider", "Exotic", 1, "limited"]],
@@ -929,6 +977,7 @@ export default [
     n: "Agate",
     r: "Mythic",
     v: "3,500,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Agate%%",
     ch: [
       ["Sandstone Stream", "0.0000004656%", "1 in 214,790,006"],
@@ -946,6 +995,7 @@ export default [
     n: "Eye of the Sands",
     r: "Exotic",
     v: "350,000,000",
+    bw: 0.25,
     ic: "%%IMG:Mineral: Eye of the Sands%%",
     ch: [["Mystic Floodplains", "0.000000003615%", "1 in 27,661,572,172"]],
     u: [["Lunar Mask", "Exotic", 1, ""]],
@@ -955,6 +1005,7 @@ export default [
     n: "Pyrite",
     r: "Common",
     v: "500",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Pyrite%%",
     ch: [
       ["Starfall River", "27.1268%", "1 in 4"],
@@ -969,6 +1020,7 @@ export default [
     n: "Silver",
     r: "Common",
     v: "700",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Silver%%",
     ch: [
       ["Enchanted Ruins", "29.1852%", "1 in 3"],
@@ -996,6 +1048,7 @@ export default [
     n: "Platinum",
     r: "Common",
     v: "2,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Platinum%%",
     ch: [
       ["Fortune River", "28.6161%", "1 in 3"],
@@ -1016,6 +1069,7 @@ export default [
     n: "Seashell",
     r: "Common",
     v: "2,200",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Seashell%%",
     ch: [
       ["Seashell Beach", "45.3288%", "1 in 2"],
@@ -1030,6 +1084,7 @@ export default [
     n: "Obsidian",
     r: "Common",
     v: "3,000",
+    bw: 0.15,
     ic: "%%IMG:Mineral: Obsidian%%",
     ch: [
       ["Infernal Heart", "73.6822%", "1 in 1"],
@@ -1049,6 +1104,7 @@ export default [
     n: "Pearl",
     r: "Common",
     v: "5,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Pearl%%",
     ch: [
       ["Windswept Beach", "18.0702%", "1 in 6"],
@@ -1064,6 +1120,7 @@ export default [
     n: "Neodymium",
     r: "Uncommon",
     v: "10,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Neodymium%%",
     ch: [
       ["Sunset Beach", "2.2666%", "1 in 44"],
@@ -1084,6 +1141,7 @@ export default [
     n: "Smoky Quartz",
     r: "Uncommon",
     v: "16,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Smoky Quartz%%",
     ch: [
       ["Timelocked Sanctuary", "4.3402%", "1 in 23"],
@@ -1108,6 +1166,7 @@ export default [
     n: "Malachite",
     r: "Uncommon",
     v: "18,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Malachite%%",
     ch: [
       ["Windswept Beach", "1.2047%", "1 in 83"],
@@ -1130,6 +1189,7 @@ export default [
     n: "Sapphire",
     r: "Uncommon",
     v: "25,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Sapphire%%",
     ch: [
       ["Starfall River", "4.3403%", "1 in 23"],
@@ -1150,6 +1210,7 @@ export default [
     n: "Ruby",
     r: "Rare",
     v: "30,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Ruby%%",
     ch: [
       ["Lifespring Oasis", "1.0329%", "1 in 97"],
@@ -1171,6 +1232,7 @@ export default [
     n: "Lapis Lazuli",
     r: "Rare",
     v: "40,000",
+    bw: 0.15,
     ic: "%%IMG:Mineral: Lapis Lazuli%%",
     ch: [
       ["Starfall River", "0.5425%", "1 in 184"],
@@ -1195,6 +1257,7 @@ export default [
     n: "Silver Clamshell",
     r: "Rare",
     v: "2,200",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Silver Clamshell%%",
     ch: [
       ["Windswept Beach", "0.1807%", "1 in 553"],
@@ -1210,6 +1273,7 @@ export default [
     n: "Peridot",
     r: "Rare",
     v: "60,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Peridot%%",
     ch: [
       ["Sandstone Stream", "0.5173%", "1 in 193"],
@@ -1229,6 +1293,7 @@ export default [
     n: "Onyx",
     r: "Rare",
     v: "75,000",
+    bw: 0.15,
     ic: "%%IMG:Mineral: Onyx%%",
     ch: [
       ["Infernal Heart", "0.1474%", "1 in 679"],
@@ -1255,6 +1320,7 @@ export default [
     n: "Meteoric Iron",
     r: "Rare",
     v: "80,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Meteoric Iron%%",
     ch: [
       ["Astral Caverns", "4.1597%", "1 in 24"],
@@ -1277,6 +1343,7 @@ export default [
     n: "Pyrelith",
     r: "Rare",
     v: "150,000",
+    bw: 0.15,
     ic: "%%IMG:Mineral: Pyrelith%%",
     ch: [
       ["Infernal Heart", "0.2947%", "1 in 339"],
@@ -1290,6 +1357,7 @@ export default [
     n: "Pink Diamond",
     r: "Mythic",
     v: "6,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Pink Diamond%%",
     ch: [
       ["Fortune River Delta", "0.00004377%", "1 in 2,284,525"],
@@ -1311,6 +1379,7 @@ export default [
     n: "Painite",
     r: "Mythic",
     v: "10,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Painite%%",
     ch: [
       ["Sunset Beach", "0.00002267%", "1 in 4,411,956"],
@@ -1336,6 +1405,7 @@ export default [
     n: "Prismara",
     r: "Mythic",
     v: "25,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Prismara%%",
     ch: [
       ["Overgrown Grotto", "0.000002801%", "1 in 35,702,853"],
@@ -1366,6 +1436,7 @@ export default [
     n: "Mythril",
     r: "Mythic",
     v: "20,000,000",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Mythril%%",
     ch: [
       ["Fungal Marsh", "0.000003797%", "1 in 26,334,402"],
@@ -1390,6 +1461,7 @@ export default [
     n: "Moonstone",
     r: "Epic",
     v: "200,000",
+    bw: 0.25,
     ic: "%%IMG:Mineral: Moonstone%%",
     ch: [
       ["Sunset Beach", "0.005666%", "1 in 17,648"],
@@ -1411,6 +1483,7 @@ export default [
     n: "Pyronium",
     r: "Epic",
     v: "226,000",
+    bw: 0.25,
     ic: "%%IMG:Mineral: Pyronium%%",
     ch: [
       ["Infernal Heart", "0.004421%", "1 in 22,620"],
@@ -1429,6 +1502,7 @@ export default [
     n: "Osmium",
     r: "Epic",
     v: "300,000",
+    bw: 0.4,
     ic: "%%IMG:Mineral: Osmium%%",
     ch: [
       ["Sandstone Stream", "0.05173%", "1 in 1,933"],
@@ -1456,6 +1530,7 @@ export default [
     n: "Opal",
     r: "Epic",
     v: "325,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Opal%%",
     ch: [
       ["Starfall River", "0.05425%", "1 in 1,843"],
@@ -1484,6 +1559,7 @@ export default [
     n: "Rose Gold",
     r: "Legendary",
     v: "500,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Rose Gold%%",
     ch: [
       ["Enchanted Ruins", "0.001459%", "1 in 68,528"],
@@ -1507,6 +1583,7 @@ export default [
     n: "Palladium",
     r: "Legendary",
     v: "500,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Palladium%%",
     ch: [
       ["Frostbite River", "0.0002575%", "1 in 388,342"],
@@ -1525,6 +1602,7 @@ export default [
     n: "Luminum",
     r: "Legendary",
     v: "1,500,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Luminum%%",
     ch: [
       ["Sunset Beach", "0.001700%", "1 in 58,826"],
@@ -1548,6 +1626,7 @@ export default [
     n: "Lightshard",
     r: "Epic",
     v: "300,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Lightshard%%",
     ch: [
       ["Haunted Creek", "0.0008645%", "1 in 115,671"],
@@ -1565,6 +1644,7 @@ export default [
     n: "Specterite",
     r: "Legendary",
     v: "2,800,000",
+    bw: 0.05,
     ic: "%%IMG:Mineral: Specterite%%",
     ch: [
       ["Rotwood Swamp", "0.0002712%", "1 in 368,682"],
@@ -1585,6 +1665,7 @@ export default [
     n: "Radiant Gold",
     r: "Mythic",
     v: "40,000,000",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Radiant Gold%%",
     ch: [
       ["Abyssal Depth", "0.000001454%", "1 in 68,771,970"],
@@ -1607,6 +1688,7 @@ export default [
     n: "Rock Candy",
     r: "Uncommon",
     v: "15,000",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Rock Candy%%",
     ch: [
       ["Haunted Creek", "1.2968%", "1 in 77"],
@@ -1619,6 +1701,7 @@ export default [
     n: "Lost Soul",
     r: "Legendary",
     v: "6,666,666",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Lost Soul%%",
     ch: [
       ["Haunted Creek", "0.0004323%", "1 in 231,342"],
@@ -1637,6 +1720,7 @@ export default [
     n: "Pumpkin Soul",
     r: "Exotic",
     v: "40,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Pumpkin Soul%%",
     ch: [["Haunted Creek", "0.0000004323%", "1 in 231,341,817"]],
     u: [
@@ -1650,6 +1734,7 @@ export default [
     n: "Mercury",
     r: "Epic",
     v: "450,000",
+    bw: 0.4,
     ic: "%%IMG:Mineral: Mercury%%",
     ch: [
       ["Sandstone Stream", "0.003621%", "1 in 27,616"],
@@ -1668,6 +1753,7 @@ export default [
     n: "Star Garnet",
     r: "Mythic",
     v: "44,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Star Garnet%%",
     ch: [
       ["Timelocked Sanctuary", "0.000001356%", "1 in 73,729,166"],
@@ -1687,6 +1773,7 @@ export default [
     n: "Red Beryl",
     r: "Mythic",
     v: "28,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Red Beryl%%",
     ch: [
       ["Astral Caverns", "0.0000009359%", "1 in 106,844,237"],
@@ -1705,6 +1792,7 @@ export default [
     n: "Peppermint Prism",
     r: "Legendary",
     v: "2,800,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Peppermint Prism%%",
     ch: [
       ["The Void (when in the loot pool)", "0.0001811%", "1 in 552,084"],
@@ -1721,6 +1809,7 @@ export default [
     n: "North Star",
     r: "Exotic",
     v: "42,500,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: North Star%%",
     ch: [["North Pole", "0.0000002793%", "1 in 358,083,649"]],
     u: [["Santa's Bag", "Exotic", 1, "limited"]],
@@ -1738,6 +1827,7 @@ export default [
     n: "Radium",
     r: "Legendary",
     v: "1,500,000",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Radium%%",
     ch: [
       ["Volcanic Springs", "0.0002194%", "1 in 455,790"],
@@ -1753,6 +1843,7 @@ export default [
     n: "Singularium",
     r: "Exotic",
     v: "250,000,000",
+    bw: 0.5,
     ic: "%%IMG:Mineral: Singularium%%",
     ch: [["Starfall River", "0.00000001085%", "1 in 9,215,980,851"]],
     u: [
@@ -1772,6 +1863,7 @@ export default [
     n: "Nickel",
     r: "Uncommon",
     v: "6,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Nickel%%",
     ch: [
       ["Starfall River", "10.8507%", "1 in 9"],
@@ -1786,6 +1878,7 @@ export default [
     n: "Meteoric Gold",
     r: "Epic",
     v: "240,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Meteoric Gold%%",
     ch: [
       ["Starfall River", "0.001085%", "1 in 92,160"],
@@ -1802,6 +1895,7 @@ export default [
     n: "Nautilus Shell",
     r: "Legendary",
     v: "2,100,000",
+    bw: 0.25,
     ic: "%%IMG:Mineral: Nautilus Shell%%",
     ch: [
       ["Seashell Beach", "0.0005666%", "1 in 176,488"],
@@ -1814,6 +1908,7 @@ export default [
     n: "Sandsteel",
     r: "Rare",
     v: "27,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Sandsteel%%",
     ch: [
       ["Mystic Floodplains", "0.1549%", "1 in 645"],
@@ -1828,6 +1923,7 @@ export default [
     n: "Selenite",
     r: "Epic",
     v: "135,000",
+    bw: 0.15,
     ic: "%%IMG:Mineral: Selenite%%",
     ch: [
       ["Lifespring Oasis", "0.06197%", "1 in 1,614"],
@@ -1841,6 +1937,7 @@ export default [
     n: "Jasper",
     r: "Legendary",
     v: "380,000",
+    bw: 0.15,
     ic: "%%IMG:Mineral: Jasper%%",
     ch: [
       ["Sandstone Stream", "0.0005173%", "1 in 193,311"],
@@ -1855,6 +1952,7 @@ export default [
     n: "Key of Life",
     r: "Exotic",
     v: "1,000,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Key of Life%%",
     ch: [["Lifespring Oasis", "0.000000001549%", "1 in 64,543,541,734"]],
     u: [["Guardian Pendant", "Exotic", 1, ""]],
@@ -1864,6 +1962,7 @@ export default [
     n: "Solarium",
     r: "Exotic",
     v: "350,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Solarium%%",
     ch: [["Sandstone Stream", "0.000000008277%", "1 in 12,081,937,826"]],
     u: [["Sun's Gift", "Exotic", 1, ""]],
@@ -1873,6 +1972,7 @@ export default [
     n: "Moonspire",
     r: "Exotic",
     v: "45,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Moonspire%%",
     ch: [["Haunted Creek", "0.00000002161%", "1 in 4,626,836,341"]],
     u: [["Dullahan's Curse", "Exotic", 1, "limited"]],
@@ -1889,6 +1989,7 @@ export default [
     n: "Titanium",
     r: "Uncommon",
     v: "7,500",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Titanium%%",
     ch: [
       ["Frozen Peak", "12.8753%", "1 in 8"],
@@ -1915,6 +2016,7 @@ export default [
     n: "Topaz",
     r: "Uncommon",
     v: "14,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Topaz%%",
     ch: [
       ["Timelocked Sanctuary", "10.8505%", "1 in 9"],
@@ -1939,6 +2041,7 @@ export default [
     n: "Zircon",
     r: "Uncommon",
     v: "25,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Zircon%%",
     ch: [
       ["Infernal Heart", "1.4736%", "1 in 68"],
@@ -1954,6 +2057,7 @@ export default [
     n: "Vortessence",
     r: "Mythic",
     v: "20,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Vortessence%%",
     ch: [
       ["Windswept Beach", "0.000009035%", "1 in 11,067,955"],
@@ -1982,6 +2086,7 @@ export default [
     n: "Volcanic Core",
     r: "Mythic",
     v: "40,000,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Volcanic Core%%",
     ch: [
       ["Infernal Heart", "0.000007368%", "1 in 13,571,797"],
@@ -2005,6 +2110,7 @@ export default [
     n: "Uranium",
     r: "Legendary",
     v: "1,500,000",
+    bw: 0.3,
     ic: "%%IMG:Mineral: Uranium%%",
     ch: [
       ["Infernal Heart", "0.0004421%", "1 in 226,197"],
@@ -2023,6 +2129,7 @@ export default [
     n: "Volcanic Key",
     r: "Legendary",
     v: "1,500,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Volcanic Key%%",
     ch: [
       ["Infernal Heart", "0.001474%", "1 in 67,859"],
@@ -2036,6 +2143,7 @@ export default [
     n: "Starshine",
     r: "Legendary",
     v: "2,500,000",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Starshine%%",
     ch: [
       ["Sandstone Stream", "0.0002587%", "1 in 386,622"],
@@ -2067,6 +2175,7 @@ export default [
     n: "Tourmaline",
     r: "Legendary",
     v: "2,888,000",
+    bw: 0.12,
     ic: "%%IMG:Mineral: Tourmaline%%",
     ch: [
       ["Frostbite Waterfall", "0.0001609%", "1 in 621,347"],
@@ -2084,6 +2193,7 @@ export default [
     n: "Voidstone",
     r: "Exotic",
     v: "111,111,111",
+    bw: 0.1,
     ic: "%%IMG:Mineral: Voidstone%%",
     ch: [["The Void", "0.0000007245%", "1 in 138,021,012"]],
     u: [["Vortex Ring", "Exotic", 1, ""]],
@@ -2099,6 +2209,7 @@ export default [
     n: "Vineheart",
     r: "Exotic",
     v: "125,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Vineheart%%",
     ch: [["Deeproot Spring", "0.0000001807%", "1 in 553,292,791"]],
     u: [
@@ -2112,6 +2223,7 @@ export default [
     n: "Umbrite",
     r: "Exotic",
     v: "180,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Umbrite%%",
     ch: [["Abyssal Depth", "0.0000001454%", "1 in 687,719,698"]],
     u: [
@@ -2133,6 +2245,7 @@ export default [
     n: "Sunstone",
     r: "Mythic",
     v: "28,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Sunstone%%",
     ch: [
       ["Meteor Falls", "0.0000005425%", "1 in 184,319,617"],
@@ -2150,6 +2263,7 @@ export default [
     n: "Starpiercer",
     r: "Exotic",
     v: "450,000,000",
+    bw: 0.2,
     ic: "%%IMG:Mineral: Starpiercer%%",
     ch: [["Meteor Falls", "0.00000002170%", "1 in 4,607,990,426"]],
     u: [

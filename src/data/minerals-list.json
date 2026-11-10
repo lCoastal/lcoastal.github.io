@@ -3,6 +3,7 @@
     "n": "Copper",
     "r": "Common",
     "v": "800",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Copper%%",
     "ch": [
       [
@@ -86,6 +87,7 @@
     "n": "Gold",
     "r": "Common",
     "v": "1,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Gold%%",
     "ch": [
       [
@@ -272,6 +274,7 @@
     "n": "Amethyst",
     "r": "Common",
     "v": "3,500",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Amethyst%%",
     "ch": [
       [
@@ -317,6 +320,7 @@
     "n": "Blue Ice",
     "r": "Common",
     "v": "1,500",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Blue Ice%%",
     "ch": [
       [
@@ -360,6 +364,7 @@
     "n": "Coral",
     "r": "Uncommon",
     "v": "23,000",
+    "bw": 0.05,
     "ic": "%%IMG:Mineral: Coral%%",
     "ch": [
       [
@@ -410,6 +415,7 @@
     "n": "Dinosaur Skull",
     "r": "Exotic",
     "v": "50,000,000",
+    "bw": 0.5,
     "ic": "%%IMG:Mineral: Dinosaur Skull%%",
     "ch": [
       [
@@ -462,6 +468,7 @@
     "n": "Cryonic Artifact",
     "r": "Exotic",
     "v": "100,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Cryonic Artifact%%",
     "ch": [
       [
@@ -516,6 +523,7 @@
     "n": "Jade",
     "r": "Rare",
     "v": "40,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Jade%%",
     "ch": [
       [
@@ -597,6 +605,7 @@
     "n": "Azuralite",
     "r": "Rare",
     "v": "120,000",
+    "bw": 0.15,
     "ic": "%%IMG:Mineral: Azuralite%%",
     "ch": [
       [
@@ -650,6 +659,7 @@
     "n": "Glacial Quartz",
     "r": "Rare",
     "v": "100,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Glacial Quartz%%",
     "ch": [
       [
@@ -693,6 +703,7 @@
     "n": "Inferlume",
     "r": "Mythic",
     "v": "14,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Inferlume%%",
     "ch": [
       [
@@ -796,6 +807,7 @@
     "n": "Flarebloom",
     "r": "Mythic",
     "v": "30,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Flarebloom%%",
     "ch": [
       [
@@ -856,6 +868,7 @@
     "n": "Frostshard",
     "r": "Mythic",
     "v": "50,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Frostshard%%",
     "ch": [
       [
@@ -919,6 +932,7 @@
     "n": "Iridium",
     "r": "Epic",
     "v": "150,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Iridium%%",
     "ch": [
       [
@@ -1004,6 +1018,7 @@
     "n": "Ammonite Fossil",
     "r": "Epic",
     "v": "200,000",
+    "bw": 0.25,
     "ic": "%%IMG:Mineral: Ammonite Fossil%%",
     "ch": [
       [
@@ -1044,6 +1059,7 @@
     "n": "Ashvein",
     "r": "Epic",
     "v": "222,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Ashvein%%",
     "ch": [
       [
@@ -1094,6 +1110,7 @@
     "n": "Emerald",
     "r": "Epic",
     "v": "250,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Emerald%%",
     "ch": [
       [
@@ -1200,6 +1217,7 @@
     "n": "Golden Pearl",
     "r": "Epic",
     "v": "250,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Golden Pearl%%",
     "ch": [
       [
@@ -1257,6 +1275,7 @@
     "n": "Borealite",
     "r": "Epic",
     "v": "280,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Borealite%%",
     "ch": [
       [
@@ -1323,6 +1342,7 @@
     "n": "Aurorite",
     "r": "Epic",
     "v": "444,444",
+    "bw": 0.15,
     "ic": "%%IMG:Mineral: Aurorite%%",
     "ch": [
       [
@@ -1429,6 +1449,7 @@
     "n": "Cobalt",
     "r": "Epic",
     "v": "250,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Cobalt%%",
     "ch": [
       [
@@ -1524,6 +1545,7 @@
     "n": "Cinnabar",
     "r": "Legendary",
     "v": "900,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Cinnabar%%",
     "ch": [
       [
@@ -1598,6 +1620,7 @@
     "n": "Diamond",
     "r": "Legendary",
     "v": "1,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Diamond%%",
     "ch": [
       [
@@ -1716,6 +1739,7 @@
     "n": "Fire Opal",
     "r": "Legendary",
     "v": "1,600,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Fire Opal%%",
     "ch": [
       [
@@ -1788,6 +1812,7 @@
     "n": "Dragon Bone",
     "r": "Legendary",
     "v": "2,000,000",
+    "bw": 0.25,
     "ic": "%%IMG:Mineral: Dragon Bone%%",
     "ch": [
       [
@@ -1839,6 +1864,7 @@
     "n": "Catseye",
     "r": "Legendary",
     "v": "2,222,222",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Catseye%%",
     "ch": [
       [
@@ -1933,6 +1959,7 @@
     "n": "Aetherite",
     "r": "Legendary",
     "v": "4,444,444",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Aetherite%%",
     "ch": [
       [
@@ -2048,6 +2075,7 @@
     "n": "Aquamarine",
     "r": "Legendary",
     "v": "4,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Aquamarine%%",
     "ch": [
       [
@@ -2114,6 +2142,7 @@
     "n": "Glowberry",
     "r": "Uncommon",
     "v": "12,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Glowberry%%",
     "ch": [
       [
@@ -2152,6 +2181,7 @@
     "n": "Amber",
     "r": "Rare",
     "v": "110,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Amber%%",
     "ch": [
       [
@@ -2190,6 +2220,7 @@
     "n": "Glowmoss",
     "r": "Epic",
     "v": "175,000",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Glowmoss%%",
     "ch": [
       [
@@ -2240,6 +2271,7 @@
     "n": "Chrysoberyl",
     "r": "Mythic",
     "v": "21,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Chrysoberyl%%",
     "ch": [
       [
@@ -2315,6 +2347,7 @@
     "n": "Firefly Stone",
     "r": "Legendary",
     "v": "1,500,000",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Firefly Stone%%",
     "ch": [
       [
@@ -2381,6 +2414,7 @@
     "n": "Gloomberry",
     "r": "Rare",
     "v": "80,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Gloomberry%%",
     "ch": [
       [
@@ -2409,6 +2443,7 @@
     "n": "Bone",
     "r": "Epic",
     "v": "200,000",
+    "bw": 0.25,
     "ic": "%%IMG:Mineral: Bone%%",
     "ch": [
       [
@@ -2466,6 +2501,7 @@
     "n": "Bloodstone",
     "r": "Exotic",
     "v": "250,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Bloodstone%%",
     "ch": [
       [
@@ -2513,6 +2549,7 @@
     "n": "Electrum",
     "r": "Uncommon",
     "v": "13,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Electrum%%",
     "ch": [
       [
@@ -2581,6 +2618,7 @@
     "n": "Diopside",
     "r": "Rare",
     "v": "99,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Diopside%%",
     "ch": [
       [
@@ -2626,6 +2664,7 @@
     "n": "Bismuth",
     "r": "Legendary",
     "v": "2,600,000",
+    "bw": 0.4,
     "ic": "%%IMG:Mineral: Bismuth%%",
     "ch": [
       [
@@ -2677,6 +2716,7 @@
     "n": "Astral Spore",
     "r": "Exotic",
     "v": "400,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Astral Spore%%",
     "ch": [
       [
@@ -2730,6 +2770,7 @@
     "n": "Gloomcap",
     "r": "Legendary",
     "v": "2,340,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Gloomcap%%",
     "ch": [
       [
@@ -2765,6 +2806,7 @@
     "n": "Candy Cane",
     "r": "Rare",
     "v": "65,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Candy Cane%%",
     "ch": [
       [
@@ -2806,6 +2848,7 @@
     "n": "Eternium",
     "r": "Exotic",
     "v": "555,555,555",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Eternium%%",
     "ch": [
       [
@@ -2856,6 +2899,7 @@
     "n": "Adamantine",
     "r": "Exotic",
     "v": "250,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Adamantine%%",
     "ch": [
       [
@@ -2892,6 +2936,7 @@
     "n": "Depleted Shard",
     "r": "Legendary",
     "v": "4,500,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Depleted Shard%%",
     "ch": [
       [
@@ -2948,6 +2993,7 @@
     "n": "Celestium",
     "r": "Exotic",
     "v": "800,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Celestium%%",
     "ch": [
       [
@@ -2994,6 +3040,7 @@
     "n": "Aetherium",
     "r": "Mythic",
     "v": "44,444,444",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Aetherium%%",
     "ch": [
       [
@@ -3054,6 +3101,7 @@
     "n": "Forgotten Totem",
     "r": "Exotic",
     "v": "42,500,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Forgotten Totem%%",
     "ch": [
       [
@@ -3084,6 +3132,7 @@
     "n": "Agate",
     "r": "Mythic",
     "v": "3,500,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Agate%%",
     "ch": [
       [
@@ -3135,6 +3184,7 @@
     "n": "Eye of the Sands",
     "r": "Exotic",
     "v": "350,000,000",
+    "bw": 0.25,
     "ic": "%%IMG:Mineral: Eye of the Sands%%",
     "ch": [
       [
@@ -3165,6 +3215,7 @@
     "n": "Pyrite",
     "r": "Common",
     "v": "500",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Pyrite%%",
     "ch": [
       [
@@ -3210,6 +3261,7 @@
     "n": "Silver",
     "r": "Common",
     "v": "700",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Silver%%",
     "ch": [
       [
@@ -3313,6 +3365,7 @@
     "n": "Platinum",
     "r": "Common",
     "v": "2,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Platinum%%",
     "ch": [
       [
@@ -3379,6 +3432,7 @@
     "n": "Seashell",
     "r": "Common",
     "v": "2,200",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Seashell%%",
     "ch": [
       [
@@ -3417,6 +3471,7 @@
     "n": "Obsidian",
     "r": "Common",
     "v": "3,000",
+    "bw": 0.15,
     "ic": "%%IMG:Mineral: Obsidian%%",
     "ch": [
       [
@@ -3480,6 +3535,7 @@
     "n": "Pearl",
     "r": "Common",
     "v": "5,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Pearl%%",
     "ch": [
       [
@@ -3530,6 +3586,7 @@
     "n": "Neodymium",
     "r": "Uncommon",
     "v": "10,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Neodymium%%",
     "ch": [
       [
@@ -3605,6 +3662,7 @@
     "n": "Smoky Quartz",
     "r": "Uncommon",
     "v": "16,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Smoky Quartz%%",
     "ch": [
       [
@@ -3700,6 +3758,7 @@
     "n": "Malachite",
     "r": "Uncommon",
     "v": "18,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Malachite%%",
     "ch": [
       [
@@ -3778,6 +3837,7 @@
     "n": "Sapphire",
     "r": "Uncommon",
     "v": "25,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Sapphire%%",
     "ch": [
       [
@@ -3853,6 +3913,7 @@
     "n": "Ruby",
     "r": "Rare",
     "v": "30,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Ruby%%",
     "ch": [
       [
@@ -3925,6 +3986,7 @@
     "n": "Lapis Lazuli",
     "r": "Rare",
     "v": "40,000",
+    "bw": 0.15,
     "ic": "%%IMG:Mineral: Lapis Lazuli%%",
     "ch": [
       [
@@ -4011,6 +4073,7 @@
     "n": "Silver Clamshell",
     "r": "Rare",
     "v": "2,200",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Silver Clamshell%%",
     "ch": [
       [
@@ -4061,6 +4124,7 @@
     "n": "Peridot",
     "r": "Rare",
     "v": "60,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Peridot%%",
     "ch": [
       [
@@ -4131,6 +4195,7 @@
     "n": "Onyx",
     "r": "Rare",
     "v": "75,000",
+    "bw": 0.15,
     "ic": "%%IMG:Mineral: Onyx%%",
     "ch": [
       [
@@ -4236,6 +4301,7 @@
     "n": "Meteoric Iron",
     "r": "Rare",
     "v": "80,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Meteoric Iron%%",
     "ch": [
       [
@@ -4313,6 +4379,7 @@
     "n": "Pyrelith",
     "r": "Rare",
     "v": "150,000",
+    "bw": 0.15,
     "ic": "%%IMG:Mineral: Pyrelith%%",
     "ch": [
       [
@@ -4353,6 +4420,7 @@
     "n": "Pink Diamond",
     "r": "Mythic",
     "v": "6,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Pink Diamond%%",
     "ch": [
       [
@@ -4425,6 +4493,7 @@
     "n": "Painite",
     "r": "Mythic",
     "v": "10,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Painite%%",
     "ch": [
       [
@@ -4519,6 +4588,7 @@
     "n": "Prismara",
     "r": "Mythic",
     "v": "25,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Prismara%%",
     "ch": [
       [
@@ -4612,6 +4682,7 @@
     "n": "Mythril",
     "r": "Mythic",
     "v": "20,000,000",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Mythril%%",
     "ch": [
       [
@@ -4702,6 +4773,7 @@
     "n": "Moonstone",
     "r": "Epic",
     "v": "200,000",
+    "bw": 0.25,
     "ic": "%%IMG:Mineral: Moonstone%%",
     "ch": [
       [
@@ -4774,6 +4846,7 @@
     "n": "Pyronium",
     "r": "Epic",
     "v": "226,000",
+    "bw": 0.25,
     "ic": "%%IMG:Mineral: Pyronium%%",
     "ch": [
       [
@@ -4830,6 +4903,7 @@
     "n": "Osmium",
     "r": "Epic",
     "v": "300,000",
+    "bw": 0.4,
     "ic": "%%IMG:Mineral: Osmium%%",
     "ch": [
       [
@@ -4931,6 +5005,7 @@
     "n": "Opal",
     "r": "Epic",
     "v": "325,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Opal%%",
     "ch": [
       [
@@ -5038,6 +5113,7 @@
     "n": "Rose Gold",
     "r": "Legendary",
     "v": "500,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Rose Gold%%",
     "ch": [
       [
@@ -5119,6 +5195,7 @@
     "n": "Palladium",
     "r": "Legendary",
     "v": "500,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Palladium%%",
     "ch": [
       [
@@ -5184,6 +5261,7 @@
     "n": "Luminum",
     "r": "Legendary",
     "v": "1,500,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Luminum%%",
     "ch": [
       [
@@ -5267,6 +5345,7 @@
     "n": "Lightshard",
     "r": "Epic",
     "v": "300,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Lightshard%%",
     "ch": [
       [
@@ -5327,6 +5406,7 @@
     "n": "Specterite",
     "r": "Legendary",
     "v": "2,800,000",
+    "bw": 0.05,
     "ic": "%%IMG:Mineral: Specterite%%",
     "ch": [
       [
@@ -5393,6 +5473,7 @@
     "n": "Radiant Gold",
     "r": "Mythic",
     "v": "40,000,000",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Radiant Gold%%",
     "ch": [
       [
@@ -5472,6 +5553,7 @@
     "n": "Rock Candy",
     "r": "Uncommon",
     "v": "15,000",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Rock Candy%%",
     "ch": [
       [
@@ -5507,6 +5589,7 @@
     "n": "Lost Soul",
     "r": "Legendary",
     "v": "6,666,666",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Lost Soul%%",
     "ch": [
       [
@@ -5566,6 +5649,7 @@
     "n": "Pumpkin Soul",
     "r": "Exotic",
     "v": "40,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Pumpkin Soul%%",
     "ch": [
       [
@@ -5608,6 +5692,7 @@
     "n": "Mercury",
     "r": "Epic",
     "v": "450,000",
+    "bw": 0.4,
     "ic": "%%IMG:Mineral: Mercury%%",
     "ch": [
       [
@@ -5673,6 +5758,7 @@
     "n": "Star Garnet",
     "r": "Mythic",
     "v": "44,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Star Garnet%%",
     "ch": [
       [
@@ -5734,6 +5820,7 @@
     "n": "Red Beryl",
     "r": "Mythic",
     "v": "28,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Red Beryl%%",
     "ch": [
       [
@@ -5790,6 +5877,7 @@
     "n": "Peppermint Prism",
     "r": "Legendary",
     "v": "2,800,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Peppermint Prism%%",
     "ch": [
       [
@@ -5837,6 +5925,7 @@
     "n": "North Star",
     "r": "Exotic",
     "v": "42,500,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: North Star%%",
     "ch": [
       [
@@ -5879,6 +5968,7 @@
     "n": "Radium",
     "r": "Legendary",
     "v": "1,500,000",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Radium%%",
     "ch": [
       [
@@ -5922,6 +6012,7 @@
     "n": "Singularium",
     "r": "Exotic",
     "v": "250,000,000",
+    "bw": 0.5,
     "ic": "%%IMG:Mineral: Singularium%%",
     "ch": [
       [
@@ -5968,6 +6059,7 @@
     "n": "Nickel",
     "r": "Uncommon",
     "v": "6,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Nickel%%",
     "ch": [
       [
@@ -6006,6 +6098,7 @@
     "n": "Meteoric Gold",
     "r": "Epic",
     "v": "240,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Meteoric Gold%%",
     "ch": [
       [
@@ -6054,6 +6147,7 @@
     "n": "Nautilus Shell",
     "r": "Legendary",
     "v": "2,100,000",
+    "bw": 0.25,
     "ic": "%%IMG:Mineral: Nautilus Shell%%",
     "ch": [
       [
@@ -6089,6 +6183,7 @@
     "n": "Sandsteel",
     "r": "Rare",
     "v": "27,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Sandsteel%%",
     "ch": [
       [
@@ -6127,6 +6222,7 @@
     "n": "Selenite",
     "r": "Epic",
     "v": "135,000",
+    "bw": 0.15,
     "ic": "%%IMG:Mineral: Selenite%%",
     "ch": [
       [
@@ -6160,6 +6256,7 @@
     "n": "Jasper",
     "r": "Legendary",
     "v": "380,000",
+    "bw": 0.15,
     "ic": "%%IMG:Mineral: Jasper%%",
     "ch": [
       [
@@ -6198,6 +6295,7 @@
     "n": "Key of Life",
     "r": "Exotic",
     "v": "1,000,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Key of Life%%",
     "ch": [
       [
@@ -6228,6 +6326,7 @@
     "n": "Solarium",
     "r": "Exotic",
     "v": "350,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Solarium%%",
     "ch": [
       [
@@ -6258,6 +6357,7 @@
     "n": "Moonspire",
     "r": "Exotic",
     "v": "45,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Moonspire%%",
     "ch": [
       [
@@ -6296,6 +6396,7 @@
     "n": "Titanium",
     "r": "Uncommon",
     "v": "7,500",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Titanium%%",
     "ch": [
       [
@@ -6394,6 +6495,7 @@
     "n": "Topaz",
     "r": "Uncommon",
     "v": "14,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Topaz%%",
     "ch": [
       [
@@ -6489,6 +6591,7 @@
     "n": "Zircon",
     "r": "Uncommon",
     "v": "25,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Zircon%%",
     "ch": [
       [
@@ -6532,6 +6635,7 @@
     "n": "Vortessence",
     "r": "Mythic",
     "v": "20,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Vortessence%%",
     "ch": [
       [
@@ -6642,6 +6746,7 @@
     "n": "Volcanic Core",
     "r": "Mythic",
     "v": "40,000,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Volcanic Core%%",
     "ch": [
       [
@@ -6698,6 +6803,7 @@
     "n": "Uranium",
     "r": "Legendary",
     "v": "1,500,000",
+    "bw": 0.3,
     "ic": "%%IMG:Mineral: Uranium%%",
     "ch": [
       [
@@ -6754,6 +6860,7 @@
     "n": "Volcanic Key",
     "r": "Legendary",
     "v": "1,500,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Volcanic Key%%",
     "ch": [
       [
@@ -6787,6 +6894,7 @@
     "n": "Starshine",
     "r": "Legendary",
     "v": "2,500,000",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Starshine%%",
     "ch": [
       [
@@ -6883,6 +6991,7 @@
     "n": "Tourmaline",
     "r": "Legendary",
     "v": "2,888,000",
+    "bw": 0.12,
     "ic": "%%IMG:Mineral: Tourmaline%%",
     "ch": [
       [
@@ -6934,6 +7043,7 @@
     "n": "Voidstone",
     "r": "Exotic",
     "v": "111,111,111",
+    "bw": 0.1,
     "ic": "%%IMG:Mineral: Voidstone%%",
     "ch": [
       [
@@ -6968,6 +7078,7 @@
     "n": "Vineheart",
     "r": "Exotic",
     "v": "125,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Vineheart%%",
     "ch": [
       [
@@ -7010,6 +7121,7 @@
     "n": "Umbrite",
     "r": "Exotic",
     "v": "180,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Umbrite%%",
     "ch": [
       [
@@ -7068,6 +7180,7 @@
     "n": "Sunstone",
     "r": "Mythic",
     "v": "28,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Sunstone%%",
     "ch": [
       [
@@ -7119,6 +7232,7 @@
     "n": "Starpiercer",
     "r": "Exotic",
     "v": "450,000,000",
+    "bw": 0.2,
     "ic": "%%IMG:Mineral: Starpiercer%%",
     "ch": [
       [
