@@ -44,7 +44,7 @@
   <section class="card" id="issues" hidden style="border-left:4px solid var(--warn)"><h2>Not on the route</h2><ul class="rt-issues" id="issueList"></ul></section>
   <section class="card"><h2>How the route is worked out</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
-      <li>For every mineral it works out your chance per pan in each zone it drops in, using the same luck model as Luck Odds (about √capacity minerals per pan) and the modifier chances from Modifier Odds. Luck isn't counted for modifiers: it changes their odds a little, but by how much isn't known yet, so it needs testing.</li>
+      <li>For every mineral it works out your chance per pan in each zone it drops in, using the same luck model as Luck Odds (about √capacity minerals per pan) and the modifier chances from Modifier Odds (your Modifier Boost and luck both push toward rarer modifiers; see Modifier Odds for how).</li>
       <li>It then shares zones out so minerals that drop in the same place are collected together. A mineral moves to a slightly worse zone if you'll be there anyway, because it's then almost free.</li>
       <li>"Expected pans" for a stop is the average number of pans to get <b>every</b> item on it, not just the first. Luck swings a lot, so about 1 in 3 runs take longer than this.</li>
       <li>Tick an item when you get it and the route updates. Weight isn't counted: an item gives its full museum boost only at its max weight, so you may want a heavier one later.</li>

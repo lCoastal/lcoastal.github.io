@@ -86,20 +86,22 @@ const SPECIAL={Treasured:["Treasure only","Every mineral inside a treasure chest
   Hearthflame:["Summer only","Only during the Summer event, during Night of the Bonfire.",false],Summer:["Summer only","Only during the Summer event.",false],Tidal:["Summer only","Only during the Summer event, panning at a beach inside Shifting Tides circles.",false]};
 const MODS=[...Object.keys(BASE),...Object.keys(SPECIAL),"None"];
 function interp(pts,x){x=Math.max(1,x);if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i];if(x<=x1){const t=(Math.log(x)-Math.log(x0))/(Math.log(x1)-Math.log(x0));return Math.exp(Math.log(y0)+t*(Math.log(y1)-Math.log(y0)))}}return pts[0][1]}
-const anyMod=e=>Math.min(.994,e<=1000?e*.00066:.66+(e-1000)*.000485);
-// Which modifier you get works like luck does for minerals: the game rolls more than once and keeps the rarest
-// modifier, rarest first by the game's weights. Fitted on two datasets (5.97x and 8.97x Modifier Boost):
-// strength L = 14.5 x Modifier Boost (x), and a third of ores roll once, a quarter at half strength, the rest at full.
+// share of ores that get a normal (panning) modifier: about 36% in my tests at different boosts,
+// so Modifier Boost changes which modifier you get far more than how often. Voidtorn and event modifiers come on top.
+const NAT_MOD=.36;const anyMod=()=>NAT_MOD;
+// Which modifier you get works like luck does for minerals: the game rolls the modifier several times and keeps
+// the rarest, by the game's weights. Strength = 10.1 x Modifier Boost (x) + 1 per 1,000 luck (the wiki's "every 1k
+// luck is an extra roll"), fitted on my tests with the Halloween event left out. A third of ores
+// roll once, a quarter at half strength, the rest at full strength.
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
-const MOD_K=14.535,MOD_MIX=[.338,.268,.394];
-function modShares(eff,night){const list=MODW.filter(([k])=>night||k!=="Lunar");const tot=list.reduce((a,x)=>a+x[1],0);
+const MOD_K=10.12,MOD_LUCK=1/1000,MOD_MIX=[.338,.268,.394];
+function modShares(eff,night,luck){const list=MODW.filter(([k])=>night||k!=="Lunar");const tot=list.reduce((a,x)=>a+x[1],0);
   const f=N=>{let a=0;const o={};list.forEach(([k,w])=>{const p=w/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-p),N);a+=p});return o};
-  const L=Math.max(1,MOD_K*Math.max(0,eff)/100),parts=[f(1),f(Math.max(1,L/2)),f(L)];const s={};
+  const L=Math.max(1,MOD_K*Math.max(0,eff)/100+MOD_LUCK*Math.max(0,+luck||0)),parts=[f(1),f(Math.max(1,L/2)),f(L)];const s={};
   list.forEach(([k])=>s[k]=100*(MOD_MIX[0]*parts[0][k]+MOD_MIX[1]*parts[1][k]+MOD_MIX[2]*parts[2][k]));return s}
 function modChance(u,o){if(!u||u==="None")return 1;if(!(u in BASE))return 0;o=o||st;
-  // luck isn't counted: it affects modifier odds a little, but how much is unknown (needs testing)
-  const mb=Math.max(0,+o.mb||0);const effAny=mb*(o.mag?2:1),effW=Math.max(1,mb);
-  const s=modShares(effW,u==="Lunar");
+  const mb=Math.max(0,+o.mb||0);const effAny=mb,effW=Math.max(1,mb);
+  const s=modShares(effW,u==="Lunar",o.luck);
   return anyMod(effAny)*s[u]/100}
 // expected pans until every item has dropped its needed count: items [{p (per pan), c (count)}]
 function erl(c,x){let term=Math.exp(-x),sum=term;for(let k=1;k<c;k++){term*=x/k;sum+=term}return 1-sum}
@@ -211,7 +213,7 @@ function settingsHTML(withMod){return `<div class="rt-row"><label class="rt-ck">
   <label class="rt-fld rt-s"><span class="lab">Capacity</span><input type="number" data-rt="cap" min="1"></label>
   <label class="rt-fld rt-s"><span class="lab">Pans per hour</span><input type="number" data-rt="pph" min="0" placeholder="optional"></label>
   <label class="rt-fld"><span class="lab">Furthest area unlocked</span><select data-rt="far"><option value="">Everything</option>${PROG.filter(z=>!EVENT_AREAS.includes(z)&&z!=="The Void").map(z=>`<option>${esc(z)}</option>`).join("")}</select></label></div>
-  <div class="rt-row"><label class="rt-ck"><input type="checkbox" data-rt="void"> Include The Void</label><label class="rt-ck"><input type="checkbox" data-rt="evt"> Include event areas</label>${withMod?`<label class="rt-ck rt-s"><input type="checkbox" data-rt="mag"> Solar Magnifier down</label>`:""}
+  <div class="rt-row"><label class="rt-ck"><input type="checkbox" data-rt="void"> Include The Void</label><label class="rt-ck"><input type="checkbox" data-rt="evt"> Include event areas</label>
   <span class="rt-row" style="gap:6px"><span class="lab">Order</span><button type="button" class="chip" data-rto="quick">${"Quickest stops first"}</button><button type="button" class="chip" data-rto="prog">Follow the map</button></span>
   <button type="button" class="btn rt-s" data-rtcalc>Use my Stat Calculator stats</button></div>`}
 function bind(root,onChange){

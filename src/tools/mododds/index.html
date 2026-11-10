@@ -13,29 +13,31 @@
 <div class="wrap">
   <header>
     <h1>Modifier Odds</h1>
-    <p class="lede">Your chance of every ore modifier from your Modifier Boost.<br>Estimates built on the wiki's stat guide and its community drop counts.</p>
+    <p class="lede">Your chance of every ore modifier from your Modifier Boost and luck.<br>Built on the game's modifier weights and my own test runs.</p>
   </header>
-  <p class="disc" role="note"><b>Heads up:</b> which modifier you get is fitted on my own test runs (about 214,000 minerals at 5.97× and 8.97× Modifier Boost) and matches them within a few percent, but it hasn't been checked at very low or very high boosts yet. Luck isn't counted: it changes modifier odds a little, but by how much still needs testing. Enchants, events and weather aren't counted either.</p>
+  <p class="disc" role="note"><b>Heads up:</b> this is a new model fitted on my own tests (with the Halloween event left out), so it may not be exact. It matches my tests within a few percent, but it hasn\'t been checked at low boosts, very high luck or other zones yet. Enchants, events and weather aren\'t counted. How it works is explained at the bottom.</p>
   <section class="card">
     <div class="inputs">
       <label class="fld"><span class="lab">Modifier Boost (panel %)</span><input type="number" id="mb" min="0" value=""></label>
+      <label class="fld"><span class="lab">Luck</span><input type="number" id="luck" min="0" value=""></label>
       <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" value=""></label>
       <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
     </div>
     <div class="tg2">
-      <label class="ck"><input type="checkbox" id="mag"> Solar Magnifier down (×2, only for how many ores get one)</label>
+      <input type="checkbox" id="mag" hidden>
       <label class="ck"><input type="checkbox" id="surge"> Modifier Surge event (×2)</label>
       <label class="ck"><input type="checkbox" id="night"> Night (Lunar can drop)</label>
     </div>
   </section>
   <section class="card"><div style="display:flex;justify-content:flex-end"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="big" id="sum"></div><div class="tw" id="tbl"></div></section>
   <section class="card"><h2>How this is worked out</h2>
-    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
-      <li>Effective Modifier Boost = your panel Modifier Boost × 2 for a Solar Magnifier × 2 for a Modifier Surge.</li>
-      <li>Which modifier you get starts from the game's modifier weights (Shiny 1, Pure 0.8, Glowing 0.5, Scorching 0.25, Irradiated 0.1, Iridescent 0.02, Cosmic 0.005, Mutated 0.001, Lunar 0.00025, Perfect 0.0001): each one's chance is its weight ÷ the total. Luck isn't counted. It does change modifier odds a little, but by how much isn't known yet, so it's left out until it's been tested.</li>
-      <li>How many ores get a modifier rises with effective Modifier Boost and tops out at about 99.4% around 1,700–1,900. The Solar Magnifier only helps here.</li>
-      <li>Modifier Boost works like luck does for minerals: the game rolls the modifier several times and keeps the rarest one. The strength is 14.5 × your Modifier Boost (shown in game as ×, so 597% = 5.97× → 87). About a third of ores roll once, a quarter at half strength and the rest at full strength. This was fitted on two test datasets (5.97× and 8.97×, about 214,000 minerals) and matches both within a few percent, so treat it as a good estimate rather than exact.</li>
-      <li>Treasured only comes from treasure chests, Voidtorn from Void tools or The Void, Electrified from Thunderstorms and Crystalline from geodes or Crystal Touch, so they aren't listed. Purity rune removes modifiers entirely.</li>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li><b>Does an ore get a modifier at all?</b> About 36% of ores get a normal one (Shiny up to Perfect). In my tests it stayed about the same at different Modifier Boosts, so boost barely changes how often you get one. Voidtorn (from Void tools) and event modifiers like Ghostly or Spooky come on top of that.</li>
+      <li><b>Which one?</b> Every modifier has a weight in the game: Shiny 1, Pure 0.8, Glowing 0.5, Scorching 0.25, Irradiated 0.1, Iridescent 0.02, Cosmic 0.005, Mutated 0.001, Lunar 0.00025 (night only), Perfect 0.0001. With no boost you'd simply get each one in proportion to its weight.</li>
+      <li><b>What boost and luck do:</b> they work like luck does for minerals. The game rolls the modifier several times and keeps the rarest one it hits, so more rolls means rarer, better modifiers, not more of them. The number of rolls ("strength") is <b>10.1 × your Modifier Boost (×) + 1 for every 1,000 luck</b>. For example 600% boost and 25,000 luck gives about 10.1 × 6 + 25 = 86. A Modifier Surge doubles the boost part.</li>
+      <li><b>Not every ore gets the full strength:</b> about a third roll just once, a quarter at half strength and the rest at full strength. That split is what made the model match my tests.</li>
+      <li><b>Where the numbers come from:</b> my own tests, with the parts where the Spooky event was running left out, because event modifiers mostly replace common ones and make the rest look rarer. The luck part follows the wiki's "every 1,000 luck is an extra roll", which fitted the data well.</li>
+      <li>Treasured only comes from treasure chests, Voidtorn from Void tools or The Void, Electrified from Thunderstorms and Crystalline from geodes or Crystal Touch, so they aren't listed. The Purity rune removes modifiers entirely. The Solar Magnifier isn't counted until it's been tested.</li>
     </ul></section>
   <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 10/11/26 · Made by @__coastal</p>
 </div>

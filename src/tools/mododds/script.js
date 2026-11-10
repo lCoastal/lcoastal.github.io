@@ -1,6 +1,6 @@
 
 const $=id=>document.getElementById(id);
-let S={mb:"",cap:"",mag:false,surge:false,night:false};try{Object.assign(S,JSON.parse(localStorage.getItem("pmo-s")||"{}"))}catch(e){}
+let S={mb:"",luck:"",cap:"",mag:false,surge:false,night:false};try{Object.assign(S,JSON.parse(localStorage.getItem("pmo-s")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("pmo-s",JSON.stringify(S))}catch(e){}};
 // the game's modifier weights; a modifier's base share is its weight ÷ the total (Treasured, Voidtorn, event ones etc. are 0 here)
 const WEIGHT={Shiny:1,Pure:.8,Glowing:.5,Scorching:.25,Irradiated:.1,Iridescent:.02,Cosmic:.005,Mutated:.001,Lunar:.00025,Perfect:.0001};
@@ -8,25 +8,26 @@ const WSUM=Object.values(WEIGHT).reduce((a,b)=>a+b,0);
 const BASE=Object.fromEntries(Object.entries(WEIGHT).map(([k,w])=>[k,w/WSUM*100]));
 const PRICE={Perfect:24,Lunar:14,Mutated:9,Cosmic:6,Iridescent:3.5,Irradiated:2.5,Scorching:2,Glowing:1.6,Pure:1.35,Shiny:1.2};
 const MUSE=Object.fromEntries(P.mods.map(m=>[m[0],m[1].join(", ")]));
-// share of ores that get any modifier (piecewise fit of the wiki chart)
-const anyMod=e=>Math.min(.994,e<=1000?e*.00066:.66+(e-1000)*.000485);
-// Which modifier you get works like luck does for minerals: the game rolls more than once and keeps the rarest
-// modifier, rarest first by the game's weights. Fitted on two datasets (5.97x and 8.97x Modifier Boost):
-// strength L = 14.5 x Modifier Boost (x), and a third of ores roll once, a quarter at half strength, the rest at full.
+// share of ores that get a normal (panning) modifier: about 36% in my tests at different boosts,
+// so Modifier Boost changes which modifier you get far more than how often. Voidtorn and event modifiers come on top.
+const NAT_MOD=.36;const anyMod=()=>NAT_MOD;
+// Which modifier you get works like luck does for minerals: the game rolls the modifier several times and keeps
+// the rarest, by the game's weights. Strength = 10.1 x Modifier Boost (x) + 1 per 1,000 luck (the wiki's "every 1k
+// luck is an extra roll"), fitted on my tests with the Halloween event left out. A third of ores
+// roll once, a quarter at half strength, the rest at full strength.
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
-const MOD_K=14.535,MOD_MIX=[.338,.268,.394];
-function modShares(eff,night){const list=MODW.filter(([k])=>night||k!=="Lunar");const tot=list.reduce((a,x)=>a+x[1],0);
+const MOD_K=10.12,MOD_LUCK=1/1000,MOD_MIX=[.338,.268,.394];
+function modShares(eff,night,luck){const list=MODW.filter(([k])=>night||k!=="Lunar");const tot=list.reduce((a,x)=>a+x[1],0);
   const f=N=>{let a=0;const o={};list.forEach(([k,w])=>{const p=w/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-p),N);a+=p});return o};
-  const L=Math.max(1,MOD_K*Math.max(0,eff)/100),parts=[f(1),f(Math.max(1,L/2)),f(L)];const s={};
+  const L=Math.max(1,MOD_K*Math.max(0,eff)/100+MOD_LUCK*Math.max(0,+luck||0)),parts=[f(1),f(Math.max(1,L/2)),f(L)];const s={};
   list.forEach(([k])=>s[k]=100*(MOD_MIX[0]*parts[0][k]+MOD_MIX[1]*parts[1][k]+MOD_MIX[2]*parts[2][k]));return s}
-function shares(eff){return modShares(eff,S.night)}
+function shares(eff){return modShares(eff,S.night,S.luck)}
 const oneInP=p=>p<=0?"—":p>=.5?fmt(p*100,1)+"%":`~1 in ${fmt(Math.round(1/p),0)}`;
-// luck isn't counted: it affects modifier odds a little, but how much is unknown (needs testing)
 function calcAll(){const mb=Math.max(0,+S.mb||0);
-  const effAny=mb*(S.mag?2:1)*(S.surge?2:1),effWhich=Math.max(1,mb*(S.surge?2:1));
+  const effAny=mb*(S.surge?2:1),effWhich=Math.max(1,mb*(S.surge?2:1));
   return {mb,effAny,effWhich,q:anyMod(effAny),sh:shares(effWhich),n:Math.max(1,Math.sqrt(Math.max(1,+S.cap||1)))}}
 const ORDER=["Perfect","Lunar","Mutated","Cosmic","Iridescent","Irradiated","Scorching","Glowing","Pure","Shiny"];
-function render(){["mb","cap"].forEach(k=>$(k).value=S[k]);["mag","surge","night"].forEach(k=>$(k).checked=!!S[k]);
+function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge","night"].forEach(k=>$(k).checked=!!S[k]);
   const {effAny,effWhich,q,sh,n}=calcAll();
   $("sum").innerHTML=`<div><span class="lab">Ores with a modifier</span><b>${fmt(q*100,1)}%</b><div class="bar"><i style="width:${q*100}%"></i></div></div>
     <div><span class="lab">Effective boost</span><b>${fmt(effAny,0)}</b><span class="hint">${fmt(effWhich,0)} for which modifier</span></div>
@@ -34,9 +35,9 @@ function render(){["mb","cap"].forEach(k=>$(k).value=S[k]);["mag","surge","night
   const order=ORDER;
   $("tbl").innerHTML=`<table class="o"><thead><tr><th>Modifier</th><th>Share of modified</th><th>Base share</th><th>Per ore</th><th>Per pan</th><th>Sell ×</th></tr></thead><tbody>${order.map(k=>{const on=k!=="Lunar"||S.night;const s=on?(sh[k]||0):0;const po=q*s/100;
     return `<tr class="${on?"":"off"}"><td><span class="mn"><b>${k}</b><span>${k==="Lunar"&&!S.night?"Night only":"Museum: "+esc(MUSE[k]||"")}</span></span></td><td data-l="Share" class="${s>BASE[k]*1.05?"up":""}">${on?fmt(s,s<0.1?4:2)+"%":"—"}</td><td data-l="Base">${fmt(BASE[k],4)}%</td><td data-l="Per ore">${on?oneInP(po):"—"}</td><td data-l="Per pan">${on?oneInP(1-Math.pow(1-po,n)):"—"}</td><td data-l="Sell">${PRICE[k]}×</td></tr>`}).join("")}</tbody></table>`}
-["mb","cap"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
+["mb","luck","cap"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
 ["mag","surge","night"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();render()}));
-$("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;S.mb=Math.round(t["Modifier Boost"]||0);S.cap=Math.round(t.Capacity)||S.cap;save();render()};
+$("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;S.mb=Math.round(t["Modifier Boost"]||0);S.luck=Math.round(t.Luck||0);S.cap=Math.round(t.Capacity)||S.cap;save();render()};
 // ---- save the results as an image (just the numbers, no page controls) ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
@@ -49,7 +50,7 @@ async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
   c.font=`600 13px ${F}`;const mbt="Made by @__coastal";const mw=c.measureText(mbt).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mbt,mx+20,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(`${fmt(mb,0)}% Modifier Boost`,PAD,PAD+30);
-  const sub=[`Capacity ${fmt(+S.cap||1,0)}`,`about ${fmt(n,1)} ores per pan`];if(S.mag)sub.push("Solar Magnifier");if(S.surge)sub.push("Modifier Surge");if(S.night)sub.push("Night");
+  const sub=[`Luck ${fmt(+S.luck||0,0)}`,`Capacity ${fmt(+S.cap||1,0)}`,`about ${fmt(n,1)} ores per pan`];if(S.surge)sub.push("Modifier Surge");if(S.night)sub.push("Night");
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(" · "),PAD,PAD+58);
   let y=PAD+82;const sums=[{lab:"Ores with a modifier",v:fmt(q*100,1)+"%",bar:q},{lab:"Effective boost",v:fmt(effAny,0),s:fmt(effWhich,0)+" for which modifier"},{lab:"Perfect per pan",v:oneInP(1-Math.pow(1-q*sh.Perfect/100,n)),s:`about ${fmt(n,1)} ores per pan`}];
   const bw=(W-PAD*2-24)/3;sums.forEach((b,i)=>{const x=PAD+i*(bw+12);c.fillStyle="#1c2126";rr(x,y,bw,SUMH,10);c.fill();c.strokeStyle="#2c333a";rr(x,y,bw,SUMH,10);c.stroke();
