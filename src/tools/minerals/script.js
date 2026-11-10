@@ -35,7 +35,10 @@ const NAT={rarity:-1,value:-1,name:1,chance:1};
 document.getElementById("dir").addEventListener("click",()=>{st.rev=!st.rev;save();render()});
 function drawDir(){const d=(NAT[st.sort]||1)*(st.rev?-1:1);const b=document.getElementById("dir");b.innerHTML=d>0?"<b>↑</b> Ascending":"<b>↓</b> Descending";b.title="Click to sort "+(d>0?"descending":"ascending")}
 
-function sortedCh(m){return [...m.ch].sort((a,b)=>oneIn(a[2])-oneIn(b[2]))}
+// The Void goes last even when its odds look best (its pool is a rotating event), unless it's the only place
+const isVoid=c=>/^The Void/.test(c[0]);
+function sortedCh(m){return [...m.ch].sort((a,b)=>isVoid(a)-isVoid(b)||oneIn(a[2])-oneIn(b[2]))}
+const realCh=m=>m.ch.some(c=>!isVoid(c))?m.ch.filter(c=>!isVoid(c)):m.ch;
 function chanceAt(m,l){const c=m.ch.filter(x=>baseLoc(x[0])===l);return c.length?Math.min(...c.map(x=>oneIn(x[2]))):Infinity}
 function rowHTML(m){
   const ch=sortedCh(m);const best=st.loc?ch.find(c=>baseLoc(c[0])===st.loc):(ch.find(c=>!/^The Void/.test(c[0]))||ch[0]);
@@ -56,7 +59,7 @@ function render(){
     return true});
   const ri=r=>ORDER.indexOf(r);
   const sorters={rarity:(a,b)=>ri(a.r)-ri(b.r)||num(b.v)-num(a.v),value:(a,b)=>num(b.v)-num(a.v),name:(a,b)=>a.n.localeCompare(b.n),
-    chance:(a,b)=>st.loc?chanceAt(a,st.loc)-chanceAt(b,st.loc):Math.min(...a.ch.map(c=>oneIn(c[2])))-Math.min(...b.ch.map(c=>oneIn(c[2])))};
+    chance:(a,b)=>st.loc?chanceAt(a,st.loc)-chanceAt(b,st.loc):Math.min(...realCh(a).map(c=>oneIn(c[2])))-Math.min(...realCh(b).map(c=>oneIn(c[2])))};
   if(st.stat&&st.sort==="rarity")list.sort((a,b)=>ri(a.r)-ri(b.r)||(b.mu.b.find(x=>x[0]===st.stat)[1]-a.mu.b.find(x=>x[0]===st.stat)[1]));
   else list.sort(sorters[st.sort]||sorters.rarity);
   if(st.rev)list.reverse();drawDir();

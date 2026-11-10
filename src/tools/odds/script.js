@@ -48,7 +48,7 @@ function render(){
     const byR=r=>rows.filter(x=>x.m.r===r).reduce((s,x)=>s+x.eff,0);
     $("sum").innerHTML=["Exotic","Mythic","Legendary"].filter(r=>!S.hideR.includes(r)).map(r=>`<div><span class="lab" style="color:${rc(r)}">Any ${r}</span><b>${oneInTxt(1-Math.pow(1-byR(r),perPan()))}</b><span class="hint">per pan</span></div>`).join("");
     $("tbl").innerHTML=`<table class="o">${head}<tbody>${rows.length?"":`<tr><td colspan="5" class="hint">No rarities picked. Turn one on above.</td></tr>`}${rows.map(s=>row(`<span class="mn" data-mineral="${esc(s.m.n)}">${s.m.ic?`<img src="${s.m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(s.m.n)}</b><br><span class="rr" style="--rc:${rc(s.m.r)}">${s.m.r}</span></span></span>`,"",s.m.r,s)).join("")}</tbody></table>`}
-  else{const m=MIN[S.min.toLowerCase()];const rows=(m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,L).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>b.s.eff-a.s.eff);
+  else{const m=MIN[S.min.toLowerCase()];const rows=(m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,L).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>/Void/.test(a.l)-/Void/.test(b.l)||b.s.eff-a.s.eff);
     const best=rows.find(x=>!/Void/.test(x.l))||rows[0];
     $("sum").innerHTML=best?(()=>{const pp=1-Math.pow(1-best.s.eff,perPan());const pans=pp>0?1/pp:Infinity;return `<div><span class="lab">Best place</span><b style="font-family:var(--f-body);font-size:1rem">${esc(best.l)}</b></div><div><span class="lab">Per pan there</span><b>${oneInTxt(pp)}</b>${+S.pph>0&&isFinite(pans)?`<span class="hint">about ${hrs(pans)}</span>`:""}</div>`})():"";
     $("tbl").innerHTML=`<table class="o">${head}<tbody>${rows.map(x=>row(`<span class="lk" data-location="${esc(baseLoc(x.l))}">${esc(x.l)}</span>${/Void/.test(x.l)?' <span class="hint">(loot pool changes)</span>':""}`,"","",x.s)).join("")}</tbody></table>`}
@@ -59,7 +59,7 @@ document.addEventListener("click",e=>{const rb=e.target.closest("[data-r]");if(r
   if(e.target.closest("[data-rnone]")){S.hideR=ORD.slice();save();render();return}const f=e.target.closest("[data-fmt]");if(f){S.fmt=f.dataset.fmt;save();render();return}});
 // ---- pan simulator: rolls pans at the picked spot with the same chances as the table ----
 let SIM=null;
-function simSpot(){if(S.by==="loc")return S.loc;const m=MIN[S.min.toLowerCase()];const rows=(m&&m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,Math.max(1,+S.luck||1)).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>b.s.eff-a.s.eff);const b=rows.find(x=>!/Void/.test(x.l))||rows[0];return b?b.l:LOCS[0]}
+function simSpot(){if(S.by==="loc")return S.loc;const m=MIN[S.min.toLowerCase()];const rows=(m&&m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,Math.max(1,+S.luck||1)).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>/Void/.test(a.l)-/Void/.test(b.l)||b.s.eff-a.s.eff);const b=rows.find(x=>!/Void/.test(x.l))||rows[0];return b?b.l:LOCS[0]}
 function simKey(){return [simSpot(),Math.max(1,+S.luck||1),Math.max(1,+S.cap||1)].join("|")}
 function simRun(n){const spot=simSpot(),L=Math.max(1,+S.luck||1);const list=shares(spot,L);if(!list.length)return;
   SIM={key:simKey(),spot,pans:0,got:{},total:0,best:null,n};
@@ -97,7 +97,7 @@ async function oddsImage(){const L=Math.max(1,+S.luck||1),pp=perPan(),pph=+S.pph
     rows=all.map(s=>({name:s.m.n,sub:s.m.r,col:HEX[s.m.r],ic:s.m.ic,...calc(s)}));
     sums=["Exotic","Mythic","Legendary"].filter(r=>!S.hideR.includes(r)&&all.some(x=>x.m.r===r)).map(r=>{const e=all.filter(x=>x.m.r===r).reduce((t,x)=>t+x.eff,0);return {lab:"Any "+r+" · per pan",col:HEX[r],v:cell(1-Math.pow(1-e,pp))}})}
   else{const m=MIN[S.min.toLowerCase()];title=m.n;tcol=HEX[m.r]||tcol;
-    const list=(m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,L).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>b.s.eff-a.s.eff);
+    const list=(m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,L).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>/Void/.test(a.l)-/Void/.test(b.l)||b.s.eff-a.s.eff);
     rows=list.map(x=>({name:x.l,sub:/Void/.test(x.l)?"Loot pool changes":"",col:"#98a2ad",ic:null,...calc(x.s)}));
     const best=list.find(x=>!/Void/.test(x.l))||list[0];
     sums=best?[{lab:"Best place",col:"#98a2ad",v:[best.l,""],txt:true},{lab:"Per pan there",col:"#98a2ad",v:(()=>{const c0=calc(best.s),v=cell(c0.p);return v[1]||!(pph&&isFinite(c0.pans))?v:[v[0],"about "+hrs(c0.pans)]})()}]:[]}
