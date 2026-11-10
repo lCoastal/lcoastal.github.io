@@ -572,6 +572,7 @@ function frameFor(id) {
   f.addEventListener("load", () => {
     syncTheme(f);
     f.dataset.ok = "1";
+    ptAddReset(f, id);
     if (!f.hidden) document.getElementById("skel").hidden = true;
   });
   main.appendChild(f);
