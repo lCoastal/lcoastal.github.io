@@ -76,18 +76,20 @@ function strip(st,g){const t=clone(st);
   else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0};t.pots=[];t.runes=[]}
   else if(g==="events"){t.b=Object.assign({},t.b,{meteor:false,weather:false})}
   return t}
-// S.only: null = count everything, otherwise a single part key like "slot:r0" or "group:museum"
+// S.only: null = count everything, otherwise a single part key like "slot:r0", "slot:r0,r1" (same item in several slots) or "group:museum"
 function effState(){let t=clone(S);const off=S.isoOff||[];off.forEach(g=>{t=strip(t,g)});
   if(S.only){const keep=S.only;let o=GROUPS.reduce((a,[g])=>strip(a,g),clone(S));
     if(keep.startsWith("group:"))o=Object.assign(o,pick(clone(S),keep.slice(6)));
-    else{const [k,v]=keep.split(":");if(k==="pan"){o.pan=S.pan;o.panEn=S.panEn}else if(k==="shovel"){o.shovel=S.shovel;o.shEn=S.shEn}else if(k==="slot"){o.slots={[v]:S.slots[v]}}}
+    else{const [k,v]=keep.split(":");if(k==="pan"){o.pan=S.pan;o.panEn=S.panEn}else if(k==="shovel"){o.shovel=S.shovel;o.shEn=S.shEn}else if(k==="slot"){o.slots={};v.split(",").forEach(x=>{o.slots[x]=S.slots[x]})}}
     t=o}
   return t}
 function pick(st,g){if(g==="tools")return {pan:st.pan,shovel:st.shovel,panEn:st.panEn,shEn:st.shEn,trinket:st.trinket};if(g==="jewelry")return {slots:st.slots};if(g==="museum")return {mus:st.mus,museumBoard:st.museumBoard};
   if(g==="boosts")return {b:Object.assign({},st.b,{meteor:false,weather:false}),n:st.n,pots:st.pots,runes:st.runes};if(g==="events")return {b:{meteor:st.b.meteor,weather:st.b.weather}};return {}}
 function parts(st){const P2=[];if(st.pan)P2.push(["pan:","Pan: "+st.pan+(st.panEn?" ("+st.panEn+")":""),t=>{t.pan="";t.panEn=""}]);
   if(st.shovel)P2.push(["shovel:","Shovel: "+st.shovel+(st.shEn?" ("+st.shEn+")":""),t=>{t.shovel="";t.shEn=""}]);
-  SLOTDEF.forEach(([k,l])=>{const v=(st.slots||{})[k];if(v&&v.n)P2.push(["slot:"+k,l+": "+v.n,t=>{t.slots=Object.assign({},t.slots);delete t.slots[k]}])});
+  // the same item worn in several slots is one source: "Gold Ring ×3", worked out by taking all of them off together
+  const worn=new Map();SLOTDEF.forEach(([k,l])=>{const v=(st.slots||{})[k];if(v&&v.n){if(!worn.has(v.n))worn.set(v.n,[]);worn.get(v.n).push([k,l])}});
+  worn.forEach((ks,n)=>P2.push(["slot:"+ks.map(x=>x[0]).join(","),ks.length>1?n+" ×"+ks.length:ks[0][1]+": "+n,t=>{t.slots=Object.assign({},t.slots);ks.forEach(([k])=>delete t.slots[k])}]));
   if(st.mus!=="none")P2.push(["group:museum","Museum",t=>{t.mus="none"}]);
   P2.push(["group:boosts","Boosts (totems, runes, potions, cookie…)",t=>Object.assign(t,strip(t,"boosts"))]);
   if(st.b&&(st.b.meteor||st.b.weather))P2.push(["group:events","Events",t=>{t.b=Object.assign({},t.b,{meteor:false,weather:false})}]);return P2}
