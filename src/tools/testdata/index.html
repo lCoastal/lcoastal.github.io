@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Test Data Check</title>
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Test Data Check</h1>
+    <p class="lede">Drop in a file of minerals you've panned and it works out the real drop rates, modifier split and weights, then compares them with what the toolkit expects.<br>Nothing leaves your device: the file is read right here in your browser.</p>
+  </header>
+  <p class="disc" role="note"><b>Heads up:</b> this only tells you something when the file is big. A few hundred rows will look wrong by chance; a few thousand per mineral is where the drop rates settle down. Rarities you barely saw are marked as thin data.</p>
+
+  <section class="card">
+    <h2>1 · Your file</h2>
+    <div class="drop" id="drop">
+      <input type="file" id="file" accept=".txt,.csv,.tsv,.log,text/plain" hidden>
+      <button type="button" class="btn pri" id="pick">Choose a file</button>
+      <span class="or">or drop it here, or paste below</span>
+    </div>
+    <textarea id="paste" spellcheck="false" placeholder="Name | Weight (kg) | Modifier | Size Boost (x) | Total Luck | Modifier Boost (x) | Capacity | Zone&#10;Gold | 45.37 | Irradiated | 22.41 | 37637 | 9.18 | 3150 | Haunted Creek" aria-label="Paste your rows"></textarea>
+    <p class="hint" id="fileInfo"></p>
+  </section>
+
+  <section class="card" id="mapCard" hidden>
+    <h2>2 · Which column is what</h2>
+    <div class="row">
+      <label class="fld"><span class="lab">Separator</span><select id="sep"><option value="auto">Work it out</option><option value="|">Bar |</option><option value=",">Comma ,</option><option value="&#9;">Tab</option><option value=";">Semicolon ;</option></select></label>
+      <label class="ck"><input type="checkbox" id="hasHead" checked> First line is a header</label>
+      <button type="button" class="btn" id="reguess">Guess again</button>
+    </div>
+    <div id="map"></div>
+    <p class="hint">Only <b>Mineral</b> is needed. Add <b>Zone</b> to check drop rates, <b>Modifier</b> for the modifier split, and <b>Weight</b> plus <b>Size Boost</b> for weights. Luck, Modifier Boost and Capacity let it compare against the toolkit's own numbers.</p>
+    <div class="row"><button type="button" class="btn pri" id="run">Check it</button><span class="hint" id="runInfo"></span></div>
+  </section>
+
+  <section class="card" id="outCard" hidden>
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">3 · What it found</h2><button type="button" class="btn" id="copyOut">Copy as text</button></div>
+    <div class="big" id="sum"></div>
+    <div id="out"></div>
+  </section>
+
+  <section class="card">
+    <h2>How to read it</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li><b>Drop rates:</b> how often each mineral actually came up in a zone, next to the chance the toolkit lists for it. The ratio is what matters: 1.00× means the toolkit agrees with your file. Anything well away from 1 with plenty of rows behind it is worth a look, since it usually means the game changed.</li>
+      <li><b>Modifiers:</b> the share of minerals that got one, and which ones. The toolkit's own model is worked out at the Modifier Boost and luck in your file, so the two columns should line up.</li>
+      <li><b>Weights:</b> every weight divided by that mineral's base weight, so all minerals can be compared on one scale.</li>
+      <li><b>Thin data</b> marks anything with too few rows to trust. Treat those lines as a hint, not a finding.</li>
+    </ul>
+  </section>
+
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 10/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>

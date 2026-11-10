@@ -43,6 +43,7 @@ const SECTIONS = [
     [
       ["codes", "m:Radiant Gold"],
       ["tierlist", "m:Diamond"],
+      ["testdata", "m:Gold"],
       ["settings", "m:Meteoric Iron"],
     ],
   ],

@@ -26,6 +26,7 @@ const LIST = [
   { id: "sluices", name: "Sluices", desc: "Stats plus every Mad Scientist upgrade" },
   { id: "calc", name: "Stat Calculator", desc: "Your full stat panel from gear, museum and boosts" },
   { id: "checklist", name: "Crafting Checklist", desc: "Every material for what you want to craft" },
+  { id: "testdata", name: "Test Data Check", desc: "Checks your own panning data against the toolkit" },
   { id: "codes", name: "Codes", desc: "Active codes with one-tap copy" },
   { id: "tierlist", name: "Tier List", desc: "Rank minerals, equipment or runes" },
   { id: "settings", name: "Settings", desc: "Compact view, short numbers and scroll memory" },
