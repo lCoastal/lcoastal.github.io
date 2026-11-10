@@ -34,8 +34,8 @@
 
   <section class="card">
     <h2>Modifiers: how often and which one</h2>
-    <p class="txt">About <b>36%</b> of panned minerals get a normal modifier, and Modifier Boost barely changes that. What it changes is <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>10.1 × Modifier Boost + 1 per 1,000 luck</b>, with a third of rolls once, a quarter at half strength and the rest at full strength.</p>
-    <div class="row"><label class="fld"><span class="lab">Modifier Boost (×)</span><input type="number" id="mb" min="0" step="0.01" value="1"></label><label class="ck"><input type="checkbox" id="night"> Night (Lunar can roll)</label></div>
+    <p class="txt">About <b>36%</b> of panned minerals get a normal modifier, and Modifier Boost barely changes that. What it changes is <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>10.1 per 100% Modifier Boost + 1 per 1,000 luck</b>, with a third of rolls once, a quarter at half strength and the rest at full strength.</p>
+    <div class="row"><label class="fld"><span class="lab">Modifier Boost (%)</span><input type="number" id="mb" min="0" step="1" value="100"></label><label class="ck"><input type="checkbox" id="night"> Night (Lunar can roll)</label></div>
     <div class="tw"><table class="t" id="modT"></table></div>
     <p class="note">Voidtorn, Treasured, Electrified and other event modifiers come from their own sources and sit on top of the 36%.</p>
   </section>

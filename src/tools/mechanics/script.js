@@ -1,6 +1,6 @@
 (()=>{
 const $=id=>document.getElementById(id);
-let S={luck:1000,cap:1000,pick:.1,mb:1,night:false};try{Object.assign(S,JSON.parse(localStorage.getItem("pmc-s")||"{}"))}catch(e){}
+let S={luck:1000,cap:1000,pick:.1,mbp:100,night:false};try{Object.assign(S,JSON.parse(localStorage.getItem("pmc-s")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("pmc-s",JSON.stringify(S))}catch(e){}};
 const p=(x,d)=>{if(!isFinite(x))return"–";const v=x*100;return(v>=10?v.toFixed(1):v>=1?v.toFixed(2):v.toPrecision(2))+"%"};
 const oneIn=x=>x>0?"1 in "+Math.round(1/x).toLocaleString():"–";
@@ -16,10 +16,10 @@ function render(){
   $("luckT").innerHTML="<tr><th>Listed chance</th><th>At your luck</th><th>Change</th></tr>"+[.2,.05,.01,.001,.0001,.00001].map(b=>{const e=eff(b,L);return`<tr><td>${p(b)} (${oneIn(b)})</td><td>${p(e)} (${oneIn(e)})</td><td>${(e/b).toFixed(e/b>=100?0:1)}×</td></tr>`}).join("");
   const c=Math.max(1,+S.cap||1),q=Math.min(1,Math.max(0,(+S.pick||0)/100)),n=Math.sqrt(c),per=1-Math.pow(1-q,n);
   $("capOut").innerHTML=`About <b>${n.toFixed(1)}</b> picks per pan, so a ${p(q)} pick comes up in <b>${p(per)}</b> of pans (${oneIn(per)}).`;
-  const {s,list,tot}=modShares(+S.mb||0,S.night,L),mx=Math.max(...Object.values(s));
+  const {s,list,tot}=modShares((+S.mbp||0)/100,S.night,L),mx=Math.max(...Object.values(s));
   $("modT").innerHTML="<tr><th>Modifier</th><th>With no boost</th><th>At your boost</th><th class='bw'></th></tr>"+[...list].reverse().map(([k,w])=>`<tr><td>${k}</td><td>${p(w/tot)}</td><td>${p(s[k])}</td><td class="bw"><div class="bar" style="width:${(s[k]/mx*100).toFixed(1)}%"></div></td></tr>`).join("")+`<tr><td colspan="4" style="font-family:var(--f-body);text-align:left;color:var(--muted)">Shares are of modified minerals. Of everything you pan, multiply by 36%.</td></tr>`;
 }
-[["luck","luck"],["cap","cap"],["pick","pick"],["mb","mb"]].forEach(([id,k])=>{$(id).value=S[k];$(id).addEventListener("input",()=>{S[k]=$(id).value;save();render()})});
+[["luck","luck"],["cap","cap"],["pick","pick"],["mb","mbp"]].forEach(([id,k])=>{$(id).value=S[k];$(id).addEventListener("input",()=>{S[k]=$(id).value;save();render()})});
 $("night").checked=!!S.night;$("night").onchange=()=>{S.night=$("night").checked;save();render()};
 render();
 })();
