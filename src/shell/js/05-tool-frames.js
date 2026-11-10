@@ -345,8 +345,9 @@ function ptFrameInit() {
     },
     true,
   );
-  // equipment mutation pickers (<select data-ptmut>): on desktop a list instead of the browser's own dropdown,
-  // and hovering a mutation shows what it does to the item. Phones keep the normal picker (no hover there).
+  // every dropdown (<select>) on desktop: the toolkit's own list instead of the browser's, in the tool's theme.
+  // Mutation pickers (<select data-ptmut>) also show what each mutation does when you hover it.
+  // Phones keep the normal picker; <select data-native> opts out.
   (function () {
     var MU = {};
     try {
@@ -357,8 +358,8 @@ function ptFrameInit() {
     var COL = { Silver: "#a9b4be", Gold: "#d9a520", Diamond: "#5fc8e8", Granite: "#b08d64", Overclocked: "#6b8cff", Festive: "#e05555", Prismatic: "#d24fc0" };
     var PCT = { "Shake Speed": 1, "Dig Speed": 1, "Size Boost": 1, "Modifier Boost": 1, "Sell Boost": 1 };
     var esc = function (t) {
-      return String(t).replace(/[&<>"]/g, function (c) {
-        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      return String(t).replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
       });
     };
     var nf = function (v) {
@@ -366,12 +367,15 @@ function ptFrameInit() {
     };
     var css = document.createElement("style");
     css.textContent =
-      ".ptmx{position:fixed;z-index:2147483000;min-width:230px;max-width:min(340px,calc(100vw - 16px));background:var(--panel,#fff);color:var(--fg,#1d2228);border:1px solid var(--line,#d6dbe0);border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.28);overflow:hidden;font-size:13px;line-height:1.35}" +
-      ".ptmx ul{list-style:none;margin:0;padding:4px;max-height:300px;overflow-y:auto}" +
-      ".ptmx li{padding:6px 10px;border-radius:7px;cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:10px}" +
+      ".ptmx{position:fixed;z-index:2147483000;max-width:min(380px,calc(100vw - 16px));background:var(--panel,#fff);color:var(--fg,#1d2228);border:1px solid var(--line,#d6dbe0);border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.28);overflow:hidden;font-size:13px;line-height:1.35;display:flex;flex-direction:column}" +
+      ".ptmx ul{list-style:none;margin:0;padding:4px;max-height:320px;overflow-y:auto}" +
+      ".ptmx li{padding:6px 10px;border-radius:7px;cursor:pointer;display:flex;justify-content:space-between;gap:10px}" +
+      ".ptmx li.mu{font-weight:600}" +
       ".ptmx li small{font-weight:400;color:var(--muted,#5d6670);font-family:ui-monospace,Consolas,monospace}" +
+      ".ptmx li.g{cursor:default;padding:8px 10px 3px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted,#5d6670)}" +
       ".ptmx li.on{background:color-mix(in srgb,var(--accent,#0f7c6b) 14%,var(--panel,#fff))}" +
       ".ptmx li.cur{box-shadow:inset 3px 0 0 var(--accent,#0f7c6b)}" +
+      ".ptmx li.off{opacity:.45;cursor:default}" +
       ".ptmx .det{border-top:1px solid var(--line,#d6dbe0);padding:8px 12px;background:var(--sunk,#f5f7f8);font-size:12.5px}" +
       ".ptmx .det b{display:block;margin-bottom:2px}" +
       ".ptmx .det .l{display:flex;justify-content:space-between;gap:12px}" +
@@ -380,7 +384,10 @@ function ptFrameInit() {
     (document.head || document.documentElement).appendChild(css);
     var box = null,
       sel = null,
-      act = -1;
+      act = -1,
+      mut = false,
+      typed = "",
+      typedT = 0;
     function info(v) {
       var m = MU[v];
       if (!m) return "<b>No mutation</b><span class='h'>The item's normal stats</span>";
@@ -392,6 +399,9 @@ function ptFrameInit() {
       if (m.ev) h += "<span class='h'>" + esc(m.ev) + "</span>";
       return h;
     }
+    function items() {
+      return box ? [].slice.call(box.querySelectorAll("li[data-i]")) : [];
+    }
     function close() {
       if (box) box.remove();
       box = null;
@@ -399,18 +409,21 @@ function ptFrameInit() {
       act = -1;
     }
     function focusItem(i) {
-      var li = box.querySelectorAll("li");
+      var li = items();
       if (!li.length) return;
       act = (i + li.length) % li.length;
-      for (var j = 0; j < li.length; j++) li[j].classList.toggle("on", j === act);
+      li.forEach(function (x, j) {
+        x.classList.toggle("on", j === act);
+      });
       li[act].scrollIntoView({ block: "nearest" });
-      box.querySelector(".det").innerHTML = info(li[act].getAttribute("data-v"));
+      if (mut) box.querySelector(".det").innerHTML = info(li[act].getAttribute("data-v"));
     }
-    function pick(v) {
+    function pick(li) {
+      if (!li || li.classList.contains("off")) return;
       var s = sel;
       close();
       if (!s) return;
-      s.value = v;
+      s.selectedIndex = +li.getAttribute("data-o");
       s.dispatchEvent(new Event("input", { bubbles: true }));
       s.dispatchEvent(new Event("change", { bubbles: true }));
       s.focus();
@@ -418,49 +431,61 @@ function ptFrameInit() {
     function open(s) {
       close();
       sel = s;
-      var opts = [].filter.call(s.options, function (o) {
-        return o.value !== "" && !o.disabled;
+      mut = s.hasAttribute("data-ptmut");
+      typed = "";
+      var h = "",
+        n = 0,
+        cur = 0,
+        lastGrp = null;
+      [].forEach.call(s.options, function (o, oi) {
+        if (mut && o.value === "") return; // "Set all mutations…" is a prompt, not a choice
+        if (o.hidden) return;
+        var g = o.parentNode && o.parentNode.tagName === "OPTGROUP" ? o.parentNode : null;
+        if (g && g !== lastGrp) h += "<li class='g' role='presentation'>" + esc(g.label) + "</li>";
+        lastGrp = g;
+        var isCur = oi === s.selectedIndex;
+        if (isCur) cur = n;
+        var cls = (isCur ? " cur" : "") + (o.disabled || (g && g.disabled) ? " off" : "") + (mut ? " mu" : "");
+        var m = mut && MU[o.value],
+          col = mut ? COL[o.value] : o.style.color;
+        h +=
+          "<li role='option' data-i='" + n++ + "' data-o='" + oi + "' data-v='" + esc(o.value) + "'" + (cls ? " class='" + cls.trim() + "'" : "") + "><span" + (col ? " style='color:" + esc(col) + "'" : "") + ">" + esc(mut ? (m ? o.value : "No mutation") : o.text) + "</span>" + (m ? "<small>×" + nf(m.x) + "</small>" : "") + "</li>";
       });
+      if (!n) return (sel = null);
       box = document.createElement("div");
       box.className = "ptmx";
       box.setAttribute("role", "listbox");
-      var cur = 0;
-      box.innerHTML =
-        "<ul>" +
-        opts
-          .map(function (o, i) {
-            var m = MU[o.value];
-            if (o.value === s.value) cur = i;
-            return (
-              "<li role='option' data-i='" + i + "' data-v='" + esc(o.value) + "'" + (o.value === s.value ? " class='cur'" : "") + "><span" + (COL[o.value] ? " style='color:" + COL[o.value] + "'" : "") + ">" + esc(m ? o.value : "No mutation") + "</span>" + (m ? "<small>×" + nf(m.x) + "</small>" : "") + "</li>"
-            );
-          })
-          .join("") +
-        "</ul><div class='det'></div>";
+      box.innerHTML = "<ul>" + h + "</ul>" + (mut ? "<div class='det'></div>" : "");
       document.body.appendChild(box);
-      var r = s.getBoundingClientRect(),
-        w = box.offsetWidth,
-        h = box.offsetHeight;
+      var r = s.getBoundingClientRect();
+      box.style.minWidth = Math.max(r.width, mut ? 230 : 160) + "px";
+      var w = box.offsetWidth,
+        bh = box.offsetHeight;
       box.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + "px";
-      box.style.top = (r.bottom + 4 + h > innerHeight && r.top - 4 - h > 0 ? r.top - 4 - h : r.bottom + 4) + "px";
+      box.style.top = (r.bottom + 4 + bh > innerHeight && r.top - 4 - bh > 0 ? r.top - 4 - bh : r.bottom + 4) + "px";
       focusItem(cur);
     }
-    var isMut = function (t) {
-      return t && t.tagName === "SELECT" && t.hasAttribute("data-ptmut");
+    var isSel = function (t) {
+      return t && t.tagName === "SELECT" && !t.multiple && !(t.size > 1) && !t.hasAttribute("data-native");
     };
     var lastTouch = 0;
-    document.addEventListener("touchstart", function () { lastTouch = Date.now(); }, { capture: true, passive: true });
+    document.addEventListener(
+      "touchstart",
+      function () {
+        lastTouch = Date.now();
+      },
+      { capture: true, passive: true },
+    );
     document.addEventListener(
       "mousedown",
       function (e) {
         var t = e.target;
         if (box && box.contains(t)) {
           e.preventDefault();
-          var li = t.closest("li");
-          if (li) pick(li.getAttribute("data-v"));
+          pick(t.closest("li[data-i]"));
           return;
         }
-        if (isMut(t) && e.button === 0 && Date.now() - lastTouch > 800 && !t.disabled) {
+        if (isSel(t) && e.button === 0 && Date.now() - lastTouch > 800 && !t.disabled) {
           e.preventDefault();
           if (sel === t) close();
           else {
@@ -474,7 +499,7 @@ function ptFrameInit() {
       true,
     );
     document.addEventListener("mouseover", function (e) {
-      var li = box && e.target.closest && e.target.closest(".ptmx li");
+      var li = box && e.target.closest && e.target.closest(".ptmx li[data-i]");
       if (li) focusItem(+li.getAttribute("data-i"));
     });
     document.addEventListener(
@@ -484,24 +509,43 @@ function ptFrameInit() {
           if (e.key === "ArrowDown" || e.key === "ArrowUp") {
             e.preventDefault();
             focusItem(act + (e.key === "ArrowDown" ? 1 : -1));
-          } else if (e.key === "Enter" || e.key === " ") {
+          } else if (e.key === "Home" || e.key === "End") {
             e.preventDefault();
-            var li = box.querySelectorAll("li")[act];
-            if (li) pick(li.getAttribute("data-v"));
+            focusItem(e.key === "Home" ? 0 : items().length - 1);
+          } else if (e.key === "Enter" || (e.key === " " && !typed)) {
+            e.preventDefault();
+            pick(items()[act]);
           } else if (e.key === "Escape" || e.key === "Tab") {
             if (e.key === "Escape") e.preventDefault();
             close();
+          } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            // type to jump, like the browser's own dropdown
+            e.preventDefault();
+            if (Date.now() - typedT > 700) typed = "";
+            typedT = Date.now();
+            typed += e.key.toLowerCase();
+            var li = items(),
+              k = li.findIndex(function (x) {
+                return x.textContent.trim().toLowerCase().indexOf(typed) === 0;
+              });
+            if (k >= 0) focusItem(k);
           }
           return;
         }
-        if (isMut(e.target) && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ")) {
+        if (isSel(e.target) && !e.altKey && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ")) {
           e.preventDefault();
           open(e.target);
         }
       },
       true,
     );
-    window.addEventListener("scroll", function (e) { if (box && !box.contains(e.target)) close(); }, true);
+    window.addEventListener(
+      "scroll",
+      function (e) {
+        if (box && !box.contains(e.target)) close();
+      },
+      true,
+    );
     window.addEventListener("resize", close);
     window.addEventListener("blur", close);
   })();
