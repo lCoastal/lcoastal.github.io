@@ -20,7 +20,7 @@
     <div class="inputs">
       <label class="fld"><span class="lab">Your luck</span><input type="number" id="luck" min="1" value=""></label>
       <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" value=""></label>
-      <label class="fld"><span class="lab" title="Leave empty to just see how many pans it takes on average">Pans per hour (optional)</span><input type="number" id="pph" min="0" placeholder="Leave empty for average pans only"></label>
+      <label class="fld"><span class="lab" title="Leave empty to skip the time estimate">Pans per hour (optional)</span><input type="number" id="pph" min="0" placeholder="Leave empty to skip the time"></label>
       <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
     </div>
     <p class="hint" id="perPan"></p>
@@ -54,7 +54,7 @@
       <div class="row"><span>Best of L rolls</span><code>f(L) = (1 − a)<sup>L</sup> − (1 − b)<sup>L</sup></code></div>
       <div class="row"><span>Per mineral</span><code>P = ¼·f(1) + ¼·f(max(1, L ÷ 2)) + ½·f(max(1, L))</code></div>
       <div class="row"><span>Per pan (capacity C)</span><code>1 − (1 − P)<sup>√C</sup></code></div>
-      <div class="row"><span>Pans on average</span><code>1 ÷ (per pan chance)</code></div>
+      <div class="row"><span>Shown as "1 in X"</span><code>X = 1 ÷ (per pan chance)</code></div>
     </div></section>
   <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 04/11/26 · Made by @__coastal</p>
 </div>

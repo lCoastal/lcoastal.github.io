@@ -32,14 +32,14 @@ const oneTxt=p=>{const n=1/p;return `~1 in ${n<10?fmt(n,1):fmt(Math.round(n),0)}
 const oneInTxt=p=>{if(!(p>0))return "—";const m=S.fmt||"one";if(m==="pct")return pctTxt(p);if(m==="both")return `${oneTxt(p)}<span class="pc2">${pctTxt(p)}</span>`;return oneTxt(p)};
 const hrs=pans=>{const pph=+S.pph;if(!(pph>0))return "—";const h=pans/pph;return h*60<1?"under 1 min":h<1?fmt(h*60,0)+" min":h<48?fmt(h,1)+" h":fmt(h/24,1)+" days"};
 function row(name,img,r,s){const pp=1-Math.pow(1-s.eff,perPan());const pans=pp>0?1/pp:Infinity;
-  return `<tr><td>${name}</td><td data-l="Base">${oneInTxt(s.base)}</td><td data-l="Per ore" class="${s.eff>s.base?"up":""}">${oneInTxt(s.eff)}</td><td data-l="Per pan">${oneInTxt(pp)}</td><td data-l="Pans on average">${isFinite(pans)?fmt(pans,pans<10?1:0):"—"}</td>${+S.pph>0?`<td data-l="Time">${isFinite(pans)?hrs(pans):"—"}</td>`:""}</tr>`}
+  return `<tr><td>${name}</td><td data-l="Base">${oneInTxt(s.base)}</td><td data-l="Per ore" class="${s.eff>s.base?"up":""}">${oneInTxt(s.eff)}</td><td data-l="Per pan">${oneInTxt(pp)}</td>${+S.pph>0?`<td data-l="Time">${isFinite(pans)?hrs(pans):"—"}</td>`:""}</tr>`}
 function render(){
   $("luck").value=S.luck;$("cap").value=S.cap;$("pph").value=S.pph;
   document.querySelectorAll("[data-fmt]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.fmt===(S.fmt||"one"))));document.body.classList.toggle("fmt-both",S.fmt==="both");
   if(S.by!=="min")S.by="loc";if(!LOCS.includes(S.loc))S.loc=LOCS[0];if(!MINS.includes(S.min))S.min=MINS[0];
   try{AC.sync()}catch(e){}
   $("perPan").textContent=`About ${fmt(perPan(),1)} minerals per pan at ${fmt(+S.cap,0)} capacity.`;
-  const L=Math.max(1,+S.luck||1);const head=`<thead><tr><th>${S.by==="loc"?"Mineral":"Location"}</th><th>Base chance</th><th>Per mineral</th><th>Per pan</th><th>Pans on average</th>${+S.pph>0?"<th>Time</th>":""}</tr></thead>`;
+  const L=Math.max(1,+S.luck||1);const head=`<thead><tr><th>${S.by==="loc"?"Mineral":"Location"}</th><th>Base chance</th><th>Per mineral</th><th>Per pan</th>${+S.pph>0?"<th>Time</th>":""}</tr></thead>`;
   $("rarF").hidden=S.by!=="loc";
   if(S.by==="loc"){const all=shares(S.loc,L);const here=ORD.filter(r=>all.some(x=>x.m.r===r));
     {const allOn=!here.some(r=>S.hideR.includes(r));$("rarF").innerHTML=`<span class="lab">Rarity</span><button type="button" class="chip" data-rall aria-pressed="${allOn}">All</button>`+here.map(r=>`<button type="button" class="chip r" data-r="${r}" style="--rc:${rc(r)}" aria-pressed="${!allOn&&!S.hideR.includes(r)}">${r}</button>`).join("")}
@@ -47,10 +47,10 @@ function render(){
     rows.sort((a,b)=>ORD.indexOf(a.m.r)-ORD.indexOf(b.m.r)||a.p-b.p);
     const byR=r=>rows.filter(x=>x.m.r===r).reduce((s,x)=>s+x.eff,0);
     $("sum").innerHTML=["Exotic","Mythic","Legendary"].filter(r=>!S.hideR.includes(r)).map(r=>`<div><span class="lab" style="color:${rc(r)}">Any ${r}</span><b>${oneInTxt(1-Math.pow(1-byR(r),perPan()))}</b><span class="hint">per pan</span></div>`).join("");
-    $("tbl").innerHTML=`<table class="o">${head}<tbody>${rows.length?"":`<tr><td colspan="6" class="hint">No rarities picked. Turn one on above.</td></tr>`}${rows.map(s=>row(`<span class="mn" data-mineral="${esc(s.m.n)}">${s.m.ic?`<img src="${s.m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(s.m.n)}</b><br><span class="rr" style="--rc:${rc(s.m.r)}">${s.m.r}</span></span></span>`,"",s.m.r,s)).join("")}</tbody></table>`}
+    $("tbl").innerHTML=`<table class="o">${head}<tbody>${rows.length?"":`<tr><td colspan="5" class="hint">No rarities picked. Turn one on above.</td></tr>`}${rows.map(s=>row(`<span class="mn" data-mineral="${esc(s.m.n)}">${s.m.ic?`<img src="${s.m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(s.m.n)}</b><br><span class="rr" style="--rc:${rc(s.m.r)}">${s.m.r}</span></span></span>`,"",s.m.r,s)).join("")}</tbody></table>`}
   else{const m=MIN[S.min.toLowerCase()];const rows=(m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,L).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>b.s.eff-a.s.eff);
     const best=rows.find(x=>!/Void/.test(x.l))||rows[0];
-    $("sum").innerHTML=best?(()=>{const pp=1-Math.pow(1-best.s.eff,perPan());const pans=pp>0?1/pp:Infinity;return `<div><span class="lab">Best place</span><b style="font-family:var(--f-body);font-size:1rem">${esc(best.l)}</b></div><div><span class="lab">Per pan there</span><b>${oneInTxt(pp)}</b></div><div><span class="lab">Pans on average</span><b>${isFinite(pans)?fmt(pans,pans<10?1:0):"—"}</b>${+S.pph>0&&isFinite(pans)?`<span class="hint">about ${hrs(pans)}</span>`:""}</div>`})():"";
+    $("sum").innerHTML=best?(()=>{const pp=1-Math.pow(1-best.s.eff,perPan());const pans=pp>0?1/pp:Infinity;return `<div><span class="lab">Best place</span><b style="font-family:var(--f-body);font-size:1rem">${esc(best.l)}</b></div><div><span class="lab">Per pan there</span><b>${oneInTxt(pp)}</b>${+S.pph>0&&isFinite(pans)?`<span class="hint">about ${hrs(pans)}</span>`:""}</div>`})():"";
     $("tbl").innerHTML=`<table class="o">${head}<tbody>${rows.map(x=>row(`<span class="lk" data-location="${esc(baseLoc(x.l))}">${esc(x.l)}</span>${/Void/.test(x.l)?' <span class="hint">(loot pool changes)</span>':""}`,"","",x.s)).join("")}</tbody></table>`}
   try{simDraw()}catch(e){}
 }
@@ -92,7 +92,6 @@ async function oddsImage(){const L=Math.max(1,+S.luck||1),pp=perPan(),pph=+S.pph
   const oneS=p=>{const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
   const cell=p=>!(p>0)?["—",""]:mode==="pct"?[pctTxt(p),""]:mode==="both"?[oneS(p),pctTxt(p)]:[oneS(p),""];
   const calc=s=>{const p=1-Math.pow(1-s.eff,pp);const pans=p>0?1/p:Infinity;return {s,p,pans}};
-  const pansT=x=>isFinite(x.pans)?fmt(x.pans,x.pans<10?1:0):"—";
   let title,tcol="#e6e9ec",rows,sums;
   if(S.by==="loc"){title=S.loc;const all=shares(S.loc,L).filter(s=>!S.hideR.includes(s.m.r)).sort((a,b)=>ORD.indexOf(a.m.r)-ORD.indexOf(b.m.r)||a.p-b.p);
     rows=all.map(s=>({name:s.m.n,sub:s.m.r,col:HEX[s.m.r],ic:s.m.ic,...calc(s)}));
@@ -101,7 +100,7 @@ async function oddsImage(){const L=Math.max(1,+S.luck||1),pp=perPan(),pph=+S.pph
     const list=(m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,L).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>b.s.eff-a.s.eff);
     rows=list.map(x=>({name:x.l,sub:/Void/.test(x.l)?"Loot pool changes":"",col:"#98a2ad",ic:null,...calc(x.s)}));
     const best=list.find(x=>!/Void/.test(x.l))||list[0];
-    sums=best?[{lab:"Best place",col:"#98a2ad",v:[best.l,""],txt:true},{lab:"Per pan there",col:"#98a2ad",v:cell(calc(best.s).p)},{lab:"Pans on average",col:"#98a2ad",v:[pansT(calc(best.s)),pph&&isFinite(calc(best.s).pans)?"about "+hrs(calc(best.s).pans):""]}]:[]}
+    sums=best?[{lab:"Best place",col:"#98a2ad",v:[best.l,""],txt:true},{lab:"Per pan there",col:"#98a2ad",v:(()=>{const c0=calc(best.s),v=cell(c0.p);return v[1]||!(pph&&isFinite(c0.pans))?v:[v[0],"about "+hrs(c0.pans)]})()}]:[]}
   const W=1200,PAD=40,RH=mode==="both"?54:46,SUMH=sums.length?78:0;
   const H=PAD+90+SUMH+(sums.length?18:0)+36+Math.max(1,rows.length)*RH+60;
   const cv=document.createElement("canvas");const sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
@@ -117,7 +116,7 @@ async function oddsImage(){const L=Math.max(1,+S.luck||1),pp=perPan(),pph=+S.pph
   if(sums.length){const bw=(W-PAD*2-12*(sums.length-1))/sums.length;sums.forEach((b,i)=>{const x=PAD+i*(bw+12);c.fillStyle="#1c2126";rr(x,y,bw,SUMH,10);c.fill();c.strokeStyle="#2c333a";c.lineWidth=1;rr(x,y,bw,SUMH,10);c.stroke();
       c.fillStyle=b.col;c.font=`600 11.5px ${F}`;c.fillText(b.lab.toUpperCase(),x+14,y+24);c.fillStyle="#e6e9ec";c.font=b.txt?`600 19px ${F}`:`500 21px ${FM}`;c.fillText(fit(b.v[0],bw-28),x+14,y+52);
       if(b.v[1]){c.fillStyle="#98a2ad";c.font=`12px ${F}`;c.fillText(fit(b.v[1],bw-28),x+14,y+69)}});y+=SUMH+18}
-  const cols=[S.by==="loc"?"Mineral":"Location","Base chance","Per mineral","Per pan","Pans on average"];if(pph)cols.push("Time");
+  const cols=[S.by==="loc"?"Mineral":"Location","Base chance","Per mineral","Per pan"];if(pph)cols.push("Time");
   const nameW=pph?360:420,nw=(W-PAD*2-nameW-24)/(cols.length-1);const cx=i=>PAD+12+nameW+nw*i;
   c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach((t,i)=>{const u=t.toUpperCase();if(!i)c.fillText(u,PAD+12,y+20);else c.fillText(u,cx(i)-c.measureText(u).width,y+20)});
   y+=30;c.strokeStyle="#2c333a";c.beginPath();c.moveTo(PAD,y);c.lineTo(W-PAD,y);c.stroke();
@@ -127,7 +126,7 @@ async function oddsImage(){const L=Math.max(1,+S.luck||1),pp=perPan(),pph=+S.pph
     let tx=PAD+12;if(icons[k]){c.drawImage(icons[k],tx,mid-15,30,30);tx+=40}
     c.fillStyle=S.by==="loc"?r.col:"#e6e9ec";c.font=`600 15px ${F}`;c.fillText(fit(r.name,nameW-(tx-PAD)),tx,r.sub?mid-2:mid+5);
     if(r.sub){c.fillStyle=S.by==="loc"?r.col:"#98a2ad";c.globalAlpha=.8;c.font=`11.5px ${F}`;c.fillText(r.sub,tx,mid+14);c.globalAlpha=1}
-    const vals=[cell(r.s.base),cell(r.s.eff),cell(r.p),[pansT(r),""]];if(pph)vals.push([isFinite(r.pans)?hrs(r.pans):"—",""]);
+    const vals=[cell(r.s.base),cell(r.s.eff),cell(r.p)];if(pph)vals.push([isFinite(r.pans)?hrs(r.pans):"—",""]);
     vals.forEach((v,i)=>{const x=cx(i+1);c.font=`14px ${FM}`;c.fillStyle=i===1&&r.s.eff>r.s.base?"#3cc2a8":"#e6e9ec";c.fillText(v[0],x-c.measureText(v[0]).width,v[1]?mid-3:mid+5);
       if(v[1]){c.font=`11.5px ${F}`;c.fillStyle="#98a2ad";c.fillText(v[1],x-c.measureText(v[1]).width,mid+14)}})});
   y+=Math.max(1,rows.length)*RH+28;{const et="Estimates only: modifiers, Size Boost, enchants, events and weather aren't counted, so real odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
