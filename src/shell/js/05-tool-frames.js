@@ -3,6 +3,7 @@ function ptFrameInit() {
   var P = window.parent;
   try {
     P.ptInstallMeta && P.ptInstallMeta(window);
+    P.ptInstallImgTheme && P.ptInstallImgTheme(window);
   } catch (e) {}
   try {
     if (P.ptAccentCSS) {

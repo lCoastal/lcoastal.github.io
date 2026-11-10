@@ -435,7 +435,7 @@ document.getElementById("bImg").onclick=async()=>{
   const by=document.createElement("div");by.style.cssText="text-align:right;padding:8px 14px 12px;background:#12161b";const pill=document.createElement("span");pill.textContent="Made by @__coastal";pill.style.cssText="display:inline-block;padding:4px 13px;border-radius:999px;border:1px solid rgba(20,184,166,.6);background:rgba(20,184,166,.14);color:#2dd4bf;font:600 13px 'IBM Plex Sans','Segoe UI',system-ui,sans-serif";by.appendChild(pill);sh.appendChild(by);
   document.body.appendChild(box);
   try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-    const cv=await html2canvas(sh,{backgroundColor:"#12161b",scale:2,useCORS:true,logging:false});
+    window.ptNoImgTheme=true;let cv;try{cv=await html2canvas(sh,{backgroundColor:"#12161b",scale:2,useCORS:true,logging:false})}finally{window.ptNoImgTheme=false}
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
     const b=getB();const fn=((b.name||"Build").replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Build")+".png";
     if(blob&&await saveFile(fn,blob))toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})());
