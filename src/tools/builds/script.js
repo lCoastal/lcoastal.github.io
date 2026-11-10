@@ -154,11 +154,13 @@ function sheetHTML(b0){if(viewMode==="text")return textHTML(b0);const b=tidy(b0)
   const cards=[];
   if(b.charm.name||b.charm.note)cards.push(gearCard({t:"Charm",ico:"🔗"},"Equipment",b.charm));
   if(b.neck.name||b.neck.note)cards.push(gearCard({t:"Necklace",ico:"📿"},"Equipment",b.neck));
-  b.extras.filter(x=>x.label||x.name).forEach(x=>cards.push(gearCard({t:x.label||"Other",ico:"✦"},"Equipment",x)));
   h+=`<div class="blk"><h3><span class="n">2</span>Equipment</h3>`;
   h+=cards.length?`<div class="gear">${cards.join("")}</div>`:"";
   h+=ringGrids(b);
   if(b.runes){const rs=b.runes.split(",").map(x=>x.trim()).filter(Boolean);h+=`<h3 style="margin:6px 0 0;font:700 11px/1 inherit;letter-spacing:.12em;text-transform:uppercase;color:#97a3b0">Runes</h3><div class="runes">${rs.map(x=>{const parts=x.split("/").map(y=>y.trim());return `<span>${parts.map(p=>{const real=findItem("Rune",p);const u=real?picOf("Rune",real):"";return (u?`<img src="${u}" alt="">`:"")+esc(p)}).join(' <i class="alt">or</i> ')}</span>`}).join("")}</div>`}
+  // extra rows go last, after the rings and runes (same order as the text view)
+  const xc=b.extras.filter(x=>x.label||x.name).map(x=>gearCard({t:x.label||"Other",ico:"✦"},"Equipment",x));
+  if(xc.length)h+=`<div class="gear" style="margin-top:8px">${xc.join("")}</div>`;
   h+=`</div>`;
   // pan + shovel
   const tc=[];
