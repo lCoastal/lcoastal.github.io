@@ -32,9 +32,18 @@ function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge"
   $("sum").innerHTML=`<div><span class="lab">Ores with a modifier</span><b>${fmt(q*100,1)}%</b><div class="bar"><i style="width:${q*100}%"></i></div></div>
     <div><span class="lab">Effective boost</span><b>${fmt(effAny,0)}</b><span class="hint">${fmt(effWhich,0)} for which modifier</span></div>
     <div><span class="lab">Perfect per pan</span><b>${oneInP(1-Math.pow(1-q*sh.Perfect/100,n))}</b><span class="hint">about ${fmt(n,1)} ores per pan</span></div>`;
+  // which way each modifier goes if you get more Modifier Boost (compared at +25% boost)
+  const more=modShares(Math.max(1,effWhich*1.25),S.night,S.luck);
+  const trend=k=>{const a=sh[k]||0,b=more[k]||0;if(!(a>0))return "";
+    const r=b/a,cls=r>1.01?"up":r<0.99?"dn":"fl";
+    const pct=Math.round(Math.abs(r-1)*100);
+    const why=cls==="up"?`More Modifier Boost makes ${k} more common (about +${pct}% at +25% boost) — boost pushes the roll toward rarer modifiers`
+      :cls==="dn"?`More Modifier Boost makes ${k} rarer (about −${pct}% at +25% boost) — the rarer ones take its place`
+      :`${k} barely changes with more Modifier Boost`;
+    return `<span class="tr ${cls}" title="${esc(why)}" aria-label="${esc(why)}">${cls==="up"?"▲":cls==="dn"?"▼":"–"}</span>`};
   const order=ORDER;
   $("tbl").innerHTML=`<table class="o"><thead><tr><th>Modifier</th><th>Share of modified</th><th>Base share</th><th>Per ore</th><th>Per pan</th><th>Sell ×</th></tr></thead><tbody>${order.map(k=>{const on=k!=="Lunar"||S.night;const s=on?(sh[k]||0):0;const po=q*s/100;
-    return `<tr class="${on?"":"off"}"><td><span class="mn"><b>${k}</b><span>${k==="Lunar"&&!S.night?"Night only":"Museum: "+esc(MUSE[k]||"")}</span></span></td><td data-l="Share" class="${s>BASE[k]*1.05?"up":""}">${on?fmt(s,s<0.1?4:2)+"%":"—"}</td><td data-l="Base">${fmt(BASE[k],4)}%</td><td data-l="Per ore">${on?oneInP(po):"—"}</td><td data-l="Per pan">${on?oneInP(1-Math.pow(1-po,n)):"—"}</td><td data-l="Sell">${PRICE[k]}×</td></tr>`}).join("")}</tbody></table>`}
+    return `<tr class="${on?"":"off"}"><td><span class="mn"><b>${k}</b><span>${k==="Lunar"&&!S.night?"Night only":"Museum: "+esc(MUSE[k]||"")}</span></span></td><td data-l="Share" class="${s>BASE[k]*1.05?"up":""}">${on?fmt(s,s<0.1?4:2)+"%"+trend(k):"—"}</td><td data-l="Base">${fmt(BASE[k],4)}%</td><td data-l="Per ore">${on?oneInP(po):"—"}</td><td data-l="Per pan">${on?oneInP(1-Math.pow(1-po,n)):"—"}</td><td data-l="Sell">${PRICE[k]}×</td></tr>`}).join("")}</tbody></table>`}
 ["mb","luck","cap"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
 ["mag","surge","night"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();render()}));
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;S.mb=Math.round(t["Modifier Boost"]||0);S.luck=Math.round(t.Luck||0);S.cap=Math.round(t.Capacity)||S.cap;save();render()};
