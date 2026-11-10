@@ -345,6 +345,166 @@ function ptFrameInit() {
     },
     true,
   );
+  // equipment mutation pickers (<select data-ptmut>): on desktop a list instead of the browser's own dropdown,
+  // and hovering a mutation shows what it does to the item. Phones keep the normal picker (no hover there).
+  (function () {
+    var MU = {};
+    try {
+      (P.PTDATA.ench.muts || []).forEach(function (m) {
+        MU[m.n] = m;
+      });
+    } catch (e) {}
+    var COL = { Silver: "#a9b4be", Gold: "#d9a520", Diamond: "#5fc8e8", Granite: "#b08d64", Overclocked: "#6b8cff", Festive: "#e05555", Prismatic: "#d24fc0" };
+    var PCT = { "Shake Speed": 1, "Dig Speed": 1, "Size Boost": 1, "Modifier Boost": 1, "Sell Boost": 1 };
+    var esc = function (t) {
+      return String(t).replace(/[&<>"]/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      });
+    };
+    var nf = function (v) {
+      return (+v).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    };
+    var css = document.createElement("style");
+    css.textContent =
+      ".ptmx{position:fixed;z-index:2147483000;min-width:230px;max-width:min(340px,calc(100vw - 16px));background:var(--panel,#fff);color:var(--fg,#1d2228);border:1px solid var(--line,#d6dbe0);border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.28);overflow:hidden;font-size:13px;line-height:1.35}" +
+      ".ptmx ul{list-style:none;margin:0;padding:4px;max-height:300px;overflow-y:auto}" +
+      ".ptmx li{padding:6px 10px;border-radius:7px;cursor:pointer;font-weight:600;display:flex;justify-content:space-between;gap:10px}" +
+      ".ptmx li small{font-weight:400;color:var(--muted,#5d6670);font-family:ui-monospace,Consolas,monospace}" +
+      ".ptmx li.on{background:color-mix(in srgb,var(--accent,#0f7c6b) 14%,var(--panel,#fff))}" +
+      ".ptmx li.cur{box-shadow:inset 3px 0 0 var(--accent,#0f7c6b)}" +
+      ".ptmx .det{border-top:1px solid var(--line,#d6dbe0);padding:8px 12px;background:var(--sunk,#f5f7f8);font-size:12.5px}" +
+      ".ptmx .det b{display:block;margin-bottom:2px}" +
+      ".ptmx .det .l{display:flex;justify-content:space-between;gap:12px}" +
+      ".ptmx .det .l span:last-child{font-family:ui-monospace,Consolas,monospace}" +
+      ".ptmx .det .h{display:block;color:var(--muted,#5d6670);font-size:12px;margin-top:4px}";
+    (document.head || document.documentElement).appendChild(css);
+    var box = null,
+      sel = null,
+      act = -1;
+    function info(v) {
+      var m = MU[v];
+      if (!m) return "<b>No mutation</b><span class='h'>The item's normal stats</span>";
+      var h = "<b style='color:" + (COL[v] || "inherit") + "'>" + esc(v) + "</b>";
+      h += "<span class='l'><span>Item's stats</span><span>×" + nf(m.x) + " (+" + Math.round((m.x - 1) * 100) + "%)</span></span>";
+      Object.keys(m.a || {}).forEach(function (n) {
+        h += "<span class='l'><span>" + esc(n) + "</span><span>+" + nf(m.a[n]) + (PCT[n] ? "%" : "") + " flat</span></span>";
+      });
+      if (m.ev) h += "<span class='h'>" + esc(m.ev) + "</span>";
+      return h;
+    }
+    function close() {
+      if (box) box.remove();
+      box = null;
+      sel = null;
+      act = -1;
+    }
+    function focusItem(i) {
+      var li = box.querySelectorAll("li");
+      if (!li.length) return;
+      act = (i + li.length) % li.length;
+      for (var j = 0; j < li.length; j++) li[j].classList.toggle("on", j === act);
+      li[act].scrollIntoView({ block: "nearest" });
+      box.querySelector(".det").innerHTML = info(li[act].getAttribute("data-v"));
+    }
+    function pick(v) {
+      var s = sel;
+      close();
+      if (!s) return;
+      s.value = v;
+      s.dispatchEvent(new Event("input", { bubbles: true }));
+      s.dispatchEvent(new Event("change", { bubbles: true }));
+      s.focus();
+    }
+    function open(s) {
+      close();
+      sel = s;
+      var opts = [].filter.call(s.options, function (o) {
+        return o.value !== "" && !o.disabled;
+      });
+      box = document.createElement("div");
+      box.className = "ptmx";
+      box.setAttribute("role", "listbox");
+      var cur = 0;
+      box.innerHTML =
+        "<ul>" +
+        opts
+          .map(function (o, i) {
+            var m = MU[o.value];
+            if (o.value === s.value) cur = i;
+            return (
+              "<li role='option' data-i='" + i + "' data-v='" + esc(o.value) + "'" + (o.value === s.value ? " class='cur'" : "") + "><span" + (COL[o.value] ? " style='color:" + COL[o.value] + "'" : "") + ">" + esc(m ? o.value : "No mutation") + "</span>" + (m ? "<small>×" + nf(m.x) + "</small>" : "") + "</li>"
+            );
+          })
+          .join("") +
+        "</ul><div class='det'></div>";
+      document.body.appendChild(box);
+      var r = s.getBoundingClientRect(),
+        w = box.offsetWidth,
+        h = box.offsetHeight;
+      box.style.left = Math.max(8, Math.min(r.left, innerWidth - w - 8)) + "px";
+      box.style.top = (r.bottom + 4 + h > innerHeight && r.top - 4 - h > 0 ? r.top - 4 - h : r.bottom + 4) + "px";
+      focusItem(cur);
+    }
+    var isMut = function (t) {
+      return t && t.tagName === "SELECT" && t.hasAttribute("data-ptmut");
+    };
+    var lastTouch = 0;
+    document.addEventListener("touchstart", function () { lastTouch = Date.now(); }, { capture: true, passive: true });
+    document.addEventListener(
+      "mousedown",
+      function (e) {
+        var t = e.target;
+        if (box && box.contains(t)) {
+          e.preventDefault();
+          var li = t.closest("li");
+          if (li) pick(li.getAttribute("data-v"));
+          return;
+        }
+        if (isMut(t) && e.button === 0 && Date.now() - lastTouch > 800 && !t.disabled) {
+          e.preventDefault();
+          if (sel === t) close();
+          else {
+            t.focus();
+            open(t);
+          }
+          return;
+        }
+        if (box) close();
+      },
+      true,
+    );
+    document.addEventListener("mouseover", function (e) {
+      var li = box && e.target.closest && e.target.closest(".ptmx li");
+      if (li) focusItem(+li.getAttribute("data-i"));
+    });
+    document.addEventListener(
+      "keydown",
+      function (e) {
+        if (box) {
+          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            e.preventDefault();
+            focusItem(act + (e.key === "ArrowDown" ? 1 : -1));
+          } else if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            var li = box.querySelectorAll("li")[act];
+            if (li) pick(li.getAttribute("data-v"));
+          } else if (e.key === "Escape" || e.key === "Tab") {
+            if (e.key === "Escape") e.preventDefault();
+            close();
+          }
+          return;
+        }
+        if (isMut(e.target) && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          open(e.target);
+        }
+      },
+      true,
+    );
+    window.addEventListener("scroll", function (e) { if (box && !box.contains(e.target)) close(); }, true);
+    window.addEventListener("resize", close);
+    window.addEventListener("blur", close);
+  })();
 }
 const PRE0 =
   '<base target="_blank"><script>try{if(!window.hostBridge&&window.parent&&window.parent.hostBridge)window.hostBridge=window.parent.hostBridge}catch(e){}document.addEventListener("click",function(e){if(!(e.ctrlKey||e.metaKey))return;var t=e.target.closest&&e.target.closest("[data-mineral],[data-location],[data-equip]");if(!t)return;e.preventDefault();e.stopPropagation();try{window.parent.ptOpen(t.hasAttribute("data-mineral")?"mineral":t.hasAttribute("data-equip")?"equip":"location",t.getAttribute("data-mineral")||t.getAttribute("data-equip")||t.getAttribute("data-location"))}catch(err){}},true);document.addEventListener("DOMContentLoaded",function(){var st=document.createElement("style");st.textContent=".pt-ft{display:flex!important;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;text-align:center;max-width:none!important;white-space:nowrap}.pt-ft i{font-style:normal}.pt-fix{flex-basis:100%;white-space:normal!important;overflow-wrap:break-word;max-width:100%;text-align:center;font-size:12.5px;color:var(--muted,#888);margin:6px 0 0;line-height:1.4}.pt-fix b{color:var(--fg,inherit);font-weight:600}.pt-ver{flex-basis:100%;text-align:center;font-size:12px;font-weight:500;letter-spacing:.02em;margin:2px 0 0;color:color-mix(in srgb,var(--fg,#888) 30%,var(--bg,transparent))}@media (max-width:600px){.pt-ft .lg{display:none}.pt-ft{gap:6px}.pt-ft>span{padding:4px 9px!important}}.pt-ft>span{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:600;line-height:1.3;color:var(--pc);background:color-mix(in srgb,var(--pc) 13%,transparent);border:1px solid color-mix(in srgb,var(--pc) 45%,transparent);transition:transform .15s,background .15s}.pt-ft>span::before{content:\\"\\";width:6px;height:6px;border-radius:50%;background:var(--pc);box-shadow:0 0 6px var(--pc)}.pt-ft>span:hover{transform:translateY(-1px);background:color-mix(in srgb,var(--pc) 22%,transparent)}.pt-ft a{color:inherit!important;text-decoration:none!important}.pt-ft .p1{--pc:#14b8a6}.pt-ft .p2{--pc:#f59e0b}.pt-ft .p3{--pc:#a78bfa}.pt-ft .p4{--pc:#6b7cff}@media (prefers-color-scheme:light){:root:not([data-theme=dark]) .pt-ft .p1{--pc:#0f8f80}:root:not([data-theme=dark]) .pt-ft .p2{--pc:#b86e00}:root:not([data-theme=dark]) .pt-ft .p3{--pc:#7c5ce0}:root:not([data-theme=dark]) .pt-ft .p4{--pc:#4b5bdc}}:root[data-theme=light] .pt-ft .p1{--pc:#0f8f80}:root[data-theme=light] .pt-ft .p2{--pc:#b86e00}:root[data-theme=light] .pt-ft .p3{--pc:#7c5ce0}:root[data-theme=light] .pt-ft .p4{--pc:#4b5bdc}";document.head.appendChild(st);document.querySelectorAll("p").forEach(function(p){if(!/Made by @__coastal\\s*$/.test(p.innerHTML)||p.classList.contains("pt-ft"))return;var m=p.textContent.match(/Last\\s+edited\\s*([0-9\\/]+)/);p.classList.add("pt-ft");p.innerHTML="<span class=\\"p1\\"><a href=\\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Made by <\/i>@__coastal<\/a><\/span><span class=\\"p2\\"><a href=\\"https://prospecting.miraheze.org/wiki/Main_Page\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Prospecting <\/i>Wiki<\/a><\/span><span class=\\"p3\\"><i class=\\"lg\\">Last edited <\/i>"+(m?m[1]:"")+"<\/span><span class=\\"p4\\"><a class=\\"pt-dc\\" href=\\"https://discord.gg/TuXc7dguFG\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Join the official <\/i>Discord<\/a><\/span>";if(!p.querySelector(\".pt-ver\"))p.insertAdjacentHTML(\"beforeend\",\"<div class=\\\"pt-fix\\\">Spotted something wrong or out of date? Message <b>@__coastal<\/b> on Discord.<\/div><div class=\\\"pt-ver\\\">Version %%PTVER%%<\/div>\");var p3=p.querySelector(".p3");if(p3&&m){var q=m[1].split("/");var d=new Date(2000+(+q[2]),(+q[1])-1,+q[0]);var n=Math.round((new Date().setHours(0,0,0,0)-d.getTime())/864e5);p3.title=n<=0?"That was today":n===1?"That was 1 day ago":"That was "+n+" days ago";p3.style.cursor="help"}var a1=p.querySelector(".p1 a"),a2=p.querySelector(".p2 a"),a4=p.querySelector(".p4 a");if(a2)a2.title="Click to go to the wiki";if(a4)a4.title="Click to get invited";if(a1){var MS=["Psst... click me","Click for a secret","Don\\u2019t click this","Bet you won\\u2019t click","Hidden developer tips inside","You\\u2019ve been chosen. Click.","Click to claim your reward","Secret pan strategy, one click away","Only 1 in 26,764 players find this","Meet the mind behind the toolkit","Click for the ultimate luck boost","Exclusive behind-the-scenes content","The best-kept secret in Prospecting","Something rare is waiting for you","Click to unlock developer mode"],li=-1;var pick=function(){var i;do{i=Math.floor(Math.random()*MS.length)}while(i===li);li=i;a1.title=MS[i]};pick();a1.addEventListener("mouseenter",pick);a1.addEventListener("focus",pick)}})});<\/script>';
