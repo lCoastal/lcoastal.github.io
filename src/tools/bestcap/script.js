@@ -28,7 +28,9 @@ function shares(loc,L){const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=l
 const ROWS=[];
 // skip a place that only lists one mineral itself (e.g. The Void): its variant row already covers it
 Object.keys(LOC).filter(loc=>LOC[loc].length>1||baseLoc(loc)!==loc).forEach(loc=>{const at=CAPS.map(L=>new Map(shares(loc,L).map(x=>[x.m,x.eff])));
-  fullList(loc).forEach(({m})=>ROWS.push({m,loc,effs:at.map(mp=>mp.get(m)||0)}))});
+  // a Firefly Zone variant only gets rows for the minerals it lists itself (Firefly Stone); everything else is the same as the zone's own row
+  const b=baseLoc(loc);const own=b!==loc&&LOC[b]?new Set(LOC[loc].map(x=>x.m)):null;
+  fullList(loc).forEach(({m})=>{if(own&&!own.has(m))return;ROWS.push({m,loc,effs:at.map(mp=>mp.get(m)||0)})})});
 const oneInT=p=>{if(!(p>0))return "—";const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
 // chance of each mineral at the luck you typed in, worked out once per zone and kept until the luck changes
 let YL={},YLkey=null;
