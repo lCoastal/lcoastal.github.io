@@ -22,7 +22,6 @@ const PT_RESET = {
   mutations: { keys: ["pmu-catf", "pmu-hide", "pmu-ofmt", "pmu-pan", "pmu-tab"] },
   equipment: { keys: ["pe-f"] },
   mechanics: { keys: ["pmc-s"] },
-  flexcard: { keys: ["pfc-s"] },
   checklist: { keys: ["pc-list"], what: "everything on the checklist" },
 };
 function ptAddReset(f, id) {

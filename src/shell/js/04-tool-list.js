@@ -27,7 +27,6 @@ const LIST = [
   { id: "calc", name: "Stat Calculator", desc: "Your full stat panel from gear, museum and boosts" },
   { id: "checklist", name: "Crafting Checklist", desc: "Every material for what you want to craft" },
   { id: "mechanics", name: "How It Works", desc: "How luck, capacity, modifiers and weight work" },
-  { id: "flexcard", name: "Flex Card", desc: "Turn a rare find into a card to post" },
   { id: "testdata", name: "Test Data Check", desc: "Checks your own panning data against the toolkit" },
   { id: "codes", name: "Codes", desc: "Active codes with one-tap copy" },
   { id: "tierlist", name: "Tier List", desc: "Rank minerals, equipment or runes" },
