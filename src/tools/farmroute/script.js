@@ -47,7 +47,8 @@ function customItems(L){const out=[];Object.entries(L.picks||{}).forEach(([n,us]
 let cRar="",cArm=0;
 function drawMode(){const cm=S.mode==="custom";document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.mode==="custom")===cm)));$("modeMuseum").hidden=cm;$("modeCustom").hidden=!cm}
 function shownMins(L){const q=$("cQ").value.trim().toLowerCase();const only=$("cOnly").checked;
-  return P.mins.filter(m=>(!cRar||m.r===cRar)&&(!q||m.n.toLowerCase().includes(q)||(m.ch||[]).some(c=>String(c[0]).toLowerCase().includes(q)))&&(!only||((L.picks[m.n]||[]).some(u=>L.mods.includes(u)))))
+  const nameQ=!!q&&P.mins.some(m=>m.n.toLowerCase().includes(q));
+  return P.mins.filter(m=>(!cRar||m.r===cRar)&&(!q||m.n.toLowerCase().includes(q)||(!nameQ&&(m.ch||[]).some(c=>String(c[0]).toLowerCase().includes(q))))&&(!only||((L.picks[m.n]||[]).some(u=>L.mods.includes(u)))))
     .sort((a,b)=>RORD.indexOf(a.r)-RORD.indexOf(b.r)||a.n.localeCompare(b.n))}
 function drawCustom(){const L=curList();
   $("cList").innerHTML=S.cl.map(x=>`<option value="${esc(x.id)}"${x.id===L.id?" selected":""}>${esc(x.name||"Untitled route")}</option>`).join("");
