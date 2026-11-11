@@ -3,11 +3,13 @@ const $=id=>document.getElementById(id);
 const ORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"],SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
 const MULT={Common:.005,Uncommon:.0075,Rare:.0125,Epic:.02,Legendary:.03,Mythic:.05,Exotic:.08};
 const STATS=["Luck","Size Boost","Sell Boost","Capacity","Modifier Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Walk Speed"];
-let S={w:{Luck:5},own:false,skip:[],mods:P.mods.map(m=>m[0]).filter(n=>!["Treasured","Perfect","Electrified","Crystalline","Voidtorn","Lunar"].includes(n))};
+let S={w:{Luck:5},own:false,skip:[],mods:P.mods.map(m=>m[0]).filter(n=>!["Treasured","Electrified","Crystalline","Voidtorn","Lunar"].includes(n))};
 try{const s=JSON.parse(localStorage.getItem("pmf-s")||"null");if(s&&s.w)S=Object.assign(S,s)}catch(e){}
+// Perfect is on by default now: switch it on once for older saves
+if(!S.perf){S.perf=1;if(!S.mods.includes("Perfect"))S.mods.push("Perfect")}
 const save=()=>{try{localStorage.setItem("pmf-s",JSON.stringify(S))}catch(e){}};
-$("weights").innerHTML=STATS.map(s=>`<label class="wt"><span>${s}</span><input type="range" min="0" max="5" step="1" data-w="${s}" aria-label="${s} weight"><output id="o-${s.replace(/\s/g,"")}"></output></label>`).join("");
-$("mods").innerHTML=P.mods.map(m=>`<label class="ck"><input type="checkbox" data-mod="${esc(m[0])}">${m[0]==="None"?"No modifier":esc(m[0])}${m[2]>1?" (×"+m[2]+")":""}</label>`).join("");
+$("weights").innerHTML=STATS.map(s=>`<label class="wt"><span>${s}</span><input type="range" min="0" max="5" step="0.1" data-w="${s}" aria-label="${s} weight"><input type="number" class="wn" min="0" max="5" step="0.1" inputmode="decimal" data-w="${s}" aria-label="${s} weight, exact"></label>`).join("");
+$("mods").innerHTML=P.mods.map(m=>`<label class="ck"><input type="checkbox" data-mod="${esc(m[0])}"><span>${m[0]==="None"?"No modifier":esc(m[0])}${m[2]>1?" (×"+m[2]+")":""}${m[1].length?`<small class="mfx">${esc(m[1].join(", "))}</small>`:""}</span></label>`).join("");
 // The museum is chosen as a whole, not slot by slot. Each weighted stat counts as weight × log(1 + museum total),
 // so a stat you already have a lot of is worth less: two stats on the same weight get a fair share each instead of
 // the first one in the list taking every tie. Unweighted stats are ignored. Each display gets its own modifier.
@@ -41,7 +43,7 @@ function solve(){const own=Store.all();const W=STATS.filter(s=>S.w[s]>0).map(s=>
   return {board,totals}}
 let last=null;
 function render(){
-  STATS.forEach(s=>{const i=document.querySelector(`[data-w="${s}"]`);i.value=S.w[s]||0;$("o-"+s.replace(/\s/g,"")).textContent=S.w[s]||0});
+  STATS.forEach(s=>document.querySelectorAll(`[data-w="${s}"]`).forEach(i=>{if(i!==document.activeElement||i.type==="range")i.value=S.w[s]||0}));
   document.querySelectorAll("[data-mod]").forEach(c=>c.checked=S.mods.includes(c.dataset.mod));$("ownOnly").checked=!!S.own;
   const r=last=solve();
   const sk=S.skip||[];$("skipped").innerHTML=sk.length?`<div class="skipped"><span class="lab">Skipped for now</span>${sk.map(n=>`<button type="button" class="chip" data-unskip="${esc(n)}" title="Put ${esc(n)} back in the running">${esc(n)} ✕</button>`).join("")}<button type="button" class="btn" data-unskip="*" style="margin-left:auto;font-size:12px;padding:4px 10px">Unskip all</button></div>`:"";
@@ -49,7 +51,7 @@ function render(){
   $("board").innerHTML=ORDER.map(rr=>`<div class="band" style="--rc:${rc(rr)}"><h3>${rr}</h3><div class="slots">${r.board[rr].map(sl=>{const m=sl.m&&MIN[sl.m.toLowerCase()];
     return m?`<div class="slot" data-mineral="${esc(m.n)}" title="Ctrl+click to open ${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b>${esc(m.n)}</b><span>${m.mu.b.map(([s,v])=>`${s} <em class="${v<0?"neg":""}">${v<0?"−":"+"}${Math.abs(v)}×</em>`).join(", ")}${sl.u&&sl.u!=="None"?` · ${esc(sl.u)}`:""}${m.mu.kg?` · ${m.mu.kg} kg`:""}</span></div><button type="button" class="skipb" data-skip="${esc(m.n)}" title="Leave ${esc(m.n)} out for now, e.g. if you can't get it yet or it's limited-time. The next best mineral takes its place.">Skip</button></div>`:`<div class="slot"><div><b class="muted">Leave empty</b><span>${S.own?"No owned mineral helps here":"Nothing here helps your goal"}</span></div></div>`}).join("")}</div></div>`).join("");
 }
-document.addEventListener("input",e=>{const t=e.target;if(t.dataset.w){S.w[t.dataset.w]=+t.value;if(!+t.value)delete S.w[t.dataset.w];save();render()}});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.w){if(t.value===""&&t.type==="number")return;const v=Math.round(Math.min(5,Math.max(0,+t.value||0))*100)/100;S.w[t.dataset.w]=v;if(!v)delete S.w[t.dataset.w];save();render()}});
 document.addEventListener("change",e=>{const t=e.target;if(t.dataset.mod){S.mods=t.checked?[...new Set([...S.mods,t.dataset.mod])]:S.mods.filter(x=>x!==t.dataset.mod);if(!S.mods.includes("None"))S.mods.push("None");save();render()}else if(t.id==="ownOnly"){S.own=t.checked;save();render()}});
 document.addEventListener("click",e=>{const k=e.target.closest("[data-skip]");if(k){e.stopPropagation();S.skip=[...new Set([...(S.skip||[]),k.dataset.skip])];save();render();toast(`Skipped ${k.dataset.skip}`);return}
   const u=e.target.closest("[data-unskip]");if(u){const n=u.dataset.unskip;const c=n==="*"?(S.skip||[]).length:1;S.skip=n==="*"?[]:(S.skip||[]).filter(x=>x!==n);save();render();toast(n==="*"?`Unskipped ${c} mineral${c===1?"":"s"}`:`${n} is back in the running`);return}
