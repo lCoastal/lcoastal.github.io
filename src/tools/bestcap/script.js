@@ -1,3 +1,4 @@
+let VIEW_BEST=false;
 
 const $=id=>document.getElementById(id);
 const ORD=["Ascended","Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
@@ -64,19 +65,21 @@ function render(){
     {const allOn=!here.some(r=>S.hideR.includes(r));$("rarF").innerHTML=`<span class="lab">Rarity</span><button type="button" class="chip" data-rall aria-pressed="${allOn}">All</button>`+here.map(r=>`<button type="button" class="chip r" data-r="${r}" style="--rc:${rc(r)}" aria-pressed="${!allOn&&!S.hideR.includes(r)}">${r}</button>`).join("")}
   const q=S.q.trim().toLowerCase();
   // group by mineral, zones inside each mineral sorted by best chance at your luck
+  // a search matching any mineral name looks for minerals only; otherwise it's a zone search, which shows every drop there
+  const minQ=!!q&&ROWS.some(x=>x.m.n.toLowerCase().includes(q)),zoneQ=!!q&&!minQ,best=S.bestOnly&&!zoneQ;
   const by=new Map();ROWS.filter(x=>!S.hideR.includes(x.m.r)).forEach(x=>{if(!by.has(x.m))by.set(x.m,[]);by.get(x.m).push(x)});
   by.forEach((list,m)=>{let zs=list.map(r=>({r,b:bestFor(r)})).sort((x,y)=>y.b.eff-x.b.eff);
     // best zone only: skip The Void unless the mineral only drops there
     // Abyssal Depth is left out unless the mineral drops nowhere else
-    {const na=zs.filter(z=>!/Abyssal Depth/i.test(z.r.loc));if(na.length)zs=na}
-    if(S.bestOnly){const nv=zs.filter(z=>!/Void/.test(z.r.loc));zs=(nv.length?nv:zs).slice(0,1)}
-    // search after picking the best zone, so a zone search shows what's best there
-    if(q&&!m.n.toLowerCase().includes(q))zs=zs.filter(z=>z.r.loc.toLowerCase().includes(q));
+    if(minQ&&!m.n.toLowerCase().includes(q))zs=[];
+    if(zoneQ)zs=zs.filter(z=>z.r.loc.toLowerCase().includes(q));
+    else{const na=zs.filter(z=>!/Abyssal Depth/i.test(z.r.loc));if(na.length)zs=na}
+    if(best){const nv=zs.filter(z=>!/Void/.test(z.r.loc));zs=(nv.length?nv:zs).slice(0,1)}
     if(zs.length)by.set(m,zs);else by.delete(m)});
   let mins=[...by.keys()];
   mins.sort(S.sort==="az"?(a,b)=>a.n.localeCompare(b.n):(a,b)=>ORD.indexOf(a.r)-ORD.indexOf(b.r)||a.n.localeCompare(b.n));
   const rows=[...by.values()].flat();const zones=new Set(rows.map(z=>z.r.loc));
-  $("count").textContent=rows.length?(S.bestOnly?`Showing ${fmt(mins.length,0)} minerals, each in its best zone`:`Showing ${fmt(mins.length,0)} minerals across ${fmt(zones.size,0)} zones`):"";
+  VIEW_BEST=best;$("count").textContent=rows.length?(best?`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"}, each in its best zone`:`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"} across ${fmt(zones.size,0)} zones`):"";
   VIEW={mins,by};
   const shown=mins.slice(0,LIMIT);
   $("rows").innerHTML=rows.length?shown.map(m=>{const zs=by.get(m);
@@ -126,7 +129,7 @@ async function capImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-ser
   const title=imgName();
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(fit(title,W-PAD*2-mw-20),PAD,PAD+30);
   const shownR=ORD.filter(r=>!S.hideR.includes(r)&&ROWS.some(x=>x.m.r===r));
-  const sub=[`Your luck ${fmt(L,0)}`,`${fmt(VIEW.mins.length,0)} mineral${VIEW.mins.length===1?"":"s"}`];if(S.bestOnly&&S.q.trim())sub.push("best zone only");if(S.hideR.length)sub.push(shownR.join(", ")||"no rarities");
+  const sub=[`Your luck ${fmt(L,0)}`,`${fmt(VIEW.mins.length,0)} mineral${VIEW.mins.length===1?"":"s"}`];if(VIEW_BEST&&S.q.trim())sub.push("best zone only");if(S.hideR.length)sub.push(shownR.join(", ")||"no rarities");
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(" · "),W-PAD*2),PAD,PAD+58);
   const cols=[["Mineral",0],["Zone",250],["Best luck cap",520],["Best luck",670],["Chance per mineral",850],["Compared to your luck",1030]];const X=v=>PAD+12+v;
   let y=HEAD;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach(([t,x])=>c.fillText(t.toUpperCase(),X(x),y+20));
