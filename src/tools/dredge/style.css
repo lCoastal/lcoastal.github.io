@@ -35,3 +35,5 @@
 .alt b{color:var(--fg)}
 .empty{color:var(--muted);font-size:14px}
 @media (max-width:520px){.wrow{grid-template-columns:22px minmax(0,1fr) 84px}}
+
+.ench{display:inline-block;margin-left:4px;padding:0 7px;border-radius:999px;border:1px solid var(--line);font:600 11px/1.6 var(--f-body);color:var(--muted);vertical-align:1px;white-space:nowrap}

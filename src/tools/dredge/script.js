@@ -1,4 +1,9 @@
 
+// best shovel enchant by rarity (a simple rule of thumb, shared on/off with the other tools)
+const ENCH_BY={Common:"Excavating",Uncommon:"Excavating",Rare:"Excavating",Epic:"Tempered",Legendary:"Tempered",Mythic:"Mythical",Exotic:"Mythical"};
+let ENCH_ON=true;try{ENCH_ON=localStorage.getItem("pt-ench")!=="0"}catch(e){}
+const enchTag=r=>ENCH_ON&&ENCH_BY[r]?` <span class="ench" title="Best shovel enchant for ${r} minerals">${ENCH_BY[r]}</span>`:"";
+
 const $=id=>document.getElementById(id);
 let S={luck:null,cap:null,pph:"",trav:50,walk:false,w:[{m:"",n:""},{m:"",n:""},{m:"",n:""}]};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-dredge")||"{}"))}catch(e){}
@@ -62,7 +67,7 @@ function renderWant(){$("want").innerHTML=S.w.map((w,i)=>{const m=findMin(w.m);c
 function okText(i){const w=S.w[i];const m=findMin(w.m);const el=$("ok"+i);el.className="ok"+(w.m&&!m?" bad":"");el.innerHTML=w.m&&!m?"Not a mineral with known drop rates":m?`<span class="rr" style="--rc:${rc(m.r)}">${m.r}</span>`:"";el.hidden=!w.m}
 function stopHTML(s,k,many){const capH=s.cap==null?`<span class="cap none">No cap</span>`:`<span class="cap">Luck cap ${fmt(s.cap,0)}</span>`;
   return `<div class="stop"><div class="sh"><span>${many?`<span class="num">${k+1}</span>`:""}<b><span class="lk" data-location="${esc(baseLoc(s.z))}">${esc(s.z)}</span></b>${isVoid(s.z)?' <span class="hint">(loot pool changes)</span>':""}</span>${capH}</div>
-  <div class="items">${s.its.map(x=>`<div class="item"><span class="mn" data-mineral="${esc(x.g.m.n)}">${x.g.m.ic?`<img src="${x.g.m.ic}" alt="">`:""}<span><b>${fmt(x.g.n,0)}× ${esc(x.g.m.n)}</b></span></span><span class="v">${x.pans<1?"":"~"}${pansW(x.pans)}</span><span class="sub">${oneInD(x.e)} per mineral${hrs(x.pans)?" · about "+hrs(x.pans):""}</span></div>`).join("")}</div>
+  <div class="items">${s.its.map(x=>`<div class="item"><span class="mn" data-mineral="${esc(x.g.m.n)}">${x.g.m.ic?`<img src="${x.g.m.ic}" alt="">`:""}<span><b>${fmt(x.g.n,0)}× ${esc(x.g.m.n)}</b>${enchTag(x.g.m.r)}</span></span><span class="v">${x.pans<1?"":"~"}${pansW(x.pans)}</span><span class="sub">${oneInD(x.e)} per mineral${hrs(x.pans)?" · about "+hrs(x.pans):""}</span></div>`).join("")}</div>
   <p class="alt">This stop takes ${s.pans<1?"":"about "}<b>${pansW(s.pans)}</b>${hrs(s.pans)?` (${hrs(s.pans)})`:""}, set by its slowest item.</p></div>`}
 // walking between zones only counts when it's switched on (off by default)
 function walkT(){return S.walk?Math.max(0,+S.trav||0):0}
@@ -99,3 +104,5 @@ $("toImg").onclick=()=>{const r=plan();if(!r||r.none){ptToast(r?"No zone drops t
   ptSaveImg("Dredge Master plan",()=>ptTableImage({title:"What the Dredge Master wants",sub,sections:[{h:t,cols,rows}],note:"Estimates only: modifiers, Size Boost, enchants, events and weather aren't counted."}))};
 window.ptRefresh=()=>{youPull(["luck","cap","pph"]);render()};
 renderWant();render();
+
+$("enchOn").checked=ENCH_ON;$("enchOn").addEventListener("change",()=>{ENCH_ON=$("enchOn").checked;try{localStorage.setItem("pt-ench",ENCH_ON?"1":"0")}catch(e){}render()});

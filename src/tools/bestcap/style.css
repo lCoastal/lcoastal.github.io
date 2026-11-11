@@ -60,3 +60,5 @@ td.bl small{display:block;font-size:11.5px;color:var(--muted);font-family:var(--
 .fx code{font-family:var(--f-mono);font-size:13px;color:var(--fg);background:none;padding:0;overflow-wrap:anywhere}
 .fx .row{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;align-items:baseline}
 @media (max-width:600px){.fx .row{grid-template-columns:1fr}}
+
+.ench{display:inline-block;margin-left:4px;padding:0 7px;border-radius:999px;border:1px solid var(--line);font:600 11px/1.6 var(--f-body);color:var(--muted);vertical-align:1px;white-space:nowrap}

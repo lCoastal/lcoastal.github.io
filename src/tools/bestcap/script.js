@@ -1,4 +1,8 @@
 let VIEW_BEST=false;
+// best shovel enchant by rarity (a simple rule of thumb, shared on/off with the other tools)
+const ENCH_BY={Common:"Excavating",Uncommon:"Excavating",Rare:"Excavating",Epic:"Tempered",Legendary:"Tempered",Mythic:"Mythical",Exotic:"Mythical"};
+let ENCH_ON=true;try{ENCH_ON=localStorage.getItem("pt-ench")!=="0"}catch(e){}
+const enchTag=r=>ENCH_ON&&ENCH_BY[r]?` <span class="ench" title="Best shovel enchant for ${r} minerals">${ENCH_BY[r]}</span>`:"";
 
 const $=id=>document.getElementById(id);
 const ORD=["Ascended","Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
@@ -83,12 +87,14 @@ function render(){
   VIEW={mins,by};
   const shown=mins.slice(0,LIMIT);
   $("rows").innerHTML=rows.length?shown.map(m=>{const zs=by.get(m);
-    return zs.map(({r,b},i)=>`<tr class="${i?"":"first"}"><td class="mcell">${i?"":`<span class="mn" data-mineral="${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(m.n)}</b><br><span class="rr" style="--rc:${rc(m.r)}">${m.r}</span></span></span>`}</td><td class="zcell" data-l="Zone"><span class="lk" data-location="${esc(baseLoc(r.loc))}">${esc(r.loc)}</span></td><td data-l="Best luck cap">${b.cap==null?`<span class="cap none">No cap</span>`:`<span class="cap">${fmt(b.cap,0)}</span>`}</td><td class="bl" data-l="Best luck">${peakCell(r)}</td><td class="num" data-l="Chance per mineral">${oneInT(b.eff)}</td><td data-l="Compared to your luck">${gain(b,r)}</td></tr>`).join("")}).join("")
+    return zs.map(({r,b},i)=>`<tr class="${i?"":"first"}"><td class="mcell">${i?"":`<span class="mn" data-mineral="${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(m.n)}</b><br><span class="rr" style="--rc:${rc(m.r)}">${m.r}</span>${enchTag(m.r)}</span></span>`}</td><td class="zcell" data-l="Zone"><span class="lk" data-location="${esc(baseLoc(r.loc))}">${esc(r.loc)}</span></td><td data-l="Best luck cap">${b.cap==null?`<span class="cap none">No cap</span>`:`<span class="cap">${fmt(b.cap,0)}</span>`}</td><td class="bl" data-l="Best luck">${peakCell(r)}</td><td class="num" data-l="Chance per mineral">${oneInT(b.eff)}</td><td data-l="Compared to your luck">${gain(b,r)}</td></tr>`).join("")}).join("")
     :`<tr><td colspan="6" class="hint">Nothing matches. Try another search or turn a rarity back on.</td></tr>`;
   $("more").innerHTML=mins.length>LIMIT?`<button type="button" class="btn" id="moreBtn">Show ${fmt(Math.min(60,mins.length-LIMIT),0)} more minerals</button>`:"";
 }
 $("q").value=S.q;$("luck").value=S.luck;$("bestOnly").checked=!!S.bestOnly;
 $("bestOnly").addEventListener("change",()=>{S.bestOnly=$("bestOnly").checked;save();render()});
+$("enchOn").checked=ENCH_ON;$("enchOn").addEventListener("change",()=>{ENCH_ON=$("enchOn").checked;try{localStorage.setItem("pt-ench",ENCH_ON?"1":"0")}catch(e){}render()});
+
 $("luck").addEventListener("input",()=>{const v=+$("luck").value;if(v>0){S.luck=v;save();render()}});
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}
   if(!t||!(t.Luck>0)){$("count").textContent="Couldn't read the Stat Calculator. Open it once and set up your gear.";return}S.luck=Math.round(t.Luck);$("luck").value=S.luck;save();render()};
