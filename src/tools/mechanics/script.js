@@ -9,7 +9,7 @@ const eff=(b,L)=>{L=Math.max(1,L);const f=l=>1-Math.pow(1-b,l);return .2983*f(1)
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
 function modShares(mbx,night,luck){const list=MODW.filter(([k])=>night||k!=="Lunar"),tot=list.reduce((a,x)=>a+x[1],0);
   const f=N=>{let a=0;const o={};list.forEach(([k,w])=>{const q=w/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-q),N);a+=q});return o};
-  const L=Math.max(1,10.12*Math.max(0,mbx)+Math.max(0,luck||0)/1000),pt=[f(1),f(Math.max(1,L/2)),f(L)],s={};
+  const L=Math.max(1,10.12*Math.max(0,mbx)+Math.min(50,Math.max(0,luck||0)/1000)),pt=[f(1),f(Math.max(1,L/2)),f(L)],s={};
   list.forEach(([k])=>s[k]=.338*pt[0][k]+.268*pt[1][k]+.394*pt[2][k]);return{s,list,tot}}
 function render(){
   const L=Math.max(1,+S.luck||1);

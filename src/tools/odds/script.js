@@ -1,4 +1,14 @@
 
+// luck events and autopan, shared by the luck tools: the luck you type is multiplied by these
+let LUCKX={ev:1,auto:false};try{Object.assign(LUCKX,JSON.parse(localStorage.getItem("pt-luckx")||"{}"))}catch(e){}
+const luckMult=()=>(+LUCKX.ev||1)*(LUCKX.auto?2/3:1);
+const effLuck=()=>(+S.luck||1)*luckMult();
+function luckxWire(after){const ev=document.getElementById("luckEv"),au=document.getElementById("luckAuto");if(!ev)return;
+  ev.value=String(LUCKX.ev||1);au.checked=!!LUCKX.auto;
+  const note=()=>{const n=document.getElementById("luckNote");if(n){const m=luckMult();n.textContent=m===1?"":"Using "+Math.round(effLuck()).toLocaleString()+" luck ("+(Math.round(m*100)/100)+"× what you typed)"}};
+  const ch=()=>{LUCKX={ev:+ev.value||1,auto:au.checked};try{localStorage.setItem("pt-luckx",JSON.stringify(LUCKX))}catch(e){}note();after()};
+  ev.addEventListener("change",ch);au.addEventListener("change",ch);document.getElementById("luck").addEventListener("input",()=>setTimeout(note));note()}
+
 const $=id=>document.getElementById(id);
 let S={luck:"",cap:"",pph:"",by:"loc",loc:"Fungal Marsh",min:"Astral Spore",hideR:[]};
 try{Object.assign(S,JSON.parse(localStorage.getItem("po-s")||"{}"))}catch(e){}
@@ -39,7 +49,7 @@ function render(){
   if(S.by!=="min")S.by="loc";if(!LOCS.includes(S.loc))S.loc=LOCS[0];if(!MINS.includes(S.min))S.min=MINS[0];
   try{AC.sync()}catch(e){}
   $("perPan").textContent=`About ${fmt(perPan(),1)} minerals per pan at ${fmt(+S.cap,0)} capacity.`;
-  const L=Math.max(1,+S.luck||1);const head=`<thead><tr><th>${S.by==="loc"?"Mineral":"Location"}</th><th>Base chance</th><th>Per mineral</th><th>Per pan</th>${+S.pph>0?"<th>Time</th>":""}</tr></thead>`;
+  const L=Math.max(1,effLuck());const head=`<thead><tr><th>${S.by==="loc"?"Mineral":"Location"}</th><th>Base chance</th><th>Per mineral</th><th>Per pan</th>${+S.pph>0?"<th>Time</th>":""}</tr></thead>`;
   $("rarF").hidden=S.by!=="loc";
   if(S.by==="loc"){const all=shares(S.loc,L);const here=ORD.filter(r=>all.some(x=>x.m.r===r));
     {const allOn=!here.some(r=>S.hideR.includes(r));$("rarF").innerHTML=`<span class="lab">Rarity</span><button type="button" class="chip" data-rall aria-pressed="${allOn}">All</button>`+here.map(r=>`<button type="button" class="chip r" data-r="${r}" style="--rc:${rc(r)}" aria-pressed="${!allOn&&!S.hideR.includes(r)}">${r}</button>`).join("")}
@@ -59,9 +69,9 @@ document.addEventListener("click",e=>{const rb=e.target.closest("[data-r]");if(r
   if(e.target.closest("[data-rnone]")){S.hideR=ORD.slice();save();render();return}const f=e.target.closest("[data-fmt]");if(f){S.fmt=f.dataset.fmt;save();render();return}});
 // ---- pan simulator: rolls pans at the picked spot with the same chances as the table ----
 let SIM=null;
-function simSpot(){if(S.by==="loc")return S.loc;const m=MIN[S.min.toLowerCase()];const rows=(m&&m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,Math.max(1,+S.luck||1)).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>/Void/.test(a.l)-/Void/.test(b.l)||b.s.eff-a.s.eff);const b=rows.find(x=>!/Void/.test(x.l))||rows[0];return b?b.l:LOCS[0]}
-function simKey(){return [simSpot(),Math.max(1,+S.luck||1),Math.max(1,+S.cap||1)].join("|")}
-function simRun(n){const spot=simSpot(),L=Math.max(1,+S.luck||1);const list=shares(spot,L);if(!list.length)return;
+function simSpot(){if(S.by==="loc")return S.loc;const m=MIN[S.min.toLowerCase()];const rows=(m&&m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,Math.max(1,effLuck())).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>/Void/.test(a.l)-/Void/.test(b.l)||b.s.eff-a.s.eff);const b=rows.find(x=>!/Void/.test(x.l))||rows[0];return b?b.l:LOCS[0]}
+function simKey(){return [simSpot(),Math.max(1,effLuck()),Math.max(1,+S.cap||1)].join("|")}
+function simRun(n){const spot=simSpot(),L=Math.max(1,effLuck());const list=shares(spot,L);if(!list.length)return;
   SIM={key:simKey(),spot,pans:0,got:{},total:0,best:null,n};
   const cum=[];let t=0;list.forEach(x=>{t+=x.eff;cum.push(t)});const pp=perPan(),whole=Math.floor(pp),frac=pp-whole;const fresh=new Set();
   for(let i=0;i<n;i++){const k=whole+(Math.random()<frac?1:0);for(let j=0;j<k;j++){const r=Math.random()*t;let lo=0,hi=cum.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(cum[mid]<r)lo=mid+1;else hi=mid}
@@ -87,7 +97,7 @@ $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals
 // ---- save the current table as an image (no page controls, just the results) ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 const HEX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
-async function oddsImage(){const L=Math.max(1,+S.luck||1),pp=perPan(),pph=+S.pph>0,mode=S.fmt||"one";
+async function oddsImage(){const L=Math.max(1,effLuck()),pp=perPan(),pph=+S.pph>0,mode=S.fmt||"one";
   const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
   const oneS=p=>{const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
   const cell=p=>!(p>0)?["—",""]:mode==="pct"?[pctTxt(p),""]:mode==="both"?[oneS(p),pctTxt(p)]:[oneS(p),""];
@@ -138,3 +148,5 @@ $("toImg").onclick=async()=>{let blob=null;try{blob=await oddsImage()}catch(e){c
 window.ptOpenFor=(kind,name)=>{if(kind==="mineral"){S.by="min";S.min=name}else{S.by="loc";S.loc=name}save();render()};
 window.ptRefresh=()=>{youPull(["luck","cap","pph"]);render()};
 render();
+
+luckxWire(()=>render());

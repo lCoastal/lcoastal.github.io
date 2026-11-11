@@ -1,3 +1,13 @@
+
+// luck events and autopan, shared by the luck tools: the luck you type is multiplied by these
+let LUCKX={ev:1,auto:false};try{Object.assign(LUCKX,JSON.parse(localStorage.getItem("pt-luckx")||"{}"))}catch(e){}
+const luckMult=()=>(+LUCKX.ev||1)*(LUCKX.auto?2/3:1);
+const effLuck=()=>(+S.luck||1)*luckMult();
+function luckxWire(after){const ev=document.getElementById("luckEv"),au=document.getElementById("luckAuto");if(!ev)return;
+  ev.value=String(LUCKX.ev||1);au.checked=!!LUCKX.auto;
+  const note=()=>{const n=document.getElementById("luckNote");if(n){const m=luckMult();n.textContent=m===1?"":"Using "+Math.round(effLuck()).toLocaleString()+" luck ("+(Math.round(m*100)/100)+"× what you typed)"}};
+  const ch=()=>{LUCKX={ev:+ev.value||1,auto:au.checked};try{localStorage.setItem("pt-luckx",JSON.stringify(LUCKX))}catch(e){}note();after()};
+  ev.addEventListener("change",ch);au.addEventListener("change",ch);document.getElementById("luck").addEventListener("input",()=>setTimeout(note));note()}
 let VIEW_BEST=false;
 // best shovel enchant by rarity (a simple rule of thumb, shared on/off with the other tools)
 const ENCH_BY={Common:"Excavating",Uncommon:"Excavating",Rare:"Excavating",Epic:"Tempered",Legendary:"Tempered",Mythic:"Mythical",Exotic:"Mythical"};
@@ -39,9 +49,9 @@ Object.keys(LOC).filter(loc=>LOC[loc].length>1||baseLoc(loc)!==loc).forEach(loc=
 const oneInT=p=>{if(!(p>0))return "—";const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
 // chance of each mineral at the luck you typed in, worked out once per zone and kept until the luck changes
 let YL={},YLkey=null;
-function atYours(r){const L=Math.max(1,+S.luck||1);if(YLkey!==L){YL={};YLkey=L}if(!YL[r.loc])YL[r.loc]=new Map(shares(r.loc,L).map(x=>[x.m,x.eff]));return YL[r.loc].get(r.m)||0}
+function atYours(r){const L=Math.max(1,effLuck());if(YLkey!==L){YL={};YLkey=L}if(!YL[r.loc])YL[r.loc]=new Map(shares(r.loc,L).map(x=>[x.m,x.eff]));return YL[r.loc].get(r.m)||0}
 // best setting at your luck: no cap (your luck) vs every cap below it; on a near tie keep the higher cap / no cap
-function bestFor(r){const L=Math.max(1,+S.luck||1);let b={cap:null,eff:atYours(r)};
+function bestFor(r){const L=Math.max(1,effLuck());let b={cap:null,eff:atYours(r)};
   for(let i=CAPS.length-1;i>=0;i--){if(CAPS[i]>=L)continue;if(r.effs[i]>b.eff*(1+1e-6))b={cap:CAPS[i],eff:r.effs[i]}}
   b.yours=atYours(r);return b}
 // the exact luck where this mineral peaks in this zone (any number, not just the cap steps)
@@ -57,7 +67,7 @@ const peakCell=r=>{const p=peakLuck(r);return p.top?`<span class="hi">Higher is 
 const times=x=>(x<10?fmt(x,2):fmt(x,0))+"×";
 // why no cap wins: some minerals only get more common with more luck, so a cap never helps them
 const noCapTxt=(r,L)=>{const p=r&&peakLuck(r);if(p&&p.top)return "Never cap your luck";if(p&&p.L>L*1.02)return "Your luck is too low, don't cap";return "Your luck is best, don't cap"};
-const gain=(b,r)=>{if(b.cap==null){const L=Math.max(1,+S.luck||1),p=r&&peakLuck(r);
+const gain=(b,r)=>{if(b.cap==null){const L=Math.max(1,effLuck()),p=r&&peakLuck(r);
     // no cap wins, but if your luck is below where this mineral peaks you'd actually want more luck, not a cap
     return `<span class="same">${noCapTxt(r,L)}</span>`}
   if(!(b.yours>0))return `<span class="gain">Only drops with a cap</span>`;const x=b.eff/b.yours;
@@ -122,7 +132,7 @@ function imgName(){const q=S.q.trim();if(!q)return S.bestOnly?"Best zone for eac
   const bz=[...new Set(zs.map(baseLoc))];if(bz.length===1)return bz[0];
   return q.replace(/\b\w/g,ch=>ch.toUpperCase())}
 async function capImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
-  const L=Math.max(1,+S.luck||1);const list=[];let total=0;
+  const L=Math.max(1,effLuck());const list=[];let total=0;
   VIEW.mins.forEach(m=>VIEW.by.get(m).forEach((z,i)=>{total++;if(list.length<MAXROWS)list.push({m,first:i===0,...z})}));
   if(!list.length)return null;
   const W=1360,PAD=40,RH=50,HEAD=PAD+92;const extra=total>list.length?34:0;
@@ -166,3 +176,5 @@ $("toImg").onclick=async()=>{let blob=null;try{blob=await capImage()}catch(e){co
 window.ptOpenFor=(kind,name)=>{S.q=name;$("q").value=name;LIMIT=60;render()};
 window.ptRefresh=()=>{const o=S.luck;youPull(["luck"]);if(+S.luck!==+o){$("luck").value=S.luck;render()}};
 render();
+
+luckxWire(()=>render());

@@ -18,7 +18,7 @@ const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],
 const NORMAL=new Set(MODW.map(x=>x[0])),NAT_MOD=.36,MOD_K=10.12,MOD_LUCK=1/1000,MOD_MIX=[.338,.268,.394];
 function modShares(mbx,night,luck){const list=MODW.filter(([k])=>night||k!=="Lunar"),tot=list.reduce((a,x)=>a+x[1],0);
   const f=N=>{let a=0;const o={};list.forEach(([k,w])=>{const p=w/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-p),N);a+=p});return o};
-  const L=Math.max(1,MOD_K*Math.max(0,mbx)+MOD_LUCK*Math.max(0,luck||0)),pt=[f(1),f(Math.max(1,L/2)),f(L)],s={};
+  const L=Math.max(1,MOD_K*Math.max(0,mbx)+Math.min(50,MOD_LUCK*Math.max(0,luck||0))),pt=[f(1),f(Math.max(1,L/2)),f(L)],s={};
   list.forEach(([k])=>s[k]=MOD_MIX[0]*pt[0][k]+MOD_MIX[1]*pt[1][k]+MOD_MIX[2]*pt[2][k]);return s}
 
 const FIELDS=[["","Ignore"],["name","Mineral"],["zone","Zone"],["mod","Modifier"],["weight","Weight (kg)"],["size","Size Boost"],["luck","Total Luck"],["mb","Modifier Boost"],["cap","Capacity"]];

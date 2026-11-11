@@ -1,4 +1,14 @@
 
+// luck events and autopan, shared by the luck tools: the luck you type is multiplied by these
+let LUCKX={ev:1,auto:false};try{Object.assign(LUCKX,JSON.parse(localStorage.getItem("pt-luckx")||"{}"))}catch(e){}
+const luckMult=()=>(+LUCKX.ev||1)*(LUCKX.auto?2/3:1);
+const effLuck=()=>(+S.luck||1)*luckMult();
+function luckxWire(after){const ev=document.getElementById("luckEv"),au=document.getElementById("luckAuto");if(!ev)return;
+  ev.value=String(LUCKX.ev||1);au.checked=!!LUCKX.auto;
+  const note=()=>{const n=document.getElementById("luckNote");if(n){const m=luckMult();n.textContent=m===1?"":"Using "+Math.round(effLuck()).toLocaleString()+" luck ("+(Math.round(m*100)/100)+"× what you typed)"}};
+  const ch=()=>{LUCKX={ev:+ev.value||1,auto:au.checked};try{localStorage.setItem("pt-luckx",JSON.stringify(LUCKX))}catch(e){}note();after()};
+  ev.addEventListener("change",ch);au.addEventListener("change",ch);document.getElementById("luck").addEventListener("input",()=>setTimeout(note));note()}
+
 // best shovel enchant by rarity (a simple rule of thumb, shared on/off with the other tools)
 const ENCH_BY={Common:"Excavating",Uncommon:"Excavating",Rare:"Excavating",Epic:"Tempered",Legendary:"Tempered",Mythic:"Mythical",Exotic:"Mythical"};
 let ENCH_ON=true;try{ENCH_ON=localStorage.getItem("pt-ench")!=="0"}catch(e){}
@@ -47,7 +57,7 @@ function bestFor(group,L,per){let best=null;
   const voidOnly=group.some(g=>!ZONES.some(z=>!isVoid(z)&&fullList(z).some(x=>x.m===g.m)));
   tryZones(voidOnly);return best}
 const PARTS={1:[[[0]]],2:[[[0,1]],[[0],[1]]],3:[[[0,1,2]],[[0,1],[2]],[[0,2],[1]],[[1,2],[0]],[[0],[1],[2]]]};
-function plan(){const L=Math.max(1,+S.luck||1),per=Math.sqrt(Math.max(1,+S.cap||1));
+function plan(){const L=Math.max(1,effLuck()),per=Math.sqrt(Math.max(1,+S.cap||1));
   // merge repeats of the same mineral
   const want=[];S.w.forEach(w=>{const m=findMin(w.m);const n=Math.max(0,Math.round(+w.n||0));if(!m||!n)return;const o=want.find(x=>x.m===m);if(o)o.n+=n;else want.push({m,n})});
   if(!want.length)return null;
@@ -96,7 +106,7 @@ window.ptOpenFor=(kind,name)=>{if(kind!=="mineral")return;const i=S.w.findIndex(
 const RHX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
 $("toImg").onclick=()=>{const r=plan();if(!r||r.none){ptToast(r?"No zone drops these, nothing to save":"Type in a mineral and how many first");return}
   const p=r.pick,pph=+S.pph>0;const walk=S.walk&&p.stops.length>1?(p.stops.length-1)*walkT():0;
-  const sub=[`Luck ${fmt(Math.max(1,+S.luck||1),0)}`,`Capacity ${fmt(+S.cap||1,0)}`,`${p.stops.length} stop${p.stops.length===1?"":"s"}`,`${p.total<1?"":"~"}${pansW(p.total)} in total`];if(walk)sub.push(`plus ~${fmt(walk,0)} pans walking`);if(pph&&hrs(p.total))sub.push("about "+hrs(p.total));
+  const sub=[`Luck ${fmt(Math.max(1,effLuck()),0)}`,`Capacity ${fmt(+S.cap||1,0)}`,`${p.stops.length} stop${p.stops.length===1?"":"s"}`,`${p.total<1?"":"~"}${pansW(p.total)} in total`];if(walk)sub.push(`plus ~${fmt(walk,0)} pans walking`);if(pph&&hrs(p.total))sub.push("about "+hrs(p.total));
   const cols=[{h:"Mineral",w:pph?.34:.4},{h:"How many",w:.12,al:"r"},{h:"Per mineral",w:.2,al:"r"},{h:"Pans",w:pph?.17:.28,al:"r"}].concat(pph?[{h:"Time",w:.17,al:"r"}]:[]);
   const rows=[];p.stops.forEach((st,k)=>{rows.push({group:`${p.stops.length>1?"Stop "+(k+1)+" · ":""}${st.z}${isVoid(st.z)?" (loot pool changes)":""} · ${st.cap==null?"No cap":"Luck cap "+fmt(st.cap,0)} · ${st.pans<1?"":"about "}${pansW(st.pans)}`});
     st.its.forEach(x=>rows.push({cells:[{t:x.g.m.n,b:true,ic:x.g.m.ic,sub:x.g.m.r,subcol:RHX[x.g.m.r]||"#98a2ad"},{t:fmt(x.g.n,0)+"×",mono:true},{t:oneInD(x.e),mono:true},{t:(x.pans<1?"":"~")+pansW(x.pans),mono:true}].concat(pph?[{t:hrs(x.pans)||"—",mono:true}]:[])}))});
@@ -106,3 +116,5 @@ window.ptRefresh=()=>{youPull(["luck","cap","pph"]);render()};
 renderWant();render();
 
 $("enchOn").checked=ENCH_ON;$("enchOn").addEventListener("change",()=>{ENCH_ON=$("enchOn").checked;try{localStorage.setItem("pt-ench",ENCH_ON?"1":"0")}catch(e){}render()});
+
+luckxWire(()=>render());
