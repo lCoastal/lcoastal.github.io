@@ -52,11 +52,12 @@ function rowHTML(m){
 }
 function render(){
   // a search that matches a mineral name only looks at names, not at what they craft into
-  st.nameQ=!!st.q&&M.some(m=>m.n.toLowerCase().includes(st.q));
+  st.nameQ=!!st.q&&M.some(m=>m.n.toLowerCase().includes(st.q));st.exactQ=!!st.q&&M.some(m=>m.n.toLowerCase()===st.q);
   let list=M.filter(m=>{
     if(st.rar.size&&!st.rar.has(m.r))return false;
     if(st.stat&&!(m.mu&&m.mu.b.some(([s,v])=>s===st.stat&&v>0)))return false;
     if(st.loc&&!m.ch.some(c=>baseLoc(c[0])===st.loc))return false;
+    if(st.exactQ&&m.n.toLowerCase()!==st.q)return false;
     if(st.q&&!(m.n.toLowerCase().includes(st.q)||(!st.nameQ&&m.u.some(u=>u[0].toLowerCase().includes(st.q)))))return false;
     return true});
   const ri=r=>ORDER.indexOf(r);

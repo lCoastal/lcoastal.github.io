@@ -70,12 +70,13 @@ function render(){
   const q=S.q.trim().toLowerCase();
   // group by mineral, zones inside each mineral sorted by best chance at your luck
   // a search matching any mineral name looks for minerals only; otherwise it's a zone search, which shows every drop there
+  const exactQ=!!q&&ROWS.some(x=>x.m.n.toLowerCase()===q),nameHit=n=>exactQ?n.toLowerCase()===q:n.toLowerCase().includes(q);
   const minQ=!!q&&ROWS.some(x=>x.m.n.toLowerCase().includes(q)),zoneQ=!!q&&!minQ,best=S.bestOnly&&!zoneQ;
   const by=new Map();ROWS.filter(x=>!S.hideR.includes(x.m.r)).forEach(x=>{if(!by.has(x.m))by.set(x.m,[]);by.get(x.m).push(x)});
   by.forEach((list,m)=>{let zs=list.map(r=>({r,b:bestFor(r)})).sort((x,y)=>y.b.eff-x.b.eff);
     // best zone only: skip The Void unless the mineral only drops there
     // Abyssal Depth is left out unless the mineral drops nowhere else
-    if(minQ&&!m.n.toLowerCase().includes(q))zs=[];
+    if(minQ&&!nameHit(m.n))zs=[];
     if(zoneQ)zs=zs.filter(z=>z.r.loc.toLowerCase().includes(q));
     else{const na=zs.filter(z=>!/Abyssal Depth/i.test(z.r.loc));if(na.length)zs=na}
     if(best){const nv=zs.filter(z=>!/Void/.test(z.r.loc));zs=(nv.length?nv:zs).slice(0,1)}
