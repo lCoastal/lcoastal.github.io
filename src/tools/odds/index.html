@@ -15,6 +15,10 @@
     <h1>Luck Odds</h1>
     <p class="lede">Estimated chances of finding each mineral with your luck.<br>These are estimates built on how the wiki describes luck, not exact game numbers.</p>
   </header>
+  <div role="alert" style="margin:0 0 16px;padding:14px 16px;border:2px solid var(--neg,#d33);border-radius:12px;background:color-mix(in srgb,var(--neg,#d33) 10%,transparent)">
+    <div style="font:700 16px/1.3 var(--f-head,inherit);color:var(--neg,#d33);letter-spacing:.02em">⚠ THE LUCK FORMULA IS NOT CORRECT</div>
+    <div style="margin-top:6px;font-size:13.5px;line-height:1.5">It was updated on 11/11/26 to fit my latest tests better, but it's still not the game's real formula. Odds, best caps and best zones here are a rough guide only, and can be clearly wrong, especially at very high luck. I'm still testing it.</div>
+  </div>
   <p class="disc" role="note"><b>Heads up:</b> each mineral's base chance comes straight from the in-game zone weights, but how luck turns into rolls is a model, not the game's own code. Modifiers, Size Boost, enchants, events and weather aren't counted, so your real odds will be close but not exact.</p>
   <section class="card">
     <div class="inputs">
@@ -41,7 +45,7 @@
   </section>
   <section class="card"><h2>How this is worked out</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
-      <li>Each mineral slot in a pan rolls three ways: half the time at your full luck, a quarter of the time at half your luck, and a quarter of the time as if your luck were 1. That's why commons never disappear.</li>
+      <li>Each mineral slot in a pan rolls three ways: about 61% of the time at a bit more than your full luck, 9% of the time at a much weaker luck, and 30% of the time as if your luck were 1. That's why commons never disappear, even at very high luck.</li>
       <li>At a given luck, the rarity roll is the best of that many tries, so rarer ores gain share as luck grows. The base rates are the drop chances listed for each location.</li>
       <li>On average a pan holds about √capacity minerals, which is how per-pan chances are worked out.</li>
       <li>Size Boost, modifiers and enchants that change drops (like Mythical) aren't counted. Treat these as rough guides.</li>
@@ -52,11 +56,11 @@
       <div class="row"><span>Everything rarer</span><code>a = p₁ + p₂ + … + pₖ₋₁</code></div>
       <div class="row"><span>Up to and including it</span><code>b = a + pₖ</code></div>
       <div class="row"><span>Best of L rolls</span><code>f(L) = (1 − a)<sup>L</sup> − (1 − b)<sup>L</sup></code></div>
-      <div class="row"><span>Per mineral</span><code>P = ¼·f(1) + ¼·f(max(1, L ÷ 2)) + ½·f(max(1, L))</code></div>
+      <div class="row"><span>Per mineral</span><code>P = 0.298·f(1) + 0.089·f(max(1, 0.138·L<sup>0.982</sup>)) + 0.613·f(max(1, 1.30·L))</code></div>
       <div class="row"><span>Per pan (capacity C)</span><code>1 − (1 − P)<sup>√C</sup></code></div>
       <div class="row"><span>Shown as "1 in X"</span><code>X = 1 ÷ (per pan chance)</code></div>
     </div></section>
-  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 10/11/26 · Made by @__coastal</p>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 11/11/26 · Made by @__coastal</p>
 </div>
 <script data-file="script.js"></script>
 

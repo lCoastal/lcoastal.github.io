@@ -4,8 +4,8 @@ let S={luck:1000,cap:1000,pick:.1,mbp:100,night:false};try{Object.assign(S,JSON.
 const save=()=>{try{localStorage.setItem("pmc-s",JSON.stringify(S))}catch(e){}};
 const p=(x,d)=>{if(!isFinite(x))return"–";const v=x*100;return(v>=10?v.toFixed(1):v>=1?v.toFixed(2):v.toPrecision(2))+"%"};
 const oneIn=x=>x>0?"1 in "+Math.round(1/x).toLocaleString():"–";
-// luck: a quarter roll once, a quarter luck/2 times, half luck times, keeping the rarest
-const eff=(b,L)=>{L=Math.max(1,L);const f=l=>1-Math.pow(1-b,l);return .25*f(1)+.25*f(Math.max(1,L/2))+.5*f(L)};
+// luck (fit 11/11/26): 30% roll once, 9% about luck/8.5 times, 61% about 1.3 x luck times, keeping the rarest
+const eff=(b,L)=>{L=Math.max(1,L);const f=l=>1-Math.pow(1-b,l);return .2983*f(1)+.0885*f(Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(Math.max(1,1.3018*L))};
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
 function modShares(mbx,night,luck){const list=MODW.filter(([k])=>night||k!=="Lunar"),tot=list.reduce((a,x)=>a+x[1],0);
   const f=N=>{let a=0;const o={};list.forEach(([k,w])=>{const q=w/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-q),N);a+=q});return o};

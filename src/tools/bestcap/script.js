@@ -28,7 +28,7 @@ function fullList(loc){const b=baseLoc(loc);const own=LOC[loc]||[];let out;
   return out.length<2?[]:out}
 function shares(loc,L){const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;
   const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);
-  return list.map(x=>{const lo=c/tot,hi=(c+x.p)/tot;c+=x.p;return {m:x.m,eff:0.25*f(lo,hi,1)+0.25*f(lo,hi,Math.max(1,L/2))+0.5*f(lo,hi,Math.max(1,L))}})}
+  return list.map(x=>{const lo=c/tot,hi=(c+x.p)/tot;c+=x.p;return {m:x.m,eff:.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L))}})}
 // work out every zone once: each mineral's chance when panning at every cap value
 const ROWS=[];
 // skip a place that only lists one mineral itself (e.g. The Void): its variant row already covers it

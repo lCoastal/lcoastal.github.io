@@ -154,7 +154,7 @@ function pansFor(name){const L=Math.max(1,compute(effState()).tot.Luck||1),cap=M
     Object.keys(ULOC).forEach(loc=>{if(/^The Void/.test(loc))return;const list=uList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;
       const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);
       list.forEach(x=>{const lo=c/tot,hi=(c+x.p)/tot;c+=x.p;
-        const eff=0.25*f(lo,hi,1)+0.25*f(lo,hi,Math.max(1,L/2))+0.5*f(lo,hi,Math.max(1,L));
+        const eff=.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L));
         const per=1-Math.pow(1-eff,n);if(per>0)UPANS[x.m.n]=Math.min(UPANS[x.m.n]==null?Infinity:UPANS[x.m.n],1/per)})})}
   return UPANS[name]}
 // your pan capacity: the museum and gear feed it, so read it off your own stats
