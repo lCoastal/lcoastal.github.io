@@ -1,3 +1,6 @@
+// A luck cap gives less luck than its number: in my tests (4 zones, 12/11/26) capped sessions behaved like
+// about 63% of the cap, while uncapped sessions matched the luck shown. So a cap of C counts as C x 0.63 here.
+const CAP_EFF=0.63;
 
 const $=id=>document.getElementById(id);
 const COLS=["#3cc2a8","#f2b53a","#b880ee","#68a6f0","#f0687f","#6cc46e","#e0602f","#a3adb8"];
@@ -17,7 +20,7 @@ function effAt(loc,m,L){const k=loc+"|"+L;if(!SH[k]){const list=fullList(loc).so
   return SH[k].get(m)||0}
 const CAPS=[1,5,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000];
 // chance per mineral for one build in one zone, at its own luck or at its best cap
-function bestEff(loc,m,L){let b={eff:effAt(loc,m,L),cap:null};if(S.useCap)CAPS.forEach(c=>{if(c<L){const e=effAt(loc,m,c);if(e>b.eff*(1+1e-6))b={eff:e,cap:c}}});return b}
+function bestEff(loc,m,L){let b={eff:effAt(loc,m,L),cap:null};if(S.useCap)CAPS.forEach(c=>{if(c<L){const e=effAt(loc,m,c*CAP_EFF);if(e>b.eff*(1+1e-6))b={eff:e,cap:c}}});return b}
 const MINS=P.mins.filter(m=>Object.keys(LOC).some(l=>fullList(l).some(x=>x.m===m))).sort((a,b)=>a.n.localeCompare(b.n));
 const zonesOf=m=>Object.keys(LOC).filter(l=>fullList(l).some(x=>x.m===m)&&(LOC[l].length>1||baseLoc(l)!==l)).sort((a,b)=>a.localeCompare(b));
 const num0=v=>{const n=parseFloat(String(v).replace(/,/g,""));return n>0?n:0};

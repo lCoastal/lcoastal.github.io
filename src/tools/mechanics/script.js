@@ -17,7 +17,7 @@ function render(){
   const c=Math.max(1,+S.cap||1),q=Math.min(1,Math.max(0,(+S.pick||0)/100)),n=Math.sqrt(c),per=1-Math.pow(1-q,n);
   $("capOut").innerHTML=`About <b>${n.toFixed(1)}</b> picks per pan, so a ${p(q)} pick comes up in <b>${p(per)}</b> of pans (${oneIn(per)}).`;
   const {s,list,tot}=modShares((+S.mbp||0)/100,S.night,L),mx=Math.max(...Object.values(s));
-  $("modT").innerHTML="<tr><th>Modifier</th><th>With no boost</th><th>At your boost</th><th class='bw'></th></tr>"+[...list].reverse().map(([k,w])=>`<tr><td>${k}</td><td>${p(w/tot)}</td><td>${p(s[k])}</td><td class="bw"><div class="bar" style="width:${(s[k]/mx*100).toFixed(1)}%"></div></td></tr>`).join("")+`<tr><td colspan="4" style="font-family:var(--f-body);text-align:left;color:var(--muted)">Shares are of modified minerals. Of everything you pan, multiply by 36%.</td></tr>`;
+  $("modT").innerHTML="<tr><th>Modifier</th><th>With no boost</th><th>At your boost</th><th class='bw'></th></tr>"+[...list].reverse().map(([k,w])=>`<tr><td>${k}</td><td>${p(w/tot)}</td><td>${p(s[k])}</td><td class="bw"><div class="bar" style="width:${(s[k]/mx*100).toFixed(1)}%"></div></td></tr>`).join("")+`<tr><td colspan="4" style="font-family:var(--f-body);text-align:left;color:var(--muted)">Shares are of modified minerals. Of everything you pan, multiply by the share that gets a modifier (about 39% at 926% boost).</td></tr>`;
 }
 [["luck","luck"],["cap","cap"],["pick","pick"],["mb","mbp"]].forEach(([id,k])=>{$(id).value=S[k];$(id).addEventListener("input",()=>{S[k]=$(id).value;save();render()})});
 $("night").checked=!!S.night;$("night").onchange=()=>{S.night=$("night").checked;save();render()};

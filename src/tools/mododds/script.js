@@ -10,7 +10,11 @@ const PRICE={Perfect:24,Lunar:14,Mutated:9,Cosmic:6,Iridescent:3.5,Irradiated:2.
 const MUSE=Object.fromEntries(P.mods.map(m=>[m[0],m[1].join(", ")]));
 // share of ores that get a normal (panning) modifier: about 36% in my tests at different boosts,
 // so Modifier Boost changes which modifier you get far more than how often. Voidtorn and event modifiers come on top.
-const NAT_MOD=.36;const anyMod=()=>NAT_MOD;
+// how many ores get a normal modifier, by effective Modifier Boost (%), from my tests: about 10% at 113%,
+// 35% at 600-840% and 39% at 926%; straight lines between, held at 39% above that (higher boosts untested)
+const MODPTS=[[0,0],[113,.096],[600,.348],[926,.39]];
+const anyMod=e=>{e=Math.max(0,+e||0);for(let i=1;i<MODPTS.length;i++)if(e<=MODPTS[i][0]){const [a,pa]=MODPTS[i-1],[b,pb]=MODPTS[i];return pa+(pb-pa)*(e-a)/(b-a)}return MODPTS[MODPTS.length-1][1]};
+const NAT_MOD=anyMod(926);
 // Which modifier you get works like luck does for minerals: the game rolls the modifier several times and keeps
 // the rarest, by the game's weights. Strength = 10.1 x Modifier Boost (x) + 1 per 1,000 luck (the wiki's "every 1k
 // luck is an extra roll"), fitted on my tests with the Halloween event left out. A third of ores

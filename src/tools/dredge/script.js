@@ -1,3 +1,6 @@
+// A luck cap gives less luck than its number: in my tests (4 zones, 12/11/26) capped sessions behaved like
+// about 63% of the cap, while uncapped sessions matched the luck shown. So a cap of C counts as C x 0.63 here.
+const CAP_EFF=0.63;
 
 // luck events and autopan, shared by the luck tools: the luck you type is multiplied by these
 let LUCKX={ev:1,auto:false};try{Object.assign(LUCKX,JSON.parse(localStorage.getItem("pt-luckx")||"{}"))}catch(e){}
@@ -51,7 +54,7 @@ const pansW=x=>(x<1?"under 1 pan":(x<10?fmt(x,1):fmt(Math.round(x),0))+(Math.rou
 function bestFor(group,L,per){let best=null;
   const tryZones=voidOk=>ZONES.filter(z=>voidOk||!isVoid(z)).forEach(z=>{const fl=fullList(z);if(!group.every(g=>fl.some(x=>x.m===g.m)))return;
     const opts=[null,...CAPS.filter(c=>c<L)];
-    opts.forEach(cap=>{const Le=cap==null?L:cap;const sh=shares(z,Le);let worst=0;const its=group.map(g=>{const e=sh.get(g.m)||0;const pans=e>0?g.n/(e*per):Infinity;worst=Math.max(worst,pans);return {g,e,pans}});
+    opts.forEach(cap=>{const Le=cap==null?L:cap*CAP_EFF;const sh=shares(z,Le);let worst=0;const its=group.map(g=>{const e=sh.get(g.m)||0;const pans=e>0?g.n/(e*per):Infinity;worst=Math.max(worst,pans);return {g,e,pans}});
       if(!best||worst<best.pans*(1-1e-9)||(Math.abs(worst-best.pans)<=best.pans*1e-9&&cap==null&&best.cap!=null))best={z,cap,pans:worst,its}})});
   // The Void only when something in the group drops nowhere else
   const voidOnly=group.some(g=>!ZONES.some(z=>!isVoid(z)&&fullList(z).some(x=>x.m===g.m)));

@@ -25,6 +25,7 @@
     <p class="txt">Every zone has a drop table. With no luck, each mineral comes up at its listed chance. Luck works like extra rolls: the game rolls the table several times and keeps the <b>rarest</b> result. So luck doesn't add a flat bonus; it pushes every pick towards the rare end of the table, and common minerals get rarer as a result.</p>
     <p class="txt">My best fit so far is that about <b>30%</b> of minerals roll just once, about <b>9%</b> roll a much weaker number of times (roughly <b>luck ÷ 8.5</b>) and about <b>61%</b> roll a bit more than your <b>full luck</b>. That's why the gain slows down: going from 100 to 1,000 luck matters far more than 10,000 to 11,000 for anything that isn't very rare.</p>
     <p class="txt">The wiki's Stat Systems Guide uses a simpler split (a quarter once, a quarter at half luck, half at full luck). My tests, with over half a million minerals, fit the split above much better, especially for mid-rarity minerals like Jade and Onyx.</p>
+    <p class="txt"><b>Luck caps give less than they say.</b> In my tests across four zones, a capped session behaved like about 63% of the cap, while uncapped sessions matched the luck shown. Best Luck Cap and Dredge already account for this.</p>
     <p class="txt"><b>Events change your luck too.</b> A Meteor Shower doubles your final luck and weather events (Nimue's Blessing, Blizzard, Swamp Fog, Starfall) multiply it by 1.5, and they stack. Hallows' Eve, the Luck Totem and most other boosts add to your multiplier instead. Autopan without the Mastered enchant digs at 51% quality, which gives about two thirds of your luck. Best Luck Cap, Dredge and Luck Odds have a setting for events and autopan.</p>
     <div class="row"><label class="fld"><span class="lab">Your luck</span><input type="number" id="luck" min="1" value="1000"></label></div>
     <div class="tw"><table class="t" id="luckT"></table></div>
@@ -40,11 +41,11 @@
 
   <section class="card">
     <h2>Modifiers: how often and which one</h2>
-    <p class="txt">About <b>36%</b> of panned minerals get a normal modifier, and Modifier Boost barely changes that. What it changes is <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>10.1 per 100% Modifier Boost + 1 per 1,000 luck</b> (the luck part stops at 50), with a third of rolls once, a quarter at half strength and the rest at full strength.</p>
+    <p class="txt">How many minerals get a normal modifier rises with Modifier Boost: about <b>10%</b> at 113%, <b>35%</b> at 600–840% and <b>39%</b> at 926% in my tests. Modifier Boost also changes <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>10.1 per 100% Modifier Boost + 1 per 1,000 luck</b> (the luck part stops at 50), with a third of rolls once, a quarter at half strength and the rest at full strength.</p>
     <div class="row"><label class="fld"><span class="lab">Modifier Boost (%)</span><input type="number" id="mb" min="0" step="1" value="100"></label><label class="ck"><input type="checkbox" id="night"> Night (Lunar can roll)</label></div>
     <div class="tw"><table class="t" id="modT"></table></div>
-    <p class="note">Voidtorn, Treasured, Electrified and other event modifiers come from their own sources and sit on top of the 36%.</p>
-    <p class="note">The 36% held steady in my tests between 600% and 920% Modifier Boost. The wiki says it climbs towards 99% near 1,900% effective boost, which I haven't been able to test yet.</p>
+    <p class="note">Voidtorn, Treasured, Electrified and other event modifiers come from their own sources and sit on top of that.</p>
+    <p class="note">Above 926% Modifier Boost the rate is untested. The wiki says it climbs towards 99% near 1,900% effective boost.</p>
   </section>
 
   <section class="card">

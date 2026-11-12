@@ -1,3 +1,6 @@
+// A luck cap gives less luck than its number: in my tests (4 zones, 12/11/26) capped sessions behaved like
+// about 63% of the cap, while uncapped sessions matched the luck shown. So a cap of C counts as C x 0.63 here.
+const CAP_EFF=0.63;
 
 // luck events and autopan, shared by the luck tools: the luck you type is multiplied by these
 let LUCKX={ev:1,auto:false};try{Object.assign(LUCKX,JSON.parse(localStorage.getItem("pt-luckx")||"{}"))}catch(e){}
@@ -42,7 +45,7 @@ function shares(loc,L){const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=l
 // work out every zone once: each mineral's chance when panning at every cap value
 const ROWS=[];
 // skip a place that only lists one mineral itself (e.g. The Void): its variant row already covers it
-Object.keys(LOC).filter(loc=>LOC[loc].length>1||baseLoc(loc)!==loc).forEach(loc=>{const at=CAPS.map(L=>new Map(shares(loc,L).map(x=>[x.m,x.eff])));
+Object.keys(LOC).filter(loc=>LOC[loc].length>1||baseLoc(loc)!==loc).forEach(loc=>{const at=CAPS.map(c=>new Map(shares(loc,c*CAP_EFF).map(x=>[x.m,x.eff])));
   // a Firefly Zone variant only gets rows for the minerals it lists itself (Firefly Stone); everything else is the same as the zone's own row
   const b=baseLoc(loc);const own=b!==loc&&LOC[b]?new Set(LOC[loc].map(x=>x.m)):null;
   fullList(loc).forEach(({m})=>{if(own&&!own.has(m))return;ROWS.push({m,loc,effs:at.map(mp=>mp.get(m)||0)})})});
