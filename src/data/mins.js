@@ -1557,6 +1557,27 @@ export default [
     ],
     mu: { kg: 20, b: [["Shake Speed", 0.2]] },
   },
+  // Uranium sits before Rose Gold: when their drop chances tie (Infernal Heart) the game
+  // treats Uranium as the rarer one. Checked against test data 12/11/26.
+  {
+    n: "Uranium",
+    r: "Legendary",
+    v: "1,500,000",
+    bw: 0.3,
+    ic: "%%IMG:Mineral: Uranium%%",
+    ch: [
+      ["Infernal Heart", "0.0004421%", "1 in 226,197"],
+      ["Fortune River Delta", "0.0002736%", "1 in 365,524"],
+      ["Azuralite Oasis", "0.0002311%", "1 in 432,683"],
+      ["Fortune River", "0.0001717%", "1 in 582,422"],
+      ["The Void (when in the loot pool)", "0.0001811%", "1 in 552,084"],
+    ],
+    u: [
+      ["Mass Accumulator", "Legendary", 1, ""],
+      ["Phoenix Heart", "Mythic", 3, ""],
+    ],
+    mu: { kg: 60, b: [["Modifier Boost", 0.3]] },
+  },
   {
     n: "Rose Gold",
     r: "Legendary",
@@ -2107,25 +2128,6 @@ export default [
         ["Size Boost", 0.2],
       ],
     },
-  },
-  {
-    n: "Uranium",
-    r: "Legendary",
-    v: "1,500,000",
-    bw: 0.3,
-    ic: "%%IMG:Mineral: Uranium%%",
-    ch: [
-      ["Infernal Heart", "0.0004421%", "1 in 226,197"],
-      ["Fortune River Delta", "0.0002736%", "1 in 365,524"],
-      ["Azuralite Oasis", "0.0002311%", "1 in 432,683"],
-      ["Fortune River", "0.0001717%", "1 in 582,422"],
-      ["The Void (when in the loot pool)", "0.0001811%", "1 in 552,084"],
-    ],
-    u: [
-      ["Mass Accumulator", "Legendary", 1, ""],
-      ["Phoenix Heart", "Mythic", 3, ""],
-    ],
-    mu: { kg: 60, b: [["Modifier Boost", 0.3]] },
   },
   {
     n: "Volcanic Key",
