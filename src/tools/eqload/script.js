@@ -5,7 +5,7 @@ const MUTS=[["None",1,{}],["Silver",1.1,{}],["Gold",1.2,{}],["Diamond",1.35,{}],
 const MUT=Object.fromEntries(MUTS.map(m=>[m[0],m]));
 const MCOL={Silver:"#d6d6d6",Gold:"#ffcc33",Diamond:"#7fd8ff",Granite:"#c8a27a",Overclocked:"#6b8cff",Festive:"#ff6b6b",Sunforged:"#ffc457",Prismatic:"#ff5fd2"};
 const RHEX={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6",Ascended:"#ffd36b"};
-const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars"]);
+const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"]);
 const PCT=new Set(["Shake Speed","Size Boost","Modifier Boost","Sell Boost","Dig Speed"]);
 // slots: necklace, charm, 6 normal rings, then rings 7 and 8 (unlocked together with Robux)
 const SLOTS=[["neck","Necklace","Necklace"],["charm","Charm","Charm"],...Array.from({length:6},(_,i)=>["r"+i,"Ring "+(i+1),"Ring"]),["r6","Ring 7","Ring"],["r7","Ring 8","Ring"]];

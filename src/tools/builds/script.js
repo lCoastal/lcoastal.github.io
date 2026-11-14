@@ -302,7 +302,7 @@ ed.addEventListener("input",e=>{const t=e.target,b=getB();if(t.dataset.act==="ad
   if(/^ring6?-count-/.test(t.id)){const c=l=>(l||[]).reduce((a,x)=>a+(parseInt(x.count)||0),0);const e8=document.getElementById("cnt8"),e6=document.getElementById("cnt6");if(e8)e8.textContent=c(b.rings);if(e6)e6.textContent=c(b.rings6)}
   touch()});
 // rings the game only lets you wear one of at a time
-const ONE_ONLY=new Set(["dredge master's ring","ring of champions","ring of the stars"]);
+const ONE_ONLY=new Set(["dredge master's ring","ring of champions","ring of the stars","scarab signet","embalmer's ring","ring of ra"]);
 function enforceOneOnly(t,b){const r=t.id.match(/^(ring6?)-(count|name)-(\d+)$/);if(!r)return;const list=r[1]==="ring6"?b.rings6:b.rings;const i=+r[3];const x=list[i];if(!x)return;
   const nm=String(x.name||"").trim();if(!ONE_ONLY.has(nm.toLowerCase()))return;
   if(list.some((y,j)=>j!==i&&String(y.name||"").trim().toLowerCase()===nm.toLowerCase())){x.name="";const el=document.getElementById(r[1]+"-name-"+i);if(el)el.value="";toast(`${nm} is already in this setup, and only one can be worn at a time`);touch();return}

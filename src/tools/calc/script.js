@@ -11,7 +11,7 @@ const MULT={Common:.005,Uncommon:.0075,Rare:.0125,Epic:.02,Legendary:.03,Mythic:
 const MODS=Object.fromEntries(P.mods.map(m=>[m[0],m]));
 window.S=null;let S={pan:"",shovel:"",slots:{},mus:"board",b:{},n:{friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0},owned:false};
 window.S=S;try{const s=JSON.parse(localStorage.getItem("pcalc")||"null");if(s)S=Object.assign(S,s,{b:Object.assign({},s.b),n:Object.assign(S.n,s.n)})}catch(e){}
-{const seen=new Set();Object.keys(S.slots).sort().forEach(k=>{const v=S.slots[k];if(v&&["Dredge Master's Ring","Ring of Champions","Ring of the Stars"].includes(v.n)){if(seen.has(v.n))v.n="";else seen.add(v.n)}})}
+{const seen=new Set();Object.keys(S.slots).sort().forEach(k=>{const v=S.slots[k];if(v&&["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"].includes(v.n)){if(seen.has(v.n))v.n="";else seen.add(v.n)}})}
 window.S=S;Object.values(S.slots).forEach(v=>{if(v&&v.l==="p"){v.l="6";v.m="Prismatic"}});
 const save=()=>{try{localStorage.setItem("pcalc",JSON.stringify(S))}catch(e){}};
 const own=n=>!!(Store.get(n)||{}).own;
@@ -272,7 +272,7 @@ $("toImg").onclick=()=>{const st=effState();const r=compute(st);
 // ---- gear picker with hover preview ----
 const clone=o=>JSON.parse(JSON.stringify(o));
 // rings the game only lets you wear one of at a time
-const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars"]);
+const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"]);
 const takenElsewhere=(k,n)=>ONE_ONLY.has(n)&&SLOTDEF.some(([kk])=>kk!==k&&(S.slots[kk]||{}).n===n);
 const slotOf=k=>k==="pan"||k==="shovel"?null:SLOTDEF.find(d=>d[0]===k);
 const curName=k=>k==="pan"?S.pan:k==="shovel"?S.shovel:((S.slots[k]||{}).n||"");

@@ -53,7 +53,7 @@ $("unhide").onclick=()=>{const n=st.hidden.length;st.hidden=[];save();render();t
 $("fBp").value=st.bp;$("fBp").onchange=()=>{st.bp=$("fBp").value;save();render()};
 const BPI='<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" d="M2.5 2.5h8l3 3v8h-11z M5 6.5h6 M5 9h6 M5 11.5h4"/></svg>';
 // rings you can only wear one of at a time (always shown, not hidden with the Blueprint tag toggle)
-const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars"]);
+const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"]);
 const oneTag=x=>ONE_ONLY.has(x.n)?`<span class="one1" title="You can only wear one ${esc(x.n)} at a time, even with free ring slots">Only 1 can be worn</span>`:"";
 // the quest(s) that give an item's blueprint, from the blueprint source text ("Quest “Name” from …")
 const QUESTS=(P.x2&&P.x2.quests)||[];
@@ -124,7 +124,7 @@ function showEquip(i){
       <div class="pv">${x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):fmt(x.price)+" "+esc(x.cur)}<small>craft cost</small></div>
       <button type="button" class="btn" id="pclose">Close</button></div>
     ${x.d?`<p class="desc">${esc(x.d)}</p>`:""}
-    ${["Dredge Master's Ring","Ring of Champions","Ring of the Stars"].includes(x.n)?`<p style="margin:0;color:var(--warn);font-weight:600;font-size:13.5px">Only one can be worn at a time.</p>`:""}
+    ${["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"].includes(x.n)?`<p style="margin:0;color:var(--warn);font-weight:600;font-size:13.5px">Only one can be worn at a time.</p>`:""}
     ${x.bp?`<div class="bpbox"><b>Needs a blueprint</b>${x.bp==="Needs a blueprint"?"The wiki doesn't say where this blueprint comes from":esc(x.bp)}.</div>`:""}
     <div class="acts">${tgHtml(x.n)}<button type="button" class="btn pri" id="addCk">Add to crafting checklist</button><button type="button" class="btn" id="addCk6">Add as 6★ (2 crafts)</button></div>
     <div class="psec"><h3>Stats by star level</h3><div class="tw"><table class="st"><tr><th>Stat</th><th>5★ range</th><th>6★ range</th><th>Prismatic max</th></tr>
