@@ -362,5 +362,10 @@ export default {
     "Ring of Champions": "Eternium",
     Clockwork: "Celestium",
     "Ring of the Stars": "Celestium",
+    "Embalmer's Ring": "Eye of the Sands",
+    "Scarab Signet": "Key of Life",
+    "Nemes of the Pharaoh": "Solarium",
+    "Heart Scarab": "Feather of Ma'at",
+    "Ring of Ra": "Feather of Ma'at",
   },
 };
