@@ -234,18 +234,38 @@ export default [
     x: ["Sells the Pharaoh's Shovel and Pharaoh's Pan.", "The only place the Key of Life drops."],
   },
   {
-    rg: "Sunscorched Desert",
-    n: "Pharaoh's Tomb",
+    rg: "Pharaoh's Tomb",
+    n: "Tomb Vein I",
     t: "?",
     npc: "Chief Archaeologist",
-    d: "The inside of the Pyramid. The door opens for a Sun Seal, and one Seal lets your whole party in. The tomb collapses after a while, so get out in time.",
+    d: "The first dig spot inside the Pyramid. The door opens for a Sun Seal, and one Seal lets your whole party in. The tomb collapses after a while, so get out in time.",
     x: [
       "Sun Seal: craft it from 5 Scarab Fragments at a relic crafting station (12 h), or buy one at the stand by the door (the price rises with each one you buy in a week). You can hold 3. The Chief Archaeologist gives you the first one.",
       "Scarab Fragments turn up while digging around the desert and sometimes in treasure chests.",
       "Three dig spots: Tomb Vein I, II and III. Traps (darts, pressure plates, blades, boulders, flames) stun you; Trap Ward shortens the stun (up to −50%).",
       "Loot: Bronze, Gilded and Royal chests, Caches, jars and the Sarcophagus (guaranteed blueprint after 20 opens without one). Drops include the 4 tomb equipment blueprints, the Ring of Ra Blueprint, Scarab Catalysts (Sunforged mutation), Feather of Ma'at, Midas Enchant Books and Mythic Summons.",
-      "Drop rates for the new minerals aren't known yet.",
-    ],
+      "Bronze chests are near this vein."
+    ]
+  },
+  {
+    rg: "Pharaoh's Tomb",
+    n: "Tomb Vein II",
+    t: "?",
+    npc: "—",
+    d: "Deeper in the tomb. Better odds than Vein I for the tomb minerals (Blue Faience, Canopic Gold, Ushabti) and the rarer desert ones.",
+    x: [
+      "Gilded chests and Cache II are near this vein; they can drop the 4 tomb equipment blueprints."
+    ]
+  },
+  {
+    rg: "Pharaoh's Tomb",
+    n: "Tomb Vein III",
+    t: "?",
+    npc: "—",
+    d: "The deepest part of the tomb, by the Sarcophagus. The only place Sky Iron and Eternal Lotus drop, and the best odds for every tomb mineral except Natron Salt, which is most common in Vein I.",
+    x: [
+      "Royal chests, Cache III and the Sarcophagus are near this vein. Only the Sarcophagus drops the Ring of Ra Blueprint (about 0.1%) and Feather of Ma'at."
+    ]
   },
   {
     rg: "Limited time",

@@ -67,6 +67,21 @@
         "1 in 6"
       ],
       [
+        "Tomb Vein I",
+        "10.1946%",
+        "1 in 10"
+      ],
+      [
+        "Tomb Vein II",
+        "9.3862%",
+        "1 in 11"
+      ],
+      [
+        "Tomb Vein III",
+        "8.5018%",
+        "1 in 12"
+      ],
+      [
         "The Void (when in the loot pool)",
         "18.1132%",
         "1 in 6"
@@ -186,6 +201,11 @@
         "1 in 2"
       ],
       [
+        "Tomb Vein I",
+        "34.8248%",
+        "1 in 3"
+      ],
+      [
         "Volcanic Springs",
         "38.3949%",
         "1 in 3"
@@ -209,6 +229,16 @@
         "North Pole",
         "27.9264%",
         "1 in 4"
+      ],
+      [
+        "Tomb Vein II",
+        "26.6829%",
+        "1 in 4"
+      ],
+      [
+        "Tomb Vein III",
+        "20.4212%",
+        "1 in 5"
       ],
       [
         "The Void (when in the loot pool)",
@@ -291,6 +321,21 @@
         "Crystal Cavern River",
         "4.2311%",
         "1 in 24"
+      ],
+      [
+        "Tomb Vein I",
+        "3.5681%",
+        "1 in 28"
+      ],
+      [
+        "Tomb Vein II",
+        "3.1287%",
+        "1 in 32"
+      ],
+      [
+        "Tomb Vein III",
+        "2.8339%",
+        "1 in 35"
       ],
       [
         "The Void (when in the loot pool)",
@@ -614,6 +659,11 @@
         "1 in 171"
       ],
       [
+        "Tomb Vein III",
+        "0.5101%",
+        "1 in 196"
+      ],
+      [
         "Abyssal Depth",
         "0.4847%",
         "1 in 206"
@@ -637,6 +687,16 @@
         "Crystal Cavern River",
         "0.4231%",
         "1 in 236"
+      ],
+      [
+        "Tomb Vein II",
+        "0.4172%",
+        "1 in 240"
+      ],
+      [
+        "Tomb Vein I",
+        "0.2549%",
+        "1 in 392"
       ],
       [
         "The Void (when in the loot pool)",
@@ -747,6 +807,16 @@
         "1 in 14,771,421"
       ],
       [
+        "Tomb Vein III",
+        "0.000004534%",
+        "1 in 22,054,255"
+      ],
+      [
+        "Tomb Vein II",
+        "0.000002607%",
+        "1 in 38,354,096"
+      ],
+      [
         "Sandstone Stream",
         "0.000001655%",
         "1 in 60,409,689"
@@ -760,6 +830,11 @@
         "Mystic Floodplains",
         "0.000001653%",
         "1 in 60,509,689"
+      ],
+      [
+        "Tomb Vein I",
+        "0.000001631%",
+        "1 in 61,306,909"
       ],
       [
         "The Void (when in the loot pool)",
@@ -1114,6 +1189,16 @@
     "ic": "%%IMG:Mineral: Emerald%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.01134%",
+        "1 in 8,822"
+      ],
+      [
+        "Tomb Vein II",
+        "0.005215%",
+        "1 in 19,177"
+      ],
+      [
         "Fortune River",
         "0.004579%",
         "1 in 21,841"
@@ -1147,6 +1232,11 @@
         "Haunted Creek",
         "0.003458%",
         "1 in 28,918"
+      ],
+      [
+        "Tomb Vein I",
+        "0.003058%",
+        "1 in 32,697"
       ],
       [
         "Abyssal Depth",
@@ -1549,6 +1639,21 @@
     "ic": "%%IMG:Mineral: Cinnabar%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.007368%",
+        "1 in 13,572"
+      ],
+      [
+        "Tomb Vein II",
+        "0.003650%",
+        "1 in 27,396"
+      ],
+      [
+        "Tomb Vein I",
+        "0.001784%",
+        "1 in 56,052"
+      ],
+      [
         "Infernal Heart",
         "0.0002210%",
         "1 in 452,393"
@@ -1743,6 +1848,21 @@
     "ic": "%%IMG:Mineral: Fire Opal%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.007935%",
+        "1 in 12,602"
+      ],
+      [
+        "Tomb Vein II",
+        "0.004172%",
+        "1 in 23,971"
+      ],
+      [
+        "Tomb Vein I",
+        "0.002039%",
+        "1 in 49,046"
+      ],
+      [
         "Volcanic Springs",
         "0.0004388%",
         "1 in 227,895"
@@ -1888,6 +2008,11 @@
         "1 in 364,632"
       ],
       [
+        "Tomb Vein III",
+        "0.0001417%",
+        "1 in 705,736"
+      ],
+      [
         "Fortune River",
         "0.0001145%",
         "1 in 873,633"
@@ -1898,6 +2023,11 @@
         "1 in 959,149"
       ],
       [
+        "Tomb Vein II",
+        "0.00007822%",
+        "1 in 1,278,470"
+      ],
+      [
         "Lifespring Oasis",
         "0.00005164%",
         "1 in 1,936,306"
@@ -1906,6 +2036,11 @@
         "Mystic Floodplains",
         "0.00005164%",
         "1 in 1,936,310"
+      ],
+      [
+        "Tomb Vein I",
+        "0.00005097%",
+        "1 in 1,961,821"
       ],
       [
         "The Void (when in the loot pool)",
@@ -2447,6 +2582,11 @@
     "ic": "%%IMG:Mineral: Bone%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.01417%",
+        "1 in 7,057"
+      ],
+      [
         "Rotwood Swamp",
         "0.01085%",
         "1 in 9,217"
@@ -2460,6 +2600,16 @@
         "Haunted Creek",
         "0.008645%",
         "1 in 11,567"
+      ],
+      [
+        "Tomb Vein II",
+        "0.007822%",
+        "1 in 12,785"
+      ],
+      [
+        "Tomb Vein I",
+        "0.005097%",
+        "1 in 19,618"
       ],
       [
         "The Void (when in the loot pool)",
@@ -2553,6 +2703,16 @@
     "ic": "%%IMG:Mineral: Electrum%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "5.6678%",
+        "1 in 18"
+      ],
+      [
+        "Tomb Vein II",
+        "4.1717%",
+        "1 in 24"
+      ],
+      [
         "Starfall River",
         "2.7127%",
         "1 in 37"
@@ -2595,6 +2755,11 @@
       [
         "Sandstone Stream",
         "2.5865%",
+        "1 in 39"
+      ],
+      [
+        "Tomb Vein I",
+        "2.5487%",
         "1 in 39"
       ],
       [
@@ -3044,6 +3209,16 @@
     "ic": "%%IMG:Mineral: Aetherium%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.000001700%",
+        "1 in 58,811,348"
+      ],
+      [
+        "Tomb Vein II",
+        "0.0000009386%",
+        "1 in 106,539,155"
+      ],
+      [
         "Sandstone Stream",
         "0.0000005690%",
         "1 in 175,737,277"
@@ -3057,6 +3232,11 @@
         "Mystic Floodplains",
         "0.0000005681%",
         "1 in 176,028,187"
+      ],
+      [
+        "Tomb Vein I",
+        "0.0000005607%",
+        "1 in 178,347,373"
       ],
       [
         "Meteor Falls",
@@ -3136,6 +3316,16 @@
     "ic": "%%IMG:Mineral: Agate%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.000001247%",
+        "1 in 80,197,293"
+      ],
+      [
+        "Tomb Vein II",
+        "0.0000007300%",
+        "1 in 136,978,913"
+      ],
+      [
         "Sandstone Stream",
         "0.0000004656%",
         "1 in 214,790,006"
@@ -3149,6 +3339,11 @@
         "Mystic Floodplains",
         "0.0000004648%",
         "1 in 215,145,561"
+      ],
+      [
+        "Tomb Vein I",
+        "0.0000004588%",
+        "1 in 217,980,122"
       ],
       [
         "The Void (when in the loot pool)",
@@ -3187,6 +3382,21 @@
     "bw": 0.25,
     "ic": "%%IMG:Mineral: Eye of the Sands%%",
     "ch": [
+      [
+        "Tomb Vein III",
+        "0.00000001474%",
+        "1 in 6,785,924,751"
+      ],
+      [
+        "Tomb Vein II",
+        "0.000000008343%",
+        "1 in 11,985,654,892"
+      ],
+      [
+        "Tomb Vein I",
+        "0.000000005097%",
+        "1 in 19,618,211,025"
+      ],
       [
         "Mystic Floodplains",
         "0.000000003615%",
@@ -3357,6 +3567,21 @@
         "1 in 6"
       ],
       [
+        "Tomb Vein I",
+        "7.6460%",
+        "1 in 13"
+      ],
+      [
+        "Tomb Vein II",
+        "7.3004%",
+        "1 in 14"
+      ],
+      [
+        "Tomb Vein III",
+        "6.8014%",
+        "1 in 15"
+      ],
+      [
         "The Void (when in the loot pool)",
         "18.1132%",
         "1 in 6"
@@ -3396,6 +3621,11 @@
         "1 in 5"
       ],
       [
+        "Tomb Vein III",
+        "14.7364%",
+        "1 in 7"
+      ],
+      [
         "Lifespring Oasis",
         "12.9112%",
         "1 in 8"
@@ -3409,6 +3639,16 @@
         "Sandstone Stream",
         "12.9325%",
         "1 in 8"
+      ],
+      [
+        "Tomb Vein II",
+        "12.5150%",
+        "1 in 8"
+      ],
+      [
+        "Tomb Vein I",
+        "10.1946%",
+        "1 in 10"
       ],
       [
         "The Void (when in the loot pool)",
@@ -3525,6 +3765,21 @@
         "Windswept Beach",
         "24.0936%",
         "1 in 4"
+      ],
+      [
+        "Tomb Vein I",
+        "19.3698%",
+        "1 in 5"
+      ],
+      [
+        "Tomb Vein II",
+        "19.8154%",
+        "1 in 5"
+      ],
+      [
+        "Tomb Vein III",
+        "19.2707%",
+        "1 in 5"
       ],
       [
         "The Void (when in the loot pool)",
@@ -3698,6 +3953,21 @@
         "1 in 29"
       ],
       [
+        "Tomb Vein III",
+        "2.8339%",
+        "1 in 35"
+      ],
+      [
+        "Tomb Vein II",
+        "2.6073%",
+        "1 in 38"
+      ],
+      [
+        "Tomb Vein I",
+        "2.0389%",
+        "1 in 49"
+      ],
+      [
         "Enchanted Ruins",
         "1.1674%",
         "1 in 86"
@@ -3777,6 +4047,21 @@
         "Windswept Beach",
         "1.2047%",
         "1 in 83"
+      ],
+      [
+        "Tomb Vein III",
+        "1.1336%",
+        "1 in 88"
+      ],
+      [
+        "Tomb Vein II",
+        "1.0429%",
+        "1 in 96"
+      ],
+      [
+        "Tomb Vein I",
+        "0.7646%",
+        "1 in 131"
       ],
       [
         "Rotwood Swamp",
@@ -3929,6 +4214,16 @@
     "ic": "%%IMG:Mineral: Ruby%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "2.8339%",
+        "1 in 35"
+      ],
+      [
+        "Tomb Vein II",
+        "1.8251%",
+        "1 in 55"
+      ],
+      [
         "Lifespring Oasis",
         "1.0329%",
         "1 in 97"
@@ -3942,6 +4237,11 @@
         "Sandstone Stream",
         "1.0346%",
         "1 in 97"
+      ],
+      [
+        "Tomb Vein I",
+        "1.0195%",
+        "1 in 98"
       ],
       [
         "Rubble Creek Sands",
@@ -4015,6 +4315,21 @@
         "Astral Caverns",
         "0.5200%",
         "1 in 192"
+      ],
+      [
+        "Tomb Vein III",
+        "0.5101%",
+        "1 in 196"
+      ],
+      [
+        "Tomb Vein II",
+        "0.4693%",
+        "1 in 213"
+      ],
+      [
+        "Tomb Vein I",
+        "0.3058%",
+        "1 in 327"
       ],
       [
         "Rubble Creek Deposits",
@@ -4140,6 +4455,16 @@
     "ic": "%%IMG:Mineral: Peridot%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "1.4170%",
+        "1 in 71"
+      ],
+      [
+        "Tomb Vein II",
+        "0.9386%",
+        "1 in 107"
+      ],
+      [
         "Sandstone Stream",
         "0.5173%",
         "1 in 193"
@@ -4153,6 +4478,11 @@
         "Mystic Floodplains",
         "0.5164%",
         "1 in 194"
+      ],
+      [
+        "Tomb Vein I",
+        "0.5097%",
+        "1 in 196"
       ],
       [
         "Infernal Heart",
@@ -4211,6 +4541,16 @@
     "ic": "%%IMG:Mineral: Onyx%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.2834%",
+        "1 in 353"
+      ],
+      [
+        "Tomb Vein II",
+        "0.1825%",
+        "1 in 548"
+      ],
+      [
         "Infernal Heart",
         "0.1474%",
         "1 in 679"
@@ -4259,6 +4599,11 @@
         "Mystic Floodplains",
         "0.1033%",
         "1 in 968"
+      ],
+      [
+        "Tomb Vein I",
+        "0.1019%",
+        "1 in 981"
       ],
       [
         "Seashell Beach",
@@ -4924,6 +5269,21 @@
         "1 in 1,933"
       ],
       [
+        "Tomb Vein III",
+        "0.04534%",
+        "1 in 2,205"
+      ],
+      [
+        "Tomb Vein II",
+        "0.04172%",
+        "1 in 2,397"
+      ],
+      [
+        "Tomb Vein I",
+        "0.02549%",
+        "1 in 3,924"
+      ],
+      [
         "Timelocked Sanctuary",
         "0.002713%",
         "1 in 36,865"
@@ -5128,6 +5488,21 @@
     "bw": 0.2,
     "ic": "%%IMG:Mineral: Rose Gold%%",
     "ch": [
+      [
+        "Tomb Vein III",
+        "0.009069%",
+        "1 in 11,027"
+      ],
+      [
+        "Tomb Vein II",
+        "0.004693%",
+        "1 in 21,308"
+      ],
+      [
+        "Tomb Vein I",
+        "0.002549%",
+        "1 in 39,236"
+      ],
       [
         "Enchanted Ruins",
         "0.001459%",
@@ -5708,6 +6083,16 @@
     "ic": "%%IMG:Mineral: Mercury%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.008502%",
+        "1 in 11,762"
+      ],
+      [
+        "Tomb Vein II",
+        "0.005215%",
+        "1 in 19,177"
+      ],
+      [
         "Sandstone Stream",
         "0.003621%",
         "1 in 27,616"
@@ -5721,6 +6106,11 @@
         "Mystic Floodplains",
         "0.003615%",
         "1 in 27,662"
+      ],
+      [
+        "Tomb Vein I",
+        "0.003568%",
+        "1 in 28,026"
       ],
       [
         "Meteor Falls",
@@ -6114,6 +6504,16 @@
     "ic": "%%IMG:Mineral: Meteoric Gold%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.002834%",
+        "1 in 35,287"
+      ],
+      [
+        "Tomb Vein II",
+        "0.001564%",
+        "1 in 63,923"
+      ],
+      [
         "Starfall River",
         "0.001085%",
         "1 in 92,160"
@@ -6137,6 +6537,11 @@
         "Mystic Floodplains",
         "0.001033%",
         "1 in 96,816"
+      ],
+      [
+        "Tomb Vein I",
+        "0.001019%",
+        "1 in 98,091"
       ],
       [
         "The Void (when in the loot pool)",
@@ -6199,6 +6604,16 @@
     "ic": "%%IMG:Mineral: Sandsteel%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.4534%",
+        "1 in 221"
+      ],
+      [
+        "Tomb Vein II",
+        "0.2607%",
+        "1 in 384"
+      ],
+      [
         "Mystic Floodplains",
         "0.1549%",
         "1 in 645"
@@ -6207,6 +6622,11 @@
         "Lifespring Oasis",
         "0.1549%",
         "1 in 645"
+      ],
+      [
+        "Tomb Vein I",
+        "0.1529%",
+        "1 in 654"
       ],
       [
         "Sandstone Stream",
@@ -6238,6 +6658,16 @@
     "ic": "%%IMG:Mineral: Selenite%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.1700%",
+        "1 in 588"
+      ],
+      [
+        "Tomb Vein II",
+        "0.1043%",
+        "1 in 959"
+      ],
+      [
         "Lifespring Oasis",
         "0.06197%",
         "1 in 1,614"
@@ -6246,6 +6676,11 @@
         "Mystic Floodplains",
         "0.06197%",
         "1 in 1,614"
+      ],
+      [
+        "Tomb Vein I",
+        "0.06117%",
+        "1 in 1,635"
       ],
       [
         "The Void (when in the loot pool)",
@@ -6272,6 +6707,16 @@
     "ic": "%%IMG:Mineral: Jasper%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.001417%",
+        "1 in 70,574"
+      ],
+      [
+        "Tomb Vein II",
+        "0.0007822%",
+        "1 in 127,847"
+      ],
+      [
         "Sandstone Stream",
         "0.0005173%",
         "1 in 193,311"
@@ -6285,6 +6730,11 @@
         "Lifespring Oasis",
         "0.0005164%",
         "1 in 193,631"
+      ],
+      [
+        "Tomb Vein I",
+        "0.0005097%",
+        "1 in 196,182"
       ],
       [
         "The Void (when in the loot pool)",
@@ -6310,6 +6760,21 @@
     "bw": 0.2,
     "ic": "%%IMG:Mineral: Key of Life%%",
     "ch": [
+      [
+        "Tomb Vein III",
+        "0.000000007368%",
+        "1 in 13,571,849,501"
+      ],
+      [
+        "Tomb Vein II",
+        "0.000000004172%",
+        "1 in 23,971,309,784"
+      ],
+      [
+        "Tomb Vein I",
+        "0.000000002549%",
+        "1 in 39,236,422,049"
+      ],
       [
         "Lifespring Oasis",
         "0.000000001549%",
@@ -6353,6 +6818,21 @@
     "bw": 0.2,
     "ic": "%%IMG:Mineral: Solarium%%",
     "ch": [
+      [
+        "Tomb Vein III",
+        "0.00000004534%",
+        "1 in 2,205,425,544"
+      ],
+      [
+        "Tomb Vein II",
+        "0.00000002607%",
+        "1 in 3,835,409,565"
+      ],
+      [
+        "Tomb Vein I",
+        "0.00000001529%",
+        "1 in 6,539,403,675"
+      ],
       [
         "Sandstone Stream",
         "0.000000008277%",
@@ -6540,6 +7020,16 @@
         "1 in 9"
       ],
       [
+        "Tomb Vein III",
+        "10.2021%",
+        "1 in 10"
+      ],
+      [
+        "Tomb Vein II",
+        "7.8219%",
+        "1 in 13"
+      ],
+      [
         "Lifespring Oasis",
         "5.1645%",
         "1 in 19"
@@ -6553,6 +7043,11 @@
         "Sandstone Stream",
         "5.1730%",
         "1 in 19"
+      ],
+      [
+        "Tomb Vein I",
+        "5.0973%",
+        "1 in 20"
       ],
       [
         "Infernal Heart",
@@ -6934,6 +7429,16 @@
     "ic": "%%IMG:Mineral: Starshine%%",
     "ch": [
       [
+        "Tomb Vein III",
+        "0.0006801%",
+        "1 in 147,028"
+      ],
+      [
+        "Tomb Vein II",
+        "0.0004172%",
+        "1 in 239,713"
+      ],
+      [
         "Sandstone Stream",
         "0.0002587%",
         "1 in 386,622"
@@ -6947,6 +7452,11 @@
         "Mystic Floodplains",
         "0.0002582%",
         "1 in 387,262"
+      ],
+      [
+        "Tomb Vein I",
+        "0.0002549%",
+        "1 in 392,364"
       ],
       [
         "Azuralite Oasis",
@@ -7319,9 +7829,19 @@
     "ic": "%%IMG:Mineral: Natron Salt%%",
     "ch": [
       [
-        "Pharaoh's Tomb",
-        "unknown",
-        "unknown"
+        "Tomb Vein I",
+        "1.0195%",
+        "1 in 98"
+      ],
+      [
+        "Tomb Vein II",
+        "0.7822%",
+        "1 in 128"
+      ],
+      [
+        "Tomb Vein III",
+        "0.5668%",
+        "1 in 176"
       ]
     ],
     "u": [
@@ -7350,9 +7870,19 @@
     "ic": "%%IMG:Mineral: Blue Faience%%",
     "ch": [
       [
-        "Pharaoh's Tomb",
-        "unknown",
-        "unknown"
+        "Tomb Vein III",
+        "0.4534%",
+        "1 in 221"
+      ],
+      [
+        "Tomb Vein II",
+        "0.3129%",
+        "1 in 320"
+      ],
+      [
+        "Tomb Vein I",
+        "0.2039%",
+        "1 in 490"
       ]
     ],
     "u": [],
@@ -7374,9 +7904,19 @@
     "ic": "%%IMG:Mineral: Scarab Amber%%",
     "ch": [
       [
-        "Pharaoh's Tomb",
-        "unknown",
-        "unknown"
+        "Tomb Vein III",
+        "0.2834%",
+        "1 in 353"
+      ],
+      [
+        "Tomb Vein II",
+        "0.1564%",
+        "1 in 639"
+      ],
+      [
+        "Tomb Vein I",
+        "0.07646%",
+        "1 in 1,308"
       ]
     ],
     "u": [
@@ -7411,9 +7951,19 @@
     "ic": "%%IMG:Mineral: Canopic Gold%%",
     "ch": [
       [
-        "Pharaoh's Tomb",
-        "unknown",
-        "unknown"
+        "Tomb Vein III",
+        "0.006801%",
+        "1 in 14,703"
+      ],
+      [
+        "Tomb Vein II",
+        "0.003129%",
+        "1 in 31,962"
+      ],
+      [
+        "Tomb Vein I",
+        "0.001529%",
+        "1 in 65,394"
       ]
     ],
     "u": [
@@ -7448,9 +7998,19 @@
     "ic": "%%IMG:Mineral: Ushabti%%",
     "ch": [
       [
-        "Pharaoh's Tomb",
-        "unknown",
-        "unknown"
+        "Tomb Vein III",
+        "0.00002834%",
+        "1 in 3,528,681"
+      ],
+      [
+        "Tomb Vein II",
+        "0.00001043%",
+        "1 in 9,588,524"
+      ],
+      [
+        "Tomb Vein I",
+        "0.000002549%",
+        "1 in 39,236,422"
       ]
     ],
     "u": [
@@ -7485,9 +8045,9 @@
     "ic": "%%IMG:Mineral: Sky Iron%%",
     "ch": [
       [
-        "Pharaoh's Tomb",
-        "unknown",
-        "unknown"
+        "Tomb Vein III",
+        "0.00001700%",
+        "1 in 5,881,135"
       ]
     ],
     "u": [
@@ -7520,9 +8080,9 @@
     "ic": "%%IMG:Mineral: Eternal Lotus%%",
     "ch": [
       [
-        "Pharaoh's Tomb",
-        "unknown",
-        "unknown"
+        "Tomb Vein III",
+        "0.0000001134%",
+        "1 in 882,170,218"
       ]
     ],
     "u": [
@@ -7559,13 +8119,7 @@
     "v": "20,000,000,000",
     "bw": 0.02,
     "ic": "%%IMG:Mineral: Feather of Ma'at%%",
-    "ch": [
-      [
-        "Pharaoh's Tomb",
-        "unknown",
-        "unknown"
-      ]
-    ],
+    "ch": [],
     "u": [
       [
         "Heart Scarab",
