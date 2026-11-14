@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 // [name, sell ×, 1 in N (0 = not from normal panning), museum stats, museum factor, how to get, appearance, colour, kind]
 const MUTS=[
 ["Perfect",24,26764,["Luck","Capacity","Size Boost"],1,"Panning, about 1 in 26,764","Cyan, with a glowing, rotating white halo around a four-pointed star","#22b8cf","Panning"],
-["Treasured",15,0,["Luck"],2,"Only from treasure chests, where every mineral is Treasured","Gold, with a soft golden sheen","#d4a017","Special"],
+["Treasured",15,0,["Luck"],2,"Only from treasure chests, where every mineral is Treasured","Gold, with a soft golden sheen","#d4a017","Special"], ["Entombed",8,0,["Luck"],2,"Only from the Pharaoh's Tomb","Teal, with a soft tomb glow","#40c8be","Special"],
 ["Lunar",14,10705,["Dig Speed","Shake Speed","Walk Speed"],1,"Panning at night only, about 1 in 10,705","Light yellow, with a spiky eight-petal flower of pulsing pink light","#e8c95a","Panning"],
 ["Voidtorn",11,0,["Luck","Capacity"],1,"Galactic Pan or Galactic Shovel, a shovel with the Voidtouched enchant, or The Void","Deep purple, cracked with glowing purple fissures","#7b3fe4","Special"],
 ["Mutated",9,2676,["Luck","Dig Strength","Modifier Boost"],1,"Panning, about 1 in 2,676","Purple, with dark purple tentacles of light always moving","#9b4dca","Panning"],

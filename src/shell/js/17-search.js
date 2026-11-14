@@ -40,6 +40,7 @@ D.locs.forEach((l) =>
 [
   "Perfect",
   "Treasured",
+  "Entombed",
   "Lunar",
   "Voidtorn",
   "Mutated",
