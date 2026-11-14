@@ -1,7 +1,7 @@
 // "Reset this tool": puts one tool's inputs and view back to default. Saved builds, loadouts, boards and lists stay.
 const PT_RESET = {
   builds: { keys: ["pbs-current", "pbs-fold", "pbs-hidep", "pbs-rings", "pbs-view"], what: "the open sheet and view (saved builds stay)" },
-  boosts: { keys: ["mb-incmut", "mb-stat"] },
+  boosts: { keys: ["mb-incmut", "mb-stat", "mb-zone"] },
   minerals: { keys: ["pm-filters"] },
   locations: { keys: ["pl-loc", "pl-tcopy"] },
   pans: { keys: ["pg-pans"] },

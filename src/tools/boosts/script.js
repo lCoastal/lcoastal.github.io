@@ -1,4 +1,11 @@
 
+// zone filter: which zones each mineral drops in, from the shared mineral data
+const baseZone=n=>String(n).replace(/\s*\((inside|outside) Firefly Zones\)/,"").replace(/\s*\(when in the loot pool\)/,"");
+const ZONES=(()=>{const m={};try{(window.parent.PTDATA.mins||[]).forEach(x=>(x.ch||[]).forEach(c=>(m[x.n.toLowerCase()]=m[x.n.toLowerCase()]||new Set()).add(baseZone(c[0]))))}catch(e){}return m})();
+const ZLIST=(()=>{let locs=[];try{locs=window.parent.PTDATA.locs||[]}catch(e){}const all=new Set(Object.values(ZONES).flatMap(s=>[...s]));
+  const groups=[];const seen=new Set();locs.forEach(l=>{if(!all.has(l.n)||seen.has(l.n))return;seen.add(l.n);let g=groups.find(x=>x.rg===l.rg);if(!g)groups.push(g={rg:l.rg,z:[]});g.z.push(l.n)});
+  const rest=[...all].filter(z=>!seen.has(z)).sort();if(rest.length)groups.push({rg:"Other",z:rest});return groups})();
+const inZone=(name,z)=>!z||(ZONES[name.toLowerCase()]||new Set()).has(z);
 const ICONS=(()=>{try{return Object.fromEntries((window.parent.PTDATA.mins||[]).filter(m=>m.ic).map(m=>[m.n,m.ic]))}catch(e){return {}}})();
 
 const SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
@@ -24,7 +31,7 @@ const MODS=[
   document.getElementById("mods").innerHTML=`<table><thead><tr><th>Modifier</th><th>Boosts</th>${R.map(r=>`<th class="w" style="color:var(--c-${r.toLowerCase()})">${r}</th>`).join("")}<th>How to get</th></tr></thead><tbody>${MODS.map(([m,s,k,h])=>`<tr><td class="n">${m}</td><td class="s">${s}</td>${R.map(r=>`<td class="w">${f(MULT[r]*k)}</td>`).join("")}<td class="h">${h}</td></tr>`).join("")}</tbody></table>`;
 })();
 const STATS=["All","Luck","Size Boost","Modifier Boost","Sell Boost","Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed","Walk Speed"];
-let stat="All",q="",rev=false;
+let stat="All",q="",rev=false,zone="";
 try{const s=localStorage.getItem("mb-stat");if(s&&STATS.includes(s))stat=s;}catch(e){}
 const chips=document.getElementById("chips");
 STATS.forEach(s=>{const b=document.createElement("button");b.type="button";b.className="chip pt-k"+(s==="All"?" pt-any":"");if(s!=="All"&&window.ptK)b.style.setProperty("--kc",ptK(s));b.id="chip-"+s.replace(/\s/g,"");b.textContent=s;b.onclick=()=>{stat=s;try{localStorage.setItem("mb-stat",s)}catch(e){}render()};chips.appendChild(b)});
@@ -32,11 +39,17 @@ const dirB=document.createElement("button");dirB.type="button";dirB.className="c
 const incL=document.createElement("label");incL.className="incm";incL.dataset.ptopt="1";incL.title="Add the mutations table under the minerals in the saved image";incL.innerHTML='<input type="checkbox" id="incMut"> Include mutations';chips.appendChild(incL);
 const incMut=incL.querySelector("input");try{incMut.checked=localStorage.getItem("mb-incmut")==="1"}catch(e){}incMut.onchange=()=>{try{localStorage.setItem("mb-incmut",incMut.checked?"1":"0")}catch(e){}};
 const imgB=document.createElement("button");imgB.type="button";imgB.className="chip img";imgB.id="toImg";imgB.textContent="Save as image";chips.appendChild(imgB);
+const zoneSel=document.getElementById("zone");
+zoneSel.innerHTML='<option value="">All zones</option>'+ZLIST.map(g=>`<optgroup label="${g.rg}">${g.z.map(z=>`<option value="${z.replace(/"/g,"&quot;")}">${z}</option>`).join("")}</optgroup>`).join("");
+try{const z=localStorage.getItem("mb-zone");if(z&&ZLIST.some(g=>g.z.includes(z)))zone=z}catch(e){}
+zoneSel.value=zone;
+zoneSel.addEventListener("change",()=>{zone=zoneSel.value;try{localStorage.setItem("mb-zone",zone)}catch(e){}render()});
+window.ptBoostsZone=z=>{zone=ZLIST.some(g=>g.z.includes(z))?z:"";zoneSel.value=zone;render()};
 document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();render()});
 const fmt=v=>(v<0?"−":"+")+Math.abs(v)+"×";
 const rc=r=>"var(--c-"+r.toLowerCase()+")";
 // the minerals one rarity shows with the current search, stat filter and sort
-function rarityRows(r){let rows=D.filter(d=>d[1]===r&&(!q||d[0].toLowerCase().includes(q)));
+function rarityRows(r){let rows=D.filter(d=>d[1]===r&&(!q||d[0].toLowerCase().includes(q))&&inZone(d[0],zone));
   if(stat!=="All")rows=rows.filter(d=>d[3].some(([s,v])=>s===stat&&v>0));
   const val=d=>stat==="All"?Math.max(...d[3].map(x=>x[1])):d[3].find(x=>x[0]===stat)[1];
   rows.sort((a,b)=>val(b)-val(a)||a[2]-b[2]||a[0].localeCompare(b[0]));
@@ -51,7 +64,7 @@ function render(){
     const {rows,best,val}=rarityRows(r);
     const sec=document.createElement("section");sec.style.setProperty("--rc",rc(r));
     sec.innerHTML=`<div class="rh"><h2>${r}</h2><span>${SLOTS[r]} museum slot${SLOTS[r]>1?"s":""} · ${rows.length} mineral${rows.length===1?"":"s"}</span></div>`;
-    if(!rows.length){const p=document.createElement("p");p.className="empty";p.textContent=stat==="All"?"No matches.":`No ${r} mineral boosts ${stat}.`;sec.appendChild(p);list.appendChild(sec);return}
+    if(!rows.length){const p=document.createElement("p");p.className="empty";p.textContent=stat==="All"?(zone?`No ${r} minerals drop in ${zone}.`:"No matches."):`No ${r} mineral${zone?" from "+zone:""} boosts ${stat}.`;sec.appendChild(p);list.appendChild(sec);return}
     const tw=document.createElement("div");tw.className="tw";
     tw.innerHTML=`<table><thead><tr><th>Mineral</th><th>Max boost</th><th class="w">Max boost at</th></tr></thead><tbody>${rows.map(d=>`<tr class="${best!==null&&val(d)===best?"top":""}"><td class="n" data-mineral="${d[0]}"><span class="mn">${ICONS[d[0]]?`<img src="${ICONS[d[0]]}" alt="" width="26" height="26" loading="lazy">`:""}${d[0]}</span></td><td><div class="b">${d[3].map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fmt(v)}</em></span>`).join("")}</div></td><td class="w">${d[2]} kg</td></tr>`).join("")}</tbody></table>`;
     sec.appendChild(tw);list.appendChild(sec);
@@ -60,7 +73,7 @@ function render(){
 // ---- save as image: what's shown (search, stat and sort included), rarities in two balanced columns, mutations underneath ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 const IMGC={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6"};
-const imgTitle=()=>stat==="All"?"Mineral max boosts":"Max "+stat+" boosts";
+const imgTitle=()=>(stat==="All"?"Mineral max boosts":"Max "+stat+" boosts")+(zone?" · "+zone:"");
 async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
   const W=1700,PAD=40,GAP=30,CW=(W-PAD*2-GAP)/2;
   const meas=document.createElement("canvas").getContext("2d");
@@ -85,7 +98,7 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(imgTitle(),PAD,PAD+30);
-  const n=secs.reduce((t,s)=>t+s.rows.length,0);const sub=[`${n} mineral${n===1?"":"s"}`];if(q)sub.push(`matching "${q}"`);if(stat!=="All")sub.push(rev?"weakest first":"strongest first, best in each rarity marked");
+  const n=secs.reduce((t,s)=>t+s.rows.length,0);const sub=[`${n} mineral${n===1?"":"s"}`];if(zone)sub.push(`that drop in ${zone}`);if(q)sub.push(`matching "${q}"`);if(stat!=="All")sub.push(rev?"weakest first":"strongest first, best in each rarity marked");
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(" · "),PAD,PAD+58);
   const icons={};await Promise.all(secs.flatMap(s=>s.rows.map(o=>img(ICONS[o.d[0]]).then(i=>icons[o.d[0]]=i))));
   cols.forEach((list,ci)=>{const x0=PAD+ci*(CW+GAP);let y=HEAD;
@@ -117,7 +130,7 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
       c.font=`12.5px ${F}`;c.fillStyle="#98a2ad";h.forEach((l,li)=>c.fillText(l,x0+12+150+300+7*92+12,mid+5+li*17));y+=rh})}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptBoostsImage=boostsImage;
-imgB.onclick=async()=>{let blob=null;try{blob=await boostsImage()}catch(e){console.error(e)}if(!blob){toast("Nothing to save. Change the search or the stat filter.");return}
-  const nm=(stat==="All"?"Mineral boosts":stat+" boosts")+".png";
+imgB.onclick=async()=>{let blob=null;try{blob=await boostsImage()}catch(e){console.error(e)}if(!blob){toast("Nothing to save. Change the search, zone or stat filter.");return}
+  const nm=(stat==="All"?"Mineral boosts":stat+" boosts")+(zone?" - "+zone.replace(/[\\/:*?"<>|]/g,""):"")+".png";
   try{await window.parent.ptSave(nm,blob);toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}};
 render();

@@ -19,7 +19,9 @@ h1{font-family:var(--f-display);font-size:2rem;line-height:1.1;margin:0;text-wra
 .lede{color:var(--muted);margin:6px 0 0;max-width:65ch}
 .controls{display:flex;flex-direction:column;gap:10px}
 .search{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);font:inherit}
-.search:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.frow{display:flex;gap:8px;flex-wrap:wrap}.frow .search{flex:1 1 240px;width:auto}
+.zone{flex:0 1 260px;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);font:inherit}
+.search:focus-visible,.zone:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font:500 12.5px var(--f-body);padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
 .chip.dirb{display:inline-flex;gap:5px;align-items:center}
