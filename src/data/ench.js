@@ -165,6 +165,12 @@ export default {
     { n: "Granite", x: 1.36, a: { "Dig Strength": 24, "Shake Strength": 6 } },
     { n: "Overclocked", x: 1.36, a: { "Dig Speed": 10, "Shake Speed": 10 } },
     { n: "Festive", x: 1.4, a: { Luck: 50, "Size Boost": 10 }, ev: "Festive Catalyst / Candy Cane event" },
+    {
+      n: "Sunforged",
+      x: 1.5,
+      a: { Luck: 300, "Sell Boost": 30 },
+      ev: "Scarab Catalyst only (Royal chests and the Sarcophagus in the Pharaoh's Tomb)",
+    },
     { n: "Prismatic", x: 1.6, a: {}, ev: "also via Prismatic Catalyst" },
   ],
   chances: {

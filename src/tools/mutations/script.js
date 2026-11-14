@@ -2,7 +2,7 @@
 const $=id=>document.getElementById(id);
 const X=P.ench||{pan:[],shovel:[],muts:[],chances:{},cat:{}};
 const PCTS=new Set(["Shake Speed","Size Boost","Modifier Boost","Sell Boost"]);
-const MC={Silver:"#a9b4be",Gold:"#d9a520",Diamond:"#5fc8e8",Granite:"#8d8d86",Overclocked:"#e0602f",Festive:"#d23c3c",Prismatic:"#c05bd8"};
+const MC={Silver:"#a9b4be",Gold:"#d9a520",Diamond:"#5fc8e8",Granite:"#8d8d86",Overclocked:"#e0602f",Festive:"#d23c3c",Sunforged:"#e8a93a",Prismatic:"#c05bd8"};
 // tabs
 const TABS=[["mut","p-mut"],["pan","p-pan"],["sh","p-sh"]];
 let tab="mut";try{tab=localStorage.getItem("pmu-tab")||"mut"}catch(e){}

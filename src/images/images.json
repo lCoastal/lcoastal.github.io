@@ -262,5 +262,18 @@
   ["Sluice: Pharaoh's Sluice","sluice/pharaohs-sluice.webp"],
   ["Sluice: Starblossom Sluice","sluice/starblossom-sluice.webp"],
   ["Sluice: Steel Sluice Box","sluice/steel-sluice-box.webp"],
-  ["Sluice: Wood Sluice Box","sluice/wood-sluice-box.webp"]
+  ["Sluice: Wood Sluice Box","sluice/wood-sluice-box.webp"],
+  ["Mineral: Natron Salt","mineral/natron-salt.webp"],
+  ["Mineral: Blue Faience","mineral/blue-faience.webp"],
+  ["Mineral: Scarab Amber","mineral/scarab-amber.webp"],
+  ["Mineral: Canopic Gold","mineral/canopic-gold.webp"],
+  ["Mineral: Ushabti","mineral/ushabti.webp"],
+  ["Mineral: Sky Iron","mineral/sky-iron.webp"],
+  ["Mineral: Eternal Lotus","mineral/eternal-lotus.webp"],
+  ["Mineral: Feather of Ma'at","mineral/feather-of-maat.webp"],
+  ["Equipment: Scarab Signet","equipment/scarab-signet.webp"],
+  ["Equipment: Embalmer's Ring","equipment/embalmers-ring.webp"],
+  ["Equipment: Heart Scarab","equipment/heart-scarab.webp"],
+  ["Equipment: Nemes of the Pharaoh","equipment/nemes-of-the-pharaoh.webp"],
+  ["Equipment: Ring of Ra","equipment/ring-of-ra.webp"]
 ]

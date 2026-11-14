@@ -27,6 +27,7 @@ export default {
   "Sandstone Stream": { luck: null, level: null, access: null },
   "Mystic Floodplains": { luck: null, level: null, access: null },
   "Lifespring Oasis": { luck: null, level: null, access: null },
+  "Pharaoh's Tomb": { luck: null, level: null, access: "Sun Seal" },
   "The Void": { luck: null, level: null, access: null },
   "Haunted Creek": { luck: null, level: null, access: null },
   "North Pole": { luck: null, level: null, access: null },

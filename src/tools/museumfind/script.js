@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 const ORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"],SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
 const MULT={Common:.005,Uncommon:.0075,Rare:.0125,Epic:.02,Legendary:.03,Mythic:.05,Exotic:.08};
 const STATS=["Luck","Size Boost","Sell Boost","Capacity","Modifier Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Walk Speed"];
-let S={w:{Luck:5},own:false,skip:[],mods:P.mods.map(m=>m[0]).filter(n=>!["Treasured","Electrified","Crystalline","Voidtorn","Lunar"].includes(n))};
+let S={w:{Luck:5},own:false,skip:[],mods:P.mods.map(m=>m[0]).filter(n=>!["Treasured","Entombed","Electrified","Crystalline","Voidtorn","Lunar"].includes(n))};
 try{const s=JSON.parse(localStorage.getItem("pmf-s")||"null");if(s&&s.w)S=Object.assign(S,s)}catch(e){}
 // Perfect is on by default now: switch it on once for older saves
 if(!S.perf){S.perf=1;if(!S.mods.includes("Perfect"))S.mods.push("Perfect")}

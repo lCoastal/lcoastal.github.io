@@ -2,6 +2,7 @@ export default [
   ["None", [], 1, ""],
   ["Perfect", ["Luck", "Capacity", "Size Boost"], 1, "~1 in 26,764"],
   ["Treasured", ["Luck"], 2, "Treasure chests only"],
+  ["Entombed", ["Luck"], 2, "Pharaoh's Tomb only"],
   ["Lunar", ["Dig Speed", "Shake Speed", "Walk Speed"], 1, "Night only, ~1 in 10,705"],
   ["Voidtorn", ["Luck", "Capacity"], 1, "The Void / Galactic tools / Voidtouched"],
   ["Mutated", ["Luck", "Dig Strength", "Modifier Boost"], 1, "~1 in 2,676"],

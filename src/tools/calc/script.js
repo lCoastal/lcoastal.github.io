@@ -4,7 +4,7 @@ const G=P.gear;const EQ=P.equip;const EQB=Object.fromEntries(EQ.map(x=>[x.n,x]))
 const STATS=["Luck","Capacity","Shake Strength","Shake Speed","Dig Strength","Dig Speed","Size Boost","Modifier Boost","Sell Boost","Inventory Size","Walk Speed","Toughness"];
 const PCT=new Set(["Shake Speed","Dig Speed","Size Boost","Modifier Boost","Sell Boost"]);
 const SLOTDEF=[["neck","Necklace","Necklace"],["charm","Charm","Charm"],...Array.from({length:8},(_,i)=>["r"+i,"Ring "+(i+1),"Ring"])];
-const MUTS=[["None",1,{}],["Silver",1.1,{}],["Gold",1.2,{}],["Diamond",1.35,{}],["Granite",1.36,{"Dig Strength":24,"Shake Strength":6}],["Overclocked",1.36,{"Dig Speed":10,"Shake Speed":10}],["Festive",1.4,{"Luck":50,"Size Boost":10}],["Prismatic",1.6,{}]];
+const MUTS=[["None",1,{}],["Silver",1.1,{}],["Gold",1.2,{}],["Diamond",1.35,{}],["Granite",1.36,{"Dig Strength":24,"Shake Strength":6}],["Overclocked",1.36,{"Dig Speed":10,"Shake Speed":10}],["Festive",1.4,{"Luck":50,"Size Boost":10}],["Sunforged",1.5,{"Luck":300,"Sell Boost":30}],["Prismatic",1.6,{}]];
 const MUT=Object.fromEntries(MUTS.map(m=>[m[0],m]));
 const mutLabel=m=>m[0]==="None"?"No mutation":`${m[0]} ×${m[1]}${Object.keys(m[2]).length?" +":""}`;
 const MULT={Common:.005,Uncommon:.0075,Rare:.0125,Epic:.02,Legendary:.03,Mythic:.05,Exotic:.08};
@@ -241,7 +241,7 @@ function render(){
 }
 // ---- save the build as an image: gear, boosts, then the stats table (what "Your stats" shows) ----
 const RHX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
-const MUTHX={Silver:"#a9b4be",Gold:"#d9a520",Diamond:"#5fc8e8",Granite:"#8d8d86",Overclocked:"#e0602f",Festive:"#d23c3c",Prismatic:"#c05bd8"};
+const MUTHX={Silver:"#a9b4be",Gold:"#d9a520",Diamond:"#5fc8e8",Granite:"#8d8d86",Overclocked:"#e0602f",Festive:"#d23c3c",Sunforged:"#ffc457",Prismatic:"#c05bd8"};
 // copy the stat panel as text, ready to paste into Discord
 $("cpStats").onclick=async()=>{const st=effState(),t=compute(st).tot;const gear=[S.pan&&"Pan: "+S.pan,S.shovel&&"Shovel: "+S.shovel].filter(Boolean).join(" · ");
   const lines=SHOW.filter(s=>t[s]).map(s=>`${s}: ${fv(s,t[s])}`);

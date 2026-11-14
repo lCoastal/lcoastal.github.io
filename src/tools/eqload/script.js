@@ -1,9 +1,9 @@
 
 const $=id=>document.getElementById(id);
 const EQ=P.equip||[];const EB=Object.fromEntries(EQ.map(x=>[x.n,x]));const IMG=n=>{const x=EB[n];return x&&x.img?(P.eimg||{})[x.img]||"":""};
-const MUTS=[["None",1,{}],["Silver",1.1,{}],["Gold",1.2,{}],["Diamond",1.35,{}],["Granite",1.36,{"Dig Strength":24,"Shake Strength":6}],["Overclocked",1.36,{"Dig Speed":10,"Shake Speed":10}],["Festive",1.4,{"Luck":50,"Size Boost":10}],["Prismatic",1.6,{}]];
+const MUTS=[["None",1,{}],["Silver",1.1,{}],["Gold",1.2,{}],["Diamond",1.35,{}],["Granite",1.36,{"Dig Strength":24,"Shake Strength":6}],["Overclocked",1.36,{"Dig Speed":10,"Shake Speed":10}],["Festive",1.4,{"Luck":50,"Size Boost":10}],["Sunforged",1.5,{"Luck":300,"Sell Boost":30}],["Prismatic",1.6,{}]];
 const MUT=Object.fromEntries(MUTS.map(m=>[m[0],m]));
-const MCOL={Silver:"#d6d6d6",Gold:"#ffcc33",Diamond:"#7fd8ff",Granite:"#c8a27a",Overclocked:"#6b8cff",Festive:"#ff6b6b",Prismatic:"#ff5fd2"};
+const MCOL={Silver:"#d6d6d6",Gold:"#ffcc33",Diamond:"#7fd8ff",Granite:"#c8a27a",Overclocked:"#6b8cff",Festive:"#ff6b6b",Sunforged:"#ffc457",Prismatic:"#ff5fd2"};
 const RHEX={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6",Ascended:"#ffd36b"};
 const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars"]);
 const PCT=new Set(["Shake Speed","Size Boost","Modifier Boost","Sell Boost","Dig Speed"]);

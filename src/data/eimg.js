@@ -67,4 +67,9 @@ export default {
   "Waverider.png": "%%IMG:Equipment: Waverider%%",
   "otherwordlyring.png": "%%IMG:Equipment: Otherworldly Ring%%",
   "Dullahan's_Curse.png": "%%IMG:Equipment: Dullahan's Curse%%",
+  "Scarab Signet.png": "%%IMG:Equipment: Scarab Signet%%",
+  "Embalmer's Ring.png": "%%IMG:Equipment: Embalmer's Ring%%",
+  "Heart Scarab.png": "%%IMG:Equipment: Heart Scarab%%",
+  "Nemes of the Pharaoh.png": "%%IMG:Equipment: Nemes of the Pharaoh%%",
+  "Ring of Ra.png": "%%IMG:Equipment: Ring of Ra%%",
 };
