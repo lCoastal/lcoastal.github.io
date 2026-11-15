@@ -46,10 +46,19 @@ zoneSel.value=zone;
 zoneSel.addEventListener("change",()=>{zone=zoneSel.value;try{localStorage.setItem("mb-zone",zone)}catch(e){}render()});
 window.ptBoostsZone=z=>{zone=ZLIST.some(g=>g.z.includes(z))?z:"";zoneSel.value=zone;render()};
 document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();render()});
+// your own picks: star minerals, then switch "Only my picks" on or off to show just those
+let PICK=new Set(),pickOn=false;try{PICK=new Set(JSON.parse(localStorage.getItem("mb-pick")||"[]").filter(n=>D.some(d=>d[0]===n)));pickOn=localStorage.getItem("mb-pickon")==="1"}catch(e){}
+const savePick=()=>{try{localStorage.setItem("mb-pick",JSON.stringify([...PICK]));localStorage.setItem("mb-pickon",pickOn?"1":"0")}catch(e){}};
+const zrow=zoneSel.parentElement;
+const pickB=document.createElement("button");pickB.type="button";pickB.className="chip pickb";pickB.id="pickOn";zrow.appendChild(pickB);
+const clrB=document.createElement("button");clrB.type="button";clrB.className="chip clrp";clrB.textContent="Clear picks";zrow.appendChild(clrB);
+pickB.onclick=()=>{if(!PICK.size&&!pickOn){toast("Star the minerals you want first (☆ next to each name)");return}pickOn=!pickOn;savePick();render()};
+clrB.onclick=()=>{const n=PICK.size;PICK.clear();pickOn=false;savePick();render();toast(`Cleared ${n} pick${n===1?"":"s"}`)};
+document.getElementById("list").addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b)return;e.stopPropagation();const n=b.dataset.pick;PICK.has(n)?PICK.delete(n):PICK.add(n);if(!PICK.size)pickOn=false;savePick();render()});
 const fmt=v=>(v<0?"−":"+")+Math.abs(v)+"×";
 const rc=r=>"var(--c-"+r.toLowerCase()+")";
 // the minerals one rarity shows with the current search, stat filter and sort
-function rarityRows(r){let rows=D.filter(d=>d[1]===r&&(!q||d[0].toLowerCase().includes(q))&&inZone(d[0],zone));
+function rarityRows(r){let rows=D.filter(d=>d[1]===r&&(!q||d[0].toLowerCase().includes(q))&&inZone(d[0],zone)&&(!pickOn||PICK.has(d[0])));
   if(stat!=="All")rows=rows.filter(d=>d[3].some(([s,v])=>s===stat&&v>0));
   const val=d=>stat==="All"?Math.max(...d[3].map(x=>x[1])):d[3].find(x=>x[0]===stat)[1];
   rows.sort((a,b)=>val(b)-val(a)||a[2]-b[2]||a[0].localeCompare(b[0]));
@@ -59,14 +68,16 @@ const rarOrder=()=>rev&&stat!=="All"?[...ORDER].reverse():ORDER;
 function render(){
   [...chips.children].forEach(c=>{if(c!==dirB)c.setAttribute("aria-pressed",String(c.textContent===stat))});
   dirB.innerHTML=rev?"<b>↑</b> Ascending":"<b>↓</b> Descending";dirB.title=rev?(stat!=="All"?"Common first, weakest boost first":"Weakest boost first"):"Strongest boost first";
+  pickB.textContent=`★ Only my picks${PICK.size?` (${PICK.size})`:""}`;pickB.setAttribute("aria-pressed",String(pickOn));pickB.title=PICK.size?(pickOn?"Showing only your starred minerals. Click to show everything again.":"Show only the minerals you starred"):"Star minerals with ☆ to pick them";clrB.hidden=!PICK.size;
   const list=document.getElementById("list");list.innerHTML="";
   rarOrder().forEach(r=>{
     const {rows,best,val}=rarityRows(r);
     const sec=document.createElement("section");sec.style.setProperty("--rc",rc(r));
     sec.innerHTML=`<div class="rh"><h2>${r}</h2><span>${SLOTS[r]} museum slot${SLOTS[r]>1?"s":""} · ${rows.length} mineral${rows.length===1?"":"s"}</span></div>`;
+    if(!rows.length&&pickOn)return;
     if(!rows.length){const p=document.createElement("p");p.className="empty";p.textContent=stat==="All"?(zone?`No ${r} minerals drop in ${zone}.`:"No matches."):`No ${r} mineral${zone?" from "+zone:""} boosts ${stat}.`;sec.appendChild(p);list.appendChild(sec);return}
     const tw=document.createElement("div");tw.className="tw";
-    tw.innerHTML=`<table><thead><tr><th>Mineral</th><th>Max boost</th><th class="w">Max boost at</th></tr></thead><tbody>${rows.map(d=>`<tr class="${best!==null&&val(d)===best?"top":""}"><td class="n" data-mineral="${d[0]}"><span class="mn">${ICONS[d[0]]?`<img src="${ICONS[d[0]]}" alt="" width="26" height="26" loading="lazy">`:""}${d[0]}</span></td><td><div class="b">${d[3].map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fmt(v)}</em></span>`).join("")}</div></td><td class="w">${d[2]} kg</td></tr>`).join("")}</tbody></table>`;
+    tw.innerHTML=`<table><thead><tr><th class="pk" aria-label="Pick"></th><th>Mineral</th><th>Max boost</th><th class="w">Max boost at</th></tr></thead><tbody>${rows.map(d=>`<tr class="${best!==null&&val(d)===best?"top":""}"><td class="pk"><button type="button" class="star" data-pick="${d[0]}" aria-pressed="${PICK.has(d[0])}" title="${PICK.has(d[0])?"Remove from":"Add to"} your picks" aria-label="${PICK.has(d[0])?"Unpick":"Pick"} ${d[0]}">${PICK.has(d[0])?"★":"☆"}</button></td><td class="n" data-mineral="${d[0]}"><span class="mn">${ICONS[d[0]]?`<img src="${ICONS[d[0]]}" alt="" width="26" height="26" loading="lazy">`:""}${d[0]}</span></td><td><div class="b">${d[3].map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fmt(v)}</em></span>`).join("")}</div></td><td class="w">${d[2]} kg</td></tr>`).join("")}</tbody></table>`;
     sec.appendChild(tw);list.appendChild(sec);
   });
 }
@@ -98,7 +109,7 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(imgTitle(),PAD,PAD+30);
-  const n=secs.reduce((t,s)=>t+s.rows.length,0);const sub=[`${n} mineral${n===1?"":"s"}`];if(zone)sub.push(`that drop in ${zone}`);if(q)sub.push(`matching "${q}"`);if(stat!=="All")sub.push(rev?"weakest first":"strongest first, best in each rarity marked");
+  const n=secs.reduce((t,s)=>t+s.rows.length,0);const sub=[`${n} mineral${n===1?"":"s"}`];if(zone)sub.push(`that drop in ${zone}`);if(q)sub.push(`matching "${q}"`);if(pickOn)sub.push("your picks");if(stat!=="All")sub.push(rev?"weakest first":"strongest first, best in each rarity marked");
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(" · "),PAD,PAD+58);
   const icons={};await Promise.all(secs.flatMap(s=>s.rows.map(o=>img(ICONS[o.d[0]]).then(i=>icons[o.d[0]]=i))));
   cols.forEach((list,ci)=>{const x0=PAD+ci*(CW+GAP);let y=HEAD;
