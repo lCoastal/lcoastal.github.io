@@ -83,6 +83,7 @@ const stHtml=(x,hl)=>statsAt(x,st.lvl).map(r=>`<span class="${r[1]<0?"neg":""}${
 
 // rarity sort shows the rarest first, so it counts as descending
 const RNAT=-1;
+let LAST=[];
 function render(){
   const t=st.q;const all=Store.all();
   {const b=$("fEv");b.innerHTML=`<span class="evw">${Object.entries(EVM).map(([k,v])=>`<span${k===st.evMode?"":` aria-hidden="true" style="visibility:hidden"`}>${v[0]}</span>`).join("")}</span>`;b.title=EVM[st.evMode][1];b.setAttribute("aria-pressed",String(st.evMode!=="hide"))}
@@ -98,8 +99,9 @@ function render(){
     :st.sort==="type"?(st.rev?[...SLOTS].reverse():SLOTS).map(t=>[t+"s",rows.filter(x=>x.slot===t),"var(--line)","slot"]).filter(g=>g[1].length)
     :[["",rows,"var(--line)",""]];
   if(lim.length)groups.push(["Limited-time",lim,"var(--ev)",""]);
+  LAST=groups;
   $("list").innerHTML=groups.some(g=>g[1].length)?groups.map(([r,rs,gc,skip])=>`<section class="grp${skip==="r"?"":" neutral"}" style="--rc:${gc}">${r?`<div class="gh"><b>${r}</b><span>${rs.length} ${rs.length===1?"item":"items"}</span></div>`:""}
-    <table class="eq"><thead><tr><th aria-label="Icon"></th><th>Name</th><th>Stats (${LVLN[st.lvl]||"6★ max"})</th><th>Recipe</th><th style="text-align:right">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
+    <table class="eq"><colgroup><col class="c-ic"><col class="c-nm"><col class="c-st"><col class="c-rc"><col class="c-pr"><col class="c-t"></colgroup><thead><tr><th aria-label="Icon"></th><th>Name</th><th>Stats (${LVLN[st.lvl]||"6★ max"})</th><th>Recipe</th><th style="text-align:right">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
     ${rs.map(x=>`<tr tabindex="0" data-open="${x.i}"${skip==="r"?` style="--rc:${rc(x.r)};--nc:${rc(x.r)}"`:` class="plain" style="--rc:var(--line);--nc:${rc(x.r)}"`}><td class="ic"><div class="icon">${x.img?`<img src="${x.img}" alt="" width="36" height="36" loading="lazy">`:""}</div></td>
       <td><div class="nm"><b>${esc(x.n)}</b><span>${skip==="slot"?"":x.slot}${skip==="r"?"":(skip==="slot"?"":" · ")+"<span style=\"color:"+rc(x.r)+"\">"+x.r+"</span>"}${x.ev?" · limited-time":""}</span>${ONE_ONLY.has(x.n)?`<span class="tags">${oneTag(x)}${bpTag(x)}</span>`:bpTag(x)}</div></td>
       <td class="sts-c"><div class="sts">${stHtml(x,hl)}</div></td>
@@ -165,4 +167,62 @@ scrim.addEventListener("click",e=>{if(e.target===scrim)closeEquip()});
 scrim.addEventListener("click",e=>{const q=e.target.closest("[data-qopen]");if(!q)return;closeEquip();try{window.parent.ptCallTool("quests","ptOpenItem",q.dataset.qopen)}catch(err){}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!scrim.hidden)closeEquip()});
 window.ptOpenItem=name=>{const x=BYN[String(name).toLowerCase()];if(x)showEquip(x.i)};
+// picture of the list as it is now (same filters, sort, value level and tags), one fixed column grid so every group lines up
+const RHX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
+const KHX={Luck:"#86f34a",Capacity:"#f0b44a","Size Boost":"#ff6b6b","Dig Strength":"#ff9d7f","Dig Speed":"#8ecbff","Sell Boost":"#ffd21f","Walk Speed":"#d6dbe0","Modifier Boost":"#39e06a","Shake Strength":"#ff8fb1","Shake Speed":"#b9a6ff"};
+async function equipImage(){
+  const groups=LAST.filter(g=>g[1].length);if(!groups.length)return null;
+  try{await document.fonts.ready}catch(e){}
+  const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
+  const W=1300,PAD=32,IW=W-PAD*2;
+  // one shared grid: icon | name | stats | recipe | price
+  const CW=[70,290,300,0,120];CW[3]=IW-CW.reduce((a,b)=>a+b,0);const CX=[];CW.reduce((a,w)=>(CX.push(a),a+w),PAD);
+  const m=document.createElement("canvas").getContext("2d");
+  const lvl=LVLN[st.lvl]||"6★ max";
+  // lay out each row first so we know the picture height
+  const recLay=x=>{m.font=`13px ${F}`;const lines=[[]];let lx=0;const av=CW[3]-24;x.rec.forEach(([q,n,kg])=>{const t=`${q}× ${n}${kg?" +"+kg:""}`;const w=22+m.measureText(t).width+14;if(lx+w>av&&lines[lines.length-1].length){lines.push([]);lx=0}lines[lines.length-1].push({t,n,w});lx+=w});return lines};
+  const tagsOf=x=>[...(ONE_ONLY.has(x.n)?[["ONLY 1 CAN BE WORN","#f0a35a"]]:[]),...(x.bp&&st.bpTag?[["BLUEPRINT","#7fb2ff"]]:[])];
+  const G=groups.map(([title,rows,gc,skip])=>({title,skip,col:title==="Limited-time"?"#f0955f":skip==="r"?RHX[title]||"#3a424b":"#3a424b",rows:rows.map(x=>{const S=statsAt(x,st.lvl),R=recLay(x),T=tagsOf(x);
+    const subTxt=[skip==="slot"?"":x.slot,skip==="r"?"":x.r,x.ev?"limited-time":""].filter(Boolean).join(" · ");
+    const nameH=24+(subTxt?18:0)+(T.length?24:0);const h=Math.max(70,S.length*21+18,R.length*26+18,nameH+18);return {x,S,R,T,subTxt,h}})}));
+  const HEAD=96,GH=40,TH=30,GGAP=14;
+  const H=PAD+HEAD+G.reduce((a,g)=>a+GH+TH+g.rows.reduce((b,r)=>b+r.h,0)+GGAP,0)-GGAP+PAD;
+  const sc=H*2>30000?1:2;const cv=document.createElement("canvas");cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
+  const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
+  const fit=(t,w)=>{t=String(t);if(c.measureText(t).width<=w)return t;while(t.length>1&&c.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"};
+  const srcs=new Set();G.forEach(g=>g.rows.forEach(r=>{if(r.x.img)srcs.add(r.x.img);r.x.rec.forEach(([,n])=>{const mm=MIN[n.toLowerCase()];if(mm&&mm.ic)srcs.add(mm.ic)})}));
+  const IMG={};await Promise.all([...srcs].map(s=>new Promise(res=>{const i=new Image();i.onload=()=>{IMG[s]=i;res()};i.onerror=()=>res();i.src=s})));
+  c.fillStyle="#14181c";c.fillRect(0,0,W,H);
+  // header: title, what the picture shows, made-by badge
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-2;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText("Equipment",PAD,PAD+30);
+  const n=G.reduce((a,g)=>a+g.rows.length,0);const sub=[`${n} item${n===1?"":"s"}`,`stats at ${lvl}, 100% quality`];if(st.slots.length)sub.push(st.slots.join(", ")+"s");if(st.stats.length)sub.push("with "+st.stats.join(st.match==="any"?" or ":" + "));if(st.rars.length)sub.push(st.rars.join(", "));if(st.q)sub.push(`search “${st.q}”`);if(st.fav)sub.push("favourites");if(st.own)sub.push("owned");
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(" · "),IW),PAD,PAD+60);
+  let y=PAD+HEAD;
+  G.forEach((g,gi)=>{const gh=GH+TH+g.rows.reduce((a,r)=>a+r.h,0);
+    c.fillStyle="#191d22";rr(PAD,y,IW,gh,8);c.fill();c.save();rr(PAD,y,IW,gh,8);c.clip();c.fillStyle=g.col;c.fillRect(PAD,y,5,gh);c.fillStyle="#1e2329";c.fillRect(PAD+5,y,IW,GH);c.restore();
+    c.strokeStyle=g.col;c.lineWidth=1;rr(PAD+.5,y+.5,IW-1,gh-1,8);c.stroke();
+    if(g.title){c.fillStyle=g.skip==="r"||g.title==="Limited-time"?g.col:"#e6e9ec";c.font=`700 19px ${FD}`;c.fillText(g.title,PAD+18,y+27)}
+    c.fillStyle="#98a2ad";c.font=`13px ${F}`;const ct=`${g.rows.length} ${g.rows.length===1?"item":"items"}`;c.fillText(ct,W-PAD-16-c.measureText(ct).width,y+26);
+    let yy=y+GH;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";["","Name",`Stats (${lvl})`,"Recipe","Price"].forEach((t,i)=>{const u=t.toUpperCase();c.fillText(u,i===4?CX[i]+CW[i]-14-c.measureText(u).width:CX[i]+12,yy+20)});
+    yy+=TH;const line=(x0,y0,x1,y1)=>{c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke()};c.strokeStyle=g.col+"66";line(PAD+5,y+GH,W-PAD,y+GH);line(PAD+5,yy,W-PAD,yy);
+    g.rows.forEach((r,k)=>{const x=r.x,rc=RHX[x.r]||"#e6e9ec";if(k%2){c.fillStyle="rgba(255,255,255,.025)";c.fillRect(PAD+5,yy,IW-5,r.h)}
+      c.strokeStyle=g.col+"40";for(let i=1;i<5;i++)line(CX[i]+.5,yy,CX[i]+.5,yy+r.h);if(k)line(PAD+5,yy+.5,W-PAD,yy+.5);
+      const im=IMG[x.img];if(im){c.save();c.shadowColor=rc+"88";c.shadowBlur=10;c.drawImage(im,CX[0]+13,yy+r.h/2-24,48,48);c.restore()}
+      // name block
+      const nh=24+(r.subTxt?18:0)+(r.T.length?24:0);let ny=yy+(r.h-nh)/2;
+      c.fillStyle=rc;c.font=`700 17px ${FD}`;c.fillText(fit(x.n,CW[1]-24),CX[1]+12,ny+18);ny+=24;
+      if(r.subTxt){c.fillStyle="#98a2ad";c.font=`12px ${F}`;c.fillText(fit(r.subTxt,CW[1]-24),CX[1]+12,ny+12);ny+=18}
+      if(r.T.length){let tx=CX[1]+12;c.font=`700 10.5px ${F}`;r.T.forEach(([t,col])=>{const tw=c.measureText(t).width+14;c.strokeStyle=col;rr(tx,ny+2,tw,18,4);c.stroke();c.fillStyle=col;c.fillText(t,tx+7,ny+15);tx+=tw+6})}
+      // stats
+      let sy=yy+(r.h-r.S.length*21)/2;r.S.forEach(([sn,v,p])=>{c.font=`600 13.5px ${F}`;c.fillStyle=KHX[sn]||"#e6e9ec";c.fillText(sn,CX[2]+12,sy+15);const nw=c.measureText(sn+" ").width;
+        c.font=`14px ${FM}`;c.fillStyle=v<0?"#ef7a66":"#e6e9ec";c.fillText((v>0&&sn!=="Status Timer Speed"?"+":"")+fmt(v)+(p?"%":""),CX[2]+12+nw,sy+15);sy+=21});
+      // recipe
+      let ry=yy+(r.h-r.R.length*26)/2;r.R.forEach(ln=>{let rx=CX[3]+12;ln.forEach(it=>{const mm=MIN[it.n.toLowerCase()];const mi=mm&&IMG[mm.ic];if(mi)c.drawImage(mi,rx,ry+3,18,18);c.font=`13px ${F}`;const q=it.t.split("× ")[0]+"×";c.fillStyle="#98a2ad";c.fillText(q,rx+22,ry+17);const qw=c.measureText(q+" ").width;c.fillStyle="#e6e9ec";c.fillText(it.t.slice(q.length+1),rx+22+qw,ry+17);rx+=it.w});ry+=26});
+      // price
+      c.font=`600 14px ${FM}`;c.fillStyle="#e6e9ec";const sh=v=>{const u=[[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]].find(([d])=>v>=d);return u?fmt(v/u[0],2)+u[1]:fmt(v)};const pt=x.price==null?"—":x.cur==="$"?"$"+sh(x.price):sh(x.price)+" "+x.cur;c.fillText(pt,CX[4]+CW[4]-14-c.measureText(pt).width,yy+r.h/2+5);
+      yy+=r.h});
+    y+=gh+GGAP});
+  return await new Promise(res=>cv.toBlob(res,"image/png"))}
+$("toImg").onclick=()=>{if(!LAST.some(g=>g[1].length)){toast("Nothing to show with these filters");return}ptSaveImg("Equipment "+(LVLN[st.lvl]||""),equipImage)};
 render();

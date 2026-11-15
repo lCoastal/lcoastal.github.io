@@ -12,7 +12,10 @@
 .gh b{font-family:var(--f-display);font-size:1.05rem;color:var(--rc)}
 .grp.neutral .gh b{color:var(--fg)}
 .gh span{font-size:12.5px;color:var(--muted)}
-table.eq{width:100%;border-collapse:collapse;font-size:13px}
+table.eq{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+/* every group's table shares the same column widths, so the columns line up from one rarity to the next */
+table.eq col.c-ic{width:52px}table.eq col.c-nm{width:23%}table.eq col.c-st{width:22%}table.eq col.c-pr{width:132px}table.eq col.c-t{width:122px}
+table.eq td{overflow-wrap:anywhere}.sts span{white-space:normal!important}
 table.eq th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:7px 8px;border-bottom:1px solid var(--rc);border-right:1px solid var(--line)}
 table.eq td{padding:6px 8px;border-bottom:1px solid var(--rc);border-right:1px solid var(--rc);vertical-align:middle}
 table.eq th:last-child,table.eq td:last-child{border-right:0}
@@ -64,9 +67,9 @@ table.eq tr .nm b{color:var(--nc)}
 .rec span{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
 .rec img{width:18px;height:18px;object-fit:contain}
 .rec .q{font-family:var(--f-mono);color:var(--muted)}
-td.pr{text-align:right;font-family:var(--f-mono);font-size:12px;white-space:nowrap}
+td.pr{text-align:right;font-family:var(--f-mono);font-size:12px;white-space:normal;overflow-wrap:anywhere}
 td.pr small{display:block;font-family:var(--f-body);font-size:11px;color:var(--muted)}
-td.t{width:72px}
+td.t{width:auto}
 @media (max-width:760px){
   table.eq thead{display:none}
   table.eq,table.eq tbody{display:block}
