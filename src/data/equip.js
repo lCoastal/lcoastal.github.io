@@ -1152,7 +1152,7 @@ export default [
     n: "Ring of Champions",
     r: "Ascended",
     slot: "Ring",
-    d: "A legendary ring only worn by the greatest of prospectors. ONLY ONE CAN BE WORN AT THE SAME TIME.stet Requires the Blueprint before it can be crafted.",
+    d: "A legendary ring only worn by the greatest of prospectors. ONLY ONE CAN BE WORN AT THE SAME TIME. Requires the Blueprint before it can be crafted.",
     ev: false,
     price: 5000000000.0,
     cur: "$",

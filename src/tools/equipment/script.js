@@ -3,9 +3,15 @@ const ORDER=["Ascended","Exotic","Mythic","Legendary","Epic","Rare","Uncommon","
 const SLOTS=["Ring","Necklace","Charm"];
 const E=P.equip.map((x,i)=>({...x,i,img:P.eimg[x.img]||""}));
 const BYN=Object.fromEntries(E.map(x=>[x.n.toLowerCase(),x]));
-const at=(s,l)=>l==="5"?s[2]:l==="6"?s[4]:+(s[4]*1.6).toFixed(3);
+// values at 100% quality. p = 6★ Prismatic (×1.6), s = 6★ Sunforged (×1.5, plus +300 Luck and +30% Sell Boost on top)
+const at=(s,l)=>l==="5"?s[2]:l==="6"?s[4]:+(s[4]*(l==="s"?1.5:1.6)).toFixed(3);
+const SUNADD=[["Luck",300,0],["Sell Boost",30,1]];
+const LVLN={"5":"5★ max","6":"6★ max","p":"6★ Prismatic","s":"6★ Sunforged"};
+// an item's stat rows at a level, as [name, value, isPct]; Sunforged adds Luck and Sell Boost even if the item has none
+function statsAt(x,l){const out=x.st.map(s=>[s[0],at(s,l),s[5]?1:0]);if(l==="s")SUNADD.forEach(([n,a,p])=>{const o=out.find(r=>r[0]===n);if(o)o[1]=+(o[1]+a).toFixed(3);else out.push([n,a,p])});return out}
 const unit=s=>s[5]?"%":"";
 const sv=(s,l)=>{const v=at(s,l);return (v>0&&s[0]!=="Status Timer Speed"?"+":"")+fmt(v)+unit(s)};
+const svr=r=>(r[1]>0&&r[0]!=="Status Timer Speed"?"+":"")+fmt(r[1])+(r[2]?"%":"");
 let st={q:"",lvl:"6",sort:"rarity",rev:false,slot:"",rar:"",fav:false,own:false,ev:true,bpTag:true,bp:""};
 try{Object.assign(st,JSON.parse(localStorage.getItem("pe-f")||"{}"),{q:""})}catch(e){}
 const save=()=>{try{localStorage.setItem("pe-f",JSON.stringify(st))}catch(e){}};
@@ -73,7 +79,7 @@ $("dir").onclick=()=>{st.rev=!st.rev;save();render()};
 const priceHtml=x=>x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):`${fmt(x.price)}<small>${esc(x.cur)}</small>`;
 const matHtml=([q,n,kg],big)=>{const m=MIN[n.toLowerCase()];return `<span data-mineral="${esc(n)}" title="${esc(n)}${kg?" (+"+esc(kg)+")":""} · Ctrl+click to open">${m&&m.ic?`<img src="${m.ic}" alt="" width="18" height="18" loading="lazy">`:""}<span class="q">${q}×</span>${esc(n)}${kg?` <span class="muted">+${esc(kg)}</span>`:""}</span>`};
 const sName=n=>KCOL[n]?`<span class="sk" style="color:var(--k-${KCOL[n]})">${esc(n)}</span>`:esc(n);
-const stHtml=(x,hl)=>x.st.map(s=>`<span class="${at(s,st.lvl)<0?"neg":""}${hl&&s[0].toLowerCase().includes(hl)?" hl":""}">${sName(s[0])} <em>${sv(s,st.lvl)}</em></span>`).join("");
+const stHtml=(x,hl)=>statsAt(x,st.lvl).map(r=>`<span class="${r[1]<0?"neg":""}${hl&&r[0].toLowerCase().includes(hl)?" hl":""}">${sName(r[0])} <em>${svr(r)}</em></span>`).join("");
 
 // rarity sort shows the rarest first, so it counts as descending
 const RNAT=-1;
@@ -93,7 +99,7 @@ function render(){
     :[["",rows,"var(--line)",""]];
   if(lim.length)groups.push(["Limited-time",lim,"var(--ev)",""]);
   $("list").innerHTML=groups.some(g=>g[1].length)?groups.map(([r,rs,gc,skip])=>`<section class="grp${skip==="r"?"":" neutral"}" style="--rc:${gc}">${r?`<div class="gh"><b>${r}</b><span>${rs.length} ${rs.length===1?"item":"items"}</span></div>`:""}
-    <table class="eq"><thead><tr><th aria-label="Icon"></th><th>Name</th><th>Stats (${st.lvl==="p"?"Prismatic":st.lvl+"★ max"})</th><th>Recipe</th><th style="text-align:right">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
+    <table class="eq"><thead><tr><th aria-label="Icon"></th><th>Name</th><th>Stats (${LVLN[st.lvl]||"6★ max"})</th><th>Recipe</th><th style="text-align:right">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
     ${rs.map(x=>`<tr tabindex="0" data-open="${x.i}"${skip==="r"?` style="--rc:${rc(x.r)};--nc:${rc(x.r)}"`:` class="plain" style="--rc:var(--line);--nc:${rc(x.r)}"`}><td class="ic"><div class="icon">${x.img?`<img src="${x.img}" alt="" width="36" height="36" loading="lazy">`:""}</div></td>
       <td><div class="nm"><b>${esc(x.n)}</b><span>${skip==="slot"?"":x.slot}${skip==="r"?"":(skip==="slot"?"":" · ")+"<span style=\"color:"+rc(x.r)+"\">"+x.r+"</span>"}${x.ev?" · limited-time":""}</span>${ONE_ONLY.has(x.n)?`<span class="tags">${oneTag(x)}${bpTag(x)}</span>`:bpTag(x)}</div></td>
       <td class="sts-c"><div class="sts">${stHtml(x,hl)}</div></td>
@@ -110,11 +116,13 @@ $("list").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.ta
 // pop-up
 const scrim=$("scrim"),page=$("page");let lastFocus=null,cur=null;
 function cmpTable(x,y){
-  const names=[...new Set([...x.st.map(s=>s[0]),...(y?y.st.map(s=>s[0]):[])])];
-  const g=(it,n)=>{const s=it&&it.st.find(z=>z[0]===n);return s?{v:at(s,cmpLvl),u:unit(s)}:null};
-  return `<table class="st"><tr><th>Stat</th><th>${esc(x.n)}</th>${y?`<th>${esc(y.n)}</th><th>Difference</th>`:""}</tr>${names.map(n=>{const a=g(x,n),b=y?g(y,n):null;const d=(a?a.v:0)-(b?b.v:0);
+  const A=statsAt(x,cmpLvl),B=y?statsAt(y,cmpLvl2):[];
+  const names=[...new Set([...A.map(r=>r[0]),...B.map(r=>r[0])])];
+  const g=(rows,n)=>{const r=rows.find(z=>z[0]===n);return r?{v:r[1],u:r[2]?"%":""}:null};
+  const hx=`${esc(x.n)}<br><small class="muted">${LVLN[cmpLvl]}</small>`,hy=y?`${esc(y.n)}<br><small class="muted">${LVLN[cmpLvl2]}</small>`:"";
+  return `<table class="st"><tr><th>Stat</th><th>${hx}</th>${y?`<th>${hy}</th><th>Difference</th>`:""}</tr>${names.map(n=>{const a=g(A,n),b=y?g(B,n):null;const d=(a?a.v:0)-(b?b.v:0);
     return `<tr><td>${esc(n)}</td><td>${a?fmt(a.v)+a.u:"—"}</td>${y?`<td>${b?fmt(b.v)+b.u:"—"}</td><td class="${d>0?"up":d<0?"dn":""}">${d>0?"+":d<0?"−":"±"}${fmt(Math.abs(d))}${(a||b).u}</td>`:""}</tr>`}).join("")}</table>`}
-let cmpLvl="6";
+let cmpLvl="6",cmpLvl2="p";
 function showEquip(i){
   const x=E[i];if(!x)return;cur=x;try{window.ptRecent&&ptRecent("Equipment",x.n)}catch(e){}
   page.style.setProperty("--gc",rc(x.r));
@@ -127,16 +135,19 @@ function showEquip(i){
     ${["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"].includes(x.n)?`<p style="margin:0;color:var(--warn);font-weight:600;font-size:13.5px">Only one can be worn at a time.</p>`:""}
     ${x.bp?`<div class="bpbox"><b>Needs a blueprint</b>${x.bp==="Needs a blueprint"?"The wiki doesn't say where this blueprint comes from":esc(x.bp)}.</div>`:""}
     <div class="acts">${tgHtml(x.n)}<button type="button" class="btn pri" id="addCk">Add to crafting checklist</button><button type="button" class="btn" id="addCk6">Add as 6★ (2 crafts)</button></div>
-    <div class="psec"><h3>Stats by star level</h3><div class="tw"><table class="st"><tr><th>Stat</th><th>5★ range</th><th>6★ range</th><th>Prismatic max</th></tr>
-      ${x.st.map(s=>`<tr><td>${sName(s[0])}</td><td>${fmt(s[1])} – ${fmt(s[2])}${unit(s)}</td><td>${fmt(s[3])} – ${fmt(s[4])}${unit(s)}</td><td>${fmt(s[4]*1.6)}${unit(s)}</td></tr>`).join("")}</table></div>
-      <p class="muted" style="margin:0;font-size:12.5px">Prismatic gear gives 1.6× the 6★ values.</p></div>
+    <div class="psec"><h3>Stats by star level</h3><div class="tw"><table class="st"><tr><th>Stat</th><th>5★ max</th><th>6★ max</th><th>6★ Prismatic</th><th>6★ Sunforged</th></tr>
+      ${(()=>{const S=statsAt(x,"s");return S.map(r=>{const s=x.st.find(z=>z[0]===r[0]);const u=r[2]?"%":"";return `<tr><td>${sName(r[0])}</td><td>${s?fmt(at(s,"5"))+u:"—"}</td><td>${s?fmt(at(s,"6"))+u:"—"}</td><td>${s?fmt(at(s,"p"))+u:"—"}</td><td>${fmt(r[1])+u}</td></tr>`}).join("")})()}</table></div>
+      <p class="muted" style="margin:0;font-size:12.5px">All at 100% quality. Prismatic gives 1.6× the 6★ values. Sunforged gives 1.5× plus +300 Luck and +30% Sell Boost.</p></div>
     <div class="psec"><h3>Recipe</h3><ul class="ing">${x.rec.map(([q,n,kg])=>{const m=MIN[n.toLowerCase()];return `<li style="--rc:${m?rc(m.r):"var(--line)"}" data-mineral="${esc(n)}" title="Ctrl+click to open ${esc(n)}">${m&&m.ic?`<img src="${m.ic}" alt="" width="26" height="26">`:""}<span class="q">${q}×</span><span>${esc(n)}${kg?` <span class="muted">(+${esc(kg)})</span>`:""}<br><span class="rr" style="--rc:${m?rc(m.r):"var(--muted)"}">${m?m.r:""}</span></span></li>`}).join("")}</ul></div>
     ${catSection(x)}
-    <div class="psec"><h3><span>Compare</span><span style="display:flex;gap:6px;flex-wrap:wrap"><select id="cmpWith" aria-label="Compare with"><option value="">Compare with another ${x.slot.toLowerCase()}…</option>${others.map(y=>`<option value="${y.i}">${esc(y.n)} (${y.r})</option>`).join("")}</select>
-      <select id="cmpLvl" aria-label="Compare at"><option value="5">5★ max</option><option value="6">6★ max</option><option value="p">Prismatic</option></select></span></h3><div class="tw" id="cmpOut">${cmpTable(x,null)}</div></div>${bpSection(x)}`;
-  $("cmpLvl").value=cmpLvl;
-  const upd=()=>{cmpLvl=$("cmpLvl").value;const y=E[+$("cmpWith").value];$("cmpOut").innerHTML=cmpTable(x,$("cmpWith").value?y:null)};
-  $("cmpWith").onchange=upd;$("cmpLvl").onchange=upd;
+    <div class="psec"><h3><span>Compare</span><span style="display:flex;gap:6px;flex-wrap:wrap"><select id="cmpWith" aria-label="Compare with"><option value="">Compare with…</option><option value="${x.i}">${esc(x.n)} (this one, another level)</option>${others.map(y=>`<option value="${y.i}">${esc(y.n)} (${y.r})</option>`).join("")}</select>
+      <select id="cmpLvl" aria-label="This item's level">${Object.entries(LVLN).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select><select id="cmpLvl2" aria-label="Other item's level" hidden>${Object.entries(LVLN).map(([k,v])=>`<option value="${k}">vs ${v}</option>`).join("")}</select></span></h3><div class="tw" id="cmpOut">${cmpTable(x,null)}</div></div>${bpSection(x)}`;
+  $("cmpLvl").value=cmpLvl;$("cmpLvl2").value=cmpLvl2;
+  const upd=e=>{const w=$("cmpWith").value;const y=w?E[+w]:null;
+    // comparing with itself at the same level shows nothing useful, so move the other side to the next level
+    if(e&&e.target.id==="cmpWith"&&y===x&&$("cmpLvl2").value===$("cmpLvl").value){const ks=Object.keys(LVLN);$("cmpLvl2").value=ks[(ks.indexOf($("cmpLvl").value)+1)%ks.length]}
+    cmpLvl=$("cmpLvl").value;cmpLvl2=$("cmpLvl2").value;$("cmpLvl2").hidden=!y;$("cmpOut").innerHTML=cmpTable(x,y)};
+  $("cmpWith").onchange=upd;$("cmpLvl").onchange=upd;$("cmpLvl2").onchange=upd;
   const add=n=>{let ok=false;try{ok=window.parent.ptChecklistAdd(x.n,n)}catch(e){}toast(ok?`Added ${x.n}${n>1?" (6★)":""} to your crafting checklist`:"Couldn't reach the crafting checklist")};
   $("addCk").onclick=()=>add(1);$("addCk6").onclick=()=>add(2);
   lastFocus=document.activeElement;scrim.hidden=false;$("pclose").onclick=closeEquip;$("pclose").focus();
