@@ -25,11 +25,12 @@ const MULT={Common:.005,Uncommon:.0075,Rare:.0125,Epic:.02,Legendary:.03,Mythic:
 // [modifier, stats, factor, how to get]
 const MODS=[
 ["Perfect","Luck + Capacity + Size Boost",1,"~1 in 26,764"],["Treasured","Luck",2,"Treasure chests only"],["Entombed","Luck",2,"Pharaoh's Tomb only"],["Lunar","Dig Speed + Shake Speed + Walk Speed",1,"~1 in 10,705, night only"],["Voidtorn","Luck + Capacity",1,"The Void, Galactic tools, Voidtouched enchant"],["Mutated","Luck + Dig Strength + Modifier Boost",1,"~1 in 2,676"],["Cosmic","Capacity + Shake Strength",1,"~1 in 535"],["Electrified","Dig Speed + Shake Speed",1,"Thunderstorm event only"],["Iridescent","Luck",1,"~1 in 134"],["Irradiated","Modifier Boost",1,"~1 in 27"],["Crystalline","Size Boost",1,"Geodes, Crystal Touch shovel"],["Scorching","Dig Strength",1,"~1 in 11"],["Glowing","Shake Speed",1,"~1 in 5"],["Pure","Dig Speed",1,"~1 in 3"],["Shiny","Shake Strength",1,"~1 in 3"]];
-(function(){
+// mutations table, with a star per modifier for your picks
+function renderMods(){
   const R=[...ORDER].reverse();
   const f=v=>"+"+(+v.toFixed(4))+"×";
-  document.getElementById("mods").innerHTML=`<table><thead><tr><th>Modifier</th><th>Boosts</th>${R.map(r=>`<th class="w" style="color:var(--c-${r.toLowerCase()})">${r}</th>`).join("")}<th>How to get</th></tr></thead><tbody>${MODS.map(([m,s,k,h])=>`<tr><td class="n">${m}</td><td class="s">${s}</td>${R.map(r=>`<td class="w">${f(MULT[r]*k)}</td>`).join("")}<td class="h">${h}</td></tr>`).join("")}</tbody></table>`;
-})();
+  const rows=MODS.filter(([m])=>!pickOn||MPICK.has(m));
+  document.getElementById("mods").innerHTML=rows.length?`<table><thead><tr><th class="pk" aria-label="Pick"></th><th>Modifier</th><th>Boosts</th>${R.map(r=>`<th class="w" style="color:var(--c-${r.toLowerCase()})">${r}</th>`).join("")}<th>How to get</th></tr></thead><tbody>${rows.map(([m,s,k,h])=>`<tr><td class="pk"><button type="button" class="star" data-mpick="${m}" aria-pressed="${MPICK.has(m)}" title="${MPICK.has(m)?"Remove from":"Add to"} your picks" aria-label="${MPICK.has(m)?"Unpick":"Pick"} ${m}">${MPICK.has(m)?"★":"☆"}</button></td><td class="n">${m}</td><td class="s">${s}</td>${R.map(r=>`<td class="w">${f(MULT[r]*k)}</td>`).join("")}<td class="h">${h}</td></tr>`).join("")}</tbody></table>`:`<p class="empty" style="padding:10px 12px;margin:0">You haven't picked any mutations. Turn off “Only my picks” to star some.</p>`}
 const STATS=["All","Luck","Size Boost","Modifier Boost","Sell Boost","Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed","Walk Speed"];
 let stat="All",q="",rev=false,zone="";
 try{const s=localStorage.getItem("mb-stat");if(s&&STATS.includes(s))stat=s;}catch(e){}
@@ -53,14 +54,16 @@ zoneSel.addEventListener("change",()=>{zone=zoneSel.value;try{localStorage.setIt
 window.ptBoostsZone=z=>{zone=ZLIST.some(g=>g.z.includes(z))?z:"";zoneSel.value=zone;render()};
 document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();render()});
 // your own picks: star minerals, then switch "Only my picks" on or off to show just those
-let PICK=new Set(),pickOn=false;try{PICK=new Set(JSON.parse(localStorage.getItem("mb-pick")||"[]").filter(n=>D.some(d=>d[0]===n)));pickOn=localStorage.getItem("mb-pickon")==="1"}catch(e){}
-const savePick=()=>{try{localStorage.setItem("mb-pick",JSON.stringify([...PICK]));localStorage.setItem("mb-pickon",pickOn?"1":"0")}catch(e){}};
+let PICK=new Set(),MPICK=new Set(),pickOn=false;try{PICK=new Set(JSON.parse(localStorage.getItem("mb-pick")||"[]").filter(n=>D.some(d=>d[0]===n)));MPICK=new Set(JSON.parse(localStorage.getItem("mb-mpick")||"[]").filter(n=>MODS.some(m=>m[0]===n)));pickOn=localStorage.getItem("mb-pickon")==="1"}catch(e){}
+const nPick=()=>PICK.size+MPICK.size;
+const savePick=()=>{try{localStorage.setItem("mb-pick",JSON.stringify([...PICK]));localStorage.setItem("mb-mpick",JSON.stringify([...MPICK]));localStorage.setItem("mb-pickon",pickOn?"1":"0")}catch(e){}};
 const zrow=zoneSel.parentElement;
 const pickB=document.createElement("button");pickB.type="button";pickB.className="chip pickb";pickB.id="pickOn";zrow.appendChild(pickB);
 const clrB=document.createElement("button");clrB.type="button";clrB.className="chip clrp";clrB.textContent="Clear picks";zrow.appendChild(clrB);
-pickB.onclick=()=>{if(!PICK.size&&!pickOn){toast("Star the minerals you want first (☆ next to each name)");return}pickOn=!pickOn;savePick();render()};
-clrB.onclick=()=>{const n=PICK.size;PICK.clear();pickOn=false;savePick();render();toast(`Cleared ${n} pick${n===1?"":"s"}`)};
-document.getElementById("list").addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b)return;e.stopPropagation();const n=b.dataset.pick;PICK.has(n)?PICK.delete(n):PICK.add(n);if(!PICK.size)pickOn=false;savePick();render()});
+pickB.onclick=()=>{if(!nPick()&&!pickOn){toast("Star the minerals or mutations you want first (☆ next to each name)");return}pickOn=!pickOn;savePick();render()};
+clrB.onclick=()=>{const n=nPick();PICK.clear();MPICK.clear();pickOn=false;savePick();render();toast(`Cleared ${n} pick${n===1?"":"s"}`)};
+document.getElementById("mods").addEventListener("click",e=>{const b=e.target.closest("[data-mpick]");if(!b)return;const n=b.dataset.mpick;MPICK.has(n)?MPICK.delete(n):MPICK.add(n);if(!nPick())pickOn=false;savePick();render()});
+document.getElementById("list").addEventListener("click",e=>{const b=e.target.closest("[data-pick]");if(!b)return;e.stopPropagation();const n=b.dataset.pick;PICK.has(n)?PICK.delete(n):PICK.add(n);if(!nPick())pickOn=false;savePick();render()});
 const fmt=v=>(v<0?"−":"+")+Math.abs(v)+"×";
 const rc=r=>"var(--c-"+r.toLowerCase()+")";
 // the minerals one rarity shows with the current search, stat filter and sort
@@ -74,9 +77,10 @@ const rarOrder=()=>rev&&stat!=="All"?[...ORDER].reverse():ORDER;
 function render(){
   [...chips.children].forEach(c=>{if(c!==dirB)c.setAttribute("aria-pressed",String(c.textContent===stat))});
   dirB.innerHTML=rev?"<b>↑</b> Ascending":"<b>↓</b> Descending";dirB.title=rev?(stat!=="All"?"Common first, weakest boost first":"Weakest boost first"):"Strongest boost first";
-  pickB.textContent=`★ Only my picks${PICK.size?` (${PICK.size})`:""}`;pickB.setAttribute("aria-pressed",String(pickOn));pickB.title=PICK.size?(pickOn?"Showing only your starred minerals. Click to show everything again.":"Show only the minerals you starred"):"Star minerals with ☆ to pick them";clrB.hidden=!PICK.size;
+  pickB.textContent=`★ Only my picks${nPick()?` (${nPick()})`:""}`;pickB.setAttribute("aria-pressed",String(pickOn));pickB.title=nPick()?(pickOn?"Showing only your starred minerals and mutations. Click to show everything again.":"Show only the minerals and mutations you starred"):"Star minerals or mutations with ☆ to pick them";clrB.hidden=!nPick();renderMods();
   if(!nameCustom&&document.activeElement!==nameI)nameI.value=autoTitle();nameI.placeholder=autoTitle();nameI.classList.toggle("custom",!!nameCustom);nameI.title=nameCustom?"Your own name. Clear it to go back to the automatic one.":"Follows the filters automatically. Type to give the picture your own name.";
   const list=document.getElementById("list");list.innerHTML="";
+  if(pickOn&&!PICK.size){list.innerHTML=`<p class="empty">You haven't picked any minerals. Turn off “Only my picks” to star some.</p>`;return}
   rarOrder().forEach(r=>{
     const {rows,best,val}=rarityRows(r);
     const sec=document.createElement("section");sec.style.setProperty("--rc",rc(r));
@@ -100,11 +104,11 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
   const BW=CW-24-250-96;
   const lines=d=>{meas.font=`13px ${F}`;const out=[[]];let w=0;d[3].forEach(([s,v])=>{const t=s+" "+fmt(v);const tw=meas.measureText(t).width+16;if(w+tw>BW&&out[out.length-1].length){out.push([]);w=0}out[out.length-1].push([s,v]);w+=tw});return out};
   const secs=rarOrder().map(r=>{const x=rarityRows(r);const rows=x.rows.map(d=>({d,ls:lines(d),top:x.best!==null&&x.val(d)===x.best}));rows.forEach(o=>o.h=Math.max(40,o.ls.length*19+21));return {r,rows,h:44+28+rows.reduce((t,o)=>t+o.h,0)+24}}).filter(s=>s.rows.length);
-  if(!secs.length)return null;
   // split the rarities (kept in museum order) where the two columns come out closest in height
   let k=1,bestH=Infinity;for(let i=1;i<=secs.length;i++){const a=secs.slice(0,i).reduce((t,s)=>t+s.h,0),b=secs.slice(i).reduce((t,s)=>t+s.h,0);if(Math.max(a,b)<bestH){bestH=Math.max(a,b);k=i}}
   const cols=[secs.slice(0,k),secs.slice(k)];
-  const mods=incMut.checked?MODS.filter(([m,st])=>stat==="All"||st.split(" + ").includes(stat)):[];
+  const mods=incMut.checked?MODS.filter(([m,st])=>(stat==="All"||st.split(" + ").includes(stat))&&(!pickOn||MPICK.has(m))):[];
+  if(!secs.length&&!mods.length)return null;if(!secs.length)bestH=0;
   meas.font=`12.5px ${F}`;const HW=W-PAD*2-24-150-300-7*92;
   const hl=t=>{const ws=t.split(" ");const o=[];let l="";ws.forEach(w=>{const tt=l?l+" "+w:w;if(meas.measureText(tt).width>HW&&l){o.push(l);l=w}else l=tt});if(l)o.push(l);return o};
   const mrows=mods.map(m=>{const h=hl(m[3]);return {m,h,rh:Math.max(36,h.length*17+19)}});
