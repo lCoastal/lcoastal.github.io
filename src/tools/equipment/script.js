@@ -113,7 +113,7 @@ function render(){
   if(lim.length)groups.push(["Limited-time",lim,"var(--ev)",""]);
   LAST=groups;
   $("list").innerHTML=groups.some(g=>g[1].length)?groups.map(([r,rs,gc,skip])=>`<section class="grp${skip==="r"?"":" neutral"}" style="--rc:${gc}">${r?`<div class="gh"><b>${r}</b><span>${rs.length} ${rs.length===1?"item":"items"}</span></div>`:""}
-    <table class="eq"><colgroup><col class="c-ic"><col class="c-nm"${st.lvls.length>1?` style="width:${st.lvls.length>2?17:20}%"`:""}><col class="c-st"${st.lvls.length>1?` style="width:${12+10*st.lvls.length}%"`:""}><col class="c-rc"><col class="c-pr"><col class="c-t"></colgroup><thead><tr><th aria-label="Icon"></th><th>Name</th><th>${st.lvls.length===1?`Stats (${LVLN[st.lvl]})`:"Stats"}</th><th>Recipe</th><th style="text-align:right">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
+    <table class="eq"><colgroup><col class="c-ic"><col class="c-nm"${st.lvls.length>1?` style="width:${st.lvls.length>2?17:20}%"`:""}><col class="c-st"${st.lvls.length>1?` style="width:${12+10*st.lvls.length}%"`:""}><col class="c-rc"><col class="c-pr"><col class="c-t"></colgroup><thead><tr><th aria-label="Icon"></th><th>Name</th><th>${st.lvls.length===1?`Stats (${LVLN[st.lvl]})`:"Stats"}</th><th>Recipe</th><th style="text-align:center">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
     ${rs.map(x=>`<tr tabindex="0" data-open="${x.i}"${skip==="r"?` style="--rc:${rc(x.r)};--nc:${rc(x.r)}"`:` class="plain" style="--rc:var(--line);--nc:${rc(x.r)}"`}><td class="ic"><div class="icon">${x.img?`<img src="${x.img}" alt="" width="36" height="36" loading="lazy">`:""}</div></td>
       <td><div class="nm"><b>${esc(x.n)}</b><span>${skip==="slot"?"":x.slot}${skip==="r"?"":(skip==="slot"?"":" · ")+"<span style=\"color:"+rc(x.r)+"\">"+x.r+"</span>"}${x.ev?" · limited-time":""}</span>${ONE_ONLY.has(x.n)?`<span class="tags">${oneTag(x)}${bpTag(x)}</span>`:bpTag(x)}</div></td>
       <td class="sts-c"><div class="sts">${stHtml(x,hl)}</div></td>
@@ -217,7 +217,7 @@ async function equipImage(){
     c.strokeStyle=g.col;c.lineWidth=1;rr(PAD+.5,y+.5,IW-1,gh-1,8);c.stroke();
     if(g.title){c.fillStyle=g.skip==="r"||g.title==="Limited-time"?g.col:"#e6e9ec";c.font=`700 19px ${FD}`;c.fillText(g.title,PAD+18,y+27)}
     c.fillStyle="#98a2ad";c.font=`13px ${F}`;const ct=`${g.rows.length} ${g.rows.length===1?"item":"items"}`;c.fillText(ct,W-PAD-16-c.measureText(ct).width,y+26);
-    let yy=y+GH;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";["","Name",NL===1?`Stats (${lvl})`:"Stats","Recipe","Price"].forEach((t,i)=>{const u=t.toUpperCase();c.fillText(u,i===4?CX[i]+CW[i]-14-c.measureText(u).width:CX[i]+12,yy+20)});
+    let yy=y+GH;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";["","Name",NL===1?`Stats (${lvl})`:"Stats","Recipe","Price"].forEach((t,i)=>{const u=t.toUpperCase();c.fillText(u,i===4?CX[i]+(CW[i]-c.measureText(u).width)/2:CX[i]+12,yy+20)});
     yy+=TH;const line=(x0,y0,x1,y1)=>{c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke()};c.strokeStyle=g.col+"66";line(PAD+5,y+GH,W-PAD,y+GH);line(PAD+5,yy,W-PAD,yy);
     g.rows.forEach((r,k)=>{const x=r.x,rc=RHX[x.r]||"#e6e9ec";if(k%2){c.fillStyle="rgba(255,255,255,.025)";c.fillRect(PAD+5,yy,IW-5,r.h)}
       c.strokeStyle=g.col+"40";for(let i=1;i<5;i++)line(CX[i]+.5,yy,CX[i]+.5,yy+r.h);if(k)line(PAD+5,yy+.5,W-PAD,yy+.5);
@@ -239,7 +239,7 @@ async function equipImage(){
       // recipe
       let ry=yy+(r.h-r.R.length*26)/2;r.R.forEach(ln=>{let rx=CX[3]+12;ln.forEach(it=>{const mm=MIN[it.n.toLowerCase()];const mi=mm&&IMG[mm.ic];if(mi)c.drawImage(mi,rx,ry+3,18,18);c.font=`13px ${F}`;const q=it.t.split("× ")[0]+"×";c.fillStyle="#98a2ad";c.fillText(q,rx+22,ry+17);const qw=c.measureText(q+" ").width;c.fillStyle="#e6e9ec";c.fillText(it.t.slice(q.length+1),rx+22+qw,ry+17);rx+=it.w});ry+=26});
       // price
-      c.font=`600 14px ${FM}`;c.fillStyle="#e6e9ec";const sh=v=>{const u=[[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]].find(([d])=>v>=d);return u?fmt(v/u[0],2)+u[1]:fmt(v)};const pt=x.price==null?"—":x.cur==="$"?"$"+sh(x.price):sh(x.price)+" "+x.cur;c.fillText(pt,CX[4]+CW[4]-14-c.measureText(pt).width,yy+r.h/2+5);
+      c.font=`600 14px ${FM}`;c.fillStyle="#e6e9ec";const sh=v=>{const u=[[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]].find(([d])=>v>=d);return u?fmt(v/u[0],2)+u[1]:fmt(v)};const pt=x.price==null?"—":x.cur==="$"?"$"+sh(x.price):sh(x.price)+" "+x.cur;c.fillText(pt,CX[4]+(CW[4]-c.measureText(pt).width)/2,yy+r.h/2+5);
       yy+=r.h});
     y+=gh+GGAP});
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
