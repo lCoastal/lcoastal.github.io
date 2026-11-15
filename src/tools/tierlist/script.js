@@ -117,13 +117,14 @@ $("impGo").onclick=()=>{const raw=$("impTx").value;const lines=raw.split(/\r?\n/
 function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 async function tierImage(){const l=L(),N=byN();const LW=150,SZ=96,TH=SZ+30,G=8,PAD=10;const F='"IBM Plex Sans",system-ui,sans-serif';
   const rows=T(l).map(t=>({t:t.label,c:t.c,items:(l.rows[t.id]||[]).map(n=>N[n]).filter(Boolean)}));
-  // columns follow the busiest row (capped at 16) so there's no empty strip on the right
-  const per=Math.min(16,Math.max(1,...rows.map(r=>r.items.length)));const bodyW=per*(SZ+G)-G;
-  const mg=document.createElement("canvas").getContext("2d");mg.font=`800 44px ${F}`;const titleW=l.t?mg.measureText(l.t).width:0;
-  const W=Math.max(LW+PAD*2+bodyW,Math.ceil(titleW)+48,420);
+  // fixed width: always exactly COLS items per row, so every picture has the same size and no spare space on the right
+  const COLS=10,per=COLS;const bodyW=per*(SZ+G)-G;
+  const W=LW+PAD*2+bodyW;
+  // long titles shrink to fit the width instead of widening the picture
+  const mg=document.createElement("canvas").getContext("2d");let tz=44;mg.font=`800 ${tz}px ${F}`;while(l.t&&mg.measureText(l.t).width>W-48&&tz>20){tz-=2;mg.font=`800 ${tz}px ${F}`}
   const hs=rows.map(r=>Math.max(1,Math.ceil(r.items.length/per))*(TH+G)-G+PAD*2);
-  const top=l.t?96:24,H=top+hs.reduce((a,b)=>a+b,0)+24;const cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
-  g.fillStyle="#12161b";g.fillRect(0,0,W,H);if(l.t){g.fillStyle="#f2f5f7";g.font=`800 44px ${F}`;g.fillText(l.t,24,66)}
+  const top=l.t?96:24,H=top+hs.reduce((a,b)=>a+b,0);const cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+  g.fillStyle="#12161b";g.fillRect(0,0,W,H);if(l.t){g.fillStyle="#f2f5f7";g.font=`800 ${tz}px ${F}`;g.fillText(l.t,24,66)}
   const pics=await Promise.all(rows.flatMap(r=>r.items).map(x=>loadImg(x.ic).then(i=>[x.n,i])));const PI=Object.fromEntries(pics);
   // row labels: big for one or two letters, smaller and wrapped onto lines for words
   const label=(txt,cx,cy,h)=>{let z=txt.length<=2?48:txt.length<=4?36:26;g.fillStyle="#1a1d21";g.textAlign="center";const words=String(txt).split(/\s+/);let lines;
@@ -131,7 +132,7 @@ async function tierImage(){const l=L(),N=byN();const LW=150,SZ=96,TH=SZ+30,G=8,P
     const lh=z*1.15,y0=cy-(lines.length-1)*lh/2+z*.36;lines.forEach((x,i)=>g.fillText(x,cx,y0+i*lh));g.textAlign="left"};
   let y=top;rows.forEach((r,i)=>{const h=hs[i];g.fillStyle=r.c;g.fillRect(0,y,LW,h);label(r.t,LW/2,y+h/2,h);
     g.fillStyle=i%2?"#1a2027":"#171c22";g.fillRect(LW,y,W-LW,h);
-    // items left-aligned; the canvas width already follows the widest row so there's no empty strip
+    // items left-aligned, wrapping onto a new line after COLS
     r.items.forEach((x,j)=>{const cx=LW+PAD+(j%per)*(SZ+G),cy=y+PAD+Math.floor(j/per)*(TH+G);g.fillStyle="#222a33";g.fillRect(cx,cy,SZ,TH);g.strokeStyle=RHX[x.r]||"#3cc2a8";g.lineWidth=3;g.strokeRect(cx+1.5,cy+1.5,SZ-3,TH-3);const im=PI[x.n];if(im)g.drawImage(im,cx+12,cy+8,SZ-24,SZ-24);
       let nm=x.n,z=14;g.font=`600 ${z}px ${F}`;while(g.measureText(nm).width>SZ-10&&z>10){z--;g.font=`600 ${z}px ${F}`}while(g.measureText(nm).width>SZ-10&&nm.length>3)nm=nm.slice(0,-2)+"…";g.fillStyle="#e6e9ec";g.textAlign="center";g.fillText(nm,cx+SZ/2,cy+TH-12);g.textAlign="left"});
     g.fillStyle="rgba(0,0,0,.35)";g.fillRect(0,y+h-1,W,1);y+=h});
