@@ -31,6 +31,8 @@ window.ptLoadBoard=(bd,name)=>{const nb=blank();ORDER.forEach(r=>(bd[r]||[]).for
 const rc=r=>"var(--c-"+r.toLowerCase()+")";
 const r4=v=>Math.round(v*10000)/10000;
 const fx=v=>(v<0?"−":"+")+r4(Math.abs(v))+"×";
+// museum totals multiply the stat, so show them as the final multiplier (a +3.125 bonus is ×4.125)
+const fxT=v=>r4(1+v)+"×";
 
 // "Any" mineral = any mineral of that rarity (no mineral boost counted, the mutation still counts).
 // Mutations can also be "Any" (any modifier, nothing counted) or "Any of: A/B/C" (counts the weakest of those, so totals are a safe minimum).
@@ -67,7 +69,7 @@ function renderBoard(){
 function renderTotals(){
   const t=totals(S);
   const rows=STATS.map(s=>({s,v:t[s]}));
-  document.getElementById("tot").innerHTML=rows.map(({s,v})=>`<div class="trow ${Math.abs(v)<1e-9?"zero":""} ${s==="Luck"||s==="Size Boost"?"lead":""}"><span class="k">${s}</span><span class="v">${Math.abs(v)<1e-9?"—":fx(v)}</span></div>`).join("");
+  document.getElementById("tot").innerHTML=rows.map(({s,v})=>`<div class="trow ${Math.abs(v)<1e-9?"zero":""} ${s==="Luck"||s==="Size Boost"?"lead":""}"><span class="k">${s}</span><span class="v">${Math.abs(v)<1e-9?"—":fxT(v)}</span></div>`).join("");
   const n=ORDER.reduce((a,r)=>a+S[r].filter(x=>x.m).length,0);
   document.getElementById("filled").textContent=`${n} of 18 displays filled.`;
 }
@@ -124,7 +126,7 @@ function showPreview(val,label){
   if(val===undefined||label===undefined){pv.innerHTML=`<span class="t">Hover or focus an option to preview your museum total.</span>`;return}
   const before=totals(S),after=totals(trial(val));
   const ch=STATS.filter(s=>Math.abs(after[s]-before[s])>1e-9);
-  pv.innerHTML=`<span class="t">Museum total with ${esc(label)}</span>`+(ch.length?`<div class="pv">${ch.map(s=>{const d=after[s]-before[s];return `<span>${s} <em>${fx(after[s])}</em> <em class="${d>0?"up":"down"}">(${d>0?"+":"−"}${r4(Math.abs(d))})</em></span>`}).join("")}</div>`:`<div class="pv"><span>No change</span></div>`);
+  pv.innerHTML=`<span class="t">Museum total with ${esc(label)}</span>`+(ch.length?`<div class="pv">${ch.map(s=>{const d=after[s]-before[s];return `<span>${s} <em>${fxT(after[s])}</em> <em class="${d>0?"up":"down"}">(${d>0?"+":"−"}${r4(Math.abs(d))})</em></span>`}).join("")}</div>`:`<div class="pv"><span>No change</span></div>`);
 }
 function hook(el,val){
   const label=val===null?"this display empty":val;
@@ -141,7 +143,7 @@ const saveL=()=>{try{localStorage.setItem("mp-loadouts",JSON.stringify(L))}catch
 const validBoard=b=>b&&ORDER.every(r=>Array.isArray(b[r])&&b[r].length===SLOTS[r]&&b[r].every(s=>s&&(s.m===null||BY[s.m]&&BY[s.m][1]===r)&&MOD[s.u||"None"]));
 const clone=o=>JSON.parse(JSON.stringify(o));
 const filledCount=b=>ORDER.reduce((a,r)=>a+b[r].filter(x=>x.m).length,0);
-function headline(b){const t=totals(b);const top=STATS.filter(s=>t[s]>1e-9).sort((a,c)=>t[c]-t[a]).slice(0,3);return top.length?top.map(s=>s+" "+fx(t[s])).join(" · "):"Empty board"}
+function headline(b){const t=totals(b);const top=STATS.filter(s=>t[s]>1e-9).sort((a,c)=>t[c]-t[a]).slice(0,3);return top.length?top.map(s=>s+" "+fxT(t[s])).join(" · "):"Empty board"}
 function renderSaved(){
   const el=document.getElementById("savedlist");
   if(!L.length){el.innerHTML='<p class="emptylo">No saved loadouts yet. Fill the board below, give it a name and press Save loadout. Saved loadouts stay in this browser; download one to keep a copy or move it to another device.</p>';return}
@@ -169,7 +171,7 @@ document.getElementById("saveform").addEventListener("submit",e=>{
 function loadoutHTML(name,b){
   const t=totals(b),when=new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
   const bands=ORDER.map(r=>`<section class="band" style="--rc:var(--c-${r.toLowerCase()})"><div class="bh"><h2>${r}</h2><span>${SLOTS[r]} display${SLOTS[r]>1?"s":""}</span></div><div class="slots">${b[r].map(s=>`<div class="slot"><div class="mn">${s.m?esc(s.m):'<i>Empty</i>'}</div><div class="mu">${s.u&&s.u!=="None"?esc(s.u):"No mutation"}</div><div class="gives">${s.m||s.u!=="None"?gainHTML(slotGain(r,s)):""}</div></div>`).join("")}</div></section>`).join("");
-  const trows=STATS.map(s=>`<div class="trow ${Math.abs(t[s])<1e-9?"zero":""}"><span>${s}</span><span class="v">${Math.abs(t[s])<1e-9?"—":fx(t[s])}</span></div>`).join("");
+  const trows=STATS.map(s=>`<div class="trow ${Math.abs(t[s])<1e-9?"zero":""}"><span>${s}</span><span class="v">${Math.abs(t[s])<1e-9?"—":fxT(t[s])}</span></div>`).join("");
   const css=`:root{--bg:#eef0f2;--panel:#fff;--fg:#1d2228;--muted:#5d6670;--line:#d6dbe0;--pos:#0f7c6b;--neg:#b3402f;--c-common:#7a8591;--c-uncommon:#3d8a3f;--c-rare:#2d6fc0;--c-epic:#8a3fc0;--c-legendary:#c98a10;--c-mythic:#c2304a;--c-exotic:#d24ab8;--fd:"Chakra Petch","Segoe UI",system-ui,sans-serif;--fb:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;--fm:"IBM Plex Mono",ui-monospace,Consolas,monospace}
 @media (prefers-color-scheme:dark){:root{--bg:#14181c;--panel:#1c2126;--fg:#e6e9ec;--muted:#98a2ad;--line:#2d343b;--pos:#3cc2a8;--neg:#ef7a66;--c-common:#a3adb8;--c-uncommon:#6cc46e;--c-rare:#68a6f0;--c-epic:#b880ee;--c-legendary:#f2b53a;--c-mythic:#f0687f;--c-exotic:#f17ad6;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--fb)}
@@ -243,7 +245,7 @@ async function boardImage(name,b){
     y+=ROWH+10}
   y+=14;c.fillStyle="#98a2ad";c.font=`600 13px ${F}`;c.fillText("MUSEUM TOTAL",PAD,y);y+=14;
   const cw=(W-PAD*2-30)/4;tl.forEach((k,i)=>{const x=PAD+(i%4)*(cw+10),yy=y+Math.floor(i/4)*44;c.fillStyle="#1c2126";rr(c,x,yy,cw,36,8);c.fill();c.strokeStyle="#2d343b";rr(c,x,yy,cw,36,8);c.stroke();
-    c.fillStyle="#e6e9ec";c.font=`14px ${F}`;c.fillText(k,x+12,yy+23);const v=tot[k];c.fillStyle=v<0?"#ef7a66":"#3cc2a8";c.font=`600 14px ${FM}`;const t=(v<0?"−":"+")+r4(Math.abs(v))+"×";c.fillText(t,x+cw-12-c.measureText(t).width,yy+23)});
+    c.fillStyle="#e6e9ec";c.font=`14px ${F}`;c.fillText(k,x+12,yy+23);const v=tot[k];c.fillStyle=v<0?"#ef7a66":"#3cc2a8";c.font=`600 14px ${FM}`;const t=fxT(v);c.fillText(t,x+cw-12-c.measureText(t).width,yy+23)});
   if(!tl.length){c.fillStyle="#5d6670";c.font=`14px ${F}`;c.fillText("No boosts yet",PAD,y+22)}
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
@@ -276,7 +278,7 @@ document.getElementById("imp").addEventListener("change",e=>{
 document.getElementById("pClear").onclick=()=>{S=blank();activeName=null;document.getElementById("lname").value="";save();renderBoard();renderSaved();toast("Board cleared")};
 document.getElementById("copy").onclick=()=>{
   const t=totals(S);
-  const txt=ORDER.map(r=>r+": "+S[r].map(x=>x.m?x.m+(x.u&&x.u!=="None"?" ("+x.u+")":""):"empty").join(", ")).join("\n")+"\n\nTotal: "+STATS.filter(s=>Math.abs(t[s])>1e-9).map(s=>s+" "+fx(t[s])).join(", ");
+  const txt=ORDER.map(r=>r+": "+S[r].map(x=>x.m?x.m+(x.u&&x.u!=="None"?" ("+x.u+")":""):"empty").join(", ")).join("\n")+"\n\nTotal: "+STATS.filter(s=>Math.abs(t[s])>1e-9).map(s=>s+" "+fxT(t[s])).join(", ");
   const done=()=>toast("Setup copied");
   try{navigator.clipboard.writeText(txt).then(done,()=>fallback(txt))}catch(e){fallback(txt)}
 };
