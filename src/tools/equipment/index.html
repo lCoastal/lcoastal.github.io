@@ -19,10 +19,10 @@
   <section class="filters" aria-label="Filters">
     <div class="frow">
       <input id="q" type="search" placeholder="Search equipment, stats or materials…" aria-label="Search equipment" autocomplete="off">
-      <select id="lvl" aria-label="Show values at"><option value="5">Values: 5★ max</option><option value="6" selected>Values: 6★ max</option><option value="p">Values: 6★ Prismatic</option><option value="s">Values: 6★ Sunforged</option></select>
-      <select id="sort" aria-label="Sort by"><option value="rarity">Sort: rarity</option><option value="price">Sort: price</option><option value="type">Sort: type</option><option value="name">Sort: name</option></select>
+            <select id="sort" aria-label="Sort by"><option value="rarity">Sort: rarity</option><option value="price">Sort: price</option><option value="type">Sort: type</option><option value="name">Sort: name</option></select>
       <button type="button" class="chip dirb" id="dir" aria-label="Sort direction"></button>
     </div>
+    <div class="frow" id="lvls"><span class="lab">Values</span></div>
     <div class="frow" id="slots" hidden><span class="lab">Type</span></div>
     <div class="frow" id="stats" hidden><span class="lab">Has stat</span></div>
     <div class="frow" id="matchRow" hidden><span class="lab">Match</span><button type="button" class="chip sm" data-match="all" title="Show items that have every stat you picked">All picked</button><button type="button" class="chip sm" data-match="any" title="Show items that have at least one of the stats you picked">Any picked</button></div>

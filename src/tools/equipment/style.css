@@ -107,3 +107,12 @@ ul.ing img{width:26px;height:26px;object-fit:contain}
 ul.ing .q{font-family:var(--f-mono);min-width:26px;color:var(--muted)}
 .acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40}
+
+/* several value levels at once: a small grid with one column per level */
+table.mst{border-collapse:collapse;font-size:12.5px;width:100%}
+table.mst th{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:right;padding:0 0 3px 8px;border:0!important;white-space:nowrap}
+table.mst th:first-child{text-align:left;padding-left:0}
+table.mst td{border:0!important;padding:1px 0 1px 8px!important;text-align:right;font-family:var(--f-mono);white-space:nowrap}
+table.mst td:first-child{text-align:left;padding-left:0!important;font-family:var(--f-body);white-space:normal}
+table.mst td.neg{color:var(--neg)}table.mst td.na{color:var(--muted)}
+table.mst tr.hl td{background:color-mix(in srgb,var(--accent) 16%,transparent)}

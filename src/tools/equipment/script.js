@@ -7,6 +7,7 @@ const BYN=Object.fromEntries(E.map(x=>[x.n.toLowerCase(),x]));
 const at=(s,l)=>l==="5"?s[2]:l==="6"?s[4]:+(s[4]*(l==="s"?1.5:1.6)).toFixed(3);
 const SUNADD=[["Luck",300,0],["Sell Boost",30,1]];
 const LVLN={"5":"5★ max","6":"6★ max","p":"6★ Prismatic","s":"6★ Sunforged"};
+const LVLS={"5":"5★","6":"6★","p":"Prismatic","s":"Sunforged"};const LKEYS=Object.keys(LVLN);
 // an item's stat rows at a level, as [name, value, isPct]; Sunforged adds Luck and Sell Boost even if the item has none
 function statsAt(x,l){const out=x.st.map(s=>[s[0],at(s,l),s[5]?1:0]);if(l==="s")SUNADD.forEach(([n,a,p])=>{const o=out.find(r=>r[0]===n);if(o)o[1]=+(o[1]+a).toFixed(3);else out.push([n,a,p])});return out}
 const unit=s=>s[5]?"%":"";
@@ -19,7 +20,15 @@ const save=()=>{try{localStorage.setItem("pe-f",JSON.stringify(st))}catch(e){}};
 if(!st.evMode)st.evMode=st.ev===false?"hide":"show";
 const EVM={show:["Show limited","Limited-time items are mixed in with everything else. Click to move them to their own area at the bottom."],sep:["Limited at the bottom","Limited-time items have their own area at the bottom. Click to hide them."],hide:["Hide limited","Limited-time items are hidden. Click to show them again."]};
 const $=id=>document.getElementById(id);
-$("lvl").value=st.lvl;$("sort").value=st.sort;
+// value levels shown in the list: pick as many as you like (always kept in 5★ → Sunforged order)
+if(!Array.isArray(st.lvls))st.lvls=[st.lvl||"6"];st.lvls=LKEYS.filter(k=>st.lvls.includes(k));if(!st.lvls.length)st.lvls=["6"];st.lvl=st.lvls[0];
+$("lvls").insertAdjacentHTML("beforeend",`<button type="button" class="chip sm" data-lv="">All</button>`+LKEYS.map(k=>`<button type="button" class="chip sm" data-lv="${k}">${LVLN[k]}</button>`).join(""));
+const drawLvls=()=>$("lvls").querySelectorAll("[data-lv]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lv?st.lvls.includes(b.dataset.lv):st.lvls.length===LKEYS.length)));drawLvls();
+$("lvls").onclick=e=>{const b=e.target.closest("[data-lv]");if(!b)return;const k=b.dataset.lv;
+  if(!k)st.lvls=st.lvls.length===LKEYS.length?["6"]:[...LKEYS];
+  else{const nx=st.lvls.includes(k)?st.lvls.filter(x=>x!==k):[...st.lvls,k];if(!nx.length)return;st.lvls=LKEYS.filter(x=>nx.includes(x))}
+  st.lvl=st.lvls[0];save();drawLvls();render()};
+$("sort").value=st.sort;
 const KCOL={"Luck":"luck","Capacity":"cap","Size Boost":"size","Dig Strength":"digstr","Dig Speed":"digspd","Sell Boost":"sell","Walk Speed":"walk","Modifier Boost":"mod","Shake Strength":"shkstr","Shake Speed":"shkspd"};
 const slotsEl=$("slots"),rarsEl=$("rars");
 // type and stat filters: pick as many as you like
@@ -73,13 +82,16 @@ function bpSection(x){if(!x.bp)return "";const qs=bpQuests(x);
       ${q.rw?`<div class="bprw"><span class="lab">Rewards</span> ${esc(q.rw)}</div>`:""}</div>`).join("")}</div>`}
 const bpTag=x=>x.bp?`<span class="bp" title="${esc(x.bp)}">${BPI}Blueprint</span>`:"";
 $("q").oninput=()=>{st.q=$("q").value.trim().toLowerCase();render()};
-$("lvl").onchange=()=>{st.lvl=$("lvl").value;save();render()};
 $("sort").onchange=()=>{st.sort=$("sort").value;st.rev=false;save();render()};
 $("dir").onclick=()=>{st.rev=!st.rev;save();render()};
 const priceHtml=x=>x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):`${fmt(x.price)}<small>${esc(x.cur)}</small>`;
 const matHtml=([q,n,kg],big)=>{const m=MIN[n.toLowerCase()];return `<span data-mineral="${esc(n)}" title="${esc(n)}${kg?" (+"+esc(kg)+")":""} · Ctrl+click to open">${m&&m.ic?`<img src="${m.ic}" alt="" width="18" height="18" loading="lazy">`:""}<span class="q">${q}×</span>${esc(n)}${kg?` <span class="muted">+${esc(kg)}</span>`:""}</span>`};
 const sName=n=>KCOL[n]?`<span class="sk" style="color:var(--k-${KCOL[n]})">${esc(n)}</span>`:esc(n);
-const stHtml=(x,hl)=>statsAt(x,st.lvl).map(r=>`<span class="${r[1]<0?"neg":""}${hl&&r[0].toLowerCase().includes(hl)?" hl":""}">${sName(r[0])} <em>${svr(r)}</em></span>`).join("");
+const stHtml=(x,hl)=>st.lvls.length===1?statsAt(x,st.lvl).map(r=>`<span class="${r[1]<0?"neg":""}${hl&&r[0].toLowerCase().includes(hl)?" hl":""}">${sName(r[0])} <em>${svr(r)}</em></span>`).join(""):multiHtml(x,hl);
+// one row per stat, one column per picked level; Sunforged can add Luck and Sell Boost rows the item doesn't normally have
+function multiRows(x){const per=st.lvls.map(l=>statsAt(x,l));const names=[];per.forEach(rs=>rs.forEach(r=>{if(!names.includes(r[0]))names.push(r[0])}));
+  return names.map(n=>({n,v:per.map(rs=>rs.find(r=>r[0]===n)||null)}))}
+const multiHtml=(x,hl)=>`<table class="mst"><tr><th></th>${st.lvls.map(l=>`<th>${LVLS[l]}</th>`).join("")}</tr>${multiRows(x).map(({n,v})=>`<tr${hl&&n.toLowerCase().includes(hl)?' class="hl"':""}><td>${sName(n)}</td>${v.map(r=>r?`<td class="${r[1]<0?"neg":""}">${svr(r)}</td>`:`<td class="na">—</td>`).join("")}</tr>`).join("")}</table>`;
 
 // rarity sort shows the rarest first, so it counts as descending
 const RNAT=-1;
@@ -101,7 +113,7 @@ function render(){
   if(lim.length)groups.push(["Limited-time",lim,"var(--ev)",""]);
   LAST=groups;
   $("list").innerHTML=groups.some(g=>g[1].length)?groups.map(([r,rs,gc,skip])=>`<section class="grp${skip==="r"?"":" neutral"}" style="--rc:${gc}">${r?`<div class="gh"><b>${r}</b><span>${rs.length} ${rs.length===1?"item":"items"}</span></div>`:""}
-    <table class="eq"><colgroup><col class="c-ic"><col class="c-nm"><col class="c-st"><col class="c-rc"><col class="c-pr"><col class="c-t"></colgroup><thead><tr><th aria-label="Icon"></th><th>Name</th><th>Stats (${LVLN[st.lvl]||"6★ max"})</th><th>Recipe</th><th style="text-align:right">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
+    <table class="eq"><colgroup><col class="c-ic"><col class="c-nm"${st.lvls.length>1?` style="width:${st.lvls.length>2?17:20}%"`:""}><col class="c-st"${st.lvls.length>1?` style="width:${12+10*st.lvls.length}%"`:""}><col class="c-rc"><col class="c-pr"><col class="c-t"></colgroup><thead><tr><th aria-label="Icon"></th><th>Name</th><th>${st.lvls.length===1?`Stats (${LVLN[st.lvl]})`:"Stats"}</th><th>Recipe</th><th style="text-align:right">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
     ${rs.map(x=>`<tr tabindex="0" data-open="${x.i}"${skip==="r"?` style="--rc:${rc(x.r)};--nc:${rc(x.r)}"`:` class="plain" style="--rc:var(--line);--nc:${rc(x.r)}"`}><td class="ic"><div class="icon">${x.img?`<img src="${x.img}" alt="" width="36" height="36" loading="lazy">`:""}</div></td>
       <td><div class="nm"><b>${esc(x.n)}</b><span>${skip==="slot"?"":x.slot}${skip==="r"?"":(skip==="slot"?"":" · ")+"<span style=\"color:"+rc(x.r)+"\">"+x.r+"</span>"}${x.ev?" · limited-time":""}</span>${ONE_ONLY.has(x.n)?`<span class="tags">${oneTag(x)}${bpTag(x)}</span>`:bpTag(x)}</div></td>
       <td class="sts-c"><div class="sts">${stHtml(x,hl)}</div></td>
@@ -174,17 +186,18 @@ async function equipImage(){
   const groups=LAST.filter(g=>g[1].length);if(!groups.length)return null;
   try{await document.fonts.ready}catch(e){}
   const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
-  const W=1300,PAD=32,IW=W-PAD*2;
-  // one shared grid: icon | name | stats | recipe | price
-  const CW=[70,290,300,0,120];CW[3]=IW-CW.reduce((a,b)=>a+b,0);const CX=[];CW.reduce((a,w)=>(CX.push(a),a+w),PAD);
+  const NL=st.lvls.length,STW=NL===1?300:150+105*NL;
+  const W=1300+(NL===1?0:STW-300),PAD=32,IW=W-PAD*2;
+  // one shared grid: icon | name | stats | recipe | price (the picture gets wider for each extra value level)
+  const CW=[70,290,STW,0,120];CW[3]=IW-CW.reduce((a,b)=>a+b,0);const CX=[];CW.reduce((a,w)=>(CX.push(a),a+w),PAD);
   const m=document.createElement("canvas").getContext("2d");
-  const lvl=LVLN[st.lvl]||"6★ max";
+  const lvl=st.lvls.map(l=>LVLN[l]).join(", ");
   // lay out each row first so we know the picture height
   const recLay=x=>{m.font=`13px ${F}`;const lines=[[]];let lx=0;const av=CW[3]-24;x.rec.forEach(([q,n,kg])=>{const t=`${q}× ${n}${kg?" +"+kg:""}`;const w=22+m.measureText(t).width+14;if(lx+w>av&&lines[lines.length-1].length){lines.push([]);lx=0}lines[lines.length-1].push({t,n,w});lx+=w});return lines};
   const tagsOf=x=>[...(ONE_ONLY.has(x.n)?[["ONLY 1 CAN BE WORN","#f0a35a"]]:[]),...(x.bp&&st.bpTag?[["BLUEPRINT","#7fb2ff"]]:[])];
-  const G=groups.map(([title,rows,gc,skip])=>({title,skip,col:title==="Limited-time"?"#f0955f":skip==="r"?RHX[title]||"#3a424b":"#3a424b",rows:rows.map(x=>{const S=statsAt(x,st.lvl),R=recLay(x),T=tagsOf(x);
+  const G=groups.map(([title,rows,gc,skip])=>({title,skip,col:title==="Limited-time"?"#f0955f":skip==="r"?RHX[title]||"#3a424b":"#3a424b",rows:rows.map(x=>{const S=NL===1?statsAt(x,st.lvl):multiRows(x),R=recLay(x),T=tagsOf(x);
     const subTxt=[skip==="slot"?"":x.slot,skip==="r"?"":x.r,x.ev?"limited-time":""].filter(Boolean).join(" · ");
-    const nameH=24+(subTxt?18:0)+(T.length?24:0);const h=Math.max(70,S.length*21+18,R.length*26+18,nameH+18);return {x,S,R,T,subTxt,h}})}));
+    const nameH=24+(subTxt?18:0)+(T.length?24:0);const h=Math.max(70,(S.length+(NL>1?1:0))*21+18,R.length*26+18,nameH+18);return {x,S,R,T,subTxt,h}})}));
   const HEAD=96,GH=40,TH=30,GGAP=14;
   const H=PAD+HEAD+G.reduce((a,g)=>a+GH+TH+g.rows.reduce((b,r)=>b+r.h,0)+GGAP,0)-GGAP+PAD;
   const sc=H*2>30000?1:2;const cv=document.createElement("canvas");cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
@@ -204,7 +217,7 @@ async function equipImage(){
     c.strokeStyle=g.col;c.lineWidth=1;rr(PAD+.5,y+.5,IW-1,gh-1,8);c.stroke();
     if(g.title){c.fillStyle=g.skip==="r"||g.title==="Limited-time"?g.col:"#e6e9ec";c.font=`700 19px ${FD}`;c.fillText(g.title,PAD+18,y+27)}
     c.fillStyle="#98a2ad";c.font=`13px ${F}`;const ct=`${g.rows.length} ${g.rows.length===1?"item":"items"}`;c.fillText(ct,W-PAD-16-c.measureText(ct).width,y+26);
-    let yy=y+GH;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";["","Name",`Stats (${lvl})`,"Recipe","Price"].forEach((t,i)=>{const u=t.toUpperCase();c.fillText(u,i===4?CX[i]+CW[i]-14-c.measureText(u).width:CX[i]+12,yy+20)});
+    let yy=y+GH;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";["","Name",NL===1?`Stats (${lvl})`:"Stats","Recipe","Price"].forEach((t,i)=>{const u=t.toUpperCase();c.fillText(u,i===4?CX[i]+CW[i]-14-c.measureText(u).width:CX[i]+12,yy+20)});
     yy+=TH;const line=(x0,y0,x1,y1)=>{c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke()};c.strokeStyle=g.col+"66";line(PAD+5,y+GH,W-PAD,y+GH);line(PAD+5,yy,W-PAD,yy);
     g.rows.forEach((r,k)=>{const x=r.x,rc=RHX[x.r]||"#e6e9ec";if(k%2){c.fillStyle="rgba(255,255,255,.025)";c.fillRect(PAD+5,yy,IW-5,r.h)}
       c.strokeStyle=g.col+"40";for(let i=1;i<5;i++)line(CX[i]+.5,yy,CX[i]+.5,yy+r.h);if(k)line(PAD+5,yy+.5,W-PAD,yy+.5);
@@ -215,8 +228,14 @@ async function equipImage(){
       if(r.subTxt){c.fillStyle="#98a2ad";c.font=`12px ${F}`;c.fillText(fit(r.subTxt,CW[1]-24),CX[1]+12,ny+12);ny+=18}
       if(r.T.length){let tx=CX[1]+12;c.font=`700 10.5px ${F}`;r.T.forEach(([t,col])=>{const tw=c.measureText(t).width+14;c.strokeStyle=col;rr(tx,ny+2,tw,18,4);c.stroke();c.fillStyle=col;c.fillText(t,tx+7,ny+15);tx+=tw+6})}
       // stats
-      let sy=yy+(r.h-r.S.length*21)/2;r.S.forEach(([sn,v,p])=>{c.font=`600 13.5px ${F}`;c.fillStyle=KHX[sn]||"#e6e9ec";c.fillText(sn,CX[2]+12,sy+15);const nw=c.measureText(sn+" ").width;
-        c.font=`14px ${FM}`;c.fillStyle=v<0?"#ef7a66":"#e6e9ec";c.fillText((v>0&&sn!=="Status Timer Speed"?"+":"")+fmt(v)+(p?"%":""),CX[2]+12+nw,sy+15);sy+=21});
+      const vtx=(sn,v,p)=>(v>0&&sn!=="Status Timer Speed"?"+":"")+fmt(v)+(p?"%":"");
+      if(NL===1){let sy=yy+(r.h-r.S.length*21)/2;r.S.forEach(([sn,v,p])=>{c.font=`600 13.5px ${F}`;c.fillStyle=KHX[sn]||"#e6e9ec";c.fillText(sn,CX[2]+12,sy+15);const nw=c.measureText(sn+" ").width;
+        c.font=`14px ${FM}`;c.fillStyle=v<0?"#ef7a66":"#e6e9ec";c.fillText(vtx(sn,v,p),CX[2]+12+nw,sy+15);sy+=21})}
+      else{// small grid: stat name, then one right-aligned value per level
+        const nameW=150,colW=(CW[2]-24-nameW)/NL,colR=i=>CX[2]+12+nameW+colW*(i+1);let sy=yy+(r.h-(r.S.length+1)*21)/2;
+        c.font=`600 10.5px ${F}`;c.fillStyle="#98a2ad";st.lvls.forEach((l,i)=>{const t=LVLS[l].toUpperCase();c.fillText(t,colR(i)-c.measureText(t).width,sy+14)});sy+=21;
+        r.S.forEach(({n:sn,v})=>{c.font=`600 13.5px ${F}`;c.fillStyle=KHX[sn]||"#e6e9ec";c.fillText(fit(sn,nameW-8),CX[2]+12,sy+15);
+          c.font=`14px ${FM}`;v.forEach((q,i)=>{const t=q?vtx(sn,q[1],q[2]):"—";c.fillStyle=!q?"#5d6670":q[1]<0?"#ef7a66":"#e6e9ec";c.fillText(t,colR(i)-c.measureText(t).width,sy+15)});sy+=21})}
       // recipe
       let ry=yy+(r.h-r.R.length*26)/2;r.R.forEach(ln=>{let rx=CX[3]+12;ln.forEach(it=>{const mm=MIN[it.n.toLowerCase()];const mi=mm&&IMG[mm.ic];if(mi)c.drawImage(mi,rx,ry+3,18,18);c.font=`13px ${F}`;const q=it.t.split("× ")[0]+"×";c.fillStyle="#98a2ad";c.fillText(q,rx+22,ry+17);const qw=c.measureText(q+" ").width;c.fillStyle="#e6e9ec";c.fillText(it.t.slice(q.length+1),rx+22+qw,ry+17);rx+=it.w});ry+=26});
       // price
@@ -224,5 +243,5 @@ async function equipImage(){
       yy+=r.h});
     y+=gh+GGAP});
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
-$("toImg").onclick=()=>{if(!LAST.some(g=>g[1].length)){toast("Nothing to show with these filters");return}ptSaveImg("Equipment "+(LVLN[st.lvl]||""),equipImage)};
+$("toImg").onclick=()=>{if(!LAST.some(g=>g[1].length)){toast("Nothing to show with these filters");return}ptSaveImg("Equipment "+st.lvls.map(l=>LVLS[l]).join(" + "),equipImage)};
 render();
