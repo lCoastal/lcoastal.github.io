@@ -38,6 +38,12 @@ STATS.forEach(s=>{const b=document.createElement("button");b.type="button";b.cla
 const dirB=document.createElement("button");dirB.type="button";dirB.className="chip dirb";dirB.setAttribute("aria-label","Sort direction");dirB.onclick=()=>{rev=!rev;render()};chips.appendChild(dirB);
 const incL=document.createElement("label");incL.className="incm";incL.dataset.ptopt="1";incL.title="Add the mutations table under the minerals in the saved image";incL.innerHTML='<input type="checkbox" id="incMut"> Include mutations';chips.appendChild(incL);
 const incMut=incL.querySelector("input");try{incMut.checked=localStorage.getItem("mb-incmut")==="1"}catch(e){}incMut.onchange=()=>{try{localStorage.setItem("mb-incmut",incMut.checked?"1":"0")}catch(e){}};
+// the picture's name: follows the filters on its own until you type your own (clear it to go back to the automatic one)
+const nameW=document.createElement("label");nameW.className="imgname";nameW.innerHTML='<span>Name</span><input id="imgName" type="text" maxlength="80" autocomplete="off" aria-label="Image name">';chips.appendChild(nameW);
+const nameI=nameW.querySelector("input");let nameCustom="";try{nameCustom=localStorage.getItem("mb-name")||""}catch(e){}
+const saveName=()=>{try{localStorage.setItem("mb-name",nameCustom)}catch(e){}};nameI.value=nameCustom;
+nameI.addEventListener("input",()=>{nameCustom=nameI.value.trim();saveName();nameI.classList.toggle("custom",!!nameCustom)});
+nameI.addEventListener("blur",()=>{if(!nameCustom)nameI.value=autoTitle()});
 const imgB=document.createElement("button");imgB.type="button";imgB.className="chip img";imgB.id="toImg";imgB.textContent="Save as image";chips.appendChild(imgB);
 const zoneSel=document.getElementById("zone");
 zoneSel.innerHTML='<option value="">All zones</option>'+ZLIST.map(g=>`<optgroup label="${g.rg}">${g.z.map(z=>`<option value="${z.replace(/"/g,"&quot;")}">${z}</option>`).join("")}</optgroup>`).join("");
@@ -69,6 +75,7 @@ function render(){
   [...chips.children].forEach(c=>{if(c!==dirB)c.setAttribute("aria-pressed",String(c.textContent===stat))});
   dirB.innerHTML=rev?"<b>↑</b> Ascending":"<b>↓</b> Descending";dirB.title=rev?(stat!=="All"?"Common first, weakest boost first":"Weakest boost first"):"Strongest boost first";
   pickB.textContent=`★ Only my picks${PICK.size?` (${PICK.size})`:""}`;pickB.setAttribute("aria-pressed",String(pickOn));pickB.title=PICK.size?(pickOn?"Showing only your starred minerals. Click to show everything again.":"Show only the minerals you starred"):"Star minerals with ☆ to pick them";clrB.hidden=!PICK.size;
+  if(!nameCustom&&document.activeElement!==nameI)nameI.value=autoTitle();nameI.placeholder=autoTitle();nameI.classList.toggle("custom",!!nameCustom);nameI.title=nameCustom?"Your own name. Clear it to go back to the automatic one.":"Follows the filters automatically. Type to give the picture your own name.";
   const list=document.getElementById("list");list.innerHTML="";
   rarOrder().forEach(r=>{
     const {rows,best,val}=rarityRows(r);
@@ -84,7 +91,8 @@ function render(){
 // ---- save as image: what's shown (search, stat and sort included), rarities in two balanced columns, mutations underneath ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 const IMGC={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6"};
-const imgTitle=()=>(stat==="All"?"Mineral max boosts":"Max "+stat+" boosts")+(zone?" · "+zone:"");
+const autoTitle=()=>(stat==="All"?"Mineral max boosts":"Max "+stat+" boosts")+(zone?" · "+zone:"")+(pickOn?" · my picks":"");
+const imgTitle=()=>nameCustom||autoTitle();
 async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
   const W=1700,PAD=40,GAP=30,CW=(W-PAD*2-GAP)/2;
   const meas=document.createElement("canvas").getContext("2d");
@@ -142,6 +150,6 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptBoostsImage=boostsImage;
 imgB.onclick=async()=>{let blob=null;try{blob=await boostsImage()}catch(e){console.error(e)}if(!blob){toast("Nothing to save. Change the search, zone or stat filter.");return}
-  const nm=(stat==="All"?"Mineral boosts":stat+" boosts")+(zone?" - "+zone.replace(/[\\/:*?"<>|]/g,""):"")+".png";
+  const nm=imgTitle().replace(/ · /g," - ").replace(/[\\/:*?"<>|]+/g," ").trim()+".png";
   try{await window.parent.ptSave(nm,blob);toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}};
 render();

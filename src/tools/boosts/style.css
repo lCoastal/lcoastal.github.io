@@ -66,3 +66,9 @@ td.pk,th.pk{width:30px;padding-left:8px!important;padding-right:0!important;vert
 .star:hover{background:color-mix(in srgb,var(--fg) 8%,transparent);color:#f2b53a}
 .star:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .chip.pickb,.chip.clrp{padding:9px 13px;border-radius:8px;font-size:13px}
+
+.imgname{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);margin-left:auto}
+.imgname input{width:230px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--muted);font:500 12.5px var(--f-body)}
+.imgname input.custom{color:var(--fg);border-color:var(--accent)}
+.imgname input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.imgname + .chip.img{margin-left:0}
