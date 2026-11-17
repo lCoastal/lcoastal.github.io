@@ -31,6 +31,7 @@ const LIST = [
   { id: "calc", name: "Stat Calculator", desc: "Your full stat panel from gear, museum and boosts" },
   { id: "checklist", name: "Crafting Checklist", desc: "Every material for what you want to craft" },
   { id: "mechanics", name: "How It Works", desc: "How luck, capacity, modifiers and weight work" },
+  { id: "formulas", name: "Formulas", desc: "Every formula the toolkit uses, one click to copy" },
   { id: "testdata", name: "Test Data Check", desc: "Checks your own panning data against the toolkit" },
   { id: "testlog", name: "Test Log", desc: "Every test behind the formulas and what it showed" },
   { id: "codes", name: "Codes", desc: "Active codes with one-tap copy" },

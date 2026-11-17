@@ -1,0 +1,16 @@
+.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-left:4px solid var(--neg);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
+.frow{display:flex;gap:10px;align-items:end}
+.srch{display:flex;flex-direction:column;gap:4px;flex:1;max-width:420px}
+.srch input{width:100%;box-sizing:border-box}
+.list{display:flex;flex-direction:column;gap:18px}
+.grp h2{margin:0 0 8px;font-family:var(--f-display);font-size:1.15rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px}
+.fc{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.fc h3{margin:0;font-size:14px}
+.fc p{margin:0;font-size:12.5px;color:var(--muted)}
+.box{position:relative;text-align:left;width:100%;font:13px/1.55 var(--f-mono);color:var(--fg);background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:24px 11px 9px;white-space:pre-wrap;overflow-wrap:anywhere;cursor:pointer}
+.box:hover{border-color:var(--accent)}
+.box .cp{position:absolute;top:6px;right:8px;font:600 11px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.box.ok .cp{color:var(--accent)}
+.box:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.empty{color:var(--muted)}
