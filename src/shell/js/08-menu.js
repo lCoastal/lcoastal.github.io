@@ -45,6 +45,7 @@ const SECTIONS = [
       ["tierlist", "m:Diamond"],
       ["mechanics", "m:Aetherite"],
       ["testdata", "m:Gold"],
+      ["testlog", "m:Moonstone"],
       ["settings", "m:Meteoric Iron"],
     ],
   ],

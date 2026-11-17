@@ -88,15 +88,9 @@ const MODS=[...Object.keys(BASE),...Object.keys(SPECIAL),"None"];
 function interp(pts,x){x=Math.max(1,x);if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++){const [x0,y0]=pts[i-1],[x1,y1]=pts[i];if(x<=x1){const t=(Math.log(x)-Math.log(x0))/(Math.log(x1)-Math.log(x0));return Math.exp(Math.log(y0)+t*(Math.log(y1)-Math.log(y0)))}}return pts[0][1]}
 // share of ores that get a normal (panning) modifier: about 36% in my tests at different boosts,
 // so Modifier Boost changes which modifier you get far more than how often. Voidtorn and event modifiers come on top.
-// how many ores get a normal modifier, by effective Modifier Boost (%), from my tests: about 10% at 113%,
-// 35% at 600-840% and 39% at 926%; straight lines between, held at 39% above that (higher boosts untested)
 // chance a mineral gets a normal modifier: each 1x of Modifier Boost is a ~6.3% chance, compounding (fitted on ~1.7M logged minerals, 1.1x to 16.6x boost; luck makes no difference)
 const anyMod=e=>1-Math.pow(1-.0631,Math.max(0,+e||0)/100);
 const NAT_MOD=anyMod(926);
-// Which modifier you get works like luck does for minerals: the game rolls the modifier several times and keeps
-// the rarest, by the game's weights. Strength = 10.1 x Modifier Boost (x) + 1 per 1,000 luck (the wiki's "every 1k
-// luck is an extra roll"), fitted on my tests with the Halloween event left out. A third of ores
-// roll once, a quarter at half strength, the rest at full strength.
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
 // which modifier you get: rolled several times keeping the rarest (by the game's weights).
 // Rolls = 11.66 x boost^0.838 + 1.96 per 1,000 luck; 31% roll once, 13% at 17% strength, 56% at full strength.
