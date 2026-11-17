@@ -3,6 +3,12 @@ const $=id=>document.getElementById(id);
 // Each session: when, where, setup, how much was logged, what was tested, what it showed, what changed on the site.
 const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables",kg:"Weights"};
 const S=[
+{id:"logger4-1711",date:"17/11/26",title:"Long check run at two capacities",zone:"Meteor Falls",topics:["lk","my","cp","md","kg"],kind:"lk",
+ setup:{Luck:"26,400 – 267,000",Capacity:"7,240 then 5,462",["Modifier Boost"]:"16.6×"},
+ amount:{Pans:8180,Minerals:776278},
+ tested:["Whether the 17/11 formulas hold on the biggest run so far","The lowest and highest number of minerals a pan can hold"],
+ found:["Items per pan: 102.0 vs 102.5 predicted at 7,240 capacity, 85.5 vs 87.5 at 5,462","A pan never held fewer than ½ × √capacity minerals (37 at 5,462, 42 at 7,240) or more than about 2.5 × √capacity (183 and 212)","Gold, Pyrite, Nickel and Sapphire within 1%; mid-tier within about 8%; Mythics about 9% under the prediction (4,349 vs 4,793)","Modifier rate 69.2% vs 66.1% predicted, every modifier's share within 1.5 points","Weights: all between 0.75 and 15.5 × base × (1 + Size Boost), and the spread matched the capacity model within about a point","Lapis Lazuli again about 1.6× more common than predicted"],
+ changed:["Test Data Check now handles files this big","Pan size range added to the findings"]},
 {id:"weights-kg-1711",date:"17/11/26",title:"Mineral weights across every logged run",zone:"All logged runs",topics:["kg","cp"],kind:"wt",
  setup:{Capacity:"1,856 – 7,240 (20 different values)",["Size Boost"]:"14.2× – 22.4×"},
  amount:{["Minerals re-checked"]:1500000},
@@ -67,11 +73,11 @@ const S=[
 // headline findings, each pointing at the sessions it comes from
 const FIND=[
  ["Luck works like extra rolls of the zone's drop table, keeping the rarest. Best fit: 29% roll once, 3% about luck ÷ 23 times, 19% about 0.41 × luck, 49% about 1.74 × luck.",["big-1111","fixed-1211","sand-1311","night-1711","frd-1711"]],
- ["Very rare minerals (base odds about 1 in 18 million to 1 in 1.5 billion, most Mythics) drop about 1.86× more often than the rolls alone say. Seen in 8 of 11 zones.",["big-1111","sand-1311","night-1711","mods-1711","logger3-1711"]],
- ["A full pan holds about 0.678 × capacity^0.565 minerals (≈20 at 400, 87 at 5,462, 102 at 7,240). Luck doesn't change it.",["frd-1711","night-1711","logger3-1711"]],
+ ["Very rare minerals (base odds about 1 in 18 million to 1 in 1.5 billion, most Mythics) drop about 1.86× more often than the rolls alone say. Seen in 8 of 11 zones.",["big-1111","sand-1311","night-1711","mods-1711","logger3-1711","logger4-1711"]],
+ ["A full pan holds about 0.678 × capacity^0.565 minerals on average (≈20 at 400, 87 at 5,462, 102 at 7,240), never fewer than ½ × √capacity and not more than about 2.5 × √capacity. Luck doesn't change it.",["frd-1711","night-1711","logger3-1711","logger4-1711"]],
  ["Chance of a normal modifier is 1 − 0.937^boost (×): about 10% at 1.1×, 36% at 6×, 45% at 9×, 69% at 16.6×. Luck doesn't change it.",["low-1211","big-1111","fixed-1211","mods-1711"]],
  ["Which modifier you get works like luck: about 11.7 × boost^0.84 + 2 per 1,000 luck rolls, keeping the rarest.",["big-1111","fixed-1211","mods-1711"]],
- ["A mineral weighs base × (1 + Size Boost) × k, with k from 0.75 to 15.5. About 26% roll small; the rest lean heavier the bigger your pan.",["weights-kg-1711"]],
+ ["A mineral weighs base × (1 + Size Boost) × k, with k from 0.75 to 15.5. About 26% roll small; the rest lean heavier the bigger your pan.",["weights-kg-1711","logger4-1711"]],
  ["The toolkit's drop chances match the game's own weights in 34 of 35 zones.",["weights-1711"]],
 ];
 const OPEN=[
