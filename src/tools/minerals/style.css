@@ -43,7 +43,7 @@ input.search{flex:1;min-width:180px}
 .row{box-sizing:border-box;height:68px;border-bottom:1px solid var(--rc);cursor:pointer}
 .row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .row:last-child{border-bottom:0}
-.row:hover{background:var(--sunk)}
+
 .icon{width:48px;height:48px;border-radius:8px;background:var(--sunk);display:flex;align-items:center;justify-content:center;flex:none}
 .icon img{width:44px;height:44px;object-fit:contain}
 .nm{display:flex;flex-direction:column;min-width:0}
@@ -56,7 +56,7 @@ input.search{flex:1;min-width:180px}
 .clip .neg em{color:var(--neg)}
 .clip small{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
 .openbtn{font:600 12.5px var(--f-body);padding:5px 12px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;justify-self:end}
-.openbtn:hover{border-color:var(--accent)}
+
 @media (max-width:860px){
   .head-row{display:none}
   .row{grid-template-columns:64px minmax(0,1fr) auto;grid-template-rows:1fr 1fr;height:92px}
@@ -91,7 +91,7 @@ input.search{flex:1;min-width:180px}
 .tw{overflow-x:auto}
 .lochd{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .cpy{font:600 12.5px var(--f-body);padding:5px 12px;border-radius:999px;border:1px solid var(--rc,var(--line));background:color-mix(in srgb,var(--rc,var(--accent)) 12%,transparent);color:var(--fg);cursor:pointer}
-.cpy:hover{background:color-mix(in srgb,var(--rc,var(--accent)) 22%,transparent)}
+
 .cpy.ok{border-color:var(--accent)}
 table.locs{width:100%;border-collapse:collapse;font-size:14px}
 table.locs th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--line);text-align:left}

@@ -21,7 +21,7 @@
 .slot img{width:34px;height:34px;object-fit:contain;flex:none}
 .slot>div{flex:1;min-width:0}
 .skipb{flex:none;margin-left:auto;font:600 11.5px var(--f-body);padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
-.skipb:hover{border-color:var(--neg);color:var(--neg)}
+
 .skipped{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;border:1px dashed var(--line);border-radius:8px;font-size:12.5px}
 .skipped .chip{font-size:12px;padding:3px 10px}
 .slot b{display:block;font-size:14px}

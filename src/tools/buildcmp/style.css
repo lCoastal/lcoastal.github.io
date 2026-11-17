@@ -8,7 +8,7 @@
 .bh{display:flex;gap:6px;align-items:center}
 .bh input{flex:1;min-width:0;font-weight:600}
 .bh .x{border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
-.bh .x:hover{color:var(--neg)}
+
 .fld{display:flex;flex-direction:column;gap:3px;min-width:0}
 .fld input{width:100%;box-sizing:border-box}
 .bld .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}

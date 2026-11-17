@@ -84,9 +84,6 @@ body {
   border-radius: 2px;
   background: currentColor;
 }
-.burger:hover {
-  border-color: var(--accent);
-}
 button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -140,9 +137,6 @@ main {
   padding: 10px 12px 8px;
   cursor: pointer;
   white-space: nowrap;
-}
-.hubbar button:hover {
-  color: var(--fg);
 }
 .hubbar button[aria-selected="true"] {
   color: var(--fg);
@@ -488,7 +482,6 @@ main iframe {
   color: var(--fg);
   cursor: pointer;
 }
-.pdbox li button:hover,
 .pdbox li button:focus-visible {
   border-color: var(--accent);
 }
@@ -559,10 +552,6 @@ main iframe {
 .rx:focus-visible {
   opacity: 1;
 }
-.rx:hover {
-  color: var(--fg);
-  border-color: var(--fg);
-}
 @media (hover: none) {
   .rx {
     opacity: 0.85;
@@ -587,10 +576,6 @@ main iframe {
   font: 500 11px/1.2 inherit;
   cursor: pointer;
   min-width: 0;
-}
-.recent .rc:hover {
-  background: color-mix(in srgb, var(--gc) 12%, transparent);
-  border-color: color-mix(in srgb, var(--gc) 30%, transparent);
 }
 .recent .rc img,
 .recent .rc .rl {
@@ -724,9 +709,6 @@ main iframe {
 .nav.danger span {
   font-size: 12.5px;
 }
-.nav:hover {
-  background: color-mix(in srgb, var(--gc, var(--accent)) 10%, var(--panel));
-}
 .dfix {
   margin: auto 8px 0;
   padding: 10px 12px;
@@ -796,15 +778,11 @@ main iframe {
 .nav.danger span {
   color: color-mix(in srgb, var(--danger) 75%, var(--muted));
 }
-.nav.danger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--danger) 15%, transparent);
-}
 .nav.danger:disabled {
   cursor: wait;
   opacity: 0.75;
 }
-.nav.danger.armed,
-.nav.danger.armed:hover:not(:disabled) {
+.nav.danger.armed {
   background: var(--danger);
   color: #fff;
   border-color: var(--danger);

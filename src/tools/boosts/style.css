@@ -63,7 +63,7 @@ td.w,th.w{padding-left:8px;padding-right:8px}
 td.pk,th.pk{width:30px;padding-left:8px!important;padding-right:0!important;vertical-align:middle}
 .star{width:26px;height:26px;border:0;background:none;cursor:pointer;font-size:17px;line-height:1;color:var(--muted);border-radius:6px;padding:0}
 .star[aria-pressed="true"]{color:#f2b53a}
-.star:hover{background:color-mix(in srgb,var(--fg) 8%,transparent);color:#f2b53a}
+
 .star:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .chip.pickb,.chip.clrp{padding:9px 13px;border-radius:8px;font-size:13px}
 

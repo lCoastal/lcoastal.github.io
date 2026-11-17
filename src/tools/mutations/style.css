@@ -38,7 +38,7 @@ table.t .nm{font-weight:600;font-size:14px;white-space:nowrap}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
 .top h2{margin:0}
 .hb{font:600 12px var(--f-body);padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--sunk);color:var(--muted);cursor:pointer;white-space:nowrap}
-.hb:hover{color:var(--fg)}
+
 .hidl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
 .hidl:empty{display:none}
 .hidl .hb{color:var(--fg)}

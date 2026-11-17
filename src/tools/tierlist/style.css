@@ -11,7 +11,7 @@
 .tier:first-child{border-top:0}
 .tl{display:flex;align-items:center;justify-content:center;font:800 26px var(--f-body);color:#1a1d21;background:var(--tc);border:0;cursor:pointer;padding:4px;text-align:center;overflow-wrap:break-word;line-height:1.1;min-width:0}
 .tl.long{font-size:14px}.tl.vlong{font-size:12px}
-.tl:hover{filter:brightness(1.06)}.tl:focus-visible{outline:2px solid var(--fg);outline-offset:-3px}
+.tl:focus-visible{outline:2px solid var(--fg);outline-offset:-3px}
 .tier.editing .tl{box-shadow:inset 0 0 0 3px #1a1d21}
 .rowbar{display:flex;gap:8px;flex-wrap:wrap}
 .btn.ghost{background:transparent;border-color:transparent;color:var(--accent)}
