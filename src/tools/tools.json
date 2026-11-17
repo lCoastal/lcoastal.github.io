@@ -13,6 +13,8 @@
   "runes",
   "odds",
   "bestcap",
+  "weightrange",
+  "sizefinder",
   "buildcmp",
   "dredge",
   "eqload",

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Size Boost Finder</title>
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Size Boost Finder</h1>
+    <p class="lede">Pick a mineral and the weight you want, and it tells you the Size Boost you need: the least that makes it possible at all, and a recommended one where your chances are actually decent.</p>
+  </header>
+  <p class="disc" role="note"><b>Heads up:</b> the minimum is exact. The chances come from the weight spread fitted on about 1.5 million logged minerals at 1,856 to 7,240 capacity, so outside that range they're an estimate.</p>
+  <section class="card">
+    <div class="inputs">
+      <label class="fld"><span class="lab">Mineral</span><input id="min" list="mins" placeholder="Type a mineral" autocomplete="off"></label>
+      <label class="fld"><span class="lab">Weight you want (kg)</span><input type="number" id="kg" min="0" inputmode="decimal"></label>
+      <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" inputmode="numeric"></label>
+      <label class="fld"><span class="lab">Your Size Boost (%, optional)</span><input type="number" id="sb" min="0" inputmode="decimal"></label>
+      <label class="fld"><span class="lab">Recommended means at least</span><select id="good"><option value="0.01">1 in 100 of them</option><option value="0.05">1 in 20 of them</option><option value="0.1">1 in 10 of them</option><option value="0.25">1 in 4 of them</option><option value="0.5">Half of them</option></select></label>
+      <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
+    </div>
+    <datalist id="mins"></datalist>
+    <div class="tg2"><label class="ck"><input type="checkbox" id="mag"> Solar Magnifier (×1.5 weight)</label></div>
+  </section>
+  <section class="card" id="out" hidden>
+    <div class="head" id="head"></div>
+    <div class="big" id="sum"></div>
+    <h2>Chance per mineral at each Size Boost</h2>
+    <div id="chart" class="chart"></div>
+    <div class="tw" id="tbl"></div>
+  </section>
+  <section class="card"><h2>How it's worked out</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li>A mineral's weight is <b>base weight × (1 + Size Boost) × k</b>, ×1.5 with the Solar Magnifier, where k is rolled between 0.75 and 15.5. The full formula and the spread of k are on the Weight Range tool.</li>
+      <li><b>Minimum:</b> the Size Boost where even the heaviest roll (k = 15.5) only just reaches your weight: Size Boost = weight ÷ (15.5 × base × magnifier) − 1. At the minimum it's possible, but almost never happens.</li>
+      <li><b>Recommended:</b> the Size Boost where at least the share you picked of that mineral comes out at your weight or heavier. More capacity makes heavy rolls more common, so it lowers the recommended boost but not the minimum.</li>
+      <li>The chance is per mineral of that kind you pan, not per pan.</li>
+    </ul>
+  </section>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> and my own test runs · Last edited 17/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>

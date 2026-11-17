@@ -8,6 +8,8 @@ const PT_RESET = {
   shovels: { keys: ["pg-shovels"] },
   sluices: { keys: ["pg-sluices"] },
   mododds: { keys: ["pmo-s"] },
+  weightrange: { keys: ["wr-s"] },
+  sizefinder: { keys: ["sf-s"] },
   farmroute: { keys: ["pfr-s"], keep: { "pfr-s": ["cl", "cc"] }, what: "inputs and ticks (saved lists stay)" },
   minmuts: { keys: ["pmm-s", "pt-sellcalc"] },
   runes: { keys: ["pr-s"] },

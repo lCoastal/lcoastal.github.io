@@ -1,8 +1,14 @@
 const $=id=>document.getElementById(id);
 // Test Log: a written summary of every test session behind the toolkit's formulas (no raw data).
 // Each session: when, where, setup, how much was logged, what was tested, what it showed, what changed on the site.
-const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables"};
+const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables",kg:"Weights"};
 const S=[
+{id:"weights-kg-1711",date:"17/11/26",title:"Mineral weights across every logged run",zone:"All logged runs",topics:["kg","cp"],kind:"wt",
+ setup:{Capacity:"1,856 – 7,240 (20 different values)",["Size Boost"]:"14.2× – 22.4×"},
+ amount:{["Minerals re-checked"]:1500000},
+ tested:["Where weights fall between the lightest and heaviest possible","Whether capacity, luck, modifier, mineral or position in the pan changes the weight"],
+ found:["Every weight falls between 0.75 and 15.5 × base weight × (1 + Size Boost); common minerals hit both ends almost exactly","About 26% of minerals always come out small (0.75 – 1.88 × base × (1 + Size Boost))","The rest are spread evenly at low capacity; the bigger the pan, the more of them lean to the heavy end (half beat 5.6× at 1,856 capacity, 10.9× at 7,240)","Luck, modifier, which mineral and where it lands in the pan made no difference"],
+ changed:["New tools: Weight Range and Size Boost Finder","Test Data Check shows each mineral's lightest and heaviest against the limits"]},
 {id:"logger3-1711",date:"17/11/26",title:"Check run on new data",zone:"Meteor Falls",topics:["lk","my","cp","md"],kind:"lk",
  setup:{Luck:"40,500 – 264,000",Capacity:"7,240",["Modifier Boost"]:"16.6×"},
  amount:{Pans:1096,Minerals:112342},
@@ -65,6 +71,7 @@ const FIND=[
  ["A full pan holds about 0.678 × capacity^0.565 minerals (≈20 at 400, 87 at 5,462, 102 at 7,240). Luck doesn't change it.",["frd-1711","night-1711","logger3-1711"]],
  ["Chance of a normal modifier is 1 − 0.937^boost (×): about 10% at 1.1×, 36% at 6×, 45% at 9×, 69% at 16.6×. Luck doesn't change it.",["low-1211","big-1111","fixed-1211","mods-1711"]],
  ["Which modifier you get works like luck: about 11.7 × boost^0.84 + 2 per 1,000 luck rolls, keeping the rarest.",["big-1111","fixed-1211","mods-1711"]],
+ ["A mineral weighs base × (1 + Size Boost) × k, with k from 0.75 to 15.5. About 26% roll small; the rest lean heavier the bigger your pan.",["weights-kg-1711"]],
  ["The toolkit's drop chances match the game's own weights in 34 of 35 zones.",["weights-1711"]],
 ];
 const OPEN=[
@@ -73,6 +80,7 @@ const OPEN=[
  "Why the modifier rate at the same boost is about 40% in some sessions and 52–57% in others (zone, weather or a totem?).",
  "The Void: fixed table (Voidstone 1 in 91.4M) or rotating pool (1 in 138M)?",
  "Modifier Boost above 16.6× and luck above 267,000 are untested.",
+ "How weights spread below 1,856 or above 7,240 capacity, and whether a Volcanic Eruption stacks with the Solar Magnifier.",
  "The \"luck caps give about 63% of the cap\" result came from the old luck model and needs re-checking.",
 ];
 const ORDER=S.map(x=>x.id);

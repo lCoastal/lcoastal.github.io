@@ -14,12 +14,14 @@ const HUBS = [
   [
     "h-luck",
     "Luck & Odds",
-    "Drop chances, best luck cap, build comparisons and modifier odds",
+    "Drop chances, best luck cap, build comparisons, modifier odds and mineral weights",
     [
       ["odds", "Luck Odds"],
       ["bestcap", "Best Luck Cap"],
       ["buildcmp", "Compare Builds"],
       ["mododds", "Modifier Odds"],
+      ["weightrange", "Weight Range"],
+      ["sizefinder", "Size Boost Finder"],
     ],
   ],
   [

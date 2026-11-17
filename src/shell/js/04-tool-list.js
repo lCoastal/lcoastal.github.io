@@ -7,6 +7,8 @@ const LIST = [
   { id: "eqload", name: "Equipment Loadouts", desc: "Rings, necklace and charm laid out like in game, with totals" },
   { id: "odds", name: "Luck Odds", desc: "Estimated chances per pan with your luck" },
   { id: "bestcap", name: "Best Luck Cap", desc: "The luck cap that finds each mineral most often, zone by zone" },
+  { id: "weightrange", name: "Weight Range", desc: "Lightest, typical and heaviest weight of a mineral" },
+  { id: "sizefinder", name: "Size Boost Finder", desc: "Size Boost you need for a mineral to hit a weight" },
   { id: "buildcmp", name: "Compare Builds", desc: "Compare the luck and capacity of several builds for one mineral" },
   { id: "mododds", name: "Modifier Odds", desc: "Chance of each ore modifier from your boost" },
   { id: "farmroute", name: "Museum Farm Route", desc: "Paste your museum, get zones to farm in order" },
