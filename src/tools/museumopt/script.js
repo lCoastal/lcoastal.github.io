@@ -174,7 +174,8 @@ function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
     o.innerHTML=`<div class="verdict yes"><span class="ic">✅</span><div><b>Yes, it can be improved</b><span>${ch.length} swap${ch.length===1?"":"s"} raise ${up} stat${up===1?"":"s"} without lowering any. ${proof}</span></div></div>
       <h3 class="sec">Swaps</h3><div class="swaps">${ch.map(c=>`<div class="sw" style="--rc:${rc(c.r)}"><span class="rr">${c.r}</span><span class="old">${mineHTML(c.was.m,c.was.u)}</span><span class="ar">→</span>${mineHTML(c.s.m,c.s.u)}</div>`).join("")}</div>
       <h3 class="sec">What it does</h3>${statTable(cur,nt)}
-      <div class="acts"><button type="button" class="btn pri" id="toCmp">Compare in the Museum Planner</button><button type="button" class="btn" id="toPl">Open in the Museum Planner</button><button type="button" class="btn" id="cpTxt">Copy as text</button></div>`;
+      <div class="acts"><button type="button" class="btn pri" id="toCmp">Compare in the Museum Planner</button><button type="button" class="btn" id="toPl">Open in the Museum Planner</button><button type="button" class="btn" id="cpTxt">Copy as text</button><button type="button" class="btn" id="toImg">Save as image</button></div>`;
+    $("toImg").onclick=()=>ptSaveImg("Museum improvement",()=>resultImage({ok:true,ch,cur,nt,proof}));
     $("toCmp").onclick=()=>{try{window.parent.ptSendMuseum("compare",NEWB,"Improved")}catch(e){}};
     $("toPl").onclick=()=>{try{window.parent.ptSendMuseum("planner",NEWB,"Improved museum")}catch(e){}};
     $("cpTxt").onclick=()=>{const t=totalsOf(NEWB);const txt=ORDER.map(r=>r+": "+NEWB[r].map(x=>x.m?x.m+(x.u&&x.u!=="None"?" ("+x.u+")":""):"empty").join(", ")).join("\n")+"\n\nTotal: "+STATS.map((s,i)=>Math.abs(t[i])>1e-9?s+" "+fxT(t[i]):"").filter(Boolean).join(", ");
@@ -187,7 +188,43 @@ function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
   T.sort((x,y)=>y.v-x.v);const seen=new Set(),from={},top=[];for(const t of T){const k=t.r+t.i;if(seen.has(t.op.n)||(from[k]||0)>=2)continue;seen.add(t.op.n);from[k]=(from[k]||0)+1;top.push(t);if(top.length>=8)break}
   const fxl=d=>STATS.map((s,i)=>Math.abs(d[i])>1e-9?`<span class="${d[i]>0?"up":"down"}">${s} ${sg(d[i])}</span>`:"").filter(Boolean).join(" · ");
   o.innerHTML=`<div class="verdict"><span class="ic">🏆</span><div><b>${res.done?"Your museum can't be improved":"No improvement found"}</b><span>${res.done?"Nothing beats it without lowering at least one stat, with the modifiers and minerals you allowed.":proof}</span></div></div>
-    ${top.length?`<h3 class="sec">Best trades if you're happy to lose a little</h3><p class="hint">One display changed at a time, ranked by ${S.goal==="all"?"total gain (every stat counted by how much it grows)":S.goal==="have"?"total gain in the stats your museum boosts":S.goal}.</p><div class="swaps" style="margin-top:6px">${top.map(t=>`<div class="trade" style="--rc:${rc(t.r)}"><div class="top"><span class="rr">${t.r}</span>${mineHTML(t.s.m,t.s.u)}<span class="ar">→</span>${mineHTML(t.op.n,t.op.u)}</div><div class="fx">${fxl(t.d)}</div></div>`).join("")}</div>`:'<p class="hint" style="margin-top:10px">No single swap gains more than it loses either.</p>'}`}
+    ${top.length?`<h3 class="sec">Best trades if you're happy to lose a little</h3><p class="hint">One display changed at a time, ranked by ${S.goal==="all"?"total gain (every stat counted by how much it grows)":S.goal==="have"?"total gain in the stats your museum boosts":S.goal}.</p><div class="acts" style="margin-top:0"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="swaps" style="margin-top:6px">${top.map(t=>`<div class="trade" style="--rc:${rc(t.r)}"><div class="top"><span class="rr">${t.r}</span>${mineHTML(t.s.m,t.s.u)}<span class="ar">→</span>${mineHTML(t.op.n,t.op.u)}</div><div class="fx">${fxl(t.d)}</div></div>`).join("")}</div>`:'<p class="hint" style="margin-top:10px">No single swap gains more than it loses either.</p>'}`;
+  const ib=document.getElementById("toImg");if(ib)ib.onclick=()=>ptSaveImg("Museum trades",()=>resultImage({ok:false,top}))}
+// ---- the result as a picture (drawn in the dark style; the toolkit maps colours to your theme) ----
+const IMGC={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6"};
+const loadImg=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src});
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function fit(c,t,max){t=String(t);if(c.measureText(t).width<=max)return t;while(t.length>1&&c.measureText(t+"…").width>max)t=t.slice(0,-1);return t+"…"}
+async function resultImage(o){try{await document.fonts.ready}catch(e){}
+  const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
+  const W=1100,PAD=36,RH=64,rows=o.ok?o.ch:o.top;const stats=o.ok?STATS.map((s,i)=>[s,o.cur[i],o.nt[i]]).filter(([,a,b])=>Math.abs(a)>1e-9||Math.abs(b)>1e-9):[];
+  const H=PAD+110+28+Math.max(1,rows.length)*(RH+(o.ok?8:26))+(o.ok?52+stats.length*34:0)+40;
+  const cv=document.createElement("canvas"),sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
+  c.fillStyle="#14181c";c.fillRect(0,0,W,H);
+  c.fillStyle="#98a2ad";c.font=`600 12px ${F}`;c.fillText("MUSEUM IMPROVER",PAD,PAD+8);
+  c.fillStyle=o.ok?"#3cc2a8":"#e6e9ec";c.font=`700 32px ${FD}`;c.fillText(o.ok?"Yes, it can be improved":"Can't be improved",PAD,PAD+44);
+  c.fillStyle="#98a2ad";c.font=`14px ${F}`;
+  const sub=o.ok?`${o.ch.length} swap${o.ch.length===1?"":"s"} raise ${STATS.filter((s,i)=>o.nt[i]>o.cur[i]+1e-9).length} stats without lowering any`:"Nothing beats it without lowering a stat. Best trades if you're happy to lose a little:";
+  c.fillText(fit(c,sub,W-PAD*2-200),PAD,PAD+72);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();
+  let y=PAD+110;c.fillStyle="#98a2ad";c.font=`600 12px ${F}`;c.fillText(o.ok?"SWAPS":"BEST TRADES",PAD,y);y+=14;
+  const half=(W-PAD*2-150-40)/2;
+  const mineral=async(n,u,x,yy,dim)=>{if(!n){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText("Empty",x,yy+RH/2+5);return}const m=MIN[String(n).toLowerCase()];let tx=x;
+    if(m&&m.ic){const im=await loadImg(m.ic);if(im){c.globalAlpha=dim?.6:1;c.drawImage(im,x,yy+10,44,44);c.globalAlpha=1}tx=x+54}
+    c.fillStyle=dim?"#b9c2cb":"#e6e9ec";c.font=`700 16px ${FD}`;c.fillText(fit(c,n,half-60),tx,yy+30);c.fillStyle=u&&u!=="None"?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText((u||"None").toUpperCase(),tx,yy+48)};
+  for(const t of rows){const r=t.r,col=IMGC[r],was=o.ok?t.was:t.s,now=o.ok?t.s:{m:t.op.n,u:t.op.u},h=RH+(o.ok?0:18);
+    c.fillStyle="#1c2126";rr(c,PAD,y,W-PAD*2,h,10);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,PAD,y,W-PAD*2,h,10);c.stroke();c.fillStyle=col;rr(c,PAD,y,5,h,3);c.fill();
+    c.fillStyle=col;c.font=`700 12px ${F}`;c.fillText(r.toUpperCase(),PAD+18,y+RH/2+4);
+    await mineral(was.m,was.u,PAD+150,y,true);c.fillStyle="#98a2ad";c.font=`20px ${F}`;c.fillText("→",PAD+150+half+4,y+RH/2+7);await mineral(now.m,now.u,PAD+150+half+40,y,false);
+    if(!o.ok){let x=PAD+150;c.font=`12.5px ${FM}`;STATS.forEach((s,i)=>{const d=t.d[i];if(Math.abs(d)<1e-9)return;const txt=`${s} ${sg(d)}`;c.fillStyle=d>0?"#3cc2a8":"#ef7a66";c.fillText(txt,x,y+RH+8);x+=c.measureText(txt).width+18})}
+    y+=h+8}
+  if(o.ok){y+=18;c.fillStyle="#98a2ad";c.font=`600 12px ${F}`;c.fillText("WHAT IT DOES",PAD,y);y+=10;
+    const cx=[PAD+14,W-PAD-330,W-PAD-200,W-PAD-14];
+    c.fillStyle="#98a2ad";c.font=`600 11px ${F}`;[["NOW",1],["AFTER",2],["CHANGE",3]].forEach(([t,i])=>c.fillText(t,cx[i]-c.measureText(t).width,y+2));y+=12;
+    stats.forEach(([s,a,b],k)=>{const yy=y+k*34;c.fillStyle=k%2?"#171b1f":"#1c2126";rr(c,PAD,yy,W-PAD*2,30,6);c.fill();
+      c.fillStyle="#e6e9ec";c.font=`14px ${F}`;c.fillText(s,cx[0],yy+20);c.font=`14px ${FM}`;c.fillStyle="#b9c2cb";
+      const ra=(t,x)=>c.fillText(t,x-c.measureText(t).width,yy+20);ra(fxT(a),cx[1]);ra(fxT(b),cx[2]);const d=b-a,z=Math.abs(d)<1e-9;c.fillStyle=z?"#98a2ad":d>0?"#3cc2a8":"#ef7a66";c.font=`600 14px ${FM}`;ra(z?"same":sg(d),cx[3])})}
+  return await new Promise(res=>cv.toBlob(res,"image/png"))}
 drawInputs();
 window.addEventListener("storage",()=>drawInputs());window.ptStoreChanged=()=>{};
 })();
