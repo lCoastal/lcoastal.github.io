@@ -10,7 +10,7 @@ function fullList(loc){const b=baseLoc(loc),own=LOC[loc]||[];let out;
   else out=[...own];return out.length<2?[]:out}
 function dropShares(loc,L){const list=fullList(loc).sort((a,b)=>a.p-b.p),tot=list.reduce((s,x)=>s+x.p,0);let c=0;L=Math.max(1,L);
   const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l),o={};
-  list.forEach(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);o[x.m.n]=(.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L)))/sn});return o}
+  list.forEach(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);o[x.m.n]=(.2891*f(lo,hi,1)+.0280*f(lo,hi,Math.max(1,.04317*L))+.1905*f(lo,hi,Math.max(1,.40579*L))+.4924*f(lo,hi,Math.max(1,1.74153*L)))/sn});return o}
 const ZONES=Object.keys(LOC);
 const zoneOf=z=>{z=String(z||"").trim().toLowerCase();return ZONES.find(k=>k.toLowerCase()===z)||ZONES.find(k=>baseLoc(k).toLowerCase()===z)||null};
 // modifier model, same as Modifier Odds

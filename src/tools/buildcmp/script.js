@@ -16,7 +16,7 @@ function fullList(loc){const b=baseLoc(loc);const own=LOC[loc]||[];let out;
   return out.length<2?[]:out}
 const SH={};
 function effAt(loc,m,L){const k=loc+"|"+L;if(!SH[k]){const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);
-    SH[k]=new Map(list.map(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);return [x.m,(.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L)))/sn]}))}
+    SH[k]=new Map(list.map(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);return [x.m,(.2891*f(lo,hi,1)+.0280*f(lo,hi,Math.max(1,.04317*L))+.1905*f(lo,hi,Math.max(1,.40579*L))+.4924*f(lo,hi,Math.max(1,1.74153*L)))/sn]}))}
   return SH[k].get(m)||0}
 const CAPS=[1,5,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000];
 // chance per mineral for one build in one zone, at its own luck or at its best cap
