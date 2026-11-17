@@ -17,6 +17,7 @@ const ENCH_BY={Common:"Excavating",Uncommon:"Excavating",Rare:"Excavating",Epic:
 let ENCH_ON=true;try{ENCH_ON=localStorage.getItem("pt-ench")!=="0"}catch(e){}
 const enchTag=r=>ENCH_ON&&ENCH_BY[r]?` <span class="ench" title="Best shovel enchant for ${r} minerals">${ENCH_BY[r]}</span>`:"";
 
+const LTD=/The Void|Haunted Creek|North Pole|Seashell Beach/;
 const $=id=>document.getElementById(id);
 const ORD=["Ascended","Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
 let S={q:"",sort:"rar",hideR:[],luck:null};
@@ -87,12 +88,13 @@ function render(){
   const minQ=!!q&&ROWS.some(x=>x.m.n.toLowerCase().includes(q)),zoneQ=!!q&&!minQ,best=S.bestOnly&&!zoneQ;
   const by=new Map();ROWS.filter(x=>!S.hideR.includes(x.m.r)).forEach(x=>{if(!by.has(x.m))by.set(x.m,[]);by.get(x.m).push(x)});
   by.forEach((list,m)=>{let zs=list.map(r=>({r,b:bestFor(r)})).sort((x,y)=>y.b.eff-x.b.eff);
-    // best zone only: skip The Void unless the mineral only drops there
+    // best zone only: skip limited-time zones unless the mineral only drops there
     // Abyssal Depth is left out unless the mineral drops nowhere else
     if(minQ&&!nameHit(m.n))zs=[];
     if(zoneQ)zs=zs.filter(z=>z.r.loc.toLowerCase().includes(q));
     else{const na=zs.filter(z=>!/Abyssal Depth/i.test(z.r.loc));if(na.length)zs=na}
-    if(best){const nv=zs.filter(z=>!/Void/.test(z.r.loc));zs=(nv.length?nv:zs).slice(0,1)}
+    // limited-time zones (The Void and event islands) go to the bottom, and best-zone mode only picks them when there's nothing else
+    {const reg=zs.filter(z=>!LTD.test(z.r.loc)),ltd=zs.filter(z=>LTD.test(z.r.loc));zs=reg.concat(ltd);if(best)zs=(reg.length?reg:ltd).slice(0,1)}
     if(zs.length)by.set(m,zs);else by.delete(m)});
   let mins=[...by.keys()];
   mins.sort(S.sort==="az"?(a,b)=>a.n.localeCompare(b.n):(a,b)=>ORD.indexOf(a.r)-ORD.indexOf(b.r)||a.n.localeCompare(b.n));
@@ -101,7 +103,7 @@ function render(){
   VIEW={mins,by};
   const shown=mins.slice(0,LIMIT);
   $("rows").innerHTML=rows.length?shown.map(m=>{const zs=by.get(m);
-    return zs.map(({r,b},i)=>`<tr class="${i?"":"first"}"><td class="mcell">${i?"":`<span class="mn" data-mineral="${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(m.n)}</b><br><span class="rr" style="--rc:${rc(m.r)}">${m.r}</span>${enchTag(m.r)}</span></span>`}</td><td class="zcell" data-l="Zone"><span class="lk" data-location="${esc(baseLoc(r.loc))}">${esc(r.loc)}</span></td><td data-l="Best luck cap">${b.cap==null?`<span class="cap none">No cap</span>`:`<span class="cap">${fmt(b.cap,0)}</span>`}</td><td class="bl" data-l="Best luck">${peakCell(r)}</td><td class="num" data-l="Chance per mineral">${oneInT(b.eff)}</td><td data-l="Compared to your luck">${gain(b,r)}</td></tr>`).join("")}).join("")
+    return zs.map(({r,b},i)=>`<tr class="${i?"":"first"}"><td class="mcell">${i?"":`<span class="mn" data-mineral="${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(m.n)}</b><br><span class="rr" style="--rc:${rc(m.r)}">${m.r}</span>${enchTag(m.r)}</span></span>`}</td><td class="zcell" data-l="Zone"><span class="lk" data-location="${esc(baseLoc(r.loc))}">${esc(r.loc)}</span>${LTD.test(r.loc)?' <span class="ltd">limited time</span>':""}</td><td data-l="Best luck cap">${b.cap==null?`<span class="cap none">No cap</span>`:`<span class="cap">${fmt(b.cap,0)}</span>`}</td><td class="bl" data-l="Best luck">${peakCell(r)}</td><td class="num" data-l="Chance per mineral">${oneInT(b.eff)}</td><td data-l="Compared to your luck">${gain(b,r)}</td></tr>`).join("")}).join("")
     :`<tr><td colspan="6" class="hint">Nothing matches. Try another search or turn a rarity back on.</td></tr>`;
   $("more").innerHTML=mins.length>LIMIT?`<button type="button" class="btn" id="moreBtn">Show ${fmt(Math.min(60,mins.length-LIMIT),0)} more minerals</button>`:"";
 }
