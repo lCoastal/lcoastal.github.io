@@ -26,17 +26,22 @@ const AC=makeAC({inp:$("min"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m
 // registered after the picker so it can still tell typed text from the current pick
 $("min").value=S.min;$("min").addEventListener("input",e=>{S.min=e.target.value;save();render()});
 
-// bar chart: share of minerals in each weight band
+// percentile chart: each bar is a slice of drops (lightest 25%, then 5% slices, then the top 1%);
+// its width is the weight range that slice covers and its height how packed it is, so the area is the share of drops
+const PE=[0,.25,.3,.35,.4,.45,.5,.55,.6,.65,.7,.75,.8,.85,.9,.95,.99,1];
+let BANDS=[];
 function chart(base,model,M){
-  const W=640,H=210,L=40,R=10,T=14,B=30,N=30,bw=(WT_MAX-WT_MIN)/N,x=k=>L+(k-WT_MIN)/(WT_MAX-WT_MIN)*(W-L-R);
-  const bars=[];for(let i=0;i<N;i++){const lo=WT_MIN+i*bw,hi=lo+bw;bars.push([lo,hi,model.sf(lo)-model.sf(hi)])}
-  const top=Math.max(...bars.map(b=>b[2])),yt=Math.ceil(top*100/5)*5/100||.05,y=v=>H-B-v/yt*(H-B-T);
-  const grid=[0,yt/2,yt].map(v=>`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${fmt(v*100,1)}%</text>`).join("");
-  const rects=bars.map(([lo,hi,v])=>`<rect class="bar${lo<WT_SM_HI-.01?" sm":""}" x="${(x(lo)+1).toFixed(1)}" y="${y(v).toFixed(1)}" width="${(x(hi)-x(lo)-2).toFixed(1)}" height="${(H-B-y(v)).toFixed(1)}"><title>${kg(base*lo*M)} – ${kg(base*hi*M)}: ${fmt(v*100,1)}% of them</title></rect>`).join("");
+  const W=640,H=220,L=14,R=14,T=12,B=30,x=k=>L+(k-WT_MIN)/(WT_MAX-WT_MIN)*(W-L-R);
+  BANDS=PE.slice(1).map((u,i)=>{const u0=PE[i],k0=model.q(1-u0),k1=model.q(1-u);return {u0,u1:u,k0,k1,d:(u-u0)/Math.max(1e-6,k1-k0)}});
+  const top=Math.max(...BANDS.map(b=>b.d)),y=v=>H-B-v/top*(H-B-T);
+  const rects=BANDS.map((b,i)=>{const hue=Math.round(200-160*(b.u0+b.u1)/2);return `<rect class="pb" data-b="${i}" x="${(x(b.k0)+.75).toFixed(1)}" y="${y(b.d).toFixed(1)}" width="${Math.max(1.5,x(b.k1)-x(b.k0)-1.5).toFixed(1)}" height="${(H-B-y(b.d)).toFixed(1)}" rx="2" style="fill:hsl(${hue} 60% 52% / .8)"/>`}).join("");
   const tk=[0,.25,.5,.75,1].map(f=>WT_MIN+f*(WT_MAX-WT_MIN));
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of minerals at each weight">${grid}${rects}<line class="ax" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>
-    ${tk.map((k,i)=>`<text x="${x(k)}" y="${H-B+17}" text-anchor="${i===0?"start":i===4?"end":"middle"}">${kg(base*k*M)}</text>`).join("")}</svg>`}
-
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weights split into percentiles">${rects}<line class="ax" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>
+    ${tk.map((k,i)=>`<text x="${x(k)}" y="${H-B+17}" text-anchor="${i===0?"start":i===4?"end":"middle"}">${kg(base*k*M)}</text>`).join("")}</svg><div class="tip" id="tip" hidden></div>`}
+const bandText=(b,base,M)=>{const p0=Math.round(b.u0*100),p1=Math.round(b.u1*100),sh=Math.round((b.u1-b.u0)*100);
+  const name=b.u0===0?`Lightest ${p1}%`:b.u1===1?`Top ${100-p0}%`:`Percentile ${p0}–${p1}`;
+  const note=b.u0===0?"the group that always comes out small":b.u1===1?"heavier than 99% of drops":`heavier than ${p0}% of drops`;
+  return `<b>${name}</b><span>${sh}% of drops · ${note}</span><span class="kg">${kg(base*b.k0*M)} – ${kg(base*b.k1*M)}</span>`};
 function mineral(m,sb,cap,model,M){
   const base=m.bw*(1+sb/100);
   $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b style="color:${rc(m.r)}">${esc(m.n)}</b><br><span>${esc(m.r)} · base weight ${m.bw} kg · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}</span></div>`;
@@ -46,8 +51,8 @@ function mineral(m,sb,cap,model,M){
   const ez=[...new Set((m.ch||[]).map(c=>baseLoc(c[0])).filter(z=>ERUPT.has(z)))];
   $("erupt").hidden=!ez.length;
   if(ez.length)$("erupt").innerHTML=`🌋 In a Volcanic Eruption (${esc(ez.join(", "))}) sizes are doubled: up to <b>${kg(base*WT_MAX*2)}</b>${S.mag?" (without the Magnifier; stacking isn't tested)":""}.`;
-  $("chart").innerHTML=chart(base,model,M);
-  $("chartNote").textContent=`The grey bars on the left are the ${Math.round(WT_SMALL*100)}% that always come out small. The rest spread across the range and lean heavier the bigger your pan.${cap&&(cap<1856||cap>7240)?" Your capacity is outside the tested 1,856–7,240, so the shape is an estimate.":""}`;
+  $("chart").innerHTML=chart(base,model,M);CUR=[base,M];
+  $("chartNote").textContent=`Each bar is a slice of your drops: the lightest 25%, then 5% slices, then the top 1%. Wider bars cover more kg, taller ones are more packed. Hover a bar for its percentile and weights.${cap&&(cap<1856||cap>7240)?" Your capacity is outside the tested 1,856–7,240, so the shape is an estimate.":""}`;
   $("pct").innerHTML=[[.5,"Top half"],[.25,"Top 25%"],[.1,"Top 10%"],[.01,"Top 1%"],[.001,"Top 0.1%"]].map(([p,l])=>`<div><span>${l}</span><b>${kg(base*model.q(p)*M)}</b><small>or heavier · ${oneIn(p)}</small></div>`).join("");
 }
 
@@ -61,6 +66,13 @@ function zone(z,sb,cap,model,M){
 }
 $("ztbl").addEventListener("click",e=>{const r=e.target.closest("[data-m]");if(!r)return;S.min=r.dataset.m;$("min").value=S.min;save();render();AC.sync();window.scrollTo({top:0,behavior:"smooth"})});
 
+let CUR=[1,1];
+const chartEl=$("chart");
+chartEl.addEventListener("mousemove",e=>{const r=e.target.closest(".pb"),tip=$("tip");if(!tip)return;chartEl.querySelectorAll(".pb.on").forEach(x=>x!==r&&x.classList.remove("on"));
+  if(!r){tip.hidden=true;return}r.classList.add("on");tip.innerHTML=bandText(BANDS[+r.dataset.b],CUR[0],CUR[1]);tip.hidden=false;
+  const cr=chartEl.getBoundingClientRect(),tw=tip.offsetWidth;let lx=e.clientX-cr.left+12;if(lx+tw>cr.width)lx=e.clientX-cr.left-tw-12;tip.style.left=Math.max(0,lx)+"px";tip.style.top=(e.clientY-cr.top-10)+"px"});
+chartEl.addEventListener("mouseleave",()=>{const tip=$("tip");if(tip)tip.hidden=true;chartEl.querySelectorAll(".pb.on").forEach(x=>x.classList.remove("on"))});
+chartEl.addEventListener("click",e=>e.target.dispatchEvent(new MouseEvent("mousemove",{clientX:e.clientX,clientY:e.clientY,bubbles:true})));
 function render(){
   const q=String(S.min).trim().toLowerCase(),m=BY[q],z=!m&&ZBY[q],sb=Math.max(0,+S.sb||0),cap=+S.cap||0,M=S.mag?1.5:1,model=wtModel(cap||4000);
   $("out").hidden=!m;$("zout").hidden=!z;

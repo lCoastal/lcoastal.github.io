@@ -64,3 +64,11 @@ table.z tbody tr:hover td{background:var(--sunk)}
 .rngbar{position:relative;height:6px;border-radius:99px;background:var(--sunk);border:1px solid var(--line);min-width:90px}
 .rngbar i{position:absolute;top:-1px;bottom:-1px;border-radius:99px;background:var(--accent)}
 @media (max-width:640px){table.z .hide-s{display:none}}
+.chart{position:relative}
+.chart .pb{cursor:pointer;transition:opacity .1s}
+.chart svg:hover .pb:not(.on){opacity:.55}
+.chart .pb.on{stroke:var(--fg);stroke-width:1.2}
+.tip{position:absolute;z-index:5;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px;box-shadow:0 6px 18px rgba(0,0,0,.25);font-size:12.5px;display:flex;flex-direction:column;gap:2px;max-width:240px}
+.tip b{font-size:13px}
+.tip span{color:var(--muted)}
+.tip .kg{font-family:var(--f-mono);color:var(--fg)}
