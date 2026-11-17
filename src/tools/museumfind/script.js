@@ -13,12 +13,14 @@ $("mods").innerHTML=P.mods.map(m=>`<label class="ck"><input type="checkbox" data
 // The museum is chosen as a whole, not slot by slot. Each weighted stat counts as weight × log(1 + museum total),
 // so a stat you already have a lot of is worth less: two stats on the same weight get a fair share each instead of
 // the first one in the list taking every tie. Unweighted stats are ignored. Each display gets its own modifier.
+const MA=(n,u)=>{try{return window.parent.ptModAllowed(n,u)}catch(e){return true}};
+const MO=n=>{try{return window.parent.ptModOnly(n)}catch(e){return null}};
 const fval=x=>Math.log(1+Math.max(x,-0.99));
 function solve(){const own=Store.all();const W=STATS.filter(s=>S.w[s]>0).map(s=>[s,S.w[s]]);
   const mods=P.mods.filter(m=>S.mods.includes(m[0]));if(!mods.some(m=>m[0]==="None"))mods.push(["None",[],1,""]);
   // every mineral × modifier choice for each rarity, with the stats it adds
-  const opts={};ORDER.forEach(r=>{opts[r]=[];P.mins.filter(m=>m.r===r&&m.mu&&(!S.own||(own[m.n]||{}).own)&&!(S.skip||[]).includes(m.n)).forEach(m=>mods.forEach(md=>{const g={};
-    m.mu.b.forEach(([st,v])=>g[st]=(g[st]||0)+v);md[1].forEach(st=>g[st]=(g[st]||0)+MULT[r]*md[2]);opts[r].push({n:m.n,u:md[0],g})}))});
+  const opts={};ORDER.forEach(r=>{opts[r]=[];P.mins.filter(m=>m.r===r&&m.mu&&(!S.own||(own[m.n]||{}).own)&&!(S.skip||[]).includes(m.n)).forEach(m=>{const only=MO(m.n);(only?[P.mods.find(x=>x[0]===only)].filter(Boolean):mods).forEach(md=>{if(!MA(m.n,md[0]))return;const g={};
+    m.mu.b.forEach(([st,v])=>g[st]=(g[st]||0)+v);md[1].forEach(st=>g[st]=(g[st]||0)+MULT[r]*md[2]);opts[r].push({n:m.n,u:md[0],g})})})});
   const slots=[];ORDER.forEach(r=>{for(let i=0;i<SLOTS[r];i++)slots.push({r,o:null})});
   const T={};W.forEach(([st])=>T[st]=0);
   const score=()=>W.reduce((a,[st,w])=>a+w*fval(T[st]),0);

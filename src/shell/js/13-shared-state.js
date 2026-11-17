@@ -123,3 +123,34 @@ window.ptBuildStats = (st) =>
     f.addEventListener("load", () => setTimeout(go, 0), { once: true });
   });
 
+
+// Which special modifiers a mineral can have (used by the museum tools):
+// Treasured: non-Exotic minerals from the treasure-chest zones, anything from the Pharaoh's Tomb deposits, and Feather of Ma'at.
+// Entombed: only minerals from the tomb deposits. Feather of Ma'at only ever comes Treasured.
+(function () {
+  const CHEST = new Set(["Sunset Beach", "Volcanic Sands", "Windswept Beach", "Frostbite River", "Rotwood Swamp", "Starfall River"]);
+  const ONLY = { "Feather of Ma'at": "Treasured" };
+  let T = null, E = null;
+  const build = () => {
+    T = new Set(); E = new Set();
+    ((window.PTDATA || {}).mins || []).forEach((m) => {
+      const zs = (m.ch || []).map((c) => String(c[0]).replace(/\s*\(.*\)$/, ""));
+      const tomb = zs.some((z) => /^Tomb Vein/.test(z));
+      if (tomb) { E.add(m.n); T.add(m.n); }
+      if (m.r !== "Exotic" && zs.some((z) => CHEST.has(z))) T.add(m.n);
+    });
+    Object.keys(ONLY).forEach((n) => T.add(n));
+  };
+  window.ptModAllowed = (name, mod) => {
+    if (!T) build();
+    if (ONLY[name]) return mod === ONLY[name] || mod === "Any";
+    if (mod === "Treasured") return T.has(name);
+    if (mod === "Entombed") return E.has(name);
+    return true;
+  };
+  window.ptModOnly = (name) => ONLY[name] || null;
+  window.ptModWhy = (name, mod) =>
+    ONLY[name] ? `${name} only comes ${ONLY[name]}` :
+    mod === "Treasured" ? `${name} isn't in treasure chests or the tomb` :
+    mod === "Entombed" ? `${name} isn't found in the tomb deposits` : "";
+})();

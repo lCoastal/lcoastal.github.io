@@ -43,6 +43,8 @@ const fxT=v=>r4(1+v)+"×";
 // Mutations can also be "Any" (any modifier, nothing counted) or "Any of: A/B/C" (counts the weakest of those, so totals are a safe minimum).
 const anyOfList=u=>String(u||"").startsWith("Any of: ")?String(u).slice(8).split("/").map(x=>x.trim()).filter(x=>MOD[x]):[];
 function modOf(u){u=u||"None";if(MOD[u])return MOD[u];if(u==="Any")return ["Any",[],1,""];const l=anyOfList(u);if(l.length)return l.map(x=>MOD[x]).reduce((a,b)=>b[1].length*b[2]<a[1].length*a[2]?b:a);return MOD.None}
+const MA=(n,u)=>{try{return !n||n==="Any"||!window.parent.ptModAllowed||window.parent.ptModAllowed(n,u)}catch(e){return true}};
+const MWHY=(n,u)=>{try{return window.parent.ptModWhy(n,u)}catch(e){return ""}};
 const modOk=u=>!!MOD[u]||u==="Any"||anyOfList(u).length>0;
 const minLabel=(r,m)=>m==="Any"?"Any "+r:m;
 function slotGain(r,slot){const g={};if(slot.m&&BY[slot.m]){BY[slot.m][3].forEach(([s,v])=>g[s]=(g[s]||0)+v);}const md=modOf(slot.u);md[1].forEach(s=>g[s]=(g[s]||0)+MULT[r]*md[2]);return g}
@@ -193,6 +195,7 @@ function drawPicker(){
       anyof.onclick=()=>{P.multi=true;P.sel=anyOfList(cur.u).length?anyOfList(cur.u):(MOD[cur.u]&&cur.u!=="None"?[cur.u]:[]);drawPicker()};opts.appendChild(anyof);
     }
     MODS.filter(m=>!P.multi||m[0]!=="None").forEach(m=>{const o=document.createElement("button");o.type="button";const on=P.multi&&P.sel.includes(m[0]);o.className="opt"+(!P.multi&&(cur.u||"None")===m[0]?" cur":"")+(on?" sel":"");
+      if(!MA(cur.m,m[0])){o.disabled=true;o.innerHTML=`<b>${m[0]}</b><span class="kg">${esc(m[3])}</span><div class="gives"><span>${esc(MWHY(cur.m,m[0]))}</span></div>`;opts.appendChild(o);return}
       o.innerHTML=`<b>${P.multi?(on?"☑ ":"☐ "):""}${m[0]}</b><span class="kg">${esc(m[3])}</span><div class="gives">${gainHTML(modGain(r,m[0]))}</div>`;
       if(P.multi){o.setAttribute("aria-pressed",String(on));o.onclick=()=>{P.sel=on?P.sel.filter(x=>x!==m[0]):[...P.sel,m[0]];drawPicker();const b=[...document.querySelectorAll("#opts .opt")].find(x=>x.textContent.includes(m[0]));b&&b.focus()};o.onmouseenter=()=>showPreview(m[0],m[0])}else hook(o,m[0]);opts.appendChild(o)});
   }
@@ -210,7 +213,7 @@ function hook(el,val){
   const label=val===null?"this display empty":val;
   el.addEventListener("mouseenter",()=>{if(!el.disabled)showPreview(val,label)});
   el.addEventListener("focus",()=>{if(!el.disabled)showPreview(val,label)});
-  el.addEventListener("click",()=>{if(el.disabled)return;const sl=brd(P.side)[P.r][P.i];if(P.kind==="m")sl.m=val;else sl.u=val;save();renderBoard();closePicker()});
+  el.addEventListener("click",()=>{if(el.disabled)return;const sl=brd(P.side)[P.r][P.i];if(P.kind==="m"){sl.m=val;if(val&&!MA(val,sl.u||"None")){let o=null;try{o=window.parent.ptModOnly(val)}catch(e){}sl.u=o||"None"}}else sl.u=val;save();renderBoard();closePicker()});
 }
 document.getElementById("opts").addEventListener("mouseleave",()=>showPreview(null));
 
