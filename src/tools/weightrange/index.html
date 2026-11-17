@@ -12,12 +12,12 @@
 <div class="wrap">
   <header>
     <h1>Weight Range</h1>
-    <p class="lede">How heavy a mineral can come out with your Size Boost and capacity: the lightest, typical and heaviest weight, and how often each size shows up.</p>
+    <p class="lede">How heavy a mineral can come out with your Size Boost and capacity: the lightest, typical and heaviest weight, and how often each size shows up. Pick a zone instead to see every mineral there at once.</p>
   </header>
   <p class="disc" role="note"><b>Heads up:</b> the lightest and heaviest weights are exact. How often each weight shows up is fitted on about 1.5 million logged minerals at 1,856 to 7,240 capacity, so outside that range it's an estimate.</p>
   <section class="card">
     <div class="inputs">
-      <label class="fld"><span class="lab">Mineral</span><input type="text" id="min" placeholder="e.g. Gold" autocomplete="off"></label>
+      <label class="fld"><span class="lab">Mineral or zone</span><input type="text" id="min" placeholder="e.g. Gold or Meteor Falls" autocomplete="off"></label>
       <label class="fld"><span class="lab">Size Boost (panel %)</span><input type="number" id="sb" min="0" inputmode="decimal"></label>
       <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" inputmode="numeric"></label>
       <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
@@ -27,13 +27,16 @@
   <section class="card" id="out" hidden>
     <div class="head" id="head"></div>
     <div class="big" id="sum"></div>
-    <h2>How the weights are spread</h2>
+    <div class="erupt" id="erupt" hidden></div>
+    <h2>Share of minerals at each weight</h2>
     <div id="chart" class="chart"></div>
     <p class="hint" id="chartNote"></p>
-    <div class="cols2">
-      <div><h2>How often you beat a weight</h2><div class="tw" id="pct"></div></div>
-      <div><h2>Heaviest possible per zone</h2><div class="tw" id="zones"></div></div>
-    </div>
+    <h2 style="margin-top:6px">How heavy the top ones get</h2>
+    <div class="tops" id="pct"></div>
+  </section>
+  <section class="card" id="zout" hidden>
+    <div class="head" id="zhead"></div>
+    <div class="tw" id="ztbl"></div>
   </section>
   <section class="card"><h2>The formula</h2>
     <div class="fbox">

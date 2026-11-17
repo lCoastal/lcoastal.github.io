@@ -7,10 +7,12 @@ const BY=Object.fromEntries(MINS.map(m=>[m.n.toLowerCase(),m]));
 const pc=v=>!isFinite(v)?"—":fmt(Math.max(0,v),v<100?1:0)+"%";
 const oneIn=p=>p<=0?"never":p>=.5?fmt(p*100,1)+"%":p>=.01?fmt(p*100,1)+"% (1 in "+fmt(Math.round(1/p),0)+")":"1 in "+fmt(Math.round(1/p),0);
 
-["min","kg","cap","sb"].forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});
+["kg","cap","sb"].forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});
 // mineral picker with pictures, same as the rest of the toolkit
 const curMin=()=>BY[String(S.min).trim().toLowerCase()];
 makeAC({inp:$("min"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),cur:()=>{const m=curMin();return m?m.n:""},icon:()=>{const m=curMin();return m&&m.ic},pick:x=>{$("min").value=x.n;$("min").dispatchEvent(new Event("input"))}});
+// registered after the picker so it can still tell typed text from the current pick
+$("min").value=S.min;$("min").addEventListener("input",e=>{S.min=e.target.value;save();render()});
 $("good").value=S.good;$("good").onchange=e=>{S.good=e.target.value;save();render()};
 $("mag").checked=!!S.mag;$("mag").onchange=e=>{S.mag=e.target.checked;save();render()};
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;
