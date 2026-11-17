@@ -1,7 +1,7 @@
 # lcoastal.github.io
 goat level project
 
-**Formulas are not exact
+**Formulas are not exact**
 
 Prospecting Toolkit by @__coastal. The live site is `index.html`.
 
