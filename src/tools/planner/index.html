@@ -33,13 +33,19 @@
       <input id="imp" type="file" accept=".html,text/html" hidden>
       <button class="btn" id="copy" type="button">Copy as text</button>
       <button class="btn" id="pClear" type="button">Clear board</button>
+      <button class="btn" id="pasteMain" type="button">Paste a setup</button>
+      <button class="btn" id="cmpBtn" type="button" aria-pressed="false">Compare two museums</button>
     </div>
   </section>
 
-  <div class="grid">
-    <div class="board" id="board"></div>
+  <div class="grid" id="grid">
+    <div class="sides">
+      <div class="tabs" id="tabs" role="group" aria-label="Which museum to show" hidden><button type="button" class="chip" data-tab="A">Museum A</button><button type="button" class="chip" data-tab="B">Museum B</button></div>
+      <div class="side" id="sideA"><div class="shead" id="headA" hidden></div><div class="board" id="board"></div></div>
+      <div class="side" id="sideB" hidden><div class="shead" id="headB"></div><div class="board" id="boardB"></div></div>
+    </div>
     <aside class="totals" aria-live="polite">
-      <h2>Museum total</h2>
+      <h2 id="totH">Museum total</h2>
       <div id="tot"></div>
       <p class="hint" id="filled"></p>
     </aside>
@@ -57,6 +63,16 @@
   </div>
 </div>
 
+<div class="scrim" id="pscrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pasteH">
+    <div class="sh"><h3 id="pasteH">Paste a setup</h3><button class="btn" id="pasteX" type="button">Close</button></div>
+    <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+      <p class="hint">Paste a setup copied from here (Copy as text) or written the same way: one rarity per line, like <code>Mythic: Pink Diamond (Perfect), Chrysoberyl (Perfect)</code>.</p>
+      <textarea id="pasteT" rows="9" spellcheck="false"></textarea>
+      <div style="display:flex;justify-content:flex-end"><button class="btn primary" id="pasteGo" type="button">Use this setup</button></div>
+    </div>
+  </div>
+</div>
 <script data-file="script.js"></script>
 
 </body>

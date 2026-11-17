@@ -96,3 +96,33 @@ label.btn{display:inline-block}
 .foot a{color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:30}
 @media (prefers-reduced-motion:no-preference){.sheet{animation:pop .14s ease-out}@keyframes pop{from{transform:translateY(8px);opacity:.6}}}
+
+/* compare mode: two boards side by side, the difference on top; one board at a time (tabs) on small screens */
+.sides{display:flex;flex-direction:column;gap:12px;min-width:0}
+.grid.cmp{grid-template-columns:1fr}
+.grid.cmp .totals{order:-1;position:static}
+.grid.cmp .sides{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.grid.cmp .tabs{grid-column:1/-1}
+.side{display:flex;flex-direction:column;gap:10px;min-width:0}
+.shead{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.shead .hrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.shead .tag{font:700 13px var(--f-display);width:26px;height:26px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:var(--bg)}
+.shead .name{flex:1;min-width:0;font:600 14px var(--f-body);padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:var(--sunk);color:var(--fg)}
+.shead select{font:13px var(--f-body);padding:5px 6px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--fg);max-width:160px}
+.btn.sm{font-size:12px;padding:4px 9px}
+.tabs{display:none;gap:6px}
+.tabs .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.grid.cmp .slots{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid.cmp .slot{padding:8px}
+.grid.cmp .pick b{font-size:13.5px}
+.slot.diff{outline:2px solid color-mix(in srgb,var(--accent) 70%,transparent);outline-offset:1px}
+.drow{display:grid;grid-template-columns:minmax(0,1fr) 70px 70px 80px;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
+.drow:last-child{border-bottom:0}
+.drow.dh{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.drow .v,.drow.dh span:not(:first-child){text-align:right}
+.drow .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.drow .up{color:var(--pos);font-weight:600}.drow .down{color:var(--neg);font-weight:600}.drow .same{color:var(--muted)}
+#pasteT{width:100%;box-sizing:border-box;font:13px/1.5 var(--f-mono);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);color:var(--fg);resize:vertical}
+@media (max-width:900px){.grid.cmp .sides{display:flex}.grid.cmp .tabs{display:flex}.side.off{display:none}}
+@media (max-width:620px){.grid.cmp .slots{grid-template-columns:1fr}}
+.grid.cmp #tot,.grid.cmp #filled{max-width:640px}

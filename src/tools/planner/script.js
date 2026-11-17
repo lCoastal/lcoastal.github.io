@@ -24,7 +24,11 @@ const MOD=Object.fromEntries(MODS.map(m=>[m[0],m]));
 const blank=()=>Object.fromEntries(ORDER.map(r=>[r,Array.from({length:SLOTS[r]},()=>({m:null,u:"None"}))]));
 let S=blank();
 try{const s=JSON.parse(localStorage.getItem("mp-board")||"null");if(s&&ORDER.every(r=>Array.isArray(s[r])&&s[r].length===SLOTS[r]))S=s;}catch(e){}
-const save=()=>{try{localStorage.setItem("mp-board",JSON.stringify(S))}catch(e){}};
+let SB=blank();try{const s=JSON.parse(localStorage.getItem("mp-board-b")||"null");if(s&&ORDER.every(r=>Array.isArray(s[r])&&s[r].length===SLOTS[r]))SB=s;}catch(e){}
+let CMP=false,TAB="A",NAMES={A:"",B:""};try{CMP=localStorage.getItem("mp-cmp")==="1";Object.assign(NAMES,JSON.parse(localStorage.getItem("mp-cmp-names")||"{}"))}catch(e){}
+const brd=side=>side==="B"?SB:S;
+const setBrd=(side,b)=>{if(side==="B")SB=b;else S=b};
+const save=()=>{try{localStorage.setItem("mp-board",JSON.stringify(S));localStorage.setItem("mp-board-b",JSON.stringify(SB));localStorage.setItem("mp-cmp",CMP?"1":"0");localStorage.setItem("mp-cmp-names",JSON.stringify(NAMES))}catch(e){}};
 // a board sent from the Best Museum Finder
 window.ptReloadLoadouts=()=>{try{const x=JSON.parse(localStorage.getItem("mp-loadouts")||"[]");if(Array.isArray(x))L=x.filter(o=>o&&o.name&&o.board)}catch(e){}renderSaved()};
 window.ptLoadBoard=(bd,name)=>{const nb=blank();ORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(nb[r][i]&&sl&&(BY[sl.m]||sl.m==="Any"))nb[r][i]={m:sl.m,u:modOk(sl.u)?sl.u:"None"}}));S=nb;activeName=null;try{document.getElementById("lname").value=name||""}catch(e){}save();renderBoard();try{renderSaved()}catch(e){}try{toast("Loaded the suggested museum")}catch(e){}};
@@ -47,43 +51,95 @@ function totals(st){const t=Object.fromEntries(STATS.map(s=>[s,0]));ORDER.forEac
 const gainHTML=g=>Object.keys(g).length?Object.entries(g).sort((a,b)=>STATS.indexOf(a[0])-STATS.indexOf(b[0])).map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fx(v)}</em></span>`).join(""):`<span>No museum bonus</span>`;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-function renderBoard(){
-  const b=document.getElementById("board");b.innerHTML="";
+function drawBoard(el,st,side){
+  el.innerHTML="";const other=CMP?brd(side==="A"?"B":"A"):null;
   ORDER.forEach(r=>{
     const band=document.createElement("section");band.className="band";band.style.setProperty("--rc",rc(r));
     band.innerHTML=`<div class="bh"><h2>${r}</h2><span>${SLOTS[r]} display${SLOTS[r]>1?"s":""} · mutation +${r4(MULT[r])}× per stat</span></div>`;
     const sl=document.createElement("div");sl.className="slots";
-    S[r].forEach((slot,i)=>{
-      const c=document.createElement("div");c.className="slot";
-      c.innerHTML=`<button type="button" class="pick ${slot.m?"":"empty"}" id="m-${r}-${i}"><small>Mineral ${i+1}</small><b${slot.m&&slot.m!=="Any"?` data-mineral="${esc(slot.m)}"`:""}>${slot.m&&slot.m!=="Any"&&window.ptIc?ptIc(slot.m):""}${slot.m?esc(minLabel(r,slot.m)):"Choose mineral"}</b></button>
-      <button type="button" class="pick" id="u-${r}-${i}"><small>Mutation</small><b title="${anyOfList(slot.u).length?"Totals count the weakest of these":""}">${esc(slot.u||"None")}</b></button>
+    st[r].forEach((slot,i)=>{
+      const c=document.createElement("div");const o=other&&other[r][i];
+      c.className="slot"+(o&&(o.m!==slot.m||(o.u||"None")!==(slot.u||"None"))?" diff":"");
+      c.innerHTML=`<button type="button" class="pick ${slot.m?"":"empty"}" id="m-${side}-${r}-${i}"><small>Mineral ${i+1}</small><b${slot.m&&slot.m!=="Any"?` data-mineral="${esc(slot.m)}"`:""}>${slot.m&&slot.m!=="Any"&&window.ptIc?ptIc(slot.m):""}${slot.m?esc(minLabel(r,slot.m)):"Choose mineral"}</b></button>
+      <button type="button" class="pick" id="u-${side}-${r}-${i}"><small>Mutation</small><b title="${anyOfList(slot.u).length?"Totals count the weakest of these":""}">${esc(slot.u||"None")}</b></button>
       <div class="gives">${slot.m||slot.u!=="None"?gainHTML(slotGain(r,slot)):'<span>Empty display</span>'}</div>`;
-      c.querySelector(`#m-${r}-${i}`).onclick=()=>openPicker(r,i,"m");
-      c.querySelector(`#u-${r}-${i}`).onclick=()=>openPicker(r,i,"u");
+      c.querySelector(`#m-${side}-${r}-${i}`).onclick=()=>openPicker(r,i,"m",side);
+      c.querySelector(`#u-${side}-${r}-${i}`).onclick=()=>openPicker(r,i,"u",side);
       sl.appendChild(c);
     });
-    band.appendChild(sl);b.appendChild(band);
+    band.appendChild(sl);el.appendChild(band);
   });
+}
+function renderBoard(){
+  document.getElementById("grid").classList.toggle("cmp",CMP);document.getElementById("cmpBtn").setAttribute("aria-pressed",String(CMP));
+  document.getElementById("cmpBtn").textContent=CMP?"Stop comparing":"Compare two museums";
+  ["A","B"].forEach(sd=>{const h=document.getElementById("head"+sd);h.hidden=!CMP;if(CMP)drawHead(sd)});
+  document.getElementById("sideB").hidden=!CMP;document.getElementById("tabs").hidden=!CMP;
+  document.querySelectorAll("#tabs [data-tab]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tab===TAB)));
+  document.getElementById("sideA").classList.toggle("off",CMP&&TAB!=="A");document.getElementById("sideB").classList.toggle("off",CMP&&TAB!=="B");
+  drawBoard(document.getElementById("board"),S,"A");if(CMP)drawBoard(document.getElementById("boardB"),SB,"B");
   renderTotals();
 }
 function renderTotals(){
+  if(CMP)return renderDiff();
+  document.getElementById("totH").textContent="Museum total";
   const t=totals(S);
   const rows=STATS.map(s=>({s,v:t[s]}));
   document.getElementById("tot").innerHTML=rows.map(({s,v})=>`<div class="trow ${Math.abs(v)<1e-9?"zero":""} ${s==="Luck"||s==="Size Boost"?"lead":""}"><span class="k">${s}</span><span class="v">${Math.abs(v)<1e-9?"—":fxT(v)}</span></div>`).join("");
   const n=ORDER.reduce((a,r)=>a+S[r].filter(x=>x.m).length,0);
   document.getElementById("filled").textContent=`${n} of 18 displays filled.`;
 }
+const sideName=sd=>NAMES[sd]||("Museum "+sd);
+function renderDiff(){
+  const a=totals(S),b=totals(SB);
+  document.getElementById("totH").textContent="Difference";
+  const rows=STATS.filter(k=>Math.abs(a[k])>1e-9||Math.abs(b[k])>1e-9);
+  let up=0,dn=0;rows.forEach(k=>{const d=b[k]-a[k];if(d>1e-9)up++;else if(d<-1e-9)dn++});
+  document.getElementById("tot").innerHTML=rows.length?`<div class="drow dh"><span>Stat</span><span title="${esc(sideName("A"))}">A</span><span title="${esc(sideName("B"))}">B</span><span>B − A</span></div>`+rows.map(k=>{const d=b[k]-a[k],z=Math.abs(d)<1e-9;
+    return `<div class="drow"><span class="k">${k}</span><span class="v">${fxT(a[k])}</span><span class="v">${fxT(b[k])}</span><span class="v ${z?"same":d>0?"up":"down"}">${z?"same":(d>0?"+":"−")+r4(Math.abs(d))}</span></div>`}).join(""):'<p class="hint">Both museums are empty.</p>';
+  let nd=0;ORDER.forEach(r=>S[r].forEach((x,i)=>{const y=SB[r][i];if(x.m!==y.m||(x.u||"None")!==(y.u||"None"))nd++}));
+  document.getElementById("filled").innerHTML=rows.length?`<b>${esc(sideName("B"))}</b> is better in ${up} stat${up===1?"":"s"} and worse in ${dn} than <b>${esc(sideName("A"))}</b>. ${nd} display${nd===1?"":"s"} differ (outlined).`:"";
+}
+// header above each side in compare mode: name, load, paste, copy across, clear
+function drawHead(sd){
+  const h=document.getElementById("head"+sd),ot=sd==="A"?"B":"A";
+  h.innerHTML=`<div class="hrow"><span class="tag">${sd}</span><input class="name" id="nm${sd}" maxlength="40" placeholder="Museum ${sd}" value="${esc(NAMES[sd])}" aria-label="Name of museum ${sd}"></div>
+    <div class="hrow"><select id="ld${sd}" aria-label="Load a museum into ${sd}"><option value="">Load…</option>${L.map((o,k)=>`<option value="${k}">${esc(o.name)}</option>`).join("")}</select>
+    <button type="button" class="btn sm" id="ps${sd}">Paste</button><button type="button" class="btn sm" id="cp${sd}" title="Copy ${sd} onto ${ot}">Copy to ${ot} ${sd==="A"?"→":"←"}</button><button type="button" class="btn sm" id="cl${sd}">Clear</button></div>`;
+  h.querySelector("#nm"+sd).oninput=e=>{NAMES[sd]=e.target.value.trim();save();renderTotals()};
+  h.querySelector("#ld"+sd).onchange=e=>{const o=L[+e.target.value];if(!o)return;setBrd(sd,clone(o.board));NAMES[sd]=o.name;save();renderBoard();toast(`Loaded “${o.name}” into ${sd}`)};
+  h.querySelector("#ps"+sd).onclick=()=>openPaste(sd);
+  h.querySelector("#cp"+sd).onclick=()=>{setBrd(ot,clone(brd(sd)));NAMES[ot]=(NAMES[sd]||"Museum "+sd)+" (copy)";save();renderBoard();toast(`Copied ${sd} to ${ot}`)};
+  h.querySelector("#cl"+sd).onclick=()=>{setBrd(sd,blank());NAMES[sd]="";save();renderBoard()};
+}
+// paste a setup copied as text ("Mythic: Pink Diamond (Perfect), Chrysoberyl (Perfect)" per line)
+function parseSetup(txt){const b=blank();let n=0;const fill={};ORDER.forEach(r=>fill[r]=0);
+  String(txt).split(/\r?\n/).forEach(line=>{const m=line.match(/^\s*([A-Za-z]+)\s*:\s*(.+)$/);if(!m||/^total/i.test(m[1]))return;
+    m[2].split(/,(?![^()]*\))/).forEach(part=>{const p=part.trim().match(/^(.+?)\s*(?:\(([^)]+)\))?$/);if(!p)return;const name=p[1].trim(),mod=(p[2]||"None").trim();
+      const d=D.find(x=>x[0].toLowerCase()===name.toLowerCase());const r=d?d[1]:ORDER.find(x=>x.toLowerCase()===m[1].toLowerCase());
+      if(!d&&!/^any\b/i.test(name))return;if(!r||fill[r]>=SLOTS[r])return;
+      b[r][fill[r]++]={m:d?d[0]:"Any",u:modOk(mod)?mod:"None"};n++})});
+  return n?b:null}
+let PS=null;
+function openPaste(sd){PS=sd;document.getElementById("pasteT").value="";document.getElementById("pasteH").textContent="Paste into "+(sd==="B"?sideName("B"):CMP?sideName("A"):"the board");document.getElementById("pscrim").hidden=false;setTimeout(()=>document.getElementById("pasteT").focus(),0)}
+document.getElementById("pasteGo").onclick=()=>{const b=parseSetup(document.getElementById("pasteT").value);if(!b){toast("Couldn't read any minerals from that");return}
+  setBrd(PS,b);NAMES[PS]="";if(PS==="A"&&!CMP){activeName=null}save();renderBoard();document.getElementById("pscrim").hidden=true;toast("Setup pasted")};
+document.getElementById("pasteX").onclick=()=>document.getElementById("pscrim").hidden=true;
+document.getElementById("pscrim").addEventListener("click",e=>{if(e.target.id==="pscrim")e.currentTarget.hidden=true});
+document.getElementById("pasteMain").onclick=()=>openPaste("A");
+document.getElementById("cmpBtn").onclick=()=>{CMP=!CMP;if(CMP&&!filledCount(SB)&&filledCount(S)){SB=clone(S);NAMES.B=(NAMES.A||document.getElementById("lname").value.trim()||"Museum A")+" (copy)"}TAB="A";save();renderBoard();if(CMP)toast("Change Museum B to see the difference")};
+document.getElementById("tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;TAB=b.dataset.tab;renderBoard()});
 
 // picker
 let P=null,sortBy="Best",sortRev=false;
 const scrim=document.getElementById("scrim");
-function openPicker(r,i,kind){P={r,i,kind,multi:false,sel:[],opener:document.getElementById(kind+"-"+r+"-"+i)};sortBy="Best";sortRev=false;drawPicker();scrim.hidden=false;setTimeout(()=>{const c=document.querySelector(".opt.cur")||document.querySelector(".opt:not([disabled])");c&&c.focus()},0)}
-function closePicker(){scrim.hidden=true;const o=P&&document.getElementById(P.kind+"-"+P.r+"-"+P.i);P=null;o&&o.focus()}
+function openPicker(r,i,kind,side){side=side||"A";P={r,i,kind,side,multi:false,sel:[],opener:document.getElementById(kind+"-"+side+"-"+r+"-"+i)};sortBy="Best";sortRev=false;drawPicker();scrim.hidden=false;setTimeout(()=>{const c=document.querySelector(".opt.cur")||document.querySelector(".opt:not([disabled])");c&&c.focus()},0)}
+function closePicker(){scrim.hidden=true;const o=P&&document.getElementById(P.kind+"-"+P.side+"-"+P.r+"-"+P.i);P=null;o&&o.focus()}
 document.getElementById("pclose").onclick=closePicker;
 scrim.addEventListener("click",e=>{if(e.target===scrim)closePicker()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!scrim.hidden)closePicker()});
 function drawPicker(){
-  const {r,i,kind}=P;const cur=S[r][i];
+  const {r,i,kind}=P;const BS=brd(P.side);const cur=BS[r][i];
   document.getElementById("ptitle").textContent=(kind==="m"?`${r} mineral`:`Mutation on ${r}`)+` · display ${i+1}`;
   const sorts=document.getElementById("sorts");
   if(kind==="m"){
@@ -95,7 +151,7 @@ function drawPicker(){
   const opts=document.getElementById("opts");opts.innerHTML="";
   let list;
   if(kind==="m"){
-    const used=S[r].map((x,k)=>k!==i&&x.m).filter(Boolean);
+    const used=BS[r].map((x,k)=>k!==i&&x.m).filter(Boolean);
     list=D.filter(d=>d[1]===r);
     const key=d=>sortBy==="Best"?Math.max(...d[3].map(x=>x[1])):sortBy==="Name"?0:(d[3].find(x=>x[0]===sortBy)||[0,-99])[1];
     list.sort((a,b)=>sortBy==="Name"?a[0].localeCompare(b[0]):key(b)-key(a)||a[0].localeCompare(b[0]));if(sortRev)list.reverse();
@@ -108,7 +164,7 @@ function drawPicker(){
     if(P.multi){
       const bar=document.createElement("div");bar.className="anybar";bar.innerHTML=`<span>Pick every modifier you'd accept here. Totals count the weakest one.</span><span style="display:flex;gap:6px"><button type="button" class="btn" id="anyCancel">Back</button><button type="button" class="btn primary" id="anyUse"${P.sel.length?"":" disabled"}>Use ${P.sel.length||""} selected</button></span>`;opts.appendChild(bar);
       bar.querySelector("#anyCancel").onclick=()=>{P.multi=false;drawPicker()};
-      bar.querySelector("#anyUse").onclick=()=>{if(!P.sel.length)return;const sl=S[P.r][P.i];sl.u=P.sel.length===1?P.sel[0]:"Any of: "+P.sel.join("/");save();renderBoard();closePicker()};
+      bar.querySelector("#anyUse").onclick=()=>{if(!P.sel.length)return;const sl=brd(P.side)[P.r][P.i];sl.u=P.sel.length===1?P.sel[0]:"Any of: "+P.sel.join("/");save();renderBoard();closePicker()};
     } else {
       const any=document.createElement("button");any.type="button";any.className="opt"+(cur.u==="Any"?" cur":"");any.innerHTML=`<b>Any modifier</b><span class="kg"></span><div class="gives"><span>Whatever it rolls. Nothing extra is counted in the totals.</span></div>`;hook(any,"Any");opts.appendChild(any);
       const anyof=document.createElement("button");anyof.type="button";anyof.className="opt"+(anyOfList(cur.u).length?" cur":"");anyof.innerHTML=`<b>Any of…</b><span class="kg">pick several</span><div class="gives"><span>${anyOfList(cur.u).length?"Now: "+esc(anyOfList(cur.u).join(", ")):"Choose a few modifiers you'd be happy with"}</span></div>`;
@@ -120,11 +176,11 @@ function drawPicker(){
   }
   showPreview(null);
 }
-function trial(val){const st=JSON.parse(JSON.stringify(S));const sl=st[P.r][P.i];if(P.kind==="m")sl.m=val;else sl.u=val;return st}
+function trial(val){const st=JSON.parse(JSON.stringify(brd(P.side)));const sl=st[P.r][P.i];if(P.kind==="m")sl.m=val;else sl.u=val;return st}
 function showPreview(val,label){
   const pv=document.getElementById("pview");
   if(val===undefined||label===undefined){pv.innerHTML=`<span class="t">Hover or focus an option to preview your museum total.</span>`;return}
-  const before=totals(S),after=totals(trial(val));
+  const before=totals(brd(P.side)),after=totals(trial(val));
   const ch=STATS.filter(s=>Math.abs(after[s]-before[s])>1e-9);
   pv.innerHTML=`<span class="t">Museum total with ${esc(label)}</span>`+(ch.length?`<div class="pv">${ch.map(s=>{const d=after[s]-before[s];return `<span>${s} <em>${fxT(after[s])}</em> <em class="${d>0?"up":"down"}">(${d>0?"+":"−"}${r4(Math.abs(d))})</em></span>`}).join("")}</div>`:`<div class="pv"><span>No change</span></div>`);
 }
@@ -132,7 +188,7 @@ function hook(el,val){
   const label=val===null?"this display empty":val;
   el.addEventListener("mouseenter",()=>{if(!el.disabled)showPreview(val,label)});
   el.addEventListener("focus",()=>{if(!el.disabled)showPreview(val,label)});
-  el.addEventListener("click",()=>{if(el.disabled)return;const sl=S[P.r][P.i];if(P.kind==="m")sl.m=val;else sl.u=val;save();renderBoard();closePicker()});
+  el.addEventListener("click",()=>{if(el.disabled)return;const sl=brd(P.side)[P.r][P.i];if(P.kind==="m")sl.m=val;else sl.u=val;save();renderBoard();closePicker()});
 }
 document.getElementById("opts").addEventListener("mouseleave",()=>showPreview(null));
 
@@ -144,7 +200,7 @@ const validBoard=b=>b&&ORDER.every(r=>Array.isArray(b[r])&&b[r].length===SLOTS[r
 const clone=o=>JSON.parse(JSON.stringify(o));
 const filledCount=b=>ORDER.reduce((a,r)=>a+b[r].filter(x=>x.m).length,0);
 function headline(b){const t=totals(b);const top=STATS.filter(s=>t[s]>1e-9).sort((a,c)=>t[c]-t[a]).slice(0,3);return top.length?top.map(s=>s+" "+fxT(t[s])).join(" · "):"Empty board"}
-function renderSaved(){
+function renderSaved(){if(CMP){drawHead("A");drawHead("B")}
   const el=document.getElementById("savedlist");
   if(!L.length){el.innerHTML='<p class="emptylo">No saved loadouts yet. Fill the board below, give it a name and press Save loadout. Saved loadouts stay in this browser; download one to keep a copy or move it to another device.</p>';return}
   el.innerHTML="";
