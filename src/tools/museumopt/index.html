@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Museum Improver</title>
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Museum Improver</h1>
+    <p class="lede">Checks every combination of minerals and modifiers for a museum that's better than yours without lowering any stat.<br>If there is one, it lists the swaps. If not, it shows the trades worth making. Values assume each mineral is at its max-boost weight.</p>
+  </header>
+  <div class="split">
+    <div class="col">
+      <section class="card"><h2>Your museum</h2>
+        <label class="fld"><span class="lab">Museum to improve</span><select id="src"></select></label>
+        <div id="pasteBox" hidden><textarea id="paste" rows="8" spellcheck="false" placeholder="Exotic: Key of Life (Perfect)&#10;Mythic: Pink Diamond (Perfect), Chrysoberyl (Perfect)&#10;…"></textarea>
+          <p class="hint">One rarity per line, the same as Copy as text in the Museum Planner.</p></div>
+        <div id="curSum" class="cur"></div>
+      </section>
+      <section class="card"><h2>Limits</h2>
+        <span class="lab">Modifiers you can get</span>
+        <div class="mods" id="mods"></div>
+        <p class="hint">Treasured only goes on minerals from treasure chests or the tomb, and Entombed only on tomb minerals. Feather of Ma'at is always Treasured.</p>
+        <label class="ck"><input type="checkbox" id="ownOnly"> Only minerals I've marked as owned (✓)</label>
+        <label class="fld"><span class="lab">Minerals you don't have</span><input type="text" id="skipIn" placeholder="Type a mineral to leave it out" autocomplete="off"></label>
+        <div class="chips" id="skips"></div>
+      </section>
+      <section class="card"><h2>What counts as better</h2>
+        <label class="fld"><span class="lab">Goal</span><select id="goal"></select></label>
+        <p class="hint">Every stat has to stay the same or go up. Among those museums, this picks the one with the most gain: every stat counted by how much it grows compared to what you have, or one stat first.</p>
+        <button type="button" class="btn pri" id="go">Find improvements</button>
+      </section>
+    </div>
+    <div class="col">
+      <section class="card" id="out"><p class="hint">Pick your museum and press Find improvements.</p></section>
+    </div>
+  </div>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 17/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>

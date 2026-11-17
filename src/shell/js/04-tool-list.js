@@ -13,6 +13,7 @@ const LIST = [
   { id: "mododds", name: "Modifier Odds", desc: "Chance of each ore modifier from your boost" },
   { id: "farmroute", name: "Museum Farm Route", desc: "Paste your museum, get zones to farm in order" },
   { id: "museumfind", name: "Best Museum Finder", desc: "Fills your museum for a goal you pick" },
+  { id: "museumopt", name: "Museum Improver", desc: "Finds a better museum without lowering any stat" },
   { id: "sluiceplan", name: "Sluice Upgrade Planner", desc: "Spend upgrade points, see stats and cost" },
   { id: "quests", name: "Quest Tracker", desc: "Every quest with tickable steps" },
   { id: "dredge", name: "Dredge Master Planner", desc: "Where to pan and what luck cap for his 3 requests" },

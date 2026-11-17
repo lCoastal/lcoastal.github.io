@@ -19,6 +19,7 @@ const PT_RESET = {
   dredge: { keys: ["pt-dredge"] },
   eqload: { keys: ["pt-eqload"] },
   museumfind: { keys: ["pmf-s"] },
+  museumopt: { keys: ["mo-s"] },
   quests: { keys: ["pq-f"], what: "filters (your ticked quests stay)" },
   items: { keys: ["pi-cur", "pi-hidetm", "pi-tab"] },
   mutations: { keys: ["pmu-catf", "pmu-hide", "pmu-ofmt", "pmu-pan", "pmu-tab"] },

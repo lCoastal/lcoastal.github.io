@@ -32,6 +32,8 @@ const setBrd=(side,b)=>{if(side==="B")SB=b;else S=b};
 const save=()=>{try{localStorage.setItem("mp-board",JSON.stringify(S));localStorage.setItem("mp-board-b",JSON.stringify(SB));localStorage.setItem("mp-cmp",CMP?"1":"0");localStorage.setItem("mp-cmp-names",JSON.stringify(NAMES));localStorage.setItem("mp-cmp-hide",HIDE?"1":"0")}catch(e){}};
 // a board sent from the Best Museum Finder
 window.ptReloadLoadouts=()=>{try{const x=JSON.parse(localStorage.getItem("mp-loadouts")||"[]");if(Array.isArray(x))L=x.filter(o=>o&&o.name&&o.board)}catch(e){}renderSaved()};
+// a board sent to compare: goes into Museum B, compare mode on
+window.ptLoadCompare=(bd,name)=>{const nb=blank();ORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(nb[r][i]&&sl&&(BY[sl.m]||sl.m==="Any"))nb[r][i]={m:sl.m,u:modOk(sl.u)?sl.u:"None"}}));SB=nb;NAMES.B=name||"Improved";CMP=true;TAB="B";save();renderBoard();try{toast("Loaded into Museum B")}catch(e){}};
 window.ptLoadBoard=(bd,name)=>{const nb=blank();ORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(nb[r][i]&&sl&&(BY[sl.m]||sl.m==="Any"))nb[r][i]={m:sl.m,u:modOk(sl.u)?sl.u:"None"}}));S=nb;activeName=null;try{document.getElementById("lname").value=name||""}catch(e){}save();renderBoard();try{renderSaved()}catch(e){}try{toast("Loaded the suggested museum")}catch(e){}};
 const rc=r=>"var(--c-"+r.toLowerCase()+")";
 const r4=v=>Math.round(v*10000)/10000;

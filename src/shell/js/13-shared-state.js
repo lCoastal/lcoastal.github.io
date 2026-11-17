@@ -55,7 +55,9 @@ window.ptStore = {
   },
 };
 window.ptSendMuseum = (target, bd, name) =>
-  target === "planner" ? callTool("planner", "ptLoadBoard", bd, name) : callTool("calc", "ptLoadMuseum", bd);
+  target === "planner" ? callTool("planner", "ptLoadBoard", bd, name)
+  : target === "compare" ? callTool("planner", "ptLoadCompare", bd, name)
+  : callTool("calc", "ptLoadMuseum", bd);
 // save a named board into the Museum Planner's saved loadouts without leaving the current page
 window.ptSaveLoadout = (name, board) => {
   let L = [];

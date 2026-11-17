@@ -8,6 +8,7 @@ const HUBS = [
       ["planner", "Planner"],
       ["boosts", "Boosts"],
       ["museumfind", "Best Museum Finder"],
+      ["museumopt", "Museum Improver"],
       ["farmroute", "Farm Route"],
     ],
   ],
