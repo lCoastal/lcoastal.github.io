@@ -4,7 +4,7 @@ let S={luck:1000,cap:1000,pick:.1,mbp:100,night:false};try{Object.assign(S,JSON.
 const save=()=>{try{localStorage.setItem("pmc-s",JSON.stringify(S))}catch(e){}};
 const p=(x,d)=>{if(!isFinite(x))return"–";const v=x*100;return(v>=10?v.toFixed(1):v>=1?v.toFixed(2):v.toPrecision(2))+"%"};
 const oneIn=x=>x>0?"1 in "+Math.round(1/x).toLocaleString():"–";
-// luck (refit 17/11/26 on ~2.3M minerals): 29% roll once, 3% about luck/23 times, 19% about 0.41 x luck, 49% about 1.74 x luck, keeping the rarest; base odds 1 in ~18M to ~1.6B get up to x1.9
+// luck (refit 17/11/26 on ~2.3M minerals): 29% roll once, 3% about luck/23 times, 19% about 0.41 x luck, 49% about 1.74 x luck, keeping the rarest; base odds 1 in ~18M to ~1.5B get up to x1.86
 const eff=(b,L)=>{L=Math.max(1,L);const f=l=>1-Math.pow(1-b,l);return (.2891*f(1)+.0280*f(Math.max(1,.04317*L))+.1905*f(Math.max(1,.40579*L))+.4924*f(Math.max(1,1.74153*L)))*(typeof rareBand==="function"?rareBand(1/b):1)};
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
 function modShares(mbx,night,luck){const list=MODW.filter(([k])=>night||k!=="Lunar"),tot=list.reduce((a,x)=>a+x[1],0);
