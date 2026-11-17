@@ -74,7 +74,7 @@ async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
     c.fillStyle="#e6e9ec";c.font=`600 15px ${F}`;c.fillText(r.k,PAD+12,mid-2);c.fillStyle="#98a2ad";c.font=`11.5px ${F}`;c.fillText(fit("Museum: "+(MUSE[r.k]||""),nameW-12),PAD+12,mid+14);
     const vals=[fmt(r.s,r.s<0.1?4:2)+"%",fmt(BASE[r.k],4)+"%",oneInP(r.po),oneInP(r.pp),PRICE[r.k]+"×"];
     vals.forEach((v,i)=>{const x=cx(i+1);c.font=`14px ${FM}`;c.fillStyle=i===0&&r.s>BASE[r.k]*1.05?"#3cc2a8":"#e6e9ec";c.fillText(v,x-c.measureText(v).width,mid+5)})});
-  y+=rows.length*RH+28;{const et="Estimates only: enchants, events, weather and Size Boost aren't counted, so real odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
+  y+=rows.length*RH+28;{const et="Estimates from a fitted model: enchants, events and weather aren't counted, so real odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptModImage=modImage;
 $("toImg").onclick=async()=>{let blob=null;try{blob=await modImage()}catch(e){console.error(e)}if(!blob){toast("Couldn't draw the image");return}

@@ -170,7 +170,7 @@ async function capImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-ser
     c.fillStyle=gc;c.font=`14px ${F}`;c.fillText(fit(gt,W-PAD-X(1030)),X(1030),mid+5)});
   y+=list.length*RH;
   if(extra){c.fillStyle="#98a2ad";c.font=`italic 13px ${F}`;c.fillText(`…and ${fmt(total-list.length,0)} more. Search or filter to fit them in one image.`,PAD+12,y+22);y+=extra}
-  {const et="Estimates only: built on a simplified luck model, so real drops can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y+10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
+  {const et="Estimates from a fitted luck model, so real drops can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y+10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptCapImage=capImage;
 $("toImg").onclick=async()=>{let blob=null;try{blob=await capImage()}catch(e){console.error(e)}if(!blob){toast(VIEW.mins.length?"Couldn't draw the image":"Nothing to save. Change the search or filters.");return}
