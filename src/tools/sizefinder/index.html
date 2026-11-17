@@ -17,14 +17,13 @@
   <p class="disc" role="note"><b>Heads up:</b> the minimum is exact. The chances come from the weight spread fitted on about 1.5 million logged minerals at 1,856 to 7,240 capacity, so outside that range they're an estimate.</p>
   <section class="card">
     <div class="inputs">
-      <label class="fld"><span class="lab">Mineral</span><input id="min" list="mins" placeholder="Type a mineral" autocomplete="off"></label>
+      <label class="fld"><span class="lab">Mineral</span><input type="text" id="min" placeholder="e.g. Gold" autocomplete="off"></label>
       <label class="fld"><span class="lab">Weight you want (kg)</span><input type="number" id="kg" min="0" inputmode="decimal"></label>
       <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" inputmode="numeric"></label>
       <label class="fld"><span class="lab">Your Size Boost (%, optional)</span><input type="number" id="sb" min="0" inputmode="decimal"></label>
       <label class="fld"><span class="lab">Recommended means at least</span><select id="good"><option value="0.01">1 in 100 of them</option><option value="0.05">1 in 20 of them</option><option value="0.1">1 in 10 of them</option><option value="0.25">1 in 4 of them</option><option value="0.5">Half of them</option></select></label>
       <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
     </div>
-    <datalist id="mins"></datalist>
     <div class="tg2"><label class="ck"><input type="checkbox" id="mag"> Solar Magnifier (×1.5 weight)</label></div>
   </section>
   <section class="card" id="out" hidden>
