@@ -25,8 +25,8 @@ const HUBS = [
   ],
   [
     "h-luck",
-    "Luck & Odds",
-    "Drop chances, best luck cap, build comparisons, modifier odds and mineral weights",
+    "Panning Calculators",
+    "What each pan gives you: drop and modifier odds, best luck cap, build comparisons, mineral weights and pan size",
     [
       ["odds", "Luck Odds"],
       ["bestcap", "Best Luck Cap"],

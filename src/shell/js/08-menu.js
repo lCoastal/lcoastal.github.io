@@ -12,7 +12,7 @@ const SECTIONS = [
   ],
   ["Museum", "#a78bfa", [["h-museum", "m:Key of Life"]]],
   [
-    "Luck & mutations",
+    "Panning & mutations",
     "#f59e0b",
     [
       ["h-luck", "m:Gold"],
