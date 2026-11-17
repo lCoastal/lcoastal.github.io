@@ -92,6 +92,7 @@ function renderBoard(){
   renderTotals();
 }
 function renderTotals(){
+  document.getElementById("cmpImg").hidden=true;
   if(CMP)return renderDiff();
   document.getElementById("totH").textContent="Museum total";
   const t=totals(S);
@@ -103,7 +104,7 @@ function renderTotals(){
 const sideName=sd=>NAMES[sd]||("Museum "+sd);
 function renderDiff(){
   const a=totals(S),b=totals(SB);
-  document.getElementById("totH").textContent="Difference";
+  document.getElementById("totH").textContent=sideName("A")+" vs "+sideName("B");document.getElementById("cmpImg").hidden=false;
   const rows=STATS.filter(k=>Math.abs(a[k])>1e-9||Math.abs(b[k])>1e-9);
   let up=0,dn=0;rows.forEach(k=>{const d=b[k]-a[k];if(d>1e-9)up++;else if(d<-1e-9)dn++});
   document.getElementById("tot").innerHTML=rows.length?`<div class="drow dh"><span>Stat</span><span title="${esc(sideName("A"))}">A</span><span title="${esc(sideName("B"))}">B</span><span>B − A</span></div>`+rows.map(k=>{const d=b[k]-a[k],z=Math.abs(d)<1e-9;
@@ -322,6 +323,66 @@ document.getElementById("imgCur").onclick=async()=>{if(!filledCount(S)){toast("T
   const ps=(()=>{try{return window.parent!==window&&typeof window.parent.ptSave==="function"?window.parent.ptSave:null}catch(e){return null}})();
   if(ps){try{await ps(filename,blob);toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}return}
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)};
+// ---- comparison of two museums as a PNG: title "A vs B", stat differences, both boards side by side ----
+const SHORT={"Dig Strength":"Dig Str","Shake Strength":"Shake Str","Modifier Boost":"Mod Boost","Dig Speed":"Dig Spd","Shake Speed":"Shake Spd","Size Boost":"Size","Sell Boost":"Sell","Walk Speed":"Walk"};
+async function compareImage(nA,nB){
+  const W=1400,PAD=36,GAP=40,COL=(W-PAD*2-GAP)/2,SW=(COL-16)/3,SH=78;
+  const ta=totals(S),tb=totals(SB),rows=STATS.filter(k=>Math.abs(ta[k])>1e-9||Math.abs(tb[k])>1e-9);
+  const DCOLS=3,DROWS=Math.max(1,Math.ceil(rows.length/DCOLS)),DH=46;
+  const HEAD=134,DIFFH=34+DROWS*(DH+8)+30,COLH=54,BAND=26+SH+14;
+  const H=HEAD+DIFFH+COLH+ORDER.length*BAND+34;
+  const cv=document.createElement("canvas");const sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
+  const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
+  try{await document.fonts.ready}catch(e){}
+  c.fillStyle="#14181c";c.fillRect(0,0,W,H);
+  // title
+  c.font=`700 34px ${FD}`;const tA=fitText(c,nA,(W-PAD*2-260)/2-30),tB=fitText(c,nB,(W-PAD*2-260)/2-30);
+  let x=PAD;c.fillStyle="#e6e9ec";c.fillText(tA,x,PAD+32);x+=c.measureText(tA).width+14;c.fillStyle="#3cc2a8";c.font=`700 24px ${FD}`;c.fillText("vs",x,PAD+30);x+=c.measureText("vs").width+14;c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(tB,x,PAD+32);
+  let up=0,dn=0;rows.forEach(k=>{const d=tb[k]-ta[k];if(d>1e-9)up++;else if(d<-1e-9)dn++});
+  let nd=0;ORDER.forEach(r=>S[r].forEach((a,i)=>{const b=SB[r][i];if(a.m!==b.m||(a.u||"None")!==(b.u||"None"))nd++}));
+  c.fillStyle="#98a2ad";c.font=`14px ${F}`;c.fillText(`Museum comparison · ${nB} is better in ${up} stat${up===1?"":"s"}, worse in ${dn} · ${nd} display${nd===1?"":"s"} differ · values at max-boost weight`.slice(0,150),PAD,PAD+60);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  // stat differences
+  let y=HEAD;c.fillStyle="#98a2ad";c.font=`600 13px ${F}`;c.fillText("STAT DIFFERENCES  ("+nB.toUpperCase().slice(0,30)+" − "+nA.toUpperCase().slice(0,30)+")",PAD,y);y+=14;
+  const dw=(W-PAD*2-(DCOLS-1)*10)/DCOLS;
+  rows.forEach((k,i)=>{const xx=PAD+(i%DCOLS)*(dw+10),yy=y+Math.floor(i/DCOLS)*(DH+8),d=tb[k]-ta[k],z=Math.abs(d)<1e-9,col=z?"#98a2ad":d>0?"#3cc2a8":"#ef7a66";
+    c.fillStyle="#1c2126";rr(c,xx,yy,dw,DH,9);c.fill();c.strokeStyle=z?"#2d343b":col;c.globalAlpha=z?1:.55;c.lineWidth=1;rr(c,xx,yy,dw,DH,9);c.stroke();c.globalAlpha=1;
+    c.fillStyle="#e6e9ec";c.font=`600 14px ${F}`;c.fillText(k,xx+14,yy+28);
+    const dt=z?"same":(d>0?"+":"−")+r4(Math.abs(d));c.font=`600 15px ${FM}`;c.fillStyle=col;const dwid=c.measureText(dt).width;c.fillText(dt,xx+dw-14-dwid,yy+29);
+    const ab=`${fxT(ta[k])} → ${fxT(tb[k])}`;c.font=`13px ${FM}`;c.fillStyle="#98a2ad";const aw=c.measureText(ab).width;c.fillText(ab,xx+dw-14-dwid-16-aw,yy+28)});
+  if(!rows.length){c.fillStyle="#5d6670";c.font=`14px ${F}`;c.fillText("Both museums are empty",PAD,y+28)}
+  y=HEAD+DIFFH;
+  // column headers
+  const colX=[PAD,PAD+COL+GAP];
+  [[nA,"A"],[nB,"B"]].forEach(([n,t],j)=>{const xx=colX[j];c.fillStyle="#3cc2a8";rr(c,xx,y,30,30,8);c.fill();c.fillStyle="#14181c";c.font=`700 16px ${FD}`;c.fillText(t,xx+15-c.measureText(t).width/2,y+21);
+    c.fillStyle="#e6e9ec";c.font=`700 20px ${FD}`;c.fillText(fitText(c,n,COL-50),xx+42,y+22)});
+  const sepTop=y-4;y+=COLH;
+  // boards, one rarity per row
+  for(const r of ORDER){const col=IMGC[r];
+    c.fillStyle=col;c.font=`700 13px ${F}`;
+    for(let j=0;j<2;j++){const xx=colX[j];c.fillText(r.toUpperCase(),xx,y+14);c.fillStyle=col;c.globalAlpha=.6;c.fillRect(xx,y+20,COL,2);c.globalAlpha=1}
+    for(let j=0;j<2;j++){const st=j?SB:S,ot=j?S:SB,xx=colX[j];
+      for(let i=0;i<SLOTS[r];i++){const sl=st[r][i],o=ot[r][i],sx=xx+i*(SW+8),sy=y+28;const diff=sl.m!==o.m||(sl.u||"None")!==(o.u||"None");
+        c.fillStyle="#1c2126";rr(c,sx,sy,SW,SH,10);c.fill();c.strokeStyle=diff?"#3cc2a8":"#2d343b";c.lineWidth=diff?2:1;rr(c,sx,sy,SW,SH,10);c.stroke();
+        c.fillStyle=col;rr(c,sx,sy,SW,4,2);c.fill();
+        if(!sl.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText(sl.u&&sl.u!=="None"?"Any · "+sl.u:"Empty",sx+14,sy+SH/2+5);continue}
+        let tx=sx+12;const ic=ICONS[sl.m];if(ic){const im=await loadImg(ic);if(im){c.drawImage(im,sx+10,sy+15,48,48)}tx=sx+66}
+        c.fillStyle="#e6e9ec";c.font=`700 15px ${FD}`;c.fillText(fitText(c,minLabel(r,sl.m),SW-(tx-sx)-8),tx,sy+28);
+        const md=sl.u&&sl.u!=="None"?sl.u:"None";c.fillStyle=md!=="None"?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(md.toUpperCase(),tx,sy+46);
+        const g=mineralGain(sl.m),gt=Object.entries(g).sort((a,b)=>STATS.indexOf(a[0])-STATS.indexOf(b[0])).map(([k,v])=>`${SHORT[k]||k} ${v<0?"−":"+"}${r4(Math.abs(v))}`).join(" · ");
+        c.fillStyle="#b9c2cb";c.font=`11.5px ${FM}`;c.fillText(fitText(c,gt,SW-(tx-sx)-8),tx,sy+64)}}
+    y+=BAND}
+  // separator between the two museums
+  const sx=PAD+COL+GAP/2;c.strokeStyle="#3cc2a8";c.globalAlpha=.45;c.lineWidth=2;c.setLineDash([6,6]);c.beginPath();c.moveTo(sx,sepTop);c.lineTo(sx,y-6);c.stroke();c.setLineDash([]);c.globalAlpha=1;
+  return await new Promise(res=>cv.toBlob(res,"image/png"))}
+async function saveCompare(){
+  if(!filledCount(S)&&!filledCount(SB)){toast("Both museums are empty");return}
+  const nA=sideName("A"),nB=sideName("B"),blob=await compareImage(nA,nB);if(!blob){toast("Couldn't draw the image");return}
+  const filename=(`${nA} vs ${nB}`.replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Museums")+" - Museum comparison.png";
+  const ps=(()=>{try{return window.parent!==window&&typeof window.parent.ptSave==="function"?window.parent.ptSave:null}catch(e){return null}})();
+  if(ps){try{await ps(filename,blob);toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+document.getElementById("cmpImg").onclick=saveCompare;
 window.ptBoardImage=()=>boardImage(document.getElementById("lname").value.trim()||PAGE_NAME,S);
 document.getElementById("dlCur").onclick=()=>{const n=document.getElementById("lname").value.trim()||activeName||PAGE_NAME;if(!filledCount(S)){toast("The board is empty");return}downloadLoadout(n,S)};
 
