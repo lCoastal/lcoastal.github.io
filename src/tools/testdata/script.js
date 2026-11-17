@@ -56,7 +56,20 @@ function guess(w){MAP=Array(w).fill("");const used=new Set();
     if(!used.has("name")&&hit(v=>MIN[v.toLowerCase()])>.6)k="name";
     else if(!used.has("zone")&&hit(v=>zoneOf(v))>.6)k="zone";
     else if(!used.has("mod")&&hit(v=>NORMAL.has(v)||/^(none|unknown)$/i.test(v))>.4)k="mod";
-    if(k){MAP[i]=k;used.add(k)}}}
+    if(k){MAP[i]=k;used.add(k)}}
+  // numbers without a header: tell the columns apart by how their values behave
+  const st=[];for(let i=0;i<w;i++){if(MAP[i])continue;const raw=ROWS.slice(0,2000).map(r=>r[i]||"").filter(v=>v&&!/^(unknown|none|n\/a|nan|-)$/i.test(v));
+    if(!raw.length||raw.some(v=>/[:\/]/.test(v))||raw.filter(v=>isNaN(+v)).length>raw.length*.02)continue;const v=raw.map(Number).filter(isFinite),d=new Set(v).size;
+    let up=0;for(let j=1;j<v.length;j++)if(v[j]>=v[j-1])up++;
+    st.push({i,int:v.every(Number.isInteger),med:med(v),d,n:v.length,mono:up>=v.length-2})}
+  const take=(k,f,by)=>{if(used.has(k))return;const cs=st.filter(x=>!MAP[x.i]&&f(x));if(by)cs.sort(by);const c=cs[0];if(c){MAP[c.i]=k;used.add(k)}};
+  take("pan",x=>x.int&&x.mono&&x.d>1&&x.d<x.n/3);
+  take("weight",x=>!x.int&&x.d>x.n*.5&&x.med<1e4);
+  take("luck",x=>!x.int&&x.med>=500);
+  take("size",x=>!x.int&&x.med>=1&&x.med<500&&x.d<=x.n*.2);
+  take("mb",x=>!x.int&&x.med>=1&&x.med<500&&x.d<=x.n*.2);
+  take("cap",x=>x.int&&x.med>=50&&x.d<=Math.max(3,x.n*.01),(a,b)=>a.d-b.d);
+  if(!used.has("luck"))take("luck",x=>x.med>=500&&x.d<=x.n*.2&&MAP.indexOf("cap")!==x.i)}
 function drawMap(w){let h='<div class="cols">';
   for(let i=0;i<w;i++){const ex=ROWS.slice(0,3).map(r=>r[i]||"").filter(Boolean).join(" · ");
     h+=`<label class="col${MAP[i]?" used":""}"><b>${esc(HEAD[i]||"Column "+(i+1))}</b><span class="ex">${esc(ex||"(empty)")}</span><select data-i="${i}">${FIELDS.map(([k,l])=>`<option value="${k}"${MAP[i]===k?" selected":""}>${l}</option>`).join("")}</select></label>`}
@@ -67,12 +80,16 @@ $("map").addEventListener("change",e=>{const s=e.target.closest("select");if(!s)
 $("sep").onchange=()=>{MAP=[];parse()};$("hasHead").onchange=()=>{parse.touched=true;MAP=[];parse()};$("reguess").onclick=()=>{MAP=[];parse()};
 function load(t){RAW=t||"";parse.touched=false;MAP=[];$("outCard").hidden=true;if(!RAW.trim()){$("mapCard").hidden=true;$("fileInfo").textContent="";return}parse()}
 $("pick").onclick=()=>$("file").click();
-const readFile=f=>{if(!f)return;const r=new FileReader();r.onload=()=>{$("paste").value=String(r.result).slice(0,20000);load(String(r.result))};r.readAsText(f)};
+const PREV=200000;let FROMFILE=false;
+const readFile=f=>{if(!f)return;const r=new FileReader();r.onload=()=>{const t=String(r.result);FROMFILE=t.length>PREV;$("paste").value=FROMFILE?t.slice(0,t.lastIndexOf("\n",PREV)):t;load(t);
+  if(FROMFILE)$("fileInfo").textContent+=" · whole file used, the box above only shows the start"};r.readAsText(f)};
 $("file").onchange=e=>readFile(e.target.files[0]);
 const dz=$("drop");["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("on")}));
 ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("on")}));
 dz.addEventListener("drop",e=>readFile(e.dataTransfer.files[0]));
-let pt;$("paste").addEventListener("input",()=>{clearTimeout(pt);pt=setTimeout(()=>load($("paste").value),300)});
+let pt;$("paste").addEventListener("input",()=>{clearTimeout(pt);pt=setTimeout(()=>{FROMFILE=false;load($("paste").value)},300)});
+// pasting into a box that holds a file preview replaces it instead of mixing the two
+$("paste").addEventListener("paste",e=>{const t=e.clipboardData&&e.clipboardData.getData("text");if(!t)return;const a=$("paste");if(a.selectionStart===a.selectionEnd&&a.value.trim()){e.preventDefault();a.value=t;a.dispatchEvent(new Event("input"))}});
 
 function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"":r[i]||""};
   const rows=ROWS.map(r=>({name:g(r,"name"),zone:g(r,"zone"),mod:g(r,"mod"),w:num(g(r,"weight")),sb:num(g(r,"size")),luck:num(g(r,"luck")),mb:num(g(r,"mb")),cap:num(g(r,"cap")),pan:g(r,"pan")})).filter(r=>r.name);
