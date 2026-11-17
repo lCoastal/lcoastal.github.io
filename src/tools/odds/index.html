@@ -45,23 +45,15 @@
   </section>
   <section class="card"><h2>How this is worked out</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
-      <li>Each mineral slot in a pan rolls four ways: about 49% of the time at 1.74× your luck, 19% at about 0.4× your luck, 3% at about 1/23 of your luck, and 29% as if your luck were 1. That's why commons never disappear. Fitted on about 2.3 million logged minerals across 11 zones, from 5,000 to 266,000 luck.</li>
-      <li>Very rare minerals, with base odds between about 1 in 18 million and 1 in 1.5 billion (most Mythics), show up about 1.86× more often than that roll model alone gives, so their chance is multiplied by up to 1.86.</li>
-      <li>At a given luck, the rarity roll is the best of that many tries, so rarer ores gain share as luck grows. The base rates are the drop chances listed for each location.</li>
-      <li>On average a pan holds about 0.68 × capacity<sup>0.565</sup> minerals (measured: about 20 at 400 capacity, 44 at 1,600, 87 at 5,462), which is how per-pan chances are worked out. Minerals with exactly the same odds share their chance evenly.</li>
+      <li>Luck works like extra tries at the zone's drop table, keeping the rarest result. Most minerals get more tries the more luck you have, but some always roll as if your luck were 1, which is why commons never disappear. Fitted on about 2.3 million logged minerals.</li>
+      <li>Very rare minerals (most Mythics) show up a bit more often than that alone gives, so the toolkit boosts them to match the logs.</li>
+      <li>So rarer minerals gain share as luck grows. The starting chances are the drop chances listed for each location.</li>
+      <li>A pan holds about 20 minerals at 400 capacity, 44 at 1,600, 87 at 5,462 and 102 at 7,240, which is how per-pan chances are worked out. Minerals with exactly the same odds share their chance evenly.</li>
       <li>Shovel enchants that change drops (like Mythical) and zone events aren't counted. Size Boost only changes how heavy minerals are (see Weight Range), not which ones you find.</li>
     </ul>
     <div class="fx">
       <h3>The formula</h3>
-      <p>For one zone, list its minerals from rarest to most common, with drop shares <code>p₁, p₂, …, pₙ</code> (as fractions that add up to 1). For the mineral in spot <code>k</code>:</p>
-      <div class="row"><span>Everything rarer</span><code>a = p₁ + p₂ + … + pₖ₋₁</code></div>
-      <div class="row"><span>Up to and including it</span><code>b = a + pₖ</code></div>
-      <div class="row"><span>Best of L rolls</span><code>f(L) = (1 − a)<sup>L</sup> − (1 − b)<sup>L</sup></code></div>
-      <div class="row"><span>Per mineral</span><code>P = 0.289·f(1) + 0.028·f(max(1, 0.0432·L)) + 0.191·f(max(1, 0.406·L)) + 0.492·f(max(1, 1.74·L))</code></div>
-      <div class="row"><span>Very rare boost</span><code>× up to 1.86 for base odds 1 in ~18M to ~1.5B</code></div>
-      <div class="row"><span>Items per pan</span><code>n = 0.678 · C<sup>0.565</sup></code></div>
-      <div class="row"><span>Per pan (capacity C)</span><code>1 − (1 − P)<sup>n</sup></code></div>
-      <div class="row"><span>Shown as "1 in X"</span><code>X = 1 ÷ (per pan chance)</code></div>
+      <div class="row"><span>Chance per pan</span><code>about chance per mineral × minerals per pan</code></div>
     </div></section>
   <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 17/11/26 · Made by @__coastal</p>
 </div>

@@ -67,7 +67,7 @@ function render(){$("useCap").checked=!!S.useCap;const R=rows();const m=R&&R.m;
     <td><span class="bn"><i></i><span>${esc(x.b.n)}<small>${fmt(x.L,0)} luck · ${fmt(x.C,0)} capacity${x.cap!=null?` · cap ${fmt(x.cap,0)}`:""}</small></span></span></td>
     ${oneZ?"":`<td data-l="Zone" style="font-family:var(--f-body);white-space:normal"><span class="lk" data-location="${esc(baseLoc(x.z))}">${esc(x.z)}</span></td>`}
     <td data-l="Per pan">${oneTxt(x.pp)}</td><td data-l="Pans">${pansTxt(x.pans)}</td>${anyT?`<td data-l="Time">${x.hours!=null?hrs(x.pans,x.pph):"—"}</td>`:""}<td data-l="Compared" style="font-family:var(--f-body)">${rel(x)}</td></tr>`).join("")}</tbody></table>
-    <p class="hint" style="margin-top:8px">Rare minerals scale with about luck × capacity<sup>0.565</sup>, so 1.8× the capacity is worth about 1.39× the luck per pan.</p>`}
+    <p class="hint" style="margin-top:8px">For rare minerals, more capacity helps less than the same boost in luck: 1.8× the capacity is worth about 1.39× the luck per pan.</p>`}
 // ---- save as image ----
 $("toImg").onclick=()=>{const R=rows();if(!R||!R.list.length){ptToast("Pick a mineral first");return}const L=R.list,anyT=L.some(x=>x.hours!=null),allT=L.every(x=>x.hours!=null);const key=allT?"hours":"pans";const best=L.reduce((a,x)=>x[key]<a[key]?x:a,L[0]);
   const HX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
