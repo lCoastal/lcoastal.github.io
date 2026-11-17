@@ -25,10 +25,11 @@ const blank=()=>Object.fromEntries(ORDER.map(r=>[r,Array.from({length:SLOTS[r]},
 let S=blank();
 try{const s=JSON.parse(localStorage.getItem("mp-board")||"null");if(s&&ORDER.every(r=>Array.isArray(s[r])&&s[r].length===SLOTS[r]))S=s;}catch(e){}
 let SB=blank();try{const s=JSON.parse(localStorage.getItem("mp-board-b")||"null");if(s&&ORDER.every(r=>Array.isArray(s[r])&&s[r].length===SLOTS[r]))SB=s;}catch(e){}
+let HIDE=false;try{HIDE=localStorage.getItem("mp-cmp-hide")==="1"}catch(e){}
 let CMP=false,TAB="A",NAMES={A:"",B:""};try{CMP=localStorage.getItem("mp-cmp")==="1";Object.assign(NAMES,JSON.parse(localStorage.getItem("mp-cmp-names")||"{}"))}catch(e){}
 const brd=side=>side==="B"?SB:S;
 const setBrd=(side,b)=>{if(side==="B")SB=b;else S=b};
-const save=()=>{try{localStorage.setItem("mp-board",JSON.stringify(S));localStorage.setItem("mp-board-b",JSON.stringify(SB));localStorage.setItem("mp-cmp",CMP?"1":"0");localStorage.setItem("mp-cmp-names",JSON.stringify(NAMES))}catch(e){}};
+const save=()=>{try{localStorage.setItem("mp-board",JSON.stringify(S));localStorage.setItem("mp-board-b",JSON.stringify(SB));localStorage.setItem("mp-cmp",CMP?"1":"0");localStorage.setItem("mp-cmp-names",JSON.stringify(NAMES));localStorage.setItem("mp-cmp-hide",HIDE?"1":"0")}catch(e){}};
 // a board sent from the Best Museum Finder
 window.ptReloadLoadouts=()=>{try{const x=JSON.parse(localStorage.getItem("mp-loadouts")||"[]");if(Array.isArray(x))L=x.filter(o=>o&&o.name&&o.board)}catch(e){}renderSaved()};
 window.ptLoadBoard=(bd,name)=>{const nb=blank();ORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(nb[r][i]&&sl&&(BY[sl.m]||sl.m==="Any"))nb[r][i]={m:sl.m,u:modOk(sl.u)?sl.u:"None"}}));S=nb;activeName=null;try{document.getElementById("lname").value=name||""}catch(e){}save();renderBoard();try{renderSaved()}catch(e){}try{toast("Loaded the suggested museum")}catch(e){}};
@@ -59,7 +60,7 @@ function drawBoard(el,st,side){
     const sl=document.createElement("div");sl.className="slots";
     st[r].forEach((slot,i)=>{
       const c=document.createElement("div");const o=other&&other[r][i];
-      c.className="slot";
+      c.className="slot";if(CMP&&HIDE&&sameSlot(r,i))c.hidden=true;
       c.innerHTML=`<button type="button" class="pick ${slot.m?"":"empty"}" id="m-${side}-${r}-${i}"><small>Mineral ${i+1}</small><b${slot.m&&slot.m!=="Any"?` data-mineral="${esc(slot.m)}"`:""}>${slot.m&&slot.m!=="Any"&&window.ptIc?ptIc(slot.m):""}${slot.m?esc(minLabel(r,slot.m)):"Choose mineral"}</b></button>
       <button type="button" class="pick" id="u-${side}-${r}-${i}"><small>Mutation</small><b title="${anyOfList(slot.u).length?"Totals count the weakest of these":""}">${esc(slot.u||"None")}</b></button>
       <div class="gives">${slot.m||slot.u!=="None"?gainHTML(slotGain(r,slot)):'<span>Empty display</span>'}</div>`;
@@ -67,12 +68,14 @@ function drawBoard(el,st,side){
       c.querySelector(`#u-${side}-${r}-${i}`).onclick=()=>openPicker(r,i,"u",side);
       sl.appendChild(c);
     });
-    band.appendChild(sl);band.dataset.side=side;bands.push(band);el.appendChild(band);
+    band.appendChild(sl);band.dataset.side=side;if(CMP&&HIDE&&sameBand(r))band.hidden=true;bands.push(band);el.appendChild(band);
   });
   return bands;
 }
 const HEAD={A:document.getElementById("headA"),B:document.getElementById("headB")};
 // compare: if a mineral is in both museums, move it in B to the display it has in A (order makes no difference to totals)
+const sameSlot=(r,i)=>{const a=S[r][i],b=SB[r][i];return a.m===b.m&&(a.u||"None")===(b.u||"None")};
+const sameBand=r=>S[r].every((x,i)=>sameSlot(r,i));
 function alignB(){let moved=false;ORDER.forEach(r=>{const a=S[r],b=SB[r];
   a.forEach((x,i)=>{if(!x.m||x.m==="Any")return;const j=b.findIndex((y,k)=>k!==i&&y.m===x.m);if(j<0||b[i].m===x.m)return;
     [b[i],b[j]]=[b[j],b[i]];moved=true})});
@@ -97,7 +100,7 @@ function renderBoard(){if(CMP)alignB();
   renderTotals();
 }
 function renderTotals(){
-  document.getElementById("cmpImg").hidden=true;
+  document.getElementById("cmpImg").hidden=true;document.getElementById("hideLab").hidden=true;
   if(CMP)return renderDiff();
   document.getElementById("totH").textContent="Museum total";
   const t=totals(S);
@@ -109,12 +112,14 @@ function renderTotals(){
 const sideName=sd=>NAMES[sd]||("Museum "+sd);
 function renderDiff(){
   const a=totals(S),b=totals(SB);
-  document.getElementById("totH").textContent=sideName("A")+" vs "+sideName("B");document.getElementById("cmpImg").hidden=false;
-  const rows=STATS.filter(k=>Math.abs(a[k])>1e-9||Math.abs(b[k])>1e-9);
+  document.getElementById("totH").textContent=sideName("A")+" vs "+sideName("B");document.getElementById("cmpImg").hidden=false;document.getElementById("hideLab").hidden=false;
+  const rows=STATS.filter(k=>(Math.abs(a[k])>1e-9||Math.abs(b[k])>1e-9)&&!(HIDE&&Math.abs(b[k]-a[k])<1e-9));
   let up=0,dn=0;rows.forEach(k=>{const d=b[k]-a[k];if(d>1e-9)up++;else if(d<-1e-9)dn++});
   document.getElementById("tot").innerHTML=rows.length?`<div class="drow dh"><span>Stat</span><span title="${esc(sideName("A"))}">A</span><span title="${esc(sideName("B"))}">B</span><span>B − A</span></div>`+rows.map(k=>{const d=b[k]-a[k],z=Math.abs(d)<1e-9;
     return `<div class="drow"><span class="k">${k}</span><span class="v">${fxT(a[k])}</span><span class="v">${fxT(b[k])}</span><span class="v ${z?"same":d>0?"up":"down"}">${z?"same":(d>0?"+":"−")+r4(Math.abs(d))}</span></div>`}).join(""):'<p class="hint">Both museums are empty.</p>';
   let nd=0;ORDER.forEach(r=>S[r].forEach((x,i)=>{const y=SB[r][i];if(x.m!==y.m||(x.u||"None")!==(y.u||"None"))nd++}));
+  if(HIDE&&!nd)document.getElementById("tot").innerHTML='<p class="hint">Both museums are the same.</p>';
+  document.getElementById("hideSame").checked=HIDE;
   document.getElementById("filled").innerHTML=rows.length?`<b>${esc(sideName("B"))}</b> is better in ${up} stat${up===1?"":"s"} and worse in ${dn} than <b>${esc(sideName("A"))}</b>. ${nd} display${nd===1?"":"s"} differ.`:"";
 }
 // header above each side in compare mode: name, load, paste, copy across, clear
@@ -332,10 +337,10 @@ document.getElementById("imgCur").onclick=async()=>{if(CMP)return saveCompare();
 const SHORT={"Dig Strength":"Dig Str","Shake Strength":"Shake Str","Modifier Boost":"Mod Boost","Dig Speed":"Dig Spd","Shake Speed":"Shake Spd","Size Boost":"Size","Sell Boost":"Sell","Walk Speed":"Walk"};
 async function compareImage(nA,nB){
   const W=1400,PAD=36,GAP=40,COL=(W-PAD*2-GAP)/2,SW=(COL-16)/3,SH=78;
-  const ta=totals(S),tb=totals(SB),rows=STATS.filter(k=>Math.abs(ta[k])>1e-9||Math.abs(tb[k])>1e-9);
+  const ta=totals(S),tb=totals(SB),rows=STATS.filter(k=>(Math.abs(ta[k])>1e-9||Math.abs(tb[k])>1e-9)&&!(HIDE&&Math.abs(tb[k]-ta[k])<1e-9));const RS=ORDER.filter(r=>!(HIDE&&sameBand(r)));
   const DCOLS=3,DROWS=Math.max(1,Math.ceil(rows.length/DCOLS)),DH=46;
   const HEAD=134,DIFFH=34+DROWS*(DH+8)+30,COLH=54,BAND=26+SH+14;
-  const H=HEAD+DIFFH+COLH+ORDER.length*BAND+34;
+  const H=HEAD+DIFFH+COLH+Math.max(1,RS.length)*BAND+34;
   const cv=document.createElement("canvas");const sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
   const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
   try{await document.fonts.ready}catch(e){}
@@ -363,11 +368,12 @@ async function compareImage(nA,nB){
     c.fillStyle="#e6e9ec";c.font=`700 20px ${FD}`;c.fillText(fitText(c,n,COL-50),xx+42,y+22)});
   const sepTop=y-4;y+=COLH;
   // boards, one rarity per row
-  for(const r of ORDER){const col=IMGC[r];
+  if(!RS.length){c.fillStyle="#5d6670";c.font=`15px ${F}`;c.fillText("Both museums are the same.",PAD,y+30);y+=BAND}
+  for(const r of RS){const col=IMGC[r];const idx=[...Array(SLOTS[r]).keys()].filter(i=>!(HIDE&&sameSlot(r,i)));
     c.fillStyle=col;c.font=`700 13px ${F}`;
     for(let j=0;j<2;j++){const xx=colX[j];c.fillText(r.toUpperCase(),xx,y+14);c.fillStyle=col;c.globalAlpha=.6;c.fillRect(xx,y+20,COL,2);c.globalAlpha=1}
     for(let j=0;j<2;j++){const st=j?SB:S,ot=j?S:SB,xx=colX[j];
-      for(let i=0;i<SLOTS[r];i++){const sl=st[r][i],sx=xx+i*(SW+8),sy=y+28;
+      for(let n=0;n<idx.length;n++){const i=idx[n],sl=st[r][i],sx=xx+n*(SW+8),sy=y+28;
         c.fillStyle="#1c2126";rr(c,sx,sy,SW,SH,10);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,sx,sy,SW,SH,10);c.stroke();
         c.fillStyle=col;rr(c,sx,sy,SW,4,2);c.fill();
         if(!sl.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText(sl.u&&sl.u!=="None"?"Any · "+sl.u:"Empty",sx+14,sy+SH/2+5);continue}
@@ -383,11 +389,12 @@ async function compareImage(nA,nB){
 async function saveCompare(){
   if(!filledCount(S)&&!filledCount(SB)){toast("Both museums are empty");return}
   const nA=sideName("A"),nB=sideName("B"),blob=await compareImage(nA,nB);if(!blob){toast("Couldn't draw the image");return}
-  const filename=(`${nA} vs ${nB}`.replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Museums")+" - Museum comparison.png";
+  const filename=(`${nA} vs ${nB}`+(HIDE?" (differences)":"").replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Museums")+" - Museum comparison.png";
   const ps=(()=>{try{return window.parent!==window&&typeof window.parent.ptSave==="function"?window.parent.ptSave:null}catch(e){return null}})();
   if(ps){try{await ps(filename,blob);toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}return}
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 document.getElementById("cmpImg").onclick=saveCompare;
+document.getElementById("hideSame").onchange=e=>{HIDE=e.target.checked;save();renderBoard()};
 window.ptBoardImage=()=>boardImage(document.getElementById("lname").value.trim()||PAGE_NAME,S);
 document.getElementById("dlCur").onclick=()=>{const n=document.getElementById("lname").value.trim()||activeName||PAGE_NAME;if(!filledCount(S)){toast("The board is empty");return}downloadLoadout(n,S)};
 

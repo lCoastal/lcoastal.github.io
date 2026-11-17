@@ -130,3 +130,6 @@ label.btn{display:inline-block}
 .grid.cmp #tot,.grid.cmp #filled{max-width:640px}
 .toth{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .toth h2{overflow-wrap:anywhere}
+.tacts{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hck{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer}
+.hck input{width:16px;height:16px;accent-color:var(--accent)}
