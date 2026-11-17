@@ -21,18 +21,27 @@ function modShares(mbx,night,luck){const list=MODW.filter(([k])=>night||k!=="Lun
   const L=Math.max(1,11.662*Math.pow(Math.max(0,mbx),.838)+1.96352*Math.max(0,luck||0)/1000),pt=[f(1),f(Math.max(1,L*.172)),f(L)],s={};
   list.forEach(([k])=>s[k]=.313*pt[0][k]+.127*pt[1][k]+.559*pt[2][k]);return s}
 
-const FIELDS=[["","Ignore"],["name","Mineral"],["zone","Zone"],["mod","Modifier"],["weight","Weight (kg)"],["size","Size Boost"],["luck","Total Luck"],["mb","Modifier Boost"],["cap","Capacity"]];
-const GUESS=[["name",/^(name|mineral|ore|item)/i],["zone",/zone|location|place|spot/i],["mod",/modifier$|^mod$|^modifier|mutation/i],["mb",/mod.*boost|modifier.*boost/i],["weight",/weight|kg|mass/i],["size",/size/i],["luck",/luck/i],["cap",/cap/i]];
+const FIELDS=[["","Ignore"],["name","Mineral"],["zone","Zone"],["mod","Modifier"],["weight","Weight (kg)"],["size","Size Boost"],["luck","Total Luck"],["mb","Modifier Boost"],["cap","Capacity"],["pan","Pan number"]];
+const GUESS=[["name",/^(name|mineral|ore|item)/i],["zone",/zone|location|place|spot/i],["mod",/modifier$|^mod$|^modifier|mutation/i],["mb",/mod.*boost|modifier.*boost/i],["weight",/weight|kg|mass/i],["size",/size/i],["luck",/luck/i],["cap",/cap/i],["pan",/^pan(\s*(no|#|number|id))?$/i]];
 let RAW="",ROWS=[],HEAD=[],MAP=[],LAST="";
 const num=v=>{const n=parseFloat(String(v==null?"":v).replace(/[^0-9.eE+-]/g,""));return isFinite(n)?n:NaN};
 const med=a=>{if(!a.length)return NaN;const s=[...a].sort((x,y)=>x-y),h=s.length>>1;return s.length%2?s[h]:(s[h-1]+s[h])/2};
 const pct=(x,d=2)=>isFinite(x)?(x*100).toFixed(d)+"%":"–";
 const fx=(x,d=2)=>isFinite(x)?x.toFixed(d)+"×":"–";
 
+// split one line, honouring "quoted" cells (CSV exports wrap every cell in quotes, "" inside means a quote)
+function splitLine(l,sep){if(l.indexOf('"')<0)return l.split(sep).map(c=>c.trim());
+  const out=[];let cur="",q=false;
+  for(let i=0;i<l.length;i++){const ch=l[i];
+    if(q){if(ch==='"'){if(l[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}
+    else if(ch==='"'&&!cur.trim())q=true,cur="";
+    else if(l.startsWith(sep,i)){out.push(cur.trim());cur="";i+=sep.length-1}
+    else cur+=ch}
+  out.push(cur.trim());return out}
 function detectSep(t){const lines=t.split(/\r?\n/).filter(l=>l.trim()).slice(0,20);let best="|",sc=-1;
-  ["|","\t",",",";"].forEach(s=>{const c=lines.map(l=>l.split(s).length);const m=Math.min(...c);if(m>1&&m>sc&&c.every(x=>x===c[0]||x>=m)){sc=m;best=s}});return best}
+  ["|","\t",",",";"].forEach(s=>{const c=lines.map(l=>splitLine(l,s).length);const m=Math.min(...c);if(m>1&&m>sc&&c.every(x=>x===c[0]||x>=m)){sc=m;best=s}});return best}
 function parse(){const sv=$("sep").value,sep=sv==="auto"?detectSep(RAW):sv;
-  const lines=RAW.split(/\r?\n/).filter(l=>l.trim());const cells=lines.map(l=>l.split(sep).map(c=>c.trim()));
+  const lines=RAW.split(/\r?\n/).filter(l=>l.trim());const cells=lines.map(l=>splitLine(l,sep));
   const w=Math.max(0,...cells.map(r=>r.length));
   // a header line has no numbers where the next lines do
   if(!parse.touched){const f=cells[0]||[],s=cells[1]||[];$("hasHead").checked=f.some((c,i)=>isNaN(num(c))&&!isNaN(num(s[i])))||f.some(c=>GUESS.some(g=>g[1].test(c)))}
@@ -46,7 +55,7 @@ function guess(w){MAP=Array(w).fill("");const used=new Set();
     const hit=f=>vals.filter(f).length/vals.length;let k="";
     if(!used.has("name")&&hit(v=>MIN[v.toLowerCase()])>.6)k="name";
     else if(!used.has("zone")&&hit(v=>zoneOf(v))>.6)k="zone";
-    else if(!used.has("mod")&&hit(v=>NORMAL.has(v)||/^none$/i.test(v))>.4)k="mod";
+    else if(!used.has("mod")&&hit(v=>NORMAL.has(v)||/^(none|unknown)$/i.test(v))>.4)k="mod";
     if(k){MAP[i]=k;used.add(k)}}}
 function drawMap(w){let h='<div class="cols">';
   for(let i=0;i<w;i++){const ex=ROWS.slice(0,3).map(r=>r[i]||"").filter(Boolean).join(" · ");
@@ -66,16 +75,18 @@ dz.addEventListener("drop",e=>readFile(e.dataTransfer.files[0]));
 let pt;$("paste").addEventListener("input",()=>{clearTimeout(pt);pt=setTimeout(()=>load($("paste").value),300)});
 
 function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"":r[i]||""};
-  const rows=ROWS.map(r=>({name:g(r,"name"),zone:g(r,"zone"),mod:g(r,"mod"),w:num(g(r,"weight")),sb:num(g(r,"size")),luck:num(g(r,"luck")),mb:num(g(r,"mb")),cap:num(g(r,"cap"))})).filter(r=>r.name);
+  const rows=ROWS.map(r=>({name:g(r,"name"),zone:g(r,"zone"),mod:g(r,"mod"),w:num(g(r,"weight")),sb:num(g(r,"size")),luck:num(g(r,"luck")),mb:num(g(r,"mb")),cap:num(g(r,"cap")),pan:g(r,"pan")})).filter(r=>r.name);
   const known=rows.filter(r=>MIN[r.name.toLowerCase()]),unknown={};rows.forEach(r=>{if(!MIN[r.name.toLowerCase()])unknown[r.name]=(unknown[r.name]||0)+1});
   let h="",txt=[];const sumBits=[`<b>${rows.length.toLocaleString()}</b> rows`];
   // ---- drop rates
-  if(col("zone")>=0){const byZ={},noZ={};known.forEach(r=>{const z=zoneOf(r.zone);if(z)(byZ[z]=byZ[z]||[]).push(r);else if(r.zone)noZ[r.zone]=(noZ[r.zone]||0)+1});
+  const ZALL=$("zoneAll").value;if(col("zone")>=0||ZALL){const byZ={},noZ={};known.forEach(r=>{const z=col("zone")>=0?zoneOf(r.zone):ZALL;if(z)(byZ[z]=byZ[z]||[]).push(r);else if(r.zone)noZ[r.zone]=(noZ[r.zone]||0)+1});
     h+='<h3 class="sec">Drop rates</h3>';txt.push("DROP RATES");
     Object.entries(byZ).sort((a,b)=>b[1].length-a[1].length).forEach(([z,rs])=>{const ls=rs.map(r=>r.luck).filter(isFinite),L=ls.length?med(ls):1;
-      const ex=dropShares(z,L),cnt={};rs.forEach(r=>{const n=MIN[r.name.toLowerCase()].n;cnt[n]=(cnt[n]||0)+1});const N=rs.length;
+      // expected rate averaged over every row's own luck (bucketed ~2% apart so it stays fast)
+      const bk=new Map();rs.forEach(r=>{const l=isFinite(r.luck)&&r.luck>0?r.luck:L,k=Math.round(Math.log(Math.max(1,l))/.02);bk.set(k,(bk.get(k)||0)+1)});
+      const ex={};bk.forEach((n,k)=>{const d=dropShares(z,Math.exp(k*.02));for(const m in d)ex[m]=(ex[m]||0)+d[m]*n/rs.length});const cnt={};rs.forEach(r=>{const n=MIN[r.name.toLowerCase()].n;cnt[n]=(cnt[n]||0)+1});const N=rs.length;
       const names=[...new Set([...Object.keys(ex),...Object.keys(cnt)])].sort((a,b)=>(ex[b]||0)-(ex[a]||0)||(cnt[b]||0)-(cnt[a]||0));
-      h+=`<p class="note"><b>${esc(z)}</b> · ${N.toLocaleString()} rows · luck ${isFinite(L)&&ls.length?Math.round(L).toLocaleString():"not given (1 used)"}</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Your rate</th><th>Toolkit</th><th>Ratio</th></tr>`;
+      h+=`<p class="note"><b>${esc(z)}</b> · ${N.toLocaleString()} rows · luck ${ls.length?(Math.min(...ls)===Math.max(...ls)?Math.round(L).toLocaleString():Math.round(Math.min(...ls)).toLocaleString()+" – "+Math.round(Math.max(...ls)).toLocaleString()+" (each row's own luck used)"):"not given (1 used)"}</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Your rate</th><th>Toolkit</th><th>Ratio</th></tr>`;
       txt.push(`${z} (${N} rows, luck ${Math.round(L)})`);
       names.forEach(n=>{const c=cnt[n]||0,o=c/N,e=ex[n],m=MIN[n.toLowerCase()],r=e>0?o/e:NaN,thin=e>0?e*N<10:c<10;
         const cls=!isFinite(r)?"off":thin?"":Math.abs(r-1)<.15?"ok":Math.abs(r-1)>.35?"off":"";
@@ -85,8 +96,20 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
     const nz=Object.keys(noZ);if(nz.length)h+=`<p class="note">Zones the toolkit doesn't know, left out: ${esc(nz.join(", "))}</p>`;
     if(!Object.keys(byZ).length)h+='<p class="note">None of the zone names matched a zone the toolkit knows.</p>';
     sumBits.push(`<b>${Object.keys(byZ).length}</b> zones checked`)}
+  // ---- items per pan
+  if(col("pan")>=0){const per=new Map();rows.forEach(r=>{if(r.pan==="")return;const k=r.pan;let o=per.get(k);if(!o){o={n:0,cap:r.cap};per.set(k,o)}o.n++});
+    const byCap=new Map();per.forEach(o=>{const c=isFinite(o.cap)?o.cap:NaN,k=isFinite(c)?c:"?";let g=byCap.get(k);if(!g){g=[];byCap.set(k,g)}g.push(o.n)});
+    const all=[...per.values()].map(o=>o.n);
+    if(all.length){const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
+      h+=`<h3 class="sec">Items per pan</h3><p class="note">${all.length.toLocaleString()} pans · ${avg(all).toFixed(2)} items per pan on average. The first and last pan may be cut off by when logging started or stopped.</p><div class="tw"><table class="t"><tr><th>Capacity</th><th>Pans</th><th>Average</th><th>Fewest – most</th><th>Toolkit</th><th>Ratio</th></tr>`;
+      txt.push("","ITEMS PER PAN",`${all.length} pans, average ${avg(all).toFixed(2)}`);
+      [...byCap.entries()].sort((a,b)=>b[1].length-a[1].length).forEach(([c,a])=>{const m=avg(a),e=c==="?"?NaN:panItems(c),r=m/e,thin=a.length<20;
+        const cls=!isFinite(r)||thin?"":Math.abs(r-1)<.03?"ok":Math.abs(r-1)>.1?"off":"";
+        h+=`<tr><td>${c==="?"?"not given":Number(c).toLocaleString()}${thin?' <span class="thin">thin data</span>':""}</td><td>${a.length.toLocaleString()}</td><td>${m.toFixed(2)}</td><td>${Math.min(...a)} – ${Math.max(...a)}</td><td>${isFinite(e)?e.toFixed(2):"–"}</td><td class="${cls}">${fx(r,3)}</td></tr>`;
+        txt.push(`  capacity ${c}: ${a.length} pans, ${m.toFixed(2)} avg vs ${isFinite(e)?e.toFixed(2):"-"}, ${fx(r,3)}`)});
+      h+="</table></div>";sumBits.push(`<b>${avg(all).toFixed(1)}</b> items per pan`)}}
   // ---- modifiers
-  if(col("mod")>=0){const N=rows.length,isNone=v=>!v||/^(none|no|-|n\/a|normal)$/i.test(v);
+  if(col("mod")>=0){const N=rows.length,isNone=v=>!v||/^(none|no|-|n\/a|normal|unknown)$/i.test(v);
     const cnt={};let any=0,norm=0;rows.forEach(r=>{if(isNone(r.mod))return;any++;cnt[r.mod]=(cnt[r.mod]||0)+1;if(NORMAL.has(r.mod))norm++});
     const mbs=rows.map(r=>r.mb).filter(isFinite),ls=rows.map(r=>r.luck).filter(isFinite),MB=mbs.length?med(mbs):NaN,LK=ls.length?med(ls):0;
     const sh=isFinite(MB)?modShares(MB,!!cnt.Lunar,LK):null;
@@ -110,9 +133,10 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
         txt.push(`  ${n}: ${rs.length} seen, base ${m.bw}, median ${med(ws).toFixed(2)} kg, max ${Math.max(...ws).toFixed(2)} kg, ${q.toFixed(1)}x base`)});
       h+="</table></div>"}}
   const uk=Object.keys(unknown);if(uk.length)h+=`<p class="note">Names the toolkit doesn't know, left out of drop rates and weights: ${esc(uk.slice(0,20).join(", "))}${uk.length>20?" …":""}</p>`;
-  if(!h)h='<p class="note">Map at least one of Zone, Modifier or Weight to get a comparison.</p>';
+  if(!h)h='<p class="note">Map at least one of Zone, Modifier, Weight or Pan number to get a comparison.</p>';
   $("sum").innerHTML=sumBits.join(" · ");$("out").innerHTML=h;$("outCard").hidden=false;LAST=txt.join("\n");
   $("outCard").scrollIntoView({behavior:"smooth",block:"start"})}
+$("zoneAll").insertAdjacentHTML("beforeend",ZONES.slice().sort().map(z=>`<option>${esc(z)}</option>`).join(""));
 $("run").onclick=run;
 $("copyOut").onclick=async()=>{const b=$("copyOut");try{await navigator.clipboard.writeText(LAST)}catch(e){const t=document.createElement("textarea");t.value=LAST;document.body.appendChild(t);t.select();try{document.execCommand("copy")}catch(_){}t.remove()}
   b.textContent="Copied";setTimeout(()=>b.textContent="Copy as text",1200)};
