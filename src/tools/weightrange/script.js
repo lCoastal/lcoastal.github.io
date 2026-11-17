@@ -1,7 +1,10 @@
 (()=>{
 const $=id=>document.getElementById(id);
 let S={min:"",sb:"",cap:"",mag:false};try{Object.assign(S,JSON.parse(localStorage.getItem("wr-s")||"{}"))}catch(e){}
-const save=()=>{try{localStorage.setItem("wr-s",JSON.stringify(S))}catch(e){}};
+const youPush=ptYouLink(S,{sb:"sb",cap:"cap",mag:"mag"},()=>{["sb","cap"].forEach(k=>$(k).value=S[k]);$("mag").checked=!!S.mag;render()});
+const save=()=>{try{localStorage.setItem("wr-s",JSON.stringify(S))}catch(e){}youPush()};
+ptPageButtons($("acts"),()=>"Weight range "+curName(),()=>ptPageRead($("head"),[{h:"",el:$("sum")},{h:"How heavy the top ones get",el:$("pct")}]),"Estimates from a fitted model, so real results can differ.");
+ptPageButtons($("zacts"),()=>"Weights in "+curName(),()=>ptPageRead($("zhead"),[{h:"",el:$("ztbl")}]),"Estimates from a fitted model, so real results can differ.");
 const baseLoc=n=>n.replace(/\s*\((inside|outside) Firefly Zones\)/,"").replace(/\s*\(when in the loot pool\)/,"");
 const MINS=P.mins.filter(m=>m.bw>0).sort((a,b)=>a.n.localeCompare(b.n));
 const BY=Object.fromEntries(MINS.map(m=>[m.n.toLowerCase(),m]));
@@ -45,7 +48,7 @@ const bandText=(b,base,M)=>`<b>${kg(base*b.k0*M)} – ${kg(base*b.k1*M)}</b><spa
 
 function mineral(m,sb,cap,model,M){
   const base=m.bw*(1+sb/100);
-  $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b style="color:${rc(m.r)}">${esc(m.n)}</b><br><span>${esc(m.r)} · base weight ${m.bw} kg · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}</span></div>`;
+  $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b class="mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}" style="color:${rc(m.r)}">${esc(m.n)}</b><br><span>${esc(m.r)} · base weight ${m.bw} kg · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}</span></div>`;
   const tile=(l,v,s)=>`<div><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
   $("sum").innerHTML=tile("Lightest possible",kg(base*WT_MIN*M),"")+tile("Typical",kg(base*model.q(.5)*M),"half come out heavier")+tile("Average",kg(base*model.mean*M),"")+tile("Heaviest possible",kg(base*WT_MAX*M),"the same in every zone");
   // eruption max only for minerals that drop nowhere else
@@ -79,4 +82,5 @@ function render(){
   if(m)mineral(m,sb,cap,model,M);else if(z)zone(z,sb,cap,model,M);
 }
 render();
+window.ptOpenFor=(kind,name)=>{if(kind!=="mineral")return;S.min=name;$("min").value=name;save();render();try{AC.sync()}catch(e){}};
 })();

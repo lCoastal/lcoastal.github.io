@@ -1,7 +1,8 @@
 
 const $=id=>document.getElementById(id);
 let S={mb:"",luck:"",cap:"",mag:false,surge:false,night:false};try{Object.assign(S,JSON.parse(localStorage.getItem("pmo-s")||"{}"))}catch(e){}
-const save=()=>{try{localStorage.setItem("pmo-s",JSON.stringify(S))}catch(e){}};
+const youPush=ptYouLink(S,{mb:"mb",luck:"luck",cap:"cap"},()=>render());
+const save=()=>{try{localStorage.setItem("pmo-s",JSON.stringify(S))}catch(e){}youPush()};
 // the game's modifier weights; a modifier's base share is its weight ÷ the total (Treasured, Voidtorn, event ones etc. are 0 here)
 const WEIGHT={Shiny:1,Pure:.8,Glowing:.5,Scorching:.25,Irradiated:.1,Iridescent:.02,Cosmic:.005,Mutated:.001,Lunar:.00025,Perfect:.0001};
 const WSUM=Object.values(WEIGHT).reduce((a,b)=>a+b,0);

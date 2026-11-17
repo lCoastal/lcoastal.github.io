@@ -57,7 +57,7 @@ function render(){
     rows.sort((a,b)=>ORD.indexOf(a.m.r)-ORD.indexOf(b.m.r)||a.p-b.p);
     const byR=r=>rows.filter(x=>x.m.r===r).reduce((s,x)=>s+x.eff,0);
     $("sum").innerHTML=["Exotic","Mythic","Legendary"].filter(r=>!S.hideR.includes(r)).map(r=>`<div><span class="lab" style="color:${rc(r)}">Any ${r}</span><b>${oneInTxt(1-Math.pow(1-byR(r),perPan()))}</b><span class="hint">per pan</span></div>`).join("");
-    $("tbl").innerHTML=`<table class="o">${head}<tbody>${rows.length?"":`<tr><td colspan="5" class="hint">No rarities picked. Turn one on above.</td></tr>`}${rows.map(s=>row(`<span class="mn" data-mineral="${esc(s.m.n)}">${s.m.ic?`<img src="${s.m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(s.m.n)}</b><br><span class="rr" style="--rc:${rc(s.m.r)}">${s.m.r}</span></span></span>`,"",s.m.r,s)).join("")}</tbody></table>`}
+    $("tbl").innerHTML=`<table class="o">${head}<tbody>${rows.length?"":`<tr><td colspan="5" class="hint">No rarities picked. Turn one on above.</td></tr>`}${rows.map(s=>row(`<span class="mn mlink" data-mineral="${esc(s.m.n)}" title="Open ${esc(s.m.n)}">${s.m.ic?`<img src="${s.m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(s.m.n)}</b><br><span class="rr" style="--rc:${rc(s.m.r)}">${s.m.r}</span></span></span>`,"",s.m.r,s)).join("")}</tbody></table>`}
   else{const m=MIN[S.min.toLowerCase()];const rows=(m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,L).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>/Void/.test(a.l)-/Void/.test(b.l)||b.s.eff-a.s.eff);
     const best=rows.find(x=>!/Void/.test(x.l))||rows[0];
     $("sum").innerHTML=best?(()=>{const pp=1-Math.pow(1-best.s.eff,perPan());const pans=pp>0?1/pp:Infinity;return `<div><span class="lab">Best place</span><b style="font-family:var(--f-body);font-size:1rem">${esc(best.l)}</b></div><div><span class="lab">Per pan there</span><b>${oneInTxt(pp)}</b>${+S.pph>0&&isFinite(pans)?`<span class="hint">about ${hrs(pans)}</span>`:""}</div>`})():"";
@@ -150,3 +150,4 @@ window.ptRefresh=()=>{youPull(["luck","cap","pph"]);render()};
 render();
 
 luckxWire(()=>render());
+window.ptYouChanged=()=>window.ptRefresh();

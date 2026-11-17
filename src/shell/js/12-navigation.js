@@ -24,6 +24,9 @@ function show(id) {
     if (n.id === "nav-" + navId) n.setAttribute("aria-current", "page");
     else n.removeAttribute("aria-current");
   });
+  const gb = document.getElementById("gBtn");
+  if (gb) gb.toggleAttribute("aria-current", id === "settings");
+  if (gb && id === "settings") gb.setAttribute("aria-current", "page");
   // the tab strip for grouped tools
   const hb = document.getElementById("hubbar");
   if (hub) {
@@ -91,3 +94,4 @@ document.getElementById("hubbar").addEventListener("keydown", (e) => {
     nb && nb.focus();
   }
 });
+document.getElementById("gBtn").onclick = () => show("settings");

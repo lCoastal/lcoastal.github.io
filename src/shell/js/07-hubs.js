@@ -25,13 +25,19 @@ const HUBS = [
   ],
   [
     "h-luck",
-    "Panning Calculators",
-    "What each pan gives you: drop and modifier odds, best luck cap, build comparisons, mineral weights and pan size",
+    "Luck & Drops",
+    "What you find in a pan: drop odds, the best luck cap and modifier odds",
     [
       ["odds", "Luck Odds"],
       ["bestcap", "Best Luck Cap"],
-      ["buildcmp", "Compare Builds"],
       ["mododds", "Modifier Odds"],
+    ],
+  ],
+  [
+    "h-weights",
+    "Weights & Pans",
+    "How heavy minerals get, the Size Boost you need and how many fit in a pan",
+    [
       ["weightrange", "Weight Range"],
       ["sizefinder", "Size Boost Finder"],
       ["pansize", "Pan Size"],
@@ -87,6 +93,15 @@ const HUBS = [
       ["quests", "Quests"],
       ["dredge", "Dredge Master"],
       ["npcs", "NPCs"],
+    ],
+  ],
+  [
+    "h-misc",
+    "Codes & Tier List",
+    "Active codes and a tier list maker",
+    [
+      ["codes", "Codes"],
+      ["tierlist", "Tier List"],
     ],
   ],
 ];

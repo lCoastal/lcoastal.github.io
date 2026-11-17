@@ -15,6 +15,11 @@
     <h1>Settings</h1>
     <p class="lede">How every tool in the toolkit looks and behaves. Changes apply straight away and are saved in this browser.</p>
   </header>
+  <section class="card set"><h2>Your stats</h2>
+    <p class="note" style="margin:0 0 10px">Typed once, used by every calculator: Luck Odds, Best Luck Cap, Modifier Odds, Weight Range, Size Boost Finder, Pan Size, Dredge Master and each mineral's page. Changing one anywhere changes it everywhere.</p>
+    <div class="yrow"><label class="yf"><span>Luck</span><input type="number" min="0" data-y="luck" inputmode="decimal"></label><label class="yf"><span>Pan capacity</span><input type="number" min="0" data-y="cap" inputmode="decimal"></label><label class="yf"><span>Size Boost %</span><input type="number" min="0" data-y="sb" inputmode="decimal"></label><label class="yf"><span>Modifier Boost %</span><input type="number" min="0" data-y="mb" inputmode="decimal"></label><label class="yf"><span>Pans per hour</span><input type="number" min="0" data-y="pph" inputmode="decimal"></label><label class="yck"><input type="checkbox" data-y="mag"> Solar Magnifier</label></div>
+    <div class="yrow" style="margin-top:10px"><button type="button" class="btn" id="yCalc">Use my Stat Calculator stats</button><button type="button" class="hkr" id="yClr">Clear</button></div>
+  </section>
   <section class="card set"><h2>Appearance</h2>
     <div class="srow stk"><div class="stx"><b>Theme</b><span>Auto follows your device or the app. Light and Dark always use that theme.</span></div><div class="seg" id="thm" role="group" aria-label="Theme"><button type="button" data-t="auto">Auto</button><button type="button" data-t="light">Light</button><button type="button" data-t="dark">Dark</button></div></div>
     <div class="srow stk"><div class="stx"><b>Accent colour</b><span>The colour of buttons, switches, links and highlights in every tool.</span><span class="accn" id="accN"></span></div><div class="sws" id="acc" role="radiogroup" aria-label="Accent colour"></div></div>

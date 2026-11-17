@@ -160,7 +160,7 @@ function placed(b,picks){// put the new minerals in the displays where the same 
   const nb=blank();ORDER.forEach(r=>{const now=(b[r]||[]).map(s=>s||{m:null,u:"None"}),nw=(picks[r]||[]).slice(),out=new Array(SLOTS[r]).fill(null);
     now.forEach((s,i)=>{const j=nw.findIndex(x=>x.n===s.m);if(j>=0){out[i]={m:nw[j].n,u:nw[j].u};nw.splice(j,1)}});
     for(let i=0;i<SLOTS[r];i++)if(!out[i])out[i]=nw.length?(x=>({m:x.n,u:x.u}))(nw.shift()):{m:null,u:"None"};nb[r]=out});return nb}
-const mineHTML=(n,u)=>n?`<span class="mn">${ic(n)}<span>${esc(n)}<small>${esc(u||"None")}</small></span></span>`:'<span class="mn"><span>Empty</span></span>';
+const mineHTML=(n,u)=>n?`<span class="mn mlink" data-mineral="${esc(n)}" title="Open ${esc(n)}">${ic(n)}<span>${esc(n)}<small>${esc(u||"None")}</small></span></span>`:'<span class="mn"><span>Empty</span></span>';
 function statTable(a,b2){const rows=STATS.map((s,i)=>[s,a[i],b2[i]]).filter(([,x,y])=>Math.abs(x)>1e-9||Math.abs(y)>1e-9);
   return `<table class="t"><tr><th>Stat</th><th>Now</th><th>After</th><th>Change</th></tr>${rows.map(([s,x,y])=>{const d=y-x,z=Math.abs(d)<1e-9;return `<tr><td>${s}</td><td>${fxT(x)}</td><td>${fxT(y)}</td><td class="${z?"same":d>0?"up":"down"}">${z?"same":sg(d)}</td></tr>`}).join("")}</table>`}
 let NEWB=null;
@@ -171,7 +171,7 @@ function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
   if(res.picks){NEWB=placed(b,res.picks);const nt=totalsOf(NEWB);
     const ch=[];ORDER.forEach(r=>NEWB[r].forEach((s,i)=>{const was=(b[r]||[])[i]||{m:null,u:"None"};if(was.m!==s.m||(was.u||"None")!==(s.u||"None"))ch.push({r,was,s})}));
     const up=STATS.filter((s,i)=>nt[i]>cur[i]+1e-9).length;
-    o.innerHTML=`<div class="verdict yes"><span class="ic">✅</span><div><b>Yes, it can be improved</b><span>${ch.length} swap${ch.length===1?"":"s"} raise ${up} stat${up===1?"":"s"} without lowering any. ${proof}</span></div></div>
+    o.innerHTML=`<div class="verdict yes"><div><b>Yes, it can be improved</b><span>${ch.length} swap${ch.length===1?"":"s"} raise ${up} stat${up===1?"":"s"} without lowering any. ${proof}</span></div></div>
       <h3 class="sec">Swaps</h3><div class="swaps">${ch.map(c=>`<div class="sw" style="--rc:${rc(c.r)}"><span class="rr">${c.r}</span><span class="old">${mineHTML(c.was.m,c.was.u)}</span><span class="ar">→</span>${mineHTML(c.s.m,c.s.u)}</div>`).join("")}</div>
       <h3 class="sec">What it does</h3>${statTable(cur,nt)}
       <div class="acts"><button type="button" class="btn pri" id="toCmp">Compare in the Museum Planner</button><button type="button" class="btn" id="toPl">Open in the Museum Planner</button><button type="button" class="btn" id="cpTxt">Copy as text</button><button type="button" class="btn" id="toImg">Save as image</button></div>`;
@@ -184,11 +184,13 @@ function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
   // nothing beats it on every stat: list the single swaps with the most gain, and what each costs
   const val=g=>g.reduce((a,v,i)=>a+v*W[i],0);const onBoard=new Set();ORDER.forEach(r=>(b[r]||[]).forEach(s=>s&&s.m&&onBoard.add(s.m)));const T=[];
   ORDER.forEach(r=>(b[r]||[]).forEach((s,i)=>{const g0=gainOf(r,s);opts[r].forEach(op=>{if(op.n!==s.m&&onBoard.has(op.n))return;if(op.n===s.m&&op.u===(s.u||"None"))return;
-    const d=op.g.map((v,k)=>v-g0[k]);const v=val(d);if(v>1e-9)T.push({r,i,s,op,d,v})})}));
+    const d=op.g.map((v,k)=>v-g0[k]);const v=val(d);
+    // only real gains: what it adds has to be more than what it takes away (no even swaps like -0.5 Luck for +0.5 Size Boost)
+    const net=d.reduce((a,x)=>a+x,0);if(v>1e-9&&net>1e-6)T.push({r,i,s,op,d,v})})}));
   T.sort((x,y)=>y.v-x.v);const seen=new Set(),from={},top=[];for(const t of T){const k=t.r+t.i;if(seen.has(t.op.n)||(from[k]||0)>=2)continue;seen.add(t.op.n);from[k]=(from[k]||0)+1;top.push(t);if(top.length>=8)break}
   const fxl=d=>STATS.map((s,i)=>Math.abs(d[i])>1e-9?`<span class="${d[i]>0?"up":"down"}">${s} ${sg(d[i])}</span>`:"").filter(Boolean).join(" · ");
-  o.innerHTML=`<div class="verdict"><span class="ic">🏆</span><div><b>${res.done?"Your museum can't be improved":"No improvement found"}</b><span>${res.done?"Nothing beats it without lowering at least one stat, with the modifiers and minerals you allowed.":proof}</span></div></div>
-    ${top.length?`<h3 class="sec">Best trades if you're happy to lose a little</h3><p class="hint">One display changed at a time, ranked by ${S.goal==="all"?"total gain (every stat counted by how much it grows)":S.goal==="have"?"total gain in the stats your museum boosts":S.goal}.</p><div class="acts" style="margin-top:0"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="swaps" style="margin-top:6px">${top.map(t=>`<div class="trade" style="--rc:${rc(t.r)}"><div class="top"><span class="rr">${t.r}</span>${mineHTML(t.s.m,t.s.u)}<span class="ar">→</span>${mineHTML(t.op.n,t.op.u)}</div><div class="fx">${fxl(t.d)}</div></div>`).join("")}</div>`:'<p class="hint" style="margin-top:10px">No single swap gains more than it loses either.</p>'}`;
+  o.innerHTML=`<div class="verdict"><div><b>${res.done?"Your museum can't be improved":"No improvement found"}</b><span>${res.done?"Nothing beats it without lowering at least one stat, with the modifiers and minerals you allowed.":proof}</span></div></div>
+    ${top.length?`<h3 class="sec">Best trades if you're happy to lose a little</h3><p class="hint">One display changed at a time, and each adds more stats in total than it takes away. Ranked by ${S.goal==="all"?"total gain (every stat counted by how much it grows)":S.goal==="have"?"total gain in the stats your museum boosts":S.goal}.</p><div class="acts" style="margin-top:0"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="swaps" style="margin-top:6px">${top.map(t=>`<div class="trade" style="--rc:${rc(t.r)}"><div class="top"><span class="rr">${t.r}</span>${mineHTML(t.s.m,t.s.u)}<span class="ar">→</span>${mineHTML(t.op.n,t.op.u)}</div><div class="fx">${fxl(t.d)}</div></div>`).join("")}</div>`:'<p class="hint" style="margin-top:10px">No single swap gains more than it loses either.</p>'}`;
   const ib=document.getElementById("toImg");if(ib)ib.onclick=()=>ptSaveImg("Museum trades",()=>resultImage({ok:false,top}))}
 // ---- the result as a picture (drawn in the dark style; the toolkit maps colours to your theme) ----
 const IMGC={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6"};

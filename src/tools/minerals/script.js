@@ -84,11 +84,47 @@ function openMineral(name,fromEl){
     <div class="pv">$${esc(m.v)}<small>per kg</small></div>
     <button type="button" class="close" id="pclose">Close</button></div>
   <div class="psec"><h3>Museum</h3><div class="mus2">${m.mu?m.mu.b.map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fx(v)}</em></span>`).join("")+`<span class="kg">max boost at ${m.mu.kg} kg</span>`+(m.bw?`<span class="kg">base weight ${m.bw} kg</span>`:""):'<span class="none">No museum boost listed</span>'}</div></div>
-  <div class="psec">${ch.length?`<div class="lochd"><h3>Where to find it</h3><button type="button" class="cpy" id="copyLocs" title="Copy every zone and how rare it is there">Copy as text</button></div>`:""}<div class="tw">${ch.length?`<table class="locs"><tr><th>Found in</th><th class="rt">How rare</th></tr>${ch.map((c,i)=>`<tr class="${i===0?"best":""}"><td data-location="${esc(baseLoc(c[0]))}" title="Ctrl+click to open this location">${esc(c[0])}</td><td class="rt"><span class="rate"><span class="odd">${odds(c[2])}</span><span class="pct">${esc(c[1])} chance</span></span></td></tr>`).join("")}</table>`:'<h3>Found in</h3><span class="none">No drop locations listed</span>'}</div></div>
+  <div class="psec"><div class="lochd"><h3>With your stats</h3></div>
+    <div class="you"><label>Luck<input type="number" min="1" id="yLuck" inputmode="numeric"></label><label>Capacity<input type="number" min="1" id="yCap" inputmode="numeric"></label><label>Size Boost %<input type="number" min="0" id="ySb" inputmode="decimal"></label><label class="ck"><input type="checkbox" id="yMag"> Solar Magnifier</label><button type="button" class="cpy" id="yCalc">Use my Stat Calculator stats</button></div>
+    <div class="ytiles" id="yOut"></div>
+    <div class="yopen"><span>Open in</span>${OPEN.map(([id,lab])=>`<button type="button" class="cpy" data-tool="${id}">${lab}</button>`).join("")}</div></div>
+  <div class="psec">${ch.length?`<div class="lochd"><h3>Where to find it</h3><button type="button" class="cpy" id="copyLocs" title="Copy every zone and how rare it is there">Copy as text</button></div>`:""}<div class="tw">${ch.length?`<table class="locs"><tr><th>Found in</th><th class="rt">How rare</th><th class="rt">Per pan for you</th></tr>${ch.map((c,i)=>`<tr class="${i===0?"best":""}"><td data-location="${esc(baseLoc(c[0]))}" title="Ctrl+click to open this location">${esc(c[0])}</td><td class="rt"><span class="rate"><span class="odd">${odds(c[2])}</span><span class="pct">${esc(c[1])} chance</span></span></td><td class="rt yp" data-yz="${esc(c[0])}">…</td></tr>`).join("")}</table>`:'<h3>Found in</h3><span class="none">No drop locations listed</span>'}</div></div>
   <div class="psec"><h3>Recipes that use ${esc(m.n)}</h3>${recipes.length?`<div class="recipes">${recipes.map(([e,o])=>`<div class="rec" style="--rc:${rc(o.r)}"><div class="rt"><b data-equip="${esc(e)}" title="Ctrl+click to open ${esc(e)} on the Equipment page" style="cursor:pointer">${esc(e)}</b><span>${esc(o.r)}${o.n?" · "+esc(o.n):""}</span></div><ul class="ing">${o.i.map(([q,ing])=>{const im=BYN[ing.toLowerCase()];const me=im&&im.n===m.n;return `<li class="${me?"me":""}"><span class="q">${q}×</span>${im?`<img src="${im.ic}" alt="">`:""}${im&&!me?`<button type="button" data-open="${esc(im.n)}" data-mineral="${esc(im.n)}">${esc(im.n)}</button>`:esc(ing)}</li>`}).join("")}</ul></div>`).join("")}</div>`:'<span class="none">Not used in any recipe yet</span>'}</div>`;
   const cb=document.getElementById("copyLocs");if(cb)cb.onclick=()=>copyText(locText(m,ch),cb);
+  youWire(m);
   scrim.hidden=false;scrim.scrollTop=0;document.getElementById("pclose").focus();
 }
+
+// ---- the mineral at your stats: shared luck / capacity / Size Boost / magnifier, worked out by the toolkit's formulas ----
+const OPEN=[["odds","Luck Odds"],["bestcap","Best Luck Cap"],["buildcmp","Compare Builds"],["weightrange","Weight Range"],["sizefinder","Size Boost Finder"],["dredge","Dredge Master"]];
+const nf=(v,d)=>Number(v).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:0});
+const oneInP=p=>!(p>0)?"—":p>=.5?nf(p*100,0)+"%":"1 in "+nf(Math.round(1/p),0);
+const kgf=v=>!isFinite(v)?"—":v>=1000?nf(v,0)+" kg":v>=100?nf(v,1)+" kg":nf(v,2)+" kg";
+const youGet=()=>{try{return window.parent.ptYou.get()}catch(e){return {}}};
+let CUR=null;
+async function youDraw(){const m=CUR;if(!m)return;const out=document.getElementById("yOut");if(!out)return;
+  let r=null;try{r=await window.parent.ptMineralStats(m.n)}catch(e){}
+  if(CUR!==m)return;
+  const y=youGet(),hasL=+y.luck>0,hasC=+y.cap>0;
+  if(!r){out.innerHTML='<span class="none">Couldn\'t work this out here.</span>';return}
+  const real=r.zones.filter(z=>z.pan!=null&&!/^The Void/.test(z.z)),best=(real.length?real:r.zones.filter(z=>z.pan!=null)).sort((a,b)=>b.pan-a.pan)[0];
+  document.querySelectorAll("[data-yz]").forEach(td=>{const z=r.zones.find(x=>x.z===td.dataset.yz);td.textContent=z&&z.pan!=null&&hasL&&hasC?oneInP(z.pan):"—"});
+  const T=(lab,v,sub)=>`<div class="yt"><span>${lab}</span><b>${v}</b>${sub?`<small>${sub}</small>`:""}</div>`;
+  const allow=k=>{try{return window.parent.ptModAllowed(m.n,k)}catch(e){return true}};
+  const only=(()=>{try{return window.parent.ptModOnly(m.n)}catch(e){return null}})();
+  const mods=only?`Only comes ${only}`:[allow("Treasured")?"Can be Treasured":"",allow("Entombed")?"Can be Entombed":""].filter(Boolean).join(" · ")||"No special modifiers";
+  out.innerHTML=(hasL&&hasC&&best?T("Best zone for you",esc(best.z),`${oneInP(best.pan)} per pan`):T("Best zone for you","—","Type your luck and capacity"))
+    +(r.wt?T("Weight",`${kgf(r.wt.lo)} – ${kgf(r.wt.hi)}`,`typical ${kgf(r.wt.mid)} · top 1% from ${kgf(r.wt.top)}`):T("Weight","—","No base weight listed"))
+    +T("Special modifiers",mods,"Treasure chests and the tomb deposits")}
+function youWire(m){CUR=m;const y=youGet(),I={yLuck:"luck",yCap:"cap",ySb:"sb"};
+  Object.entries(I).forEach(([id,k])=>{const el=document.getElementById(id);el.value=y[k]??"";el.addEventListener("input",()=>{try{window.parent.ptYou.set({[k]:el.value},window)}catch(e){}clearTimeout(youWire.t);youWire.t=setTimeout(youDraw,200)})});
+  const mg=document.getElementById("yMag");mg.checked=!!y.mag;mg.onchange=()=>{try{window.parent.ptYou.set({mag:mg.checked},window)}catch(e){}youDraw()};
+  document.getElementById("yCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;
+    const p={luck:String(Math.round(t.Luck||0)||""),cap:String(Math.round(t.Capacity||0)||""),sb:String(Math.round((t["Size Boost"]||0)*10)/10)};
+    try{window.parent.ptYou.set(p,window)}catch(e){}document.getElementById("yLuck").value=p.luck;document.getElementById("yCap").value=p.cap;document.getElementById("ySb").value=p.sb;youDraw()};
+  document.querySelectorAll(".yopen [data-tool]").forEach(b=>b.onclick=()=>{const id=b.dataset.tool;closeMineral();try{window.parent.ptCallTool(id,"ptOpenFor","mineral",m.n)}catch(e){}});
+  youDraw()}
+window.ptYouChanged=()=>{if(scrim.hidden||!CUR)return;const y=youGet();[["yLuck","luck"],["yCap","cap"],["ySb","sb"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=y[k]??""});const mg=document.getElementById("yMag");if(mg)mg.checked=!!y.mag;youDraw()};
 function locText(m,ch){const n=s=>isFinite(oneIn(s))?oneIn(s).toLocaleString("en-US"):"?";
   return `**${m.n}** (${m.r}) · $${m.v}/kg\nWhere to find it:\n`+ch.map(c=>`• ${c[0]}: ~1 in ${n(c[2])} (${c[1]})`).join("\n")}
 async function copyText(t,btn){let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}

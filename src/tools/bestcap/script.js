@@ -103,7 +103,7 @@ function render(){
   VIEW={mins,by};
   const shown=mins.slice(0,LIMIT);
   $("rows").innerHTML=rows.length?shown.map(m=>{const zs=by.get(m);
-    return zs.map(({r,b},i)=>`<tr class="${i?"":"first"}"><td class="mcell">${i?"":`<span class="mn" data-mineral="${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(m.n)}</b><br><span class="rr" style="--rc:${rc(m.r)}">${m.r}</span>${enchTag(m.r)}</span></span>`}</td><td class="zcell" data-l="Zone"><span class="lk" data-location="${esc(baseLoc(r.loc))}">${esc(r.loc)}</span>${LTD.test(r.loc)?' <span class="ltd">limited time</span>':""}</td><td data-l="Best luck cap">${b.cap==null?`<span class="cap none">No cap</span>`:`<span class="cap">${fmt(b.cap,0)}</span>`}</td><td class="bl" data-l="Best luck">${peakCell(r)}</td><td class="num" data-l="Chance per mineral">${oneInT(b.eff)}</td><td data-l="Compared to your luck">${gain(b,r)}</td></tr>`).join("")}).join("")
+    return zs.map(({r,b},i)=>`<tr class="${i?"":"first"}"><td class="mcell">${i?"":`<span class="mn mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(m.n)}</b><br><span class="rr" style="--rc:${rc(m.r)}">${m.r}</span>${enchTag(m.r)}</span></span>`}</td><td class="zcell" data-l="Zone"><span class="lk" data-location="${esc(baseLoc(r.loc))}">${esc(r.loc)}</span>${LTD.test(r.loc)?' <span class="ltd">limited time</span>':""}</td><td data-l="Best luck cap">${b.cap==null?`<span class="cap none">No cap</span>`:`<span class="cap">${fmt(b.cap,0)}</span>`}</td><td class="bl" data-l="Best luck">${peakCell(r)}</td><td class="num" data-l="Chance per mineral">${oneInT(b.eff)}</td><td data-l="Compared to your luck">${gain(b,r)}</td></tr>`).join("")}).join("")
     :`<tr><td colspan="6" class="hint">Nothing matches. Try another search or turn a rarity back on.</td></tr>`;
   $("more").innerHTML=mins.length>LIMIT?`<button type="button" class="btn" id="moreBtn">Show ${fmt(Math.min(60,mins.length-LIMIT),0)} more minerals</button>`:"";
 }
@@ -183,3 +183,4 @@ window.ptRefresh=()=>{const o=S.luck;youPull(["luck"]);if(+S.luck!==+o){$("luck"
 render();
 
 luckxWire(()=>render());
+window.ptYouChanged=()=>window.ptRefresh();

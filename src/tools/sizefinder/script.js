@@ -1,7 +1,9 @@
 (()=>{
 const $=id=>document.getElementById(id);
 let S={min:"",kg:"",cap:"",sb:"",good:"0.1",mag:false};try{Object.assign(S,JSON.parse(localStorage.getItem("sf-s")||"{}"))}catch(e){}
-const save=()=>{try{localStorage.setItem("sf-s",JSON.stringify(S))}catch(e){}};
+const youPush=ptYouLink(S,{sb:"sb",cap:"cap",mag:"mag"},()=>{["sb","cap"].forEach(k=>$(k).value=S[k]);$("mag").checked=!!S.mag;render()});
+const save=()=>{try{localStorage.setItem("sf-s",JSON.stringify(S))}catch(e){}youPush()};
+ptPageButtons($("acts"),()=>"Size Boost for "+(String(S.min).trim()||"a mineral"),()=>ptPageRead($("head"),[{h:"",el:$("sum")},{h:"Chance per mineral at each Size Boost",el:$("tbl")}]),"Estimates from a fitted model, so real results can differ.");
 const MINS=P.mins.filter(m=>m.bw>0).sort((a,b)=>a.n.localeCompare(b.n));
 const BY=Object.fromEntries(MINS.map(m=>[m.n.toLowerCase(),m]));
 const pc=v=>!isFinite(v)?"—":fmt(Math.max(0,v),v<100?1:0)+"%";
@@ -10,7 +12,7 @@ const oneIn=p=>p<=0?"never":p>=.5?fmt(p*100,1)+"%":p>=.01?fmt(p*100,1)+"% (1 in 
 ["kg","cap","sb"].forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});
 // mineral picker with pictures, same as the rest of the toolkit
 const curMin=()=>BY[String(S.min).trim().toLowerCase()];
-makeAC({inp:$("min"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),cur:()=>{const m=curMin();return m?m.n:""},icon:()=>{const m=curMin();return m&&m.ic},pick:x=>{$("min").value=x.n;$("min").dispatchEvent(new Event("input"))}});
+const AC=makeAC({inp:$("min"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),cur:()=>{const m=curMin();return m?m.n:""},icon:()=>{const m=curMin();return m&&m.ic},pick:x=>{$("min").value=x.n;$("min").dispatchEvent(new Event("input"))}});
 // registered after the picker so it can still tell typed text from the current pick
 $("min").value=S.min;$("min").addEventListener("input",e=>{S.min=e.target.value;save();render()});
 $("good").value=S.good;$("good").onchange=e=>{S.good=e.target.value;save();render()};
@@ -40,7 +42,7 @@ function render(){
   const model=wtModel(cap||4000),B=m.bw;
   const minSB=need(w,B,M,WT_MAX),recSB=need(w,B,M,model.q(good)),halfSB=need(w,B,M,model.q(.5));
   const mine=S.sb===""?null:Math.max(0,+S.sb||0);
-  $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b>${esc(m.n)} at ${fmt(w,2)} kg</b><br><span>Base weight ${B} kg · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${cap&&(cap<1856||cap>7240)?' · <span class="warn">the chances are a rougher estimate at this capacity</span>':""}</span></div>`;
+  $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b class="mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}">${esc(m.n)} at ${fmt(w,2)} kg</b><br><span>Base weight ${B} kg · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${cap&&(cap<1856||cap>7240)?' · <span class="warn">the chances are a rougher estimate at this capacity</span>':""}</span></div>`;
   const tile=(l,v,s,c)=>`<div${c?` class="${c}"`:""}><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
   const goodTxt=$("good").selectedOptions[0].textContent;
   let h=tile("Minimum Size Boost",pc(minSB),minSB<=0?"no Size Boost needed to make it possible":"possible, but only with a perfect roll")
@@ -53,4 +55,5 @@ function render(){
   $("tbl").innerHTML=`<table class="t"><tr><th>Reaches ${fmt(w,2)} kg</th><th>Size Boost needed</th></tr>${[[1e-6,"Possible at all"],[.001,"1 in 1,000"],[.01,"1 in 100"],[.05,"1 in 20"],[.1,"1 in 10"],[.25,"1 in 4"],[.5,"Half of them"]].map(([p,l])=>`<tr><td>${l}</td><td>${pc(p<1e-5?minSB:need(w,B,M,model.q(p)))}</td></tr>`).join("")}</table>`;
 }
 render();
+window.ptOpenFor=(kind,name)=>{if(kind!=="mineral")return;S.min=name;$("min").value=name;save();render();try{AC.sync()}catch(e){}};
 })();

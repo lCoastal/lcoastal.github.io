@@ -305,6 +305,23 @@ main iframe {
   bottom: -6px;
   transform: rotate(-45deg);
 }
+.gbtn {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+.gbtn[aria-current="page"] {
+  color: var(--fg);
+  border-color: var(--accent);
+}
 .res {
   position: absolute;
   top: calc(100% + 6px);

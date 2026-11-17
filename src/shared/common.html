@@ -190,6 +190,45 @@ function wtModel(cap){cap=Math.max(1,+cap||0);const h=Math.max(0,.533*(1-Math.ex
   const q=p=>{if(p>=1)return WT_MIN;if(p<=0)return WT_MAX;let lo=WT_MIN,hi=WT_MAX;for(let i=0;i<60;i++){const m=(lo+hi)/2;sf(m)>p?lo=m:hi=m}return (lo+hi)/2};
   const mean=WT_SMALL*(WT_MIN+WT_SM_HI)/2+pu*(WT_MIN+WT_MAX)/2+h*(WT_MIN+W*a/(a+WT_B));
   return {sf,pdf,q,mean,h,a,pu,cap}}
+// your stats (luck, capacity, Size Boost, magnifier, modifier boost, pans per hour) are typed once and shared by every tool:
+// ptYouLink(S,{stateKey:sharedKey},redraw) fills S from the shared copy now and whenever another tool changes it,
+// and returns a function that sends S's values back (call it when saving)
+function ptYouLink(S,map,redraw){const get=()=>{try{return window.parent.ptYou.get()}catch(e){return {}}};
+  const pull=()=>{const y=get();let ch=false;Object.keys(map).forEach(k=>{const v=y[map[k]];if(v!==undefined&&v!==null&&v!==""&&String(S[k])!==String(v)){S[k]=v;ch=true}});return ch};
+  pull();window.ptYouChanged=()=>{if(pull()&&redraw)redraw()};
+  return ()=>{const o={};Object.keys(map).forEach(k=>o[map[k]]=S[k]);try{window.parent.ptYou.set(o,window)}catch(e){}}}
+// one mineral at your stats, for the mineral page: chance per mineral and per pan in each zone, and its weight range
+function ptMineralStats(name,you){const mins=P.mins||[];const m=mins.find(x=>x.n===name);if(!m)return null;you=you||{};
+  const L=Math.max(1,+you.luck||1),cap=Math.max(1,+you.cap||1),items=panItems(cap);
+  const LOC={};mins.forEach(x=>(x.ch||[]).forEach(c=>{const p=parseFloat(String(c[1]).replace(/[%,]/g,""))/100;if(p>0)(LOC[c[0]]=LOC[c[0]]||[]).push({m:x,p})}));
+  const full=loc=>{const b=baseLoc(loc),own=LOC[loc]||[];let out;
+    if(b!==loc&&LOC[b])out=LOC[b].filter(x=>!own.some(y=>y.m===x.m)).concat(own);
+    else if(own.length<2){const seen=new Set();out=[];Object.keys(LOC).filter(v=>v!==loc&&baseLoc(v)===loc).forEach(v=>LOC[v].concat(own).forEach(x=>{if(!seen.has(x.m)){seen.add(x.m);out.push(x)}}))}
+    else out=[...own];return out.length<2?[]:out};
+  const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);
+  const zones=(m.ch||[]).map(c=>{const list=full(c[0]).sort((a,b)=>a.p-b.p);const x=list.find(y=>y.m===m);if(!x)return {z:c[0]};
+    const tot=list.reduce((s,y)=>s+y.p,0);const [lo,hi,sn]=tieSpan(list,x,tot);
+    const q=Math.min(1,(.2891*f(lo,hi,1)+.0280*f(lo,hi,Math.max(1,.04317*L))+.1905*f(lo,hi,Math.max(1,.40579*L))+.4924*f(lo,hi,Math.max(1,1.74153*L)))/sn*rareBand(tot/x.p));
+    return {z:c[0],q,pan:1-Math.pow(1-q,items)}});
+  let wt=null;if(m.bw>0){const W=wtModel(cap),k=m.bw*(1+Math.max(0,+you.sb||0)/100)*(you.mag?1.5:1);wt={lo:k*WT_MIN,mid:k*W.q(.5),hi:k*WT_MAX,top:k*W.q(.01)}}
+  return {zones,items,wt,luck:L,cap}}
+// "Save as image" and "Copy as text" for pages whose result is a heading (.head), tiles (div > .lab, b, small) and tables:
+// both are read straight from what the page shows. parts=[{h, el}] in order; head = the .head element (picture, name, details)
+function ptPageRead(head,parts){const T=e=>(e?e.textContent:"").replace(/\s+/g," ").trim();
+  const img=head&&head.querySelector("img"),hb=head&&head.querySelector("b"),hs=head&&head.querySelector("span");
+  const out={title:T(hb)||document.title,tic:img?img.src:"",sub:T(hs)?T(hs).split(" · "):[],secs:[]};
+  parts.forEach(({h,el})=>{if(!el||el.hidden||!el.innerHTML.trim())return;const tb=el.querySelector("table");
+    if(tb){const ths=[...tb.querySelectorAll("tr:first-child th")].filter(th=>T(th)||!th.classList.contains("hide-s"));const n=ths.length;
+      const rows=[...tb.querySelectorAll("tr")].filter(r=>r.querySelector("td")).map(r=>[...r.querySelectorAll("td")].slice(0,n).map((td,i)=>{const im=td.querySelector("img");return {t:T(td),ic:i===0&&im?im.src:"",mono:i>0,b:i===0}}));
+      out.secs.push({h,cols:ths.map((th,i)=>({h:T(th),w:i===0?.34:.66/Math.max(1,n-1),al:i?"r":""})),rows:rows.map(c=>({cells:c})),text:rows.map(c=>c.map(x=>x.t).join(" · "))});return}
+    const tiles=[...el.children].filter(d=>d.querySelector("b")).map(d=>({l:T(d.querySelector(".lab,span")),v:T(d.querySelector("b")),s:T(d.querySelector("small"))}));
+    if(tiles.length)out.secs.push({h,cols:[{h:"",w:.36},{h:"",w:.26,al:"r"},{h:"",w:.38}],rows:tiles.map(t=>({cells:[{t:t.l,b:true},{t:t.v,mono:true},{t:t.s,col:"#98a2ad"}]})),text:tiles.map(t=>`${t.l}: ${t.v}${t.s?" ("+t.s+")":""}`)})});
+  return out}
+function ptPageButtons(box,name,read,note){const mk=(lab,fn)=>{const b=document.createElement("button");b.type="button";b.className="btn";b.textContent=lab;b.onclick=fn;box.appendChild(b)};
+  mk("Copy as text",async()=>{const r=read();const t=[`**${r.title}**`+(r.sub.length?" ("+r.sub.join(" · ")+")":"")].concat(...r.secs.map(s=>(s.h?["",s.h+":"]:[""]).concat(s.text.map(x=>"• "+x)))).join("\n");
+    let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(_){}}
+    ptToast(ok?"Copied":"Couldn't copy")});
+  mk("Save as image",()=>{const r=read();ptSaveImg(typeof name==="function"?name():name,()=>ptTableImage({title:r.title,tic:r.tic,sub:r.sub,sections:r.secs.map(s=>({h:s.h,cols:s.cols,rows:s.rows})),note}))})}
 async function ptSaveImg(name,make){let blob=null;try{blob=await make()}catch(e){console.error(e)}if(!blob){ptToast("Couldn't draw the image");return}
   try{await window.parent.ptSave(name.replace(/[\\/:*?"<>|]+/g," ").trim()+".png",blob);ptToast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")ptToast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}}
 </script>

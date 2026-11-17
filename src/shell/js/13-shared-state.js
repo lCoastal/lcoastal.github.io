@@ -1,4 +1,4 @@
-// your luck, capacity and pans per hour, shared by every tool that asks for them
+// your luck, capacity, Size Boost, magnifier, modifier boost and pans per hour, shared by every tool that asks for them
 window.ptYou = {
   get: () => {
     try {
@@ -7,12 +7,40 @@ window.ptYou = {
       return {};
     }
   },
-  set: (p) => {
+  set: (p, from) => {
+    const o = Object.assign(window.ptYou.get(), p);
     try {
-      const o = Object.assign(window.ptYou.get(), p);
       localStorage.setItem("pt-you", JSON.stringify(o));
     } catch (e) {}
+    clearTimeout(window.ptYou._t);
+    window.ptYou._t = setTimeout(() => {
+      [...Object.values(frames), typeof pop !== "undefined" ? pop : null].forEach((f) => {
+        try {
+          if (f && f.contentWindow !== from && f.contentWindow.ptYouChanged) f.contentWindow.ptYouChanged();
+        } catch (e) {}
+      });
+    }, 150);
   },
+};
+// the toolkit's formulas (shared/common.html) loaded once in a hidden frame, for pages that don't load them themselves
+let MODEL = null;
+const modelFrame = () =>
+  MODEL ||
+  (MODEL = new Promise((res) => {
+    const f = document.createElement("iframe");
+    f.hidden = true;
+    f.title = "Formulas";
+    f.srcdoc = "<!doctype html><html><head>" + ptImg(PT_PARTS.COMMON) + "</head><body></body></html>";
+    f.addEventListener("load", () => res(f.contentWindow), { once: true });
+    document.body.appendChild(f);
+  }));
+window.ptMineralStats = async (name) => {
+  try {
+    const w = await modelFrame();
+    return w.ptMineralStats(name, window.ptYou.get());
+  } catch (e) {
+    return null;
+  }
 };
 // call a function inside a tool once it has loaded
 function callTool(id, fn, ...args) {

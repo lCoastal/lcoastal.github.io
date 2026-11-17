@@ -35,3 +35,8 @@ kbd.rec{border-color:var(--accent);color:var(--accent);animation:hkp 1s ease-in-
 .hkmsg{font-size:12.5px;color:var(--accent);min-height:0}
 .hkmsg.bad{color:var(--neg,#c53030)}
 @media (max-width:560px){.srow.sub,.srow.stk{flex-direction:column;align-items:flex-start;gap:10px}.srow.stk .sws,.srow.stk .hkc{justify-content:flex-start}}
+
+.yrow{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end}
+.yf{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
+.yf input{width:130px;font:inherit;font-size:14px;font-weight:400;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:7px 9px}
+.yck{display:flex;align-items:center;gap:6px;font-size:14px;padding-bottom:8px}

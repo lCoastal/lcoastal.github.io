@@ -27,13 +27,14 @@
     <div class="tg2"><label class="ck"><input type="checkbox" id="mag"> Solar Magnifier (×1.5 weight)</label></div>
   </section>
   <section class="card" id="out" hidden>
+    <div class="acts" id="acts" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end"></div>
     <div class="head" id="head"></div>
     <div class="big" id="sum"></div>
     <h2>Chance per mineral at each Size Boost</h2>
     <div id="chart" class="chart"></div>
     <div class="tw" id="tbl"></div>
   </section>
-  <section class="card"><h2>How it's worked out</h2>
+  <section class="card"><h2>How it works</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
       <li>A mineral's weight is <b>base weight × (1 + Size Boost) × a roll between 0.75 and 15.5</b>, ×1.5 with the Solar Magnifier. How the rolls spread is shown on Weight Range.</li>
       <li><b>Minimum:</b> the Size Boost where even the heaviest roll (k = 15.5) only just reaches your weight: Size Boost = weight ÷ (15.5 × base × magnifier) − 1. At the minimum it's possible, but almost never happens.</li>

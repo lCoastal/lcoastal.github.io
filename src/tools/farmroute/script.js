@@ -61,7 +61,7 @@ function drawCustom(){const L=curList();
   const on=(n,u)=>(L.picks[n]||[]).includes(u);
   let body="",last="";list.forEach(m=>{if(m.r!==last){last=m.r;body+=`<tr class="rg" style="--rc:${rc(m.r)}"><td colspan="${mods.length+1}">${m.r}</td></tr>`}
     const any=mods.some(u=>on(m.n,u));
-    body+=`<tr${any?' class="on"':""}><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}<b data-mineral="${esc(m.n)}">${esc(m.n)}</b></span></td>${mods.map(u=>`<td><input type="checkbox" data-pick="${esc(m.n)}" data-u="${esc(u)}" aria-label="${esc(m.n)}: ${esc(modName(u))}"${on(m.n,u)?" checked":""}></td>`).join("")}</tr>`});
+    body+=`<tr${any?' class="on"':""}><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}<b class="mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}">${esc(m.n)}</b></span></td>${mods.map(u=>`<td><input type="checkbox" data-pick="${esc(m.n)}" data-u="${esc(u)}" aria-label="${esc(m.n)}: ${esc(modName(u))}"${on(m.n,u)?" checked":""}></td>`).join("")}</tr>`});
   const head=`<tr><th>Mineral</th>${mods.map(u=>{const all=list.length&&list.every(m=>on(m.n,u));return `<th><label title="Tick ${esc(modName(u))} for every mineral shown"><span>${esc(modName(u))}</span><input type="checkbox" data-colall="${esc(u)}"${all?" checked":""} aria-label="${esc(modName(u))} for every mineral shown"></label></th>`}).join("")}</tr>`;
   $("cGrid").innerHTML=list.length?`<table class="fr-grid"><thead>${head}</thead><tbody>${body}</tbody></table>`:'<div class="none">No minerals match.</div>';
   const n=customItems(L).length;$("cInfo").textContent=n?`${n} item${n===1?"":"s"} on this route.`:""}

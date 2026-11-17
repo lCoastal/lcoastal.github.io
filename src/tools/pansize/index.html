@@ -21,6 +21,7 @@
     </div>
   </section>
   <section class="card" id="out" hidden>
+    <div class="acts" id="acts" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end"></div>
     <div class="big" id="sum"></div>
     <div class="range" id="range"></div>
     <p class="hint">Every full pan lands somewhere between the fewest and the most. Most pans sit in the lower two thirds of that range; the high end is rare.</p>
@@ -30,7 +31,7 @@
     <div class="inputs"><label class="fld"><span class="lab">Minerals per pan</span><input type="number" id="want" min="1" inputmode="numeric" placeholder="e.g. 200"></label></div>
     <div class="big" id="need"></div>
   </section>
-  <section class="card"><h2>The formula</h2>
+  <section class="card"><h2>How it works</h2>
     <div class="fbox">
       <div class="row"><span>Fewest</span><code>½ × √capacity</code></div>
       <div class="row"><span>Average</span><code>about 0.68 × capacity<sup>0.565</sup></code></div>
