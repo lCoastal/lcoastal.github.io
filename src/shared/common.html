@@ -166,6 +166,11 @@ async function ptTableImage(o){const F='"IBM Plex Sans","Segoe UI",system-ui,san
   if(o.note){const et=o.note;c.font=`600 13px ${F}`;const ew=Math.min(W-PAD*2,c.measureText(et).width+30),ex=PAD,ey=y;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(fit(et,ew-30),ex+22,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 function ptToast(t){const d=document.createElement("div");d.className="ptoast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+// items in one full pan, measured: ≈20 at 400 capacity, ≈44 at 1,600, ≈87 at 5,462 (plain √capacity undercounts big pans)
+function panItems(cap){return Math.max(1,0.6779*Math.pow(Math.max(1,+cap||1),0.56474))}
+// luck model helper: minerals with the same odds share one slot evenly (otherwise whichever is listed first takes the whole slot)
+const _TIE=new WeakMap();
+function tieSpan(list,x,tot){let m=_TIE.get(list);if(!m){m=new Map();let c=0;list.forEach(y=>{const g=m.get(y.p);if(g){g[1]+=y.p;g[2]++}else m.set(y.p,[c,c+y.p,1]);c+=y.p});_TIE.set(list,m)}const g=m.get(x.p);return [g[0]/tot,g[1]/tot,g[2]]}
 async function ptSaveImg(name,make){let blob=null;try{blob=await make()}catch(e){console.error(e)}if(!blob){ptToast("Couldn't draw the image");return}
   try{await window.parent.ptSave(name.replace(/[\\/:*?"<>|]+/g," ").trim()+".png",blob);ptToast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")ptToast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}}
 </script>

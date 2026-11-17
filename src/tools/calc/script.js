@@ -149,12 +149,12 @@ function uList(loc){const b=baseLoc(loc),own=ULOC[loc]||[];let out;
 let UPANS=null,UPANSKEY="";
 // expected pans to get one of a mineral, at your luck and capacity, in the zone where it comes up most
 function pansFor(name){const L=Math.max(1,compute(effState()).tot.Luck||1),cap=Math.max(1,+S.n.cap||+S.cap||1);
-  const n=Math.max(1,Math.sqrt(Math.max(1,ucap())));const key=Math.round(L)+"|"+Math.round(n*100);
+  const n=panItems(ucap());const key=Math.round(L)+"|"+Math.round(n*100);
   if(UPANSKEY!==key){UPANSKEY=key;UPANS={};
     Object.keys(ULOC).forEach(loc=>{if(/^The Void/.test(loc))return;const list=uList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;
       const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);
-      list.forEach(x=>{const lo=c/tot,hi=(c+x.p)/tot;c+=x.p;
-        const eff=.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L));
+      list.forEach(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);
+        const eff=(.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L)))/sn;
         const per=1-Math.pow(1-eff,n);if(per>0)UPANS[x.m.n]=Math.min(UPANS[x.m.n]==null?Infinity:UPANS[x.m.n],1/per)})})}
   return UPANS[name]}
 // your pan capacity: the museum and gear feed it, so read it off your own stats

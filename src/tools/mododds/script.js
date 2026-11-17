@@ -29,7 +29,7 @@ function shares(eff){return modShares(eff,S.night,S.luck)}
 const oneInP=p=>p<=0?"—":p>=.5?fmt(p*100,1)+"%":`~1 in ${fmt(Math.round(1/p),0)}`;
 function calcAll(){const mb=Math.max(0,+S.mb||0);
   const effAny=mb*(S.surge?2:1),effWhich=Math.max(1,mb*(S.surge?2:1));
-  return {mb,effAny,effWhich,q:anyMod(effAny),sh:shares(effWhich),n:Math.max(1,Math.sqrt(Math.max(1,+S.cap||1)))}}
+  return {mb,effAny,effWhich,q:anyMod(effAny),sh:shares(effWhich),n:panItems(S.cap)}}
 const ORDER=["Perfect","Lunar","Mutated","Cosmic","Iridescent","Irradiated","Scorching","Glowing","Pure","Shiny"];
 function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge","night"].forEach(k=>$(k).checked=!!S[k]);
   const {effAny,effWhich,q,sh,n}=calcAll();

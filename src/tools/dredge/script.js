@@ -38,7 +38,7 @@ function fullList(loc){const b=baseLoc(loc);const own=LOC[loc]||[];let out;
 const SH={};
 function shares(loc,L){const k=loc+"|"+L;if(SH[k])return SH[k];const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;
   const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);const out=new Map();
-  list.forEach(x=>{const lo=c/tot,hi=(c+x.p)/tot;c+=x.p;out.set(x.m,.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L)))});return SH[k]=out}
+  list.forEach(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);out.set(x.m,(.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L)))/sn)});return SH[k]=out}
 // a zone that only lists one mineral itself (The Void) is covered by its variant
 const ZONES=Object.keys(LOC).filter(l=>fullList(l).length&&(LOC[l].length>1||baseLoc(l)!==l));
 const MINS=P.mins.filter(m=>ZONES.some(z=>fullList(z).some(x=>x.m===m))).sort((a,b)=>a.n.localeCompare(b.n));
@@ -60,7 +60,7 @@ function bestFor(group,L,per){let best=null;
   const voidOnly=group.some(g=>!ZONES.some(z=>!isVoid(z)&&fullList(z).some(x=>x.m===g.m)));
   tryZones(voidOnly);return best}
 const PARTS={1:[[[0]]],2:[[[0,1]],[[0],[1]]],3:[[[0,1,2]],[[0,1],[2]],[[0,2],[1]],[[1,2],[0]],[[0],[1],[2]]]};
-function plan(){const L=Math.max(1,effLuck()),per=Math.sqrt(Math.max(1,+S.cap||1));
+function plan(){const L=Math.max(1,effLuck()),per=panItems(S.cap);
   // merge repeats of the same mineral
   const want=[];S.w.forEach(w=>{const m=findMin(w.m);const n=Math.max(0,Math.round(+w.n||0));if(!m||!n)return;const o=want.find(x=>x.m===m);if(o)o.n+=n;else want.push({m,n})});
   if(!want.length)return null;

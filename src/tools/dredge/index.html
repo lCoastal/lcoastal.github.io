@@ -40,7 +40,7 @@
   </section>
   <section class="card"><h2>How this is worked out</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
-      <li>Every zone and every luck cap below your luck (plus no cap) is tried. A pan holds about √capacity minerals, so you find about <code>√capacity × chance</code> of a mineral per pan.</li>
+      <li>Every zone and every luck cap below your luck (plus no cap) is tried. A pan holds about <code>0.68 × capacity<sup>0.565</sup></code> minerals (measured: about 20 at 400 capacity, 87 at 5,462), so you find about that many × the chance of a mineral per pan.</li>
       <li>When several things are farmed in the same place they come in at the same time, so that stop takes as long as its slowest item.</li>
       <li>Every way of grouping the items is compared: all in one place, two stops, or one stop each. If you turn on walking between zones, each extra stop adds the walking time you set. Either way, if fewer stops is within 15% of the best, fewer stops is picked so you don't have to keep moving.</li>
       <li>The Void is only used when an item doesn't drop anywhere else, because its loot pool changes.</li>

@@ -16,7 +16,7 @@ function fullList(loc){const b=baseLoc(loc);const own=LOC[loc]||[];let out;
   return out.length<2?[]:out}
 const SH={};
 function effAt(loc,m,L){const k=loc+"|"+L;if(!SH[k]){const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);
-    SH[k]=new Map(list.map(x=>{const lo=c/tot,hi=(c+x.p)/tot;c+=x.p;return [x.m,.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L))]}))}
+    SH[k]=new Map(list.map(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);return [x.m,(.2983*f(lo,hi,1)+.0885*f(lo,hi,Math.max(1,.1376*Math.pow(L,.9823)))+.6132*f(lo,hi,Math.max(1,1.3018*L)))/sn]}))}
   return SH[k].get(m)||0}
 const CAPS=[1,5,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000];
 // chance per mineral for one build in one zone, at its own luck or at its best cap
@@ -49,7 +49,7 @@ function rows(){const m=curMin();if(!m)return null;const zs=zonesOf(m);if(!zs.le
   const list=S.b.map((b,i)=>{const L=Math.max(1,num0(b.luck)||1),C=Math.max(1,num0(b.cap)||1),pph=num0(b.pph);
     const cand=(S.zone&&zs.includes(S.zone))?[S.zone]:(zs.filter(z=>!/Void/.test(z)).length?zs.filter(z=>!/Void/.test(z)):zs);
     let best=null;cand.forEach(z=>{const r=bestEff(z,m,L);if(!best||r.eff>best.eff)best={...r,z}});
-    const pp=1-Math.pow(1-best.eff,Math.sqrt(C));const pans=pp>0?1/pp:Infinity;return {i,b,L,C,pph,z:best.z,cap:best.cap,eff:best.eff,pp,pans,hours:pph>0?pans/pph:null}});
+    const pp=1-Math.pow(1-best.eff,panItems(C));const pans=pp>0?1/pp:Infinity;return {i,b,L,C,pph,z:best.z,cap:best.cap,eff:best.eff,pp,pans,hours:pph>0?pans/pph:null}});
   return {m,zs,list}}
 function render(){$("useCap").checked=!!S.useCap;const R=rows();const m=R&&R.m;
   $("zone").innerHTML=`<option value="">Best zone for each build</option>`+(R?R.zs.map(z=>`<option value="${esc(z)}"${z===S.zone?" selected":""}>${esc(z)}</option>`).join(""):"");
@@ -67,7 +67,7 @@ function render(){$("useCap").checked=!!S.useCap;const R=rows();const m=R&&R.m;
     <td><span class="bn"><i></i><span>${esc(x.b.n)}<small>${fmt(x.L,0)} luck · ${fmt(x.C,0)} capacity${x.cap!=null?` · cap ${fmt(x.cap,0)}`:""}</small></span></span></td>
     ${oneZ?"":`<td data-l="Zone" style="font-family:var(--f-body);white-space:normal"><span class="lk" data-location="${esc(baseLoc(x.z))}">${esc(x.z)}</span></td>`}
     <td data-l="Per pan">${oneTxt(x.pp)}</td><td data-l="Pans">${pansTxt(x.pans)}</td>${anyT?`<td data-l="Time">${x.hours!=null?hrs(x.pans,x.pph):"—"}</td>`:""}<td data-l="Compared" style="font-family:var(--f-body)">${rel(x)}</td></tr>`).join("")}</tbody></table>
-    <p class="hint" style="margin-top:8px">Rare minerals scale with about luck × √capacity, so 1.8× the capacity is worth about 1.34× the luck per pan.</p>`}
+    <p class="hint" style="margin-top:8px">Rare minerals scale with about luck × capacity<sup>0.565</sup>, so 1.8× the capacity is worth about 1.39× the luck per pan.</p>`}
 // ---- save as image ----
 $("toImg").onclick=()=>{const R=rows();if(!R||!R.list.length){ptToast("Pick a mineral first");return}const L=R.list,anyT=L.some(x=>x.hours!=null),allT=L.every(x=>x.hours!=null);const key=allT?"hours":"pans";const best=L.reduce((a,x)=>x[key]<a[key]?x:a,L[0]);
   const HX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};

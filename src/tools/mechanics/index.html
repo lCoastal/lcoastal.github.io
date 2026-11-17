@@ -34,7 +34,7 @@
 
   <section class="card">
     <h2>Capacity: how many tries per pan</h2>
-    <p class="txt">A full pan doesn't give one roll per slot. It behaves like <b>√capacity</b> separate picks, so 400 capacity is about 20 picks and 1,600 is about 40. Doubling capacity gives roughly 1.4× the picks, which is why capacity helps steadily but never explodes.</p>
+    <p class="txt">A full pan doesn't give one roll per slot. It behaves like about <b>0.68 × capacity<sup>0.565</sup></b> separate picks (measured), so 400 capacity is about 20 picks, 1,600 is about 44 and 5,462 is about 87. Doubling capacity gives roughly 1.4× the picks, which is why capacity helps steadily but never explodes.</p>
     <div class="row"><label class="fld"><span class="lab">Capacity</span><input type="number" id="cap" min="1" value="1000"></label><label class="fld"><span class="lab">Chance per pick (%)</span><input type="number" id="pick" min="0" step="0.01" value="0.1"></label></div>
     <p class="big" id="capOut"></p>
   </section>

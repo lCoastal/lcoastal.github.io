@@ -14,7 +14,7 @@ function modShares(mbx,night,luck){const list=MODW.filter(([k])=>night||k!=="Lun
 function render(){
   const L=Math.max(1,+S.luck||1);
   $("luckT").innerHTML="<tr><th>Listed chance</th><th>At your luck</th><th>Change</th></tr>"+[.2,.05,.01,.001,.0001,.00001].map(b=>{const e=eff(b,L);return`<tr><td>${p(b)} (${oneIn(b)})</td><td>${p(e)} (${oneIn(e)})</td><td>${(e/b).toFixed(e/b>=100?0:1)}×</td></tr>`}).join("");
-  const c=Math.max(1,+S.cap||1),q=Math.min(1,Math.max(0,(+S.pick||0)/100)),n=Math.sqrt(c),per=1-Math.pow(1-q,n);
+  const c=Math.max(1,+S.cap||1),q=Math.min(1,Math.max(0,(+S.pick||0)/100)),n=panItems(c),per=1-Math.pow(1-q,n);
   $("capOut").innerHTML=`About <b>${n.toFixed(1)}</b> picks per pan, so a ${p(q)} pick comes up in <b>${p(per)}</b> of pans (${oneIn(per)}).`;
   const {s,list,tot}=modShares((+S.mbp||0)/100,S.night,L),mx=Math.max(...Object.values(s));
   $("modT").innerHTML="<tr><th>Modifier</th><th>With no boost</th><th>At your boost</th><th class='bw'></th></tr>"+[...list].reverse().map(([k,w])=>`<tr><td>${k}</td><td>${p(w/tot)}</td><td>${p(s[k])}</td><td class="bw"><div class="bar" style="width:${(s[k]/mx*100).toFixed(1)}%"></div></td></tr>`).join("")+`<tr><td colspan="4" style="font-family:var(--f-body);text-align:left;color:var(--muted)">Shares are of modified minerals. Of everything you pan, multiply by the share that gets a modifier (about 39% at 926% boost).</td></tr>`;
