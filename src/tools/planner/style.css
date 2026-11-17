@@ -114,7 +114,6 @@ label.btn{display:inline-block}
 .grid.cmp .slot{padding:8px}
 .grid.cmp .pick b{font-size:13.5px}
 .slot{position:relative}
-.slot .chg{position:absolute;top:6px;right:6px;font:700 9.5px var(--f-body);letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:99px;background:var(--line);color:var(--fg);z-index:1}
 .drow{display:grid;grid-template-columns:minmax(0,1fr) 70px 70px 80px;gap:8px;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:baseline}
 .drow:last-child{border-bottom:0}
 .drow.dh{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
