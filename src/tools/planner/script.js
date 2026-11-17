@@ -60,7 +60,7 @@ function drawBoard(el,st,side){
     st[r].forEach((slot,i)=>{
       const c=document.createElement("div");const o=other&&other[r][i];
       c.className="slot"+(o&&(o.m!==slot.m||(o.u||"None")!==(slot.u||"None"))?" diff":"");
-      c.innerHTML=`<button type="button" class="pick ${slot.m?"":"empty"}" id="m-${side}-${r}-${i}"><small>Mineral ${i+1}</small><b${slot.m&&slot.m!=="Any"?` data-mineral="${esc(slot.m)}"`:""}>${slot.m&&slot.m!=="Any"&&window.ptIc?ptIc(slot.m):""}${slot.m?esc(minLabel(r,slot.m)):"Choose mineral"}</b></button>
+      c.innerHTML=`${c.classList.contains("diff")?`<span class="chg" title="This display is different in the other museum">Changed</span>`:""}<button type="button" class="pick ${slot.m?"":"empty"}" id="m-${side}-${r}-${i}"><small>Mineral ${i+1}</small><b${slot.m&&slot.m!=="Any"?` data-mineral="${esc(slot.m)}"`:""}>${slot.m&&slot.m!=="Any"&&window.ptIc?ptIc(slot.m):""}${slot.m?esc(minLabel(r,slot.m)):"Choose mineral"}</b></button>
       <button type="button" class="pick" id="u-${side}-${r}-${i}"><small>Mutation</small><b title="${anyOfList(slot.u).length?"Totals count the weakest of these":""}">${esc(slot.u||"None")}</b></button>
       <div class="gives">${slot.m||slot.u!=="None"?gainHTML(slotGain(r,slot)):'<span>Empty display</span>'}</div>`;
       c.querySelector(`#m-${side}-${r}-${i}`).onclick=()=>openPicker(r,i,"m",side);
@@ -110,7 +110,7 @@ function renderDiff(){
   document.getElementById("tot").innerHTML=rows.length?`<div class="drow dh"><span>Stat</span><span title="${esc(sideName("A"))}">A</span><span title="${esc(sideName("B"))}">B</span><span>B − A</span></div>`+rows.map(k=>{const d=b[k]-a[k],z=Math.abs(d)<1e-9;
     return `<div class="drow"><span class="k">${k}</span><span class="v">${fxT(a[k])}</span><span class="v">${fxT(b[k])}</span><span class="v ${z?"same":d>0?"up":"down"}">${z?"same":(d>0?"+":"−")+r4(Math.abs(d))}</span></div>`}).join(""):'<p class="hint">Both museums are empty.</p>';
   let nd=0;ORDER.forEach(r=>S[r].forEach((x,i)=>{const y=SB[r][i];if(x.m!==y.m||(x.u||"None")!==(y.u||"None"))nd++}));
-  document.getElementById("filled").innerHTML=rows.length?`<b>${esc(sideName("B"))}</b> is better in ${up} stat${up===1?"":"s"} and worse in ${dn} than <b>${esc(sideName("A"))}</b>. ${nd} display${nd===1?"":"s"} differ (outlined).`:"";
+  document.getElementById("filled").innerHTML=rows.length?`<b>${esc(sideName("B"))}</b> is better in ${up} stat${up===1?"":"s"} and worse in ${dn} than <b>${esc(sideName("A"))}</b>. ${nd} display${nd===1?"":"s"} differ (marked Changed).`:"";
 }
 // header above each side in compare mode: name, load, paste, copy across, clear
 function drawHead(sd){
@@ -363,8 +363,9 @@ async function compareImage(nA,nB){
     for(let j=0;j<2;j++){const xx=colX[j];c.fillText(r.toUpperCase(),xx,y+14);c.fillStyle=col;c.globalAlpha=.6;c.fillRect(xx,y+20,COL,2);c.globalAlpha=1}
     for(let j=0;j<2;j++){const st=j?SB:S,ot=j?S:SB,xx=colX[j];
       for(let i=0;i<SLOTS[r];i++){const sl=st[r][i],o=ot[r][i],sx=xx+i*(SW+8),sy=y+28;const diff=sl.m!==o.m||(sl.u||"None")!==(o.u||"None");
-        c.fillStyle="#1c2126";rr(c,sx,sy,SW,SH,10);c.fill();c.strokeStyle=diff?"#3cc2a8":"#2d343b";c.lineWidth=diff?2:1;rr(c,sx,sy,SW,SH,10);c.stroke();
+        c.fillStyle="#1c2126";rr(c,sx,sy,SW,SH,10);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,sx,sy,SW,SH,10);c.stroke();
         c.fillStyle=col;rr(c,sx,sy,SW,4,2);c.fill();
+        if(diff){c.font=`700 9.5px ${F}`;const tw=c.measureText("CHANGED").width+12;c.fillStyle="#2d343b";rr(c,sx+SW-tw-8,sy+34,tw,16,8);c.fill();c.fillStyle="#e6e9ec";c.fillText("CHANGED",sx+SW-tw-2,sy+45.5)}
         if(!sl.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText(sl.u&&sl.u!=="None"?"Any · "+sl.u:"Empty",sx+14,sy+SH/2+5);continue}
         let tx=sx+12;const ic=ICONS[sl.m];if(ic){const im=await loadImg(ic);if(im){c.drawImage(im,sx+10,sy+15,48,48)}tx=sx+66}
         c.fillStyle="#e6e9ec";c.font=`700 15px ${FD}`;c.fillText(fitText(c,minLabel(r,sl.m),SW-(tx-sx)-8),tx,sy+28);
