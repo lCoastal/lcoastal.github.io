@@ -26,18 +26,18 @@ const AC=makeAC({inp:$("min"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m
 // registered after the picker so it can still tell typed text from the current pick
 $("min").value=S.min;$("min").addEventListener("input",e=>{S.min=e.target.value;save();render()});
 
-// percentile chart: each bar is a slice of drops (lightest 25%, then 5% slices, then the top 1%);
-// its width is the weight range that slice covers and its height how packed it is, so the area is the share of drops
+// percentile chart: x is the share of drops (each slice as wide as its share), y is weight in kg;
+// each bar reaches the heaviest weight in that slice
 const PE=[0,.25,.3,.35,.4,.45,.5,.55,.6,.65,.7,.75,.8,.85,.9,.95,.99,1];
 let BANDS=[];
 function chart(base,model,M){
-  const W=640,H=220,L=14,R=14,T=12,B=30,x=k=>L+(k-WT_MIN)/(WT_MAX-WT_MIN)*(W-L-R);
-  BANDS=PE.slice(1).map((u,i)=>{const u0=PE[i],k0=model.q(1-u0),k1=model.q(1-u);return {u0,u1:u,k0,k1,d:(u-u0)/Math.max(1e-6,k1-k0)}});
-  const top=Math.max(...BANDS.map(b=>b.d)),y=v=>H-B-v/top*(H-B-T);
-  const rects=BANDS.map((b,i)=>{const hue=Math.round(200-160*(b.u0+b.u1)/2);return `<rect class="pb" data-b="${i}" x="${(x(b.k0)+.75).toFixed(1)}" y="${y(b.d).toFixed(1)}" width="${Math.max(1.5,x(b.k1)-x(b.k0)-1.5).toFixed(1)}" height="${(H-B-y(b.d)).toFixed(1)}" rx="2" style="fill:hsl(${hue} 60% 52% / .8)"/>`}).join("");
-  const tk=[0,.25,.5,.75,1].map(f=>WT_MIN+f*(WT_MAX-WT_MIN));
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weights split into percentiles">${rects}<line class="ax" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>
-    ${tk.map((k,i)=>`<text x="${x(k)}" y="${H-B+17}" text-anchor="${i===0?"start":i===4?"end":"middle"}">${kg(base*k*M)}</text>`).join("")}</svg><div class="tip" id="tip" hidden></div>`}
+  const W=640,H=240,L=58,R=12,T=12,B=30,x=u=>L+u*(W-L-R),top=base*WT_MAX*M,y=v=>H-B-v/top*(H-B-T);
+  BANDS=PE.slice(1).map((u,i)=>{const u0=PE[i];return {u0,u1:u,k0:model.q(1-u0),k1:model.q(1-u)}});
+  const grid=[0,.25,.5,.75,1].map(f=>`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(top*f)}" y2="${y(top*f)}"/><text x="${L-6}" y="${y(top*f)+4}" text-anchor="end">${kg(top*f)}</text>`).join("");
+  const rects=BANDS.map((b,i)=>{const y0=y(0),y1=y(base*b.k1*M);return `<rect class="pb" data-b="${i}" x="${(x(b.u0)+1).toFixed(1)}" y="${y1.toFixed(1)}" width="${Math.max(1.5,x(b.u1)-x(b.u0)-2).toFixed(1)}" height="${Math.max(2,y0-y1).toFixed(1)}" rx="2"/>`}).join("");
+  const tk=[0,.25,.5,.75,1];
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weights by percentile">${grid}${rects}<line class="ax" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>
+    ${tk.map((u,i)=>`<text x="${x(u)}" y="${H-B+17}" text-anchor="${i===0?"start":i===4?"end":"middle"}">${u===0?"lightest":u===1?"heaviest":Math.round(u*100)+"%"}</text>`).join("")}</svg><div class="tip" id="tip" hidden></div>`}
 const bandText=(b,base,M)=>{const p0=Math.round(b.u0*100),p1=Math.round(b.u1*100),sh=Math.round((b.u1-b.u0)*100);
   const name=b.u0===0?`Lightest ${p1}%`:b.u1===1?`Top ${100-p0}%`:`Percentile ${p0}–${p1}`;
   const note=b.u0===0?"the group that always comes out small":b.u1===1?"heavier than 99% of drops":`heavier than ${p0}% of drops`;
@@ -47,12 +47,11 @@ function mineral(m,sb,cap,model,M){
   $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b style="color:${rc(m.r)}">${esc(m.n)}</b><br><span>${esc(m.r)} · base weight ${m.bw} kg · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}</span></div>`;
   const tile=(l,v,s)=>`<div><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
   $("sum").innerHTML=tile("Lightest possible",kg(base*WT_MIN*M),"")+tile("Typical",kg(base*model.q(.5)*M),"half come out heavier")+tile("Average",kg(base*model.mean*M),"")+tile("Heaviest possible",kg(base*WT_MAX*M),"the same in every zone");
-  // eruption only matters if the mineral drops in an eruption zone
-  const ez=[...new Set((m.ch||[]).map(c=>baseLoc(c[0])).filter(z=>ERUPT.has(z)))];
-  $("erupt").hidden=!ez.length;
-  if(ez.length)$("erupt").innerHTML=`🌋 In a Volcanic Eruption (${esc(ez.join(", "))}) sizes are doubled: up to <b>${kg(base*WT_MAX*2)}</b>${S.mag?" (without the Magnifier; stacking isn't tested)":""}.`;
+  // eruption max only for minerals that drop nowhere else
+  const zs=[...new Set((m.ch||[]).map(c=>baseLoc(c[0])))],onlyEr=zs.length&&zs.every(z=>ERUPT.has(z));
+  if(onlyEr)$("sum").lastElementChild.querySelector("small").textContent=kg(base*WT_MAX*2*M)+" in a Volcanic Eruption";
   $("chart").innerHTML=chart(base,model,M);CUR=[base,M];
-  $("chartNote").textContent=`Each bar is a slice of your drops: the lightest 25%, then 5% slices, then the top 1%. Wider bars cover more kg, taller ones are more packed. Hover a bar for its percentile and weights.${cap&&(cap<1856||cap>7240)?" Your capacity is outside the tested 1,856–7,240, so the shape is an estimate.":""}`;
+  $("chartNote").textContent=`Left to right is all your drops from lightest to heaviest: each bar is a slice of them (the lightest 25%, then 5% slices, then the top 1%) and as wide as its share. A bar's height is the heaviest weight in that slice. Hover a bar for its full range.${cap&&(cap<1856||cap>7240)?" Your capacity is outside the tested 1,856–7,240, so the shape is an estimate.":""}`;
   $("pct").innerHTML=[[.5,"Top half"],[.25,"Top 25%"],[.1,"Top 10%"],[.01,"Top 1%"],[.001,"Top 0.1%"]].map(([p,l])=>`<div><span>${l}</span><b>${kg(base*model.q(p)*M)}</b><small>or heavier · ${oneIn(p)}</small></div>`).join("");
 }
 
@@ -61,8 +60,8 @@ function zone(z,sb,cap,model,M){
   $("zhead").innerHTML=`<div><b>${esc(z)}</b><br><span>${list.length} minerals · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${er?" · 🌋 has Volcanic Eruptions":""}</span></div>`;
   const hiAll=Math.max(...list.map(x=>x.m.bw))*f*WT_MAX*M*(er?2:1),loAll=Math.min(...list.map(x=>x.m.bw))*f*WT_MIN*M,lg=v=>Math.log(v/loAll)/Math.log(hiAll/loAll)*100;
   $("ztbl").innerHTML=`<table class="z"><thead><tr><th>Mineral</th><th>Lightest</th><th>Typical</th><th>Heaviest</th>${er?"<th>In an eruption</th>":""}<th class="hide-s"></th></tr></thead><tbody>${list.map(({m})=>{const b=m.bw*f*M,lo=b*WT_MIN,hi=b*WT_MAX;
-    return `<tr data-m="${esc(m.n)}" title="Open ${esc(m.n)}"><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}<span><span style="color:${rc(m.r)}">${esc(m.n)}</span><small>${esc(m.r)} · base ${m.bw} kg</small></span></span></td><td>${kg(lo)}</td><td>${kg(b*half)}</td><td class="hv">${kg(hi)}</td>${er?`<td class="er">${kg(m.bw*f*WT_MAX*2)}</td>`:""}<td class="hide-s" style="width:22%"><div class="rngbar"><i style="left:${lg(lo).toFixed(1)}%;right:${(100-lg(hi)).toFixed(1)}%"></i></div></td></tr>`}).join("")}</tbody></table>
-    <p class="hint" style="margin-top:8px">Rarest first. Click a mineral to see how its weights spread. The bar shows each mineral's range on the same scale.${er&&S.mag?" The eruption column is without the Magnifier, since stacking isn't tested.":""}</p>`;
+    return `<tr data-m="${esc(m.n)}" title="Open ${esc(m.n)}"><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}<span><span style="color:${rc(m.r)}">${esc(m.n)}</span><small>${esc(m.r)} · base ${m.bw} kg</small></span></span></td><td>${kg(lo)}</td><td>${kg(b*half)}</td><td class="hv">${kg(hi)}</td>${er?`<td class="er">${kg(m.bw*f*WT_MAX*2*M)}</td>`:""}<td class="hide-s" style="width:22%"><div class="rngbar"><i style="left:${lg(lo).toFixed(1)}%;right:${(100-lg(hi)).toFixed(1)}%"></i></div></td></tr>`}).join("")}</tbody></table>
+    <p class="hint" style="margin-top:8px">Rarest first. Click a mineral to see how its weights spread. The bar shows each mineral's range on the same scale.</p>`;
 }
 $("ztbl").addEventListener("click",e=>{const r=e.target.closest("[data-m]");if(!r)return;S.min=r.dataset.m;$("min").value=S.min;save();render();AC.sync();window.scrollTo({top:0,behavior:"smooth"})});
 
