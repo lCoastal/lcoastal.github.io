@@ -10,6 +10,7 @@ const PT_RESET = {
   mododds: { keys: ["pmo-s"] },
   weightrange: { keys: ["wr-s"] },
   sizefinder: { keys: ["sf-s"] },
+  pansize: { keys: ["ps-s"] },
   farmroute: { keys: ["pfr-s"], keep: { "pfr-s": ["cl", "cc"] }, what: "inputs and ticks (saved lists stay)" },
   minmuts: { keys: ["pmm-s", "pt-sellcalc"] },
   runes: { keys: ["pr-s"] },

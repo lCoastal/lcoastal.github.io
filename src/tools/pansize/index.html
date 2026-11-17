@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Pan Size</title>
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Pan Size</h1>
+    <p class="lede">How many minerals a full pan gives at your capacity: the fewest, the average and the most.</p>
+  </header>
+  <section class="card">
+    <div class="inputs">
+      <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" inputmode="numeric" placeholder="e.g. 7240"></label>
+      <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
+    </div>
+  </section>
+  <section class="card" id="out" hidden>
+    <div class="big" id="sum"></div>
+    <div class="range" id="range"></div>
+    <p class="hint">Every full pan lands somewhere between the fewest and the most. Most pans sit in the lower two thirds of that range; the high end is rare.</p>
+  </section>
+  <section class="card">
+    <h2>Capacity you need</h2>
+    <div class="inputs"><label class="fld"><span class="lab">Minerals per pan</span><input type="number" id="want" min="1" inputmode="numeric" placeholder="e.g. 200"></label></div>
+    <div class="big" id="need"></div>
+  </section>
+  <section class="card"><h2>The formula</h2>
+    <div class="fbox">
+      <div class="row"><span>Fewest</span><code>½ × √capacity</code></div>
+      <div class="row"><span>Average</span><code>about 0.68 × capacity<sup>0.565</sup></code></div>
+      <div class="row"><span>Most</span><code>about 2.5 × √capacity</code></div>
+    </div>
+    <ul class="hint" style="margin:10px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li>Doubling capacity gives about 1.4× the minerals, not 2×, so capacity helps steadily but with smaller gains the more you have.</li>
+      <li>Luck doesn't change how many minerals you get. Events and items that give extra items (like the Calibrator, Volcanic Eruption or the Fortune River events) come on top.</li>
+    </ul>
+  </section>
+  <p class="foot">Last edited 17/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>

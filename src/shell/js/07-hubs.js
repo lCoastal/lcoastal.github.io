@@ -23,6 +23,7 @@ const HUBS = [
       ["mododds", "Modifier Odds"],
       ["weightrange", "Weight Range"],
       ["sizefinder", "Size Boost Finder"],
+      ["pansize", "Pan Size"],
     ],
   ],
   [

@@ -40,7 +40,7 @@ function render(){
   const model=wtModel(cap||4000),B=m.bw;
   const minSB=need(w,B,M,WT_MAX),recSB=need(w,B,M,model.q(good)),halfSB=need(w,B,M,model.q(.5));
   const mine=S.sb===""?null:Math.max(0,+S.sb||0);
-  $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b>${esc(m.n)} at ${fmt(w,2)} kg</b><br><span>Base weight ${B} kg · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${cap&&(cap<1856||cap>7240)?' · <span class="warn">outside the tested 1,856–7,240 capacity</span>':""}</span></div>`;
+  $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b>${esc(m.n)} at ${fmt(w,2)} kg</b><br><span>Base weight ${B} kg · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${cap&&(cap<1856||cap>7240)?' · <span class="warn">the chances are a rougher estimate at this capacity</span>':""}</span></div>`;
   const tile=(l,v,s,c)=>`<div${c?` class="${c}"`:""}><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
   const goodTxt=$("good").selectedOptions[0].textContent;
   let h=tile("Minimum Size Boost",pc(minSB),minSB<=0?"no Size Boost needed to make it possible":"possible, but only with a perfect roll")

@@ -52,7 +52,7 @@ function mineral(m,sb,cap,model,M){
   const zs=[...new Set((m.ch||[]).map(c=>baseLoc(c[0])))],onlyEr=zs.length&&zs.every(z=>ERUPT.has(z));
   if(onlyEr)$("sum").lastElementChild.querySelector("small").textContent=kg(base*WT_MAX*2*M)+" in a Volcanic Eruption";
   $("chart").innerHTML=chart(base,model,M);CUR=[base,M];
-  $("chartNote").textContent=`Each bar is an equal slice of the weight range, and its height is how many of your drops land there. Hover a bar to see which percentiles it covers.${cap&&(cap<1856||cap>7240)?" Your capacity is outside the tested 1,856–7,240, so the shape is an estimate.":""}`;
+  $("chartNote").textContent=`Each bar is an equal slice of the weight range, and its height is how many of your drops land there. Hover a bar to see which percentiles it covers.${cap&&(cap<1856||cap>7240)?" At capacity this far out the shape is a rougher estimate.":""}`;
   $("pct").innerHTML=[[.5,"Top half"],[.25,"Top 25%"],[.1,"Top 10%"],[.01,"Top 1%"],[.001,"Top 0.1%"]].map(([p,l])=>`<div><span>${l}</span><b>${kg(base*model.q(p)*M)}</b><small>or heavier · ${oneIn(p)}</small></div>`).join("");
 }
 

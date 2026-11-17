@@ -9,6 +9,7 @@ const LIST = [
   { id: "bestcap", name: "Best Luck Cap", desc: "The luck cap that finds each mineral most often, zone by zone" },
   { id: "weightrange", name: "Weight Range", desc: "Lightest, typical and heaviest weight of a mineral" },
   { id: "sizefinder", name: "Size Boost Finder", desc: "Size Boost you need for a mineral to hit a weight" },
+  { id: "pansize", name: "Pan Size", desc: "Fewest, average and most minerals per pan" },
   { id: "buildcmp", name: "Compare Builds", desc: "Compare the luck and capacity of several builds for one mineral" },
   { id: "mododds", name: "Modifier Odds", desc: "Chance of each ore modifier from your boost" },
   { id: "farmroute", name: "Museum Farm Route", desc: "Paste your museum, get zones to farm in order" },
