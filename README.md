@@ -1,6 +1,8 @@
 # lcoastal.github.io
 goat level project
 
+**Formulas are not exact
+
 Prospecting Toolkit by @__coastal. The live site is `index.html`.
 
 **Don't edit `index.html` by hand.** Edit the files in `src/` and push. GitHub Actions rebuilds `index.html` for you.
