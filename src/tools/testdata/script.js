@@ -25,6 +25,8 @@ const FIELDS=[["","Ignore"],["name","Mineral"],["zone","Zone"],["mod","Modifier"
 const GUESS=[["name",/^(name|mineral|ore|item)/i],["zone",/zone|location|place|spot/i],["mod",/modifier$|^mod$|^modifier|mutation/i],["mb",/mod.*boost|modifier.*boost/i],["weight",/weight|kg|mass/i],["size",/size/i],["luck",/luck/i],["cap",/cap/i],["pan",/^pan(\s*(no|#|number|id))?$/i]];
 let RAW="",ROWS=[],HEAD=[],MAP=[],LAST="";
 const num=v=>{const n=parseFloat(String(v==null?"":v).replace(/[^0-9.eE+-]/g,""));return isFinite(n)?n:NaN};
+// min/max without spreading (spreading hundreds of thousands of values overflows the call stack)
+const mn=a=>{let m=Infinity;for(let i=0;i<a.length;i++)if(a[i]<m)m=a[i];return m},mx=a=>{let m=-Infinity;for(let i=0;i<a.length;i++)if(a[i]>m)m=a[i];return m};
 const med=a=>{if(!a.length)return NaN;const s=[...a].sort((x,y)=>x-y),h=s.length>>1;return s.length%2?s[h]:(s[h-1]+s[h])/2};
 const pct=(x,d=2)=>isFinite(x)?(x*100).toFixed(d)+"%":"–";
 const fx=(x,d=2)=>isFinite(x)?x.toFixed(d)+"×":"–";
@@ -39,10 +41,10 @@ function splitLine(l,sep){if(l.indexOf('"')<0)return l.split(sep).map(c=>c.trim(
     else cur+=ch}
   out.push(cur.trim());return out}
 function detectSep(t){const lines=t.split(/\r?\n/).filter(l=>l.trim()).slice(0,20);let best="|",sc=-1;
-  ["|","\t",",",";"].forEach(s=>{const c=lines.map(l=>splitLine(l,s).length);const m=Math.min(...c);if(m>1&&m>sc&&c.every(x=>x===c[0]||x>=m)){sc=m;best=s}});return best}
+  ["|","\t",",",";"].forEach(s=>{const c=lines.map(l=>splitLine(l,s).length);const m=mn(c);if(m>1&&m>sc&&c.every(x=>x===c[0]||x>=m)){sc=m;best=s}});return best}
 function parse(){const sv=$("sep").value,sep=sv==="auto"?detectSep(RAW):sv;
   const lines=RAW.split(/\r?\n/).filter(l=>l.trim());const cells=lines.map(l=>splitLine(l,sep));
-  const w=Math.max(0,...cells.map(r=>r.length));
+  const w=Math.max(0,mx(cells.map(r=>r.length)));
   // a header line has no numbers where the next lines do
   if(!parse.touched){const f=cells[0]||[],s=cells[1]||[];$("hasHead").checked=f.some((c,i)=>isNaN(num(c))&&!isNaN(num(s[i])))||f.some(c=>GUESS.some(g=>g[1].test(c)))}
   const hh=$("hasHead").checked;HEAD=hh?cells[0]:[];ROWS=hh?cells.slice(1):cells;
@@ -103,7 +105,7 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
       const bk=new Map();rs.forEach(r=>{const l=isFinite(r.luck)&&r.luck>0?r.luck:L,k=Math.round(Math.log(Math.max(1,l))/.02);bk.set(k,(bk.get(k)||0)+1)});
       const ex={};bk.forEach((n,k)=>{const d=dropShares(z,Math.exp(k*.02));for(const m in d)ex[m]=(ex[m]||0)+d[m]*n/rs.length});const cnt={};rs.forEach(r=>{const n=MIN[r.name.toLowerCase()].n;cnt[n]=(cnt[n]||0)+1});const N=rs.length;
       const names=[...new Set([...Object.keys(ex),...Object.keys(cnt)])].sort((a,b)=>(ex[b]||0)-(ex[a]||0)||(cnt[b]||0)-(cnt[a]||0));
-      h+=`<p class="note"><b>${esc(z)}</b> · ${N.toLocaleString()} rows · luck ${ls.length?(Math.min(...ls)===Math.max(...ls)?Math.round(L).toLocaleString():Math.round(Math.min(...ls)).toLocaleString()+" – "+Math.round(Math.max(...ls)).toLocaleString()+" (each row's own luck used)"):"not given (1 used)"}</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Your rate</th><th>Toolkit</th><th>Ratio</th></tr>`;
+      h+=`<p class="note"><b>${esc(z)}</b> · ${N.toLocaleString()} rows · luck ${ls.length?(mn(ls)===mx(ls)?Math.round(L).toLocaleString():Math.round(mn(ls)).toLocaleString()+" – "+Math.round(mx(ls)).toLocaleString()+" (each row's own luck used)"):"not given (1 used)"}</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Your rate</th><th>Toolkit</th><th>Ratio</th></tr>`;
       txt.push(`${z} (${N} rows, luck ${Math.round(L)})`);
       names.forEach(n=>{const c=cnt[n]||0,o=c/N,e=ex[n],m=MIN[n.toLowerCase()],r=e>0?o/e:NaN,thin=e>0?e*N<10:c<10;
         const cls=!isFinite(r)?"off":thin?"":Math.abs(r-1)<.15?"ok":Math.abs(r-1)>.35?"off":"";
@@ -122,7 +124,7 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
       txt.push("","ITEMS PER PAN",`${all.length} pans, average ${avg(all).toFixed(2)}`);
       [...byCap.entries()].sort((a,b)=>b[1].length-a[1].length).forEach(([c,a])=>{const m=avg(a),e=c==="?"?NaN:panItems(c),r=m/e,thin=a.length<20;
         const cls=!isFinite(r)||thin?"":Math.abs(r-1)<.03?"ok":Math.abs(r-1)>.1?"off":"";
-        h+=`<tr><td>${c==="?"?"not given":Number(c).toLocaleString()}${thin?' <span class="thin">thin data</span>':""}</td><td>${a.length.toLocaleString()}</td><td>${m.toFixed(2)}</td><td>${Math.min(...a)} – ${Math.max(...a)}</td><td>${isFinite(e)?e.toFixed(2):"–"}</td><td class="${cls}">${fx(r,3)}</td></tr>`;
+        h+=`<tr><td>${c==="?"?"not given":Number(c).toLocaleString()}${thin?' <span class="thin">thin data</span>':""}</td><td>${a.length.toLocaleString()}</td><td>${m.toFixed(2)}</td><td>${mn(a)} – ${mx(a)}</td><td>${isFinite(e)?e.toFixed(2):"–"}</td><td class="${cls}">${fx(r,3)}</td></tr>`;
         txt.push(`  capacity ${c}: ${a.length} pans, ${m.toFixed(2)} avg vs ${isFinite(e)?e.toFixed(2):"-"}, ${fx(r,3)}`)});
       h+="</table></div>";sumBits.push(`<b>${avg(all).toFixed(1)}</b> items per pan`)}}
   // ---- modifiers
@@ -148,8 +150,8 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
       const pc=x=>isFinite(x)?(x*100).toFixed(1)+"%":"–";
       h+=`<h3 class="sec">Weights</h3><p class="note">The game rolls weights from <b>0.75 × base × (1 + Size Boost)</b> up to <b>15.5 × base × (1 + Size Boost)</b>.${hasS?` Size Boost ${S.toFixed(2)}×. ${out?`<b>${out.toLocaleString()}</b> minerals fell outside that range: a base weight is probably off.`:"Every mineral fell inside that range."}`:" Add the Size Boost column to compare against it."}<br>Smallest and biggest show how close your lightest and heaviest got to the limits: 100% means it hit the limit.</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Base</th><th>Lightest kg</th><th>Smallest possible</th><th>Smallest</th><th>Heaviest kg</th><th>Biggest possible</th><th>Biggest</th></tr>`;
       txt.push("","WEIGHTS (range 0.75 to 15.5 x base x (1 + size boost))"+(hasS?`, size boost ${S.toFixed(2)}x, ${out} outside`:""));
-      Object.entries(by).sort((a,b)=>b[1].length-a[1].length).forEach(([n,rs])=>{const m=MIN[n.toLowerCase()],ws=rs.map(r=>r.w),lo=Math.min(...ws),hi=Math.max(...ws);
-        const qs=hasS?rs.filter(r=>isFinite(r.sb)).map(q):[],ql=qs.length?Math.min(...qs):NaN,qh=qs.length?Math.max(...qs):NaN;
+      Object.entries(by).sort((a,b)=>b[1].length-a[1].length).forEach(([n,rs])=>{const m=MIN[n.toLowerCase()],ws=rs.map(r=>r.w),lo=mn(ws),hi=mx(ws);
+        const qs=hasS?rs.filter(r=>isFinite(r.sb)).map(q):[],ql=qs.length?mn(qs):NaN,qh=qs.length?mx(qs):NaN;
         const smin=hasS?WMIN*m.bw*(1+S):NaN,smax=hasS?WMAX*m.bw*(1+S):NaN,ps=ql/WMIN,pb=qh/WMAX;
         // smallest: 100% = hit the floor, above = never got that light; biggest: 100% = hit the ceiling
         const cs=!isFinite(ps)?"":ps<.995?"off":ps<=1.05?"ok":"",cb=!isFinite(pb)?"":pb>1.005?"off":pb>=.95?"ok":"";
