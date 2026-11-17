@@ -8,22 +8,18 @@ const WSUM=Object.values(WEIGHT).reduce((a,b)=>a+b,0);
 const BASE=Object.fromEntries(Object.entries(WEIGHT).map(([k,w])=>[k,w/WSUM*100]));
 const PRICE={Perfect:24,Lunar:14,Mutated:9,Cosmic:6,Iridescent:3.5,Irradiated:2.5,Scorching:2,Glowing:1.6,Pure:1.35,Shiny:1.2};
 const MUSE=Object.fromEntries(P.mods.map(m=>[m[0],m[1].join(", ")]));
-// share of ores that get a normal (panning) modifier: about 36% in my tests at different boosts,
-// so Modifier Boost changes which modifier you get far more than how often. Voidtorn and event modifiers come on top.
-// how many ores get a normal modifier, by effective Modifier Boost (%), from my tests: about 10% at 113%,
-// 35% at 600-840% and 39% at 926%; straight lines between, held at 39% above that (higher boosts untested)
-const MODPTS=[[0,0],[113,.096],[600,.348],[926,.39]];
-const anyMod=e=>{e=Math.max(0,+e||0);for(let i=1;i<MODPTS.length;i++)if(e<=MODPTS[i][0]){const [a,pa]=MODPTS[i-1],[b,pb]=MODPTS[i];return pa+(pb-pa)*(e-a)/(b-a)}return MODPTS[MODPTS.length-1][1]};
+// chance a mineral gets a normal modifier: each 1x of Modifier Boost is a ~6.3% chance, compounding (fitted on ~1.7M logged minerals, 1.1x to 16.6x boost; luck makes no difference)
+const anyMod=e=>1-Math.pow(1-.0631,Math.max(0,+e||0)/100);
 const NAT_MOD=anyMod(926);
-// Which modifier you get works like luck does for minerals: the game rolls the modifier several times and keeps
-// the rarest, by the game's weights. Strength = 10.1 x Modifier Boost (x) + 1 per 1,000 luck (the wiki's "every 1k
-// luck is an extra roll"), fitted on my tests with the Halloween event left out. A third of ores
-// roll once, a quarter at half strength, the rest at full strength.
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
-const MOD_K=10.12,MOD_LUCK=1/1000,MOD_MIX=[.338,.268,.394];
+// which modifier you get: rolled several times keeping the rarest (by the game's weights).
+// Rolls = 11.66 x boost^0.838 + 1.96 per 1,000 luck; 31% roll once, 13% at 17% strength, 56% at full strength.
+// Fitted on ~1.7M logged minerals (boost 1.1x-16.6x, luck 5k-267k), event modifiers left out.
+const MOD_MIX=[.313,.127,.559],MOD_PART=.172;
+const modStrength=(mbx,luck)=>Math.max(1,11.662*Math.pow(Math.max(0,+mbx||0),.838)+1.96352*Math.max(0,+luck||0)/1000);
 function modShares(eff,night,luck){const list=MODW.filter(([k])=>night||k!=="Lunar");const tot=list.reduce((a,x)=>a+x[1],0);
   const f=N=>{let a=0;const o={};list.forEach(([k,w])=>{const p=w/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-p),N);a+=p});return o};
-  const L=Math.max(1,MOD_K*Math.max(0,eff)/100+Math.min(50,MOD_LUCK*Math.max(0,+luck||0))),parts=[f(1),f(Math.max(1,L/2)),f(L)];const s={};
+  const L=modStrength(eff/100,luck),parts=[f(1),f(Math.max(1,L*MOD_PART)),f(L)];const s={};
   list.forEach(([k])=>s[k]=100*(MOD_MIX[0]*parts[0][k]+MOD_MIX[1]*parts[1][k]+MOD_MIX[2]*parts[2][k]));return s}
 function shares(eff){return modShares(eff,S.night,S.luck)}
 const oneInP=p=>p<=0?"—":p>=.5?fmt(p*100,1)+"%":`~1 in ${fmt(Math.round(1/p),0)}`;

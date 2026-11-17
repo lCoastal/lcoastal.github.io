@@ -41,11 +41,11 @@
 
   <section class="card">
     <h2>Modifiers: how often and which one</h2>
-    <p class="txt">How many minerals get a normal modifier rises with Modifier Boost: about <b>10%</b> at 113%, <b>35%</b> at 600–840% and <b>39%</b> at 926% in my tests. Modifier Boost also changes <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>10.1 per 100% Modifier Boost + 1 per 1,000 luck</b> (the luck part stops at 50), with a third of rolls once, a quarter at half strength and the rest at full strength.</p>
+    <p class="txt">How many minerals get a normal modifier rises with Modifier Boost only: about <b>1 − 0.937<sup>boost (×)</sup></b>, so roughly <b>7%</b> at 113%, <b>32%</b> at 600%, <b>45%</b> at 926% and <b>66%</b> at 1,660%. Modifier Boost also changes <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>11.7 × boost (×)<sup>0.84</sup> + 2 per 1,000 luck</b> (no cap), with 31% of rolls once, 13% at about a sixth of the strength and 56% at full strength.</p>
     <div class="row"><label class="fld"><span class="lab">Modifier Boost (%)</span><input type="number" id="mb" min="0" step="1" value="100"></label><label class="ck"><input type="checkbox" id="night"> Night (Lunar can roll)</label></div>
     <div class="tw"><table class="t" id="modT"></table></div>
     <p class="note">Voidtorn, Treasured, Electrified and other event modifiers come from their own sources and sit on top of that.</p>
-    <p class="note">Above 926% Modifier Boost the rate is untested. The wiki says it climbs towards 99% near 1,900% effective boost.</p>
+    <p class="note">Measured from 113% to 1,660% Modifier Boost. Above that the formula keeps climbing (about 80% at 2,500%) but isn't tested yet.</p>
   </section>
 
   <section class="card">
