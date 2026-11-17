@@ -39,19 +39,14 @@
   </section>
   <section class="card"><h2>The formula</h2>
     <div class="fbox">
-      <div class="row"><span>Weight</span><code>W = B × (1 + S) × k × M</code></div>
-      <div class="row"><span>B, S, M</span><code>base weight · Size Boost (1,476% → 14.76) · 1.5 with Solar Magnifier, 2 in a Volcanic Eruption zone</code></div>
-      <div class="row"><span>k (lightest – heaviest)</span><code>0.75 ≤ k ≤ 15.5</code></div>
-      <div class="row"><span>k, small roll</span><code>26.1% of minerals: k uniform from 0.75 to 1.88</code></div>
-      <div class="row"><span>k, heavy roll</span><code>h of minerals: k = 0.75 + 14.75 · x, x ~ Beta(a, 1.99)</code></div>
-      <div class="row"><span>k, even roll</span><code>the rest (73.9% − h): k uniform from 0.75 to 15.5</code></div>
-      <div class="row"><span>h and a from capacity C</span><code>h = 0.533 · (1 − e<sup>−(C − 1797)/2266</sup>) (0 below 1,797) · a = 4.24 + 0.000667 · C</code></div>
+      <div class="row"><span>Weight</span><code>base weight × (1 + Size Boost) × roll</code></div>
+      <div class="row"><span>Roll</span><code>between 0.75 and 15.5</code></div>
     </div>
     <ul class="hint" style="margin:10px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
       <li><b>Lightest and heaviest:</b> every logged mineral falls between 0.75 and 15.5 × base weight × (1 + Size Boost). Common minerals in big runs hit both ends almost exactly.</li>
       <li><b>Capacity matters:</b> about a quarter of minerals always come out small, near the lightest weight. The rest are spread evenly at low capacity, and the bigger your pan, the more of them lean towards the heavy end. The heaviest possible doesn't change.</li>
       <li><b>What doesn't matter:</b> luck, the modifier, which mineral it is and where in the pan it lands made no difference in the logs.</li>
-      <li>Solar Magnifier is ×1.5 on the final weight. Volcanic Eruption is ×2 size in its zones; whether it stacks with the Magnifier isn't tested, so the table shows it on its own.</li>
+      <li>Size Boost as a number: 1,476% is 14.76. The Solar Magnifier is ×1.5 on the final weight, and a Volcanic Eruption doubles sizes in its zones.</li>
     </ul>
   </section>
   <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> and my own test runs · Last edited 17/11/26 · Made by @__coastal</p>
