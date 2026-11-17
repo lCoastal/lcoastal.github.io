@@ -62,7 +62,7 @@ function render(){
     return `<article class="m" style="--mc:${x.c}"><div class="mh"><b><span class="dot"></span>${esc(x.n)}</b><span class="tag">${esc(x.kind)}</span></div>
     <div class="nums"><div><span class="lab">Sells for</span><b>${fmt(x.sell,2)}×</b></div><div><span class="lab">${m?esc(fmt(kg,2))+" kg "+esc(m.n):"Chance"}</span><b>${m?money(per*kg*x.sell):x.one?'~1 in '+fmt(x.one,0):"—"}</b></div></div>
     ${m&&x.one?`<p class="row"><span class="lab">Chance</span>~1 in ${fmt(x.one,0)} per mineral</p>`:""}
-    <div class="mus">${x.stats.length?x.stats.map(s=>`<span>${esc(s)} <em>+${+(mv).toFixed(4)}×</em></span>`).join(""):'<span style="color:var(--muted);border-color:var(--line)">No museum boost</span>'}</div>
+    <div class="mus">${x.stats.length?x.stats.map(s=>`<span${window.ptK&&ptK(s)?` style="--kc:${ptK(s)}"`:""}>${esc(s)} <em>+${+(mv).toFixed(4)}×</em></span>`).join(""):'<span style="color:var(--muted);border-color:var(--line)">No museum boost</span>'}</div>
     <p class="row"><span class="lab">How to get</span>${esc(x.how)}</p>
     ${x.look?`<p class="look">${esc(x.look)}</p>`:""}</article>`};
   if(!rows.length){$("list").innerHTML='<div class="empty">No mutations match.</div>';return}
