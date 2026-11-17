@@ -122,15 +122,22 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
       h+=`<tr><td>${esc(k)}${isN?"":' <span class="thin">event / other</span>'}${thin&&isN?' <span class="thin">thin data</span>':""}</td><td>${c.toLocaleString()}</td><td>${isN?pct(o):pct(c/N)+" of all"}</td><td>${isN&&sh?pct(e):"–"}</td><td class="${cls}">${isN?fx(r):"–"}</td></tr>`;
       txt.push(`  ${k}: ${c}${isN?`, ${pct(o)} vs ${sh?pct(e):"–"}, ${fx(r)}`:" (event/other)"}`)});
     h+="</table></div>";sumBits.push(`<b>${pct(any/N,1)}</b> modified`)}
-  // ---- weights
-  if(col("weight")>=0){const by={};known.forEach(r=>{const m=MIN[r.name.toLowerCase()];if(!(m.bw>0)||!(r.w>0))return;(by[m.n]=by[m.n]||[]).push(r)});
-    const all=Object.values(by).flat().map(r=>r.w/MIN[r.name.toLowerCase()].bw);
-    if(all.length){const sbs=Object.values(by).flat().map(r=>r.sb).filter(isFinite);
-      h+=`<h3 class="sec">Weights</h3><p class="note">Weight ÷ base weight across ${all.length.toLocaleString()} minerals: median ${med(all).toFixed(1)}, top ${Math.max(...all).toFixed(1)}${sbs.length?` · Size Boost ${med(sbs).toFixed(2)}×`:""}.</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Base</th><th>Median kg</th><th>Heaviest kg</th><th>Median ÷ base</th></tr>`;
-      txt.push("","WEIGHTS (weight / base weight)",`all: median ${med(all).toFixed(1)}, top ${Math.max(...all).toFixed(1)}`);
-      Object.entries(by).sort((a,b)=>b[1].length-a[1].length).forEach(([n,rs])=>{const m=MIN[n.toLowerCase()],ws=rs.map(r=>r.w),q=med(ws)/m.bw;
-        h+=`<tr><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}${esc(n)}${rs.length<10?' <span class="thin">thin data</span>':""}</span></td><td>${rs.length.toLocaleString()}</td><td>${m.bw}</td><td>${med(ws).toFixed(2)}</td><td>${Math.max(...ws).toFixed(2)}</td><td>${q.toFixed(1)}</td></tr>`;
-        txt.push(`  ${n}: ${rs.length} seen, base ${m.bw}, median ${med(ws).toFixed(2)} kg, max ${Math.max(...ws).toFixed(2)} kg, ${q.toFixed(1)}x base`)});
+  // ---- weights: game range is 0.75 to 15.5 × base weight × (1 + Size Boost)
+  if(col("weight")>=0){const WMIN=.75,WMAX=15.5,by={};known.forEach(r=>{const m=MIN[r.name.toLowerCase()];if(!(m.bw>0)||!(r.w>0))return;(by[m.n]=by[m.n]||[]).push(r)});
+    const flat=Object.values(by).flat(),all=flat.map(r=>r.w/MIN[r.name.toLowerCase()].bw);
+    if(all.length){const sbs=flat.map(r=>r.sb).filter(isFinite),hasS=sbs.length>0,S=hasS?med(sbs):NaN;
+      const q=r=>r.w/(MIN[r.name.toLowerCase()].bw*(1+r.sb));
+      const allQ=hasS?flat.filter(r=>isFinite(r.sb)).map(q):[];let out=0;allQ.forEach(x=>{if(x<WMIN*.995||x>WMAX*1.005)out++});
+      const pc=x=>isFinite(x)?(x*100).toFixed(1)+"%":"–";
+      h+=`<h3 class="sec">Weights</h3><p class="note">The game rolls weights from <b>0.75 × base × (1 + Size Boost)</b> up to <b>15.5 × base × (1 + Size Boost)</b>.${hasS?` Size Boost ${S.toFixed(2)}×. ${out?`<b>${out.toLocaleString()}</b> minerals fell outside that range: a base weight is probably off.`:"Every mineral fell inside that range."}`:" Add the Size Boost column to compare against it."}<br>Smallest and biggest show how close your lightest and heaviest got to the limits: 100% means it hit the limit.</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Base</th><th>Lightest kg</th><th>Smallest possible</th><th>Smallest</th><th>Heaviest kg</th><th>Biggest possible</th><th>Biggest</th></tr>`;
+      txt.push("","WEIGHTS (range 0.75 to 15.5 x base x (1 + size boost))"+(hasS?`, size boost ${S.toFixed(2)}x, ${out} outside`:""));
+      Object.entries(by).sort((a,b)=>b[1].length-a[1].length).forEach(([n,rs])=>{const m=MIN[n.toLowerCase()],ws=rs.map(r=>r.w),lo=Math.min(...ws),hi=Math.max(...ws);
+        const qs=hasS?rs.filter(r=>isFinite(r.sb)).map(q):[],ql=qs.length?Math.min(...qs):NaN,qh=qs.length?Math.max(...qs):NaN;
+        const smin=hasS?WMIN*m.bw*(1+S):NaN,smax=hasS?WMAX*m.bw*(1+S):NaN,ps=ql/WMIN,pb=qh/WMAX;
+        // smallest: 100% = hit the floor, above = never got that light; biggest: 100% = hit the ceiling
+        const cs=!isFinite(ps)?"":ps<.995?"off":ps<=1.05?"ok":"",cb=!isFinite(pb)?"":pb>1.005?"off":pb>=.95?"ok":"";
+        h+=`<tr><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}${esc(n)}${rs.length<10?' <span class="thin">thin data</span>':""}</span></td><td>${rs.length.toLocaleString()}</td><td>${m.bw}</td><td>${lo.toFixed(2)}</td><td>${isFinite(smin)?smin.toFixed(2):"–"}</td><td class="${cs}">${pc(ps)}</td><td>${hi.toFixed(2)}</td><td>${isFinite(smax)?smax.toFixed(2):"–"}</td><td class="${cb}">${pc(pb)}</td></tr>`;
+        txt.push(`  ${n}: ${rs.length} seen, base ${m.bw}, lightest ${lo.toFixed(2)} kg (${pc(ps)} of smallest possible), heaviest ${hi.toFixed(2)} kg (${pc(pb)} of biggest possible)`)});
       h+="</table></div>"}}
   const uk=Object.keys(unknown);if(uk.length)h+=`<p class="note">Names the toolkit doesn't know, left out of drop rates and weights: ${esc(uk.slice(0,20).join(", "))}${uk.length>20?" …":""}</p>`;
   if(!h)h='<p class="note">Map at least one of Zone, Modifier, Weight or Pan number to get a comparison.</p>';
