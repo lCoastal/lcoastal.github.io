@@ -1,6 +1,17 @@
 // tools that cover the same ground are grouped into one menu entry with tabs: [hub id, name, menu text, [tool id, tab label]...]
 const HUBS = [
   [
+    "h-research",
+    "Research",
+    "How the game works, the formulas, the tests behind them and a checker for your own data",
+    [
+      ["mechanics", "How It Works"],
+      ["formulas", "Formulas"],
+      ["testlog", "Test Log"],
+      ["testdata", "Test Data Check"],
+    ],
+  ],
+  [
     "h-museum",
     "Museum",
     "Plan, look up boosts, find the best setup and farm it",

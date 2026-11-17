@@ -43,10 +43,7 @@ const SECTIONS = [
     [
       ["codes", "m:Radiant Gold"],
       ["tierlist", "m:Diamond"],
-      ["mechanics", "m:Aetherite"],
-      ["formulas", "m:Prismara"],
-      ["testdata", "m:Gold"],
-      ["testlog", "m:Moonstone"],
+      ["h-research", "m:Aetherite"],
       ["settings", "m:Meteoric Iron"],
     ],
   ],
