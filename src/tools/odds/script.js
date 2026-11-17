@@ -34,7 +34,7 @@ function fullList(loc){const b=baseLoc(loc);const own=LOC[loc]||[];let out;
   return out.length<2?[]:out}
 function shares(loc,L){const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;
   const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);
-  return list.map(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);const q=(.2891*f(lo,hi,1)+.0280*f(lo,hi,Math.max(1,.04317*L))+.1905*f(lo,hi,Math.max(1,.40579*L))+.4924*f(lo,hi,Math.max(1,1.74153*L)))/sn;return {...x,base:x.p/tot,eff:q}})}
+  return list.map(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);const q=(.2891*f(lo,hi,1)+.0280*f(lo,hi,Math.max(1,.04317*L))+.1905*f(lo,hi,Math.max(1,.40579*L))+.4924*f(lo,hi,Math.max(1,1.74153*L)))/sn*rareBand(tot/x.p);return {...x,base:x.p/tot,eff:q}})}
 const perPan=()=>panItems(S.cap);
 // chances written as "1 in N", as a percentage, or both (picked with the 1 in / % / Both buttons)
 const pctTxt=p=>{const v=p*100;return (v>=10?fmt(v,1):v>=1?fmt(v,2):v>=0.01?fmt(v,3):Number(v.toPrecision(2)).toLocaleString("en-US",{maximumFractionDigits:20}))+"%"};

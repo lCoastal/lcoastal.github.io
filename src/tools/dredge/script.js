@@ -38,7 +38,7 @@ function fullList(loc){const b=baseLoc(loc);const own=LOC[loc]||[];let out;
 const SH={};
 function shares(loc,L){const k=loc+"|"+L;if(SH[k])return SH[k];const list=fullList(loc).sort((a,b)=>a.p-b.p);const tot=list.reduce((s,x)=>s+x.p,0);let c=0;
   const f=(lo,hi,l)=>Math.pow(1-lo,l)-Math.pow(1-hi,l);const out=new Map();
-  list.forEach(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);out.set(x.m,(.2891*f(lo,hi,1)+.0280*f(lo,hi,Math.max(1,.04317*L))+.1905*f(lo,hi,Math.max(1,.40579*L))+.4924*f(lo,hi,Math.max(1,1.74153*L)))/sn)});return SH[k]=out}
+  list.forEach(x=>{const [lo,hi,sn]=tieSpan(list,x,tot);out.set(x.m,(.2891*f(lo,hi,1)+.0280*f(lo,hi,Math.max(1,.04317*L))+.1905*f(lo,hi,Math.max(1,.40579*L))+.4924*f(lo,hi,Math.max(1,1.74153*L)))/sn*rareBand(tot/x.p))});return SH[k]=out}
 // a zone that only lists one mineral itself (The Void) is covered by its variant
 const ZONES=Object.keys(LOC).filter(l=>fullList(l).length&&(LOC[l].length>1||baseLoc(l)!==l));
 const MINS=P.mins.filter(m=>ZONES.some(z=>fullList(z).some(x=>x.m===m))).sort((a,b)=>a.n.localeCompare(b.n));
