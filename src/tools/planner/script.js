@@ -317,7 +317,7 @@ async function boardImage(name,b){
   if(!tl.length){c.fillStyle="#5d6670";c.font=`14px ${F}`;c.fillText("No boosts yet",PAD,y+22)}
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
-document.getElementById("imgCur").onclick=async()=>{if(!filledCount(S)){toast("The board is empty");return}
+document.getElementById("imgCur").onclick=async()=>{if(CMP)return saveCompare();if(!filledCount(S)){toast("The board is empty");return}
   const n=document.getElementById("lname").value.trim()||activeName||PAGE_NAME;const blob=await boardImage(n,S);if(!blob){toast("Couldn't draw the image");return}
   const filename=(n.replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Museum")+" - Museum.png";
   const ps=(()=>{try{return window.parent!==window&&typeof window.parent.ptSave==="function"?window.parent.ptSave:null}catch(e){return null}})();
