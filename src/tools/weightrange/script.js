@@ -26,22 +26,23 @@ const AC=makeAC({inp:$("min"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m
 // registered after the picker so it can still tell typed text from the current pick
 $("min").value=S.min;$("min").addEventListener("input",e=>{S.min=e.target.value;save();render()});
 
-// percentile chart: x is the share of drops (each slice as wide as its share), y is weight in kg;
-// each bar reaches the heaviest weight in that slice
-const PE=[0,.25,.3,.35,.4,.45,.5,.55,.6,.65,.7,.75,.8,.85,.9,.95,.99,1];
+// chart: the weight range cut into equal kg slices; a bar's height is the share of drops in that slice,
+// and hovering shows which percentiles the slice covers
+const NB=25;
 let BANDS=[];
 function chart(base,model,M){
-  const W=640,H=240,L=58,R=12,T=12,B=30,x=u=>L+u*(W-L-R),top=base*WT_MAX*M,y=v=>H-B-v/top*(H-B-T);
-  BANDS=PE.slice(1).map((u,i)=>{const u0=PE[i];return {u0,u1:u,k0:model.q(1-u0),k1:model.q(1-u)}});
-  const grid=[0,.25,.5,.75,1].map(f=>`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(top*f)}" y2="${y(top*f)}"/><text x="${L-6}" y="${y(top*f)+4}" text-anchor="end">${kg(top*f)}</text>`).join("");
-  const rects=BANDS.map((b,i)=>{const y0=y(0),y1=y(base*b.k1*M);return `<rect class="pb" data-b="${i}" x="${(x(b.u0)+1).toFixed(1)}" y="${y1.toFixed(1)}" width="${Math.max(1.5,x(b.u1)-x(b.u0)-2).toFixed(1)}" height="${Math.max(2,y0-y1).toFixed(1)}" rx="2"/>`}).join("");
-  const tk=[0,.25,.5,.75,1];
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weights by percentile">${grid}${rects}<line class="ax" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>
-    ${tk.map((u,i)=>`<text x="${x(u)}" y="${H-B+17}" text-anchor="${i===0?"start":i===4?"end":"middle"}">${u===0?"lightest":u===1?"heaviest":Math.round(u*100)+"%"}</text>`).join("")}</svg><div class="tip" id="tip" hidden></div>`}
-const bandText=(b,base,M)=>{const p0=Math.round(b.u0*100),p1=Math.round(b.u1*100),sh=Math.round((b.u1-b.u0)*100);
-  const name=b.u0===0?`Lightest ${p1}%`:b.u1===1?`Top ${100-p0}%`:`Percentile ${p0}–${p1}`;
-  const note=b.u0===0?"the group that always comes out small":b.u1===1?"heavier than 99% of drops":`heavier than ${p0}% of drops`;
-  return `<b>${name}</b><span>${sh}% of drops · ${note}</span><span class="kg">${kg(base*b.k0*M)} – ${kg(base*b.k1*M)}</span>`};
+  const W=640,H=230,L=46,R=12,T=12,B=30,bw=(WT_MAX-WT_MIN)/NB,x=k=>L+(k-WT_MIN)/(WT_MAX-WT_MIN)*(W-L-R);
+  BANDS=[];for(let i=0;i<NB;i++){const k0=WT_MIN+i*bw,k1=k0+bw,s0=model.sf(k0),s1=model.sf(k1);BANDS.push({k0,k1,v:s0-s1,u0:1-s0,u1:1-s1})}
+  const top=Math.max(...BANDS.map(b=>b.v)),step=top>.2?.1:top>.1?.05:top>.04?.02:.01,yt=Math.ceil(top/step)*step,y=v=>H-B-v/yt*(H-B-T);
+  const ticks=[];for(let v=0;v<=yt+1e-9;v+=step)ticks.push(v);
+  const grid=ticks.map(v=>`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/><text x="${L-6}" y="${(y(v)+4).toFixed(1)}" text-anchor="end">${fmt(v*100,0)}%</text>`).join("");
+  const rects=BANDS.map((b,i)=>`<rect class="pb" data-b="${i}" x="${(x(b.k0)+1).toFixed(1)}" y="${y(b.v).toFixed(1)}" width="${(x(b.k1)-x(b.k0)-2).toFixed(1)}" height="${Math.max(0,H-B-y(b.v)).toFixed(1)}" rx="2"/>`).join("");
+  const tk=[0,.25,.5,.75,1].map(f=>WT_MIN+f*(WT_MAX-WT_MIN));
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Share of drops at each weight">${grid}${rects}<line class="ax" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>
+    ${tk.map((k,i)=>`<text x="${x(k)}" y="${H-B+17}" text-anchor="${i===0?"start":i===4?"end":"middle"}">${kg(base*k*M)}</text>`).join("")}</svg><div class="tip" id="tip" hidden></div>`}
+const pctl=u=>u<.995?Math.round(u*100):u<.9995?fmt(u*100,1):fmt(u*100,2);
+const bandText=(b,base,M)=>`<b>${kg(base*b.k0*M)} – ${kg(base*b.k1*M)}</b><span>${b.v>=.001?fmt(b.v*100,1):fmt(b.v*100,2)}% of drops land here</span><span>${b.u0<.005?`The lightest ${pctl(b.u1)}% of drops`:b.u1>.995?`Percentile ${pctl(b.u0)}–100: the heaviest ${fmt((1-b.u0)*100,1)}%`:`Percentile ${pctl(b.u0)}–${pctl(b.u1)}: heavier than ${pctl(b.u0)}% of drops`}</span>`;
+
 function mineral(m,sb,cap,model,M){
   const base=m.bw*(1+sb/100);
   $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b style="color:${rc(m.r)}">${esc(m.n)}</b><br><span>${esc(m.r)} · base weight ${m.bw} kg · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}</span></div>`;
@@ -51,7 +52,7 @@ function mineral(m,sb,cap,model,M){
   const zs=[...new Set((m.ch||[]).map(c=>baseLoc(c[0])))],onlyEr=zs.length&&zs.every(z=>ERUPT.has(z));
   if(onlyEr)$("sum").lastElementChild.querySelector("small").textContent=kg(base*WT_MAX*2*M)+" in a Volcanic Eruption";
   $("chart").innerHTML=chart(base,model,M);CUR=[base,M];
-  $("chartNote").textContent=`Left to right is all your drops from lightest to heaviest: each bar is a slice of them (the lightest 25%, then 5% slices, then the top 1%) and as wide as its share. A bar's height is the heaviest weight in that slice. Hover a bar for its full range.${cap&&(cap<1856||cap>7240)?" Your capacity is outside the tested 1,856–7,240, so the shape is an estimate.":""}`;
+  $("chartNote").textContent=`Each bar is an equal slice of the weight range, and its height is how many of your drops land there. Hover a bar to see which percentiles it covers.${cap&&(cap<1856||cap>7240)?" Your capacity is outside the tested 1,856–7,240, so the shape is an estimate.":""}`;
   $("pct").innerHTML=[[.5,"Top half"],[.25,"Top 25%"],[.1,"Top 10%"],[.01,"Top 1%"],[.001,"Top 0.1%"]].map(([p,l])=>`<div><span>${l}</span><b>${kg(base*model.q(p)*M)}</b><small>or heavier · ${oneIn(p)}</small></div>`).join("");
 }
 
