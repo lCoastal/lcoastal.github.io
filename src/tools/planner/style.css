@@ -101,8 +101,6 @@ label.btn{display:inline-block}
 .sides{display:flex;flex-direction:column;gap:12px;min-width:0}
 .grid.cmp{grid-template-columns:1fr}
 .grid.cmp .totals{order:-1;position:static}
-.grid.cmp .sides{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-.grid.cmp .tabs{grid-column:1/-1}
 .side{display:flex;flex-direction:column;gap:10px;min-width:0}
 .shead{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
 .shead .hrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
@@ -123,6 +121,9 @@ label.btn{display:inline-block}
 .drow .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .drow .up{color:var(--pos);font-weight:600}.drow .down{color:var(--neg);font-weight:600}.drow .same{color:var(--muted)}
 #pasteT{width:100%;box-sizing:border-box;font:13px/1.5 var(--f-mono);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);color:var(--fg);resize:vertical}
-@media (max-width:900px){.grid.cmp .sides{display:flex}.grid.cmp .tabs{display:flex}.side.off{display:none}}
+.pair{display:grid;grid-template-columns:1fr 1fr;column-gap:18px;row-gap:14px;align-items:stretch}
+.pair>.band{min-width:0}
+.pair>.band .slots{flex:1}
+@media (max-width:900px){.grid.cmp .tabs{display:flex}.pair{grid-template-columns:1fr}.pair.showA [data-side="B"],.pair.showB [data-side="A"]{display:none}}
 @media (max-width:620px){.grid.cmp .slots{grid-template-columns:1fr}}
 .grid.cmp #tot,.grid.cmp #filled{max-width:640px}

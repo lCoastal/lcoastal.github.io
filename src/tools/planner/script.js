@@ -52,7 +52,7 @@ const gainHTML=g=>Object.keys(g).length?Object.entries(g).sort((a,b)=>STATS.inde
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function drawBoard(el,st,side){
-  el.innerHTML="";const other=CMP?brd(side==="A"?"B":"A"):null;
+  el.innerHTML="";const bands=[];const other=CMP?brd(side==="A"?"B":"A"):null;
   ORDER.forEach(r=>{
     const band=document.createElement("section");band.className="band";band.style.setProperty("--rc",rc(r));
     band.innerHTML=`<div class="bh"><h2>${r}</h2><span>${SLOTS[r]} display${SLOTS[r]>1?"s":""} · mutation +${r4(MULT[r])}× per stat</span></div>`;
@@ -67,17 +67,28 @@ function drawBoard(el,st,side){
       c.querySelector(`#u-${side}-${r}-${i}`).onclick=()=>openPicker(r,i,"u",side);
       sl.appendChild(c);
     });
-    band.appendChild(sl);el.appendChild(band);
+    band.appendChild(sl);band.dataset.side=side;bands.push(band);el.appendChild(band);
   });
+  return bands;
 }
+const HEAD={A:document.getElementById("headA"),B:document.getElementById("headB")};
 function renderBoard(){
   document.getElementById("grid").classList.toggle("cmp",CMP);document.getElementById("cmpBtn").setAttribute("aria-pressed",String(CMP));
   document.getElementById("cmpBtn").textContent=CMP?"Stop comparing":"Compare two museums";
-  ["A","B"].forEach(sd=>{const h=document.getElementById("head"+sd);h.hidden=!CMP;if(CMP)drawHead(sd)});
-  document.getElementById("sideB").hidden=!CMP;document.getElementById("tabs").hidden=!CMP;
+  ["A","B"].forEach(sd=>{const h=HEAD[sd];h.hidden=!CMP;if(CMP)drawHead(sd)});
+  document.getElementById("sideB").hidden=true;document.getElementById("tabs").hidden=!CMP;
   document.querySelectorAll("#tabs [data-tab]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tab===TAB)));
   document.getElementById("sideA").classList.toggle("off",CMP&&TAB!=="A");document.getElementById("sideB").classList.toggle("off",CMP&&TAB!=="B");
-  drawBoard(document.getElementById("board"),S,"A");if(CMP)drawBoard(document.getElementById("boardB"),SB,"B");
+  const pair=document.getElementById("pair");pair.hidden=!CMP;
+  if(!CMP){drawBoard(document.getElementById("board"),S,"A");document.getElementById("sideA").hidden=false}
+  else{
+    // compare: one grid, A and B bands of each rarity on the same row so they line up
+    document.getElementById("sideA").hidden=true;
+    const a=drawBoard(document.createElement("div"),S,"A"),b=drawBoard(document.createElement("div"),SB,"B");
+    pair.innerHTML="";pair.className="pair show"+TAB;
+    const hA=HEAD.A,hB=HEAD.B;hA.dataset.side="A";hB.dataset.side="B";
+    pair.append(hA,hB);ORDER.forEach((r,k)=>pair.append(a[k],b[k]));
+  }
   renderTotals();
 }
 function renderTotals(){
@@ -102,7 +113,7 @@ function renderDiff(){
 }
 // header above each side in compare mode: name, load, paste, copy across, clear
 function drawHead(sd){
-  const h=document.getElementById("head"+sd),ot=sd==="A"?"B":"A";
+  const h=HEAD[sd],ot=sd==="A"?"B":"A";
   h.innerHTML=`<div class="hrow"><span class="tag">${sd}</span><input class="name" id="nm${sd}" maxlength="40" placeholder="Museum ${sd}" value="${esc(NAMES[sd])}" aria-label="Name of museum ${sd}"></div>
     <div class="hrow"><select id="ld${sd}" aria-label="Load a museum into ${sd}"><option value="">Load…</option>${L.map((o,k)=>`<option value="${k}">${esc(o.name)}</option>`).join("")}</select>
     <button type="button" class="btn sm" id="ps${sd}">Paste</button><button type="button" class="btn sm" id="cp${sd}" title="Copy ${sd} onto ${ot}">Copy to ${ot} ${sd==="A"?"→":"←"}</button><button type="button" class="btn sm" id="cl${sd}">Clear</button></div>`;
