@@ -3,16 +3,22 @@ const $=id=>document.getElementById(id);
 // [group, title, formula (copied as is), what it means]
 const F=[
 ["Pans","Average minerals per pan",
-`average = 0.678 × capacity^0.565`,
-"What a full pan gives on average over many pans. Luck doesn't change it."],
+`n = 0.678 × C^0.565`,
+"n = average minerals in a full pan · C = capacity. Luck doesn't change it."],
 ["Pans","Fewest and most minerals per pan",
-`fewest = ½ × √capacity
-most ≈ 2.5 × √capacity`,
-"Every full pan lands between these two. Most pans sit in the lower part of that range."],
+`min = ½ × √C
+max ≈ 2.5 × √C`,
+"min = fewest minerals a full pan can give · max = most · C = capacity. Most pans sit in the lower part of that range."],
 ["Weight","Lightest and heaviest weight",
-`lightest = 0.75 × base weight × (1 + Size Boost)
-heaviest = 15.5 × base weight × (1 + Size Boost)`,
-"Size Boost as a number (1,476% = 14.76). ×1.5 with the Solar Magnifier."],
+`Wmin = 0.75 × B × (1 + S)
+Wmax = 15.5 × B × (1 + S)`,
+"Wmin = lightest weight (kg) · Wmax = heaviest weight (kg) · B = the mineral's base weight (kg) · S = Size Boost as a number (1,476% = 14.76). With the Solar Magnifier multiply by 1.5."],
+["Weight","Maximum weight at a Size Boost",
+`Wmax = 15.5 × B × (1 + S)`,
+"Wmax = heaviest weight you can get (kg) · B = the mineral's base weight (kg) · S = your Size Boost as a number (1,476% = 14.76). With the Solar Magnifier multiply by 1.5."],
+["Weight","Minimum Size Boost for a weight",
+`S = W ÷ (15.5 × B) − 1`,
+"S = Size Boost you need, as a number (×100 for %, so 18.35 = 1,835%) · W = the weight you want (kg) · B = the mineral's base weight (kg). With the Solar Magnifier use W ÷ 1.5 instead of W."],
 ];
 const box=f=>`<button type="button" class="box" data-copy="${esc(f)}" title="Click to copy"><span class="cp">Copy</span>${esc(f)}</button>`;
 let q="";
