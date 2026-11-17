@@ -28,3 +28,8 @@ table.t tr:last-child td{border-bottom:0}
 .big{font:600 15px/1.5 var(--f-body);margin:8px 0 0}
 .bar{height:8px;border-radius:4px;background:var(--accent);min-width:1px}
 td.bw{width:40%}
+.row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;margin:4px 0 8px}
+.row .fld{display:flex;flex-direction:column;gap:4px;min-width:140px;flex:1 1 140px;max-width:220px}
+.row .fld input{width:100%;box-sizing:border-box}
+.row .ck{display:inline-flex;align-items:center;gap:7px;padding-bottom:8px;cursor:pointer}
+.row .ck input{width:16px;height:16px;accent-color:var(--accent)}

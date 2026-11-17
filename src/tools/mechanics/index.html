@@ -25,36 +25,54 @@
     <p class="txt">Every zone has a drop table. With no luck, each mineral comes up at its listed chance. Luck works like extra rolls: the game rolls the table several times and keeps the <b>rarest</b> result. So luck doesn't add a flat bonus; it pushes every pick towards the rare end of the table, and common minerals get rarer as a result.</p>
     <p class="txt">The best fit so far is that about <b>29%</b> of minerals roll just once, about <b>3%</b> roll roughly <b>luck ÷ 23</b> times, about <b>19%</b> roll about <b>0.4 × luck</b> times and about <b>49%</b> roll about <b>1.74 × luck</b> times, keeping the rarest result. On top of that, minerals with base odds between about <b>1 in 18 million and 1 in 1.5 billion</b> (most Mythics) come up about <b>1.86×</b> more often than the rolls alone predict. That's why the gain slows down: going from 100 to 1,000 luck matters far more than 10,000 to 11,000 for anything that isn't very rare.</p>
     <p class="txt">The wiki's Stat Systems Guide uses a simpler split (a quarter once, a quarter at half luck, half at full luck). Testing fits the split above much better, especially for mid-rarity minerals like Jade and Onyx and for very rare ones at high luck.</p>
-    <p class="txt"><b>Luck caps give less than they say.</b> A capped session seems to behave like about 63% of the cap, while uncapped sessions match the luck shown. Best Luck Cap and Dredge already account for this.</p>
+    <p class="txt"><b>Ties and duplicates.</b> Minerals with exactly the same listed odds share their chance evenly. The Duplicator trinket gives Mythic and Exotic ores a 10% chance to be duplicated, so with it you see a few more of those than the luck alone gives.</p>
+    <p class="txt"><b>Luck caps may give less than they say.</b> A capped session seems to behave like about 63% of the cap. That's less certain than the rest of this page; Best Luck Cap and Dredge use it.</p>
     <p class="txt"><b>Events change your luck too.</b> A Meteor Shower doubles your final luck and weather events (Nimue's Blessing, Blizzard, Swamp Fog, Starfall) multiply it by 1.5, and they stack. Hallows' Eve, the Luck Totem and most other boosts add to your multiplier instead. Autopan without the Mastered enchant digs at 51% quality, which gives about two thirds of your luck. Best Luck Cap, Dredge and Luck Odds have a setting for events and autopan.</p>
+    <p class="txt"><b>The Senet Die</b> rolls once per full pan and multiplies all of your luck for that pan, events included: ×0.5, ×0.75, ×1, ×1.25, ×1.5 or ×3, each equally likely. On average that's <b>×1.33</b>.</p>
     <div class="row"><label class="fld"><span class="lab">Your luck</span><input type="number" id="luck" min="1" value="1000"></label></div>
     <div class="tw"><table class="t" id="luckT"></table></div>
     <p class="note">For a mineral that's the rarest in its zone. Something with rarer minerals above it gains less, because those take the rare rolls first.</p>
   </section>
 
   <section class="card">
-    <h2>Capacity: how many tries per pan</h2>
-    <p class="txt">A full pan doesn't give one roll per slot. It behaves like about <b>0.68 × capacity<sup>0.565</sup></b> separate picks on average, so 400 capacity is about 20 picks, 1,600 is about 44 and 5,462 is about 87. Each pan lands somewhere between <b>½ × √capacity</b> and about <b>2.5 × √capacity</b>. Doubling capacity gives roughly 1.4× the picks, which is why capacity helps steadily but never explodes. The Pan Size tool shows yours.</p>
+    <h2>Capacity: how many minerals per pan</h2>
+    <p class="txt">A full pan doesn't give one mineral per point of capacity. On average it gives about <b>0.68 × capacity<sup>0.565</sup></b> minerals, so 400 capacity is about 20, 1,600 is about 44, 5,462 about 87 and 7,240 about 102. Every pan lands between <b>½ × √capacity</b> and about <b>2.5 × √capacity</b>, and most pans sit in the lower two thirds of that range, which is why the average is below the middle. Doubling capacity gives roughly 1.4× the minerals, so capacity helps steadily but never explodes. Luck doesn't change the count. The Pan Size tool shows yours.</p>
     <div class="row"><label class="fld"><span class="lab">Capacity</span><input type="number" id="cap" min="1" value="1000"></label><label class="fld"><span class="lab">Chance per pick (%)</span><input type="number" id="pick" min="0" step="0.01" value="0.1"></label></div>
     <p class="big" id="capOut"></p>
   </section>
 
   <section class="card">
     <h2>Modifiers: how often and which one</h2>
-    <p class="txt">How many minerals get a normal modifier rises with Modifier Boost only: about <b>1 − 0.937<sup>boost (×)</sup></b>, so roughly <b>7%</b> at 113%, <b>32%</b> at 600%, <b>45%</b> at 926% and <b>66%</b> at 1,660%. Modifier Boost also changes <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>11.7 × boost (×)<sup>0.84</sup> + 2 per 1,000 luck</b> (no cap), with 31% of rolls once, 13% at about a sixth of the strength and 56% at full strength.</p>
+    <p class="txt">How many minerals get a normal modifier rises with Modifier Boost only (luck doesn't change it): about <b>1 − 0.937<sup>boost (×)</sup></b>, so roughly <b>7%</b> at 113%, <b>32%</b> at 600%, <b>45%</b> at 926% and <b>66%</b> at 1,660%. Modifier Boost also changes <b>which</b> modifier you get. It works like luck does for minerals: the game rolls the modifier several times by its weight and keeps the rarest. The roll strength is about <b>11.7 × boost (×)<sup>0.84</sup> + 2 per 1,000 luck</b> (no cap), with 31% of rolls once, 13% at about a sixth of the strength and 56% at full strength. A Modifier Surge doubles the boost part.</p>
     <div class="row"><label class="fld"><span class="lab">Modifier Boost (%)</span><input type="number" id="mb" min="0" step="1" value="100"></label><label class="ck"><input type="checkbox" id="night"> Night (Lunar can roll)</label></div>
     <div class="tw"><table class="t" id="modT"></table></div>
-    <p class="note">Voidtorn, Treasured, Electrified and other event modifiers come from their own sources and sit on top of that.</p>
+    <p class="note">Special modifiers come from their own sources and sit on top of that: <b>Treasured</b> only from treasure chests (non-Exotic ores of that chest's zone) and the Pharaoh's Tomb deposits, <b>Entombed</b> only from the tomb deposits, Voidtorn from Void tools or The Void, Electrified from Thunderstorms and Crystalline from geodes or Crystal Touch. Feather of Ma'at always comes Treasured.</p>
     <p class="note">At very high Modifier Boost the formula keeps climbing (about 80% at 2,500%), but that end is less certain.</p>
   </section>
 
   <section class="card">
-    <h2>Weight: what's known so far</h2>
+    <h2>Weight: how heavy a mineral comes out</h2>
+    <p class="txt">A mineral's weight is <b>base weight × (1 + Size Boost) × a roll between 0.75 and 15.5</b>, with Size Boost as a number (1,476% is 14.76). So the lightest you can get is 0.75 × base × (1 + Size Boost) and the heaviest 15.5 × base × (1 + Size Boost). The Solar Magnifier multiplies the final weight by 1.5, and a Volcanic Eruption doubles sizes in its zones.</p>
+    <p class="txt">The roll isn't spread evenly. About <b>a quarter</b> of minerals always roll small, right near the bottom. The rest spread across the whole range, evenly at low capacity, and the bigger your pan, the more of them lean towards the heavy end. The heaviest possible doesn't change with capacity, only how often you get close to it. <b>Luck, the modifier and which mineral it is make no difference.</b></p>
+    <div class="row"><label class="fld"><span class="lab">Base weight (kg)</span><input type="number" id="bw" min="0" step="0.01" value="0.2"></label><label class="fld"><span class="lab">Size Boost (%)</span><input type="number" id="sb" min="0" step="1" value="1476"></label><label class="fld"><span class="lab">Capacity</span><input type="number" id="wcap" min="1" value="7240"></label><label class="ck"><input type="checkbox" id="mag"> Solar Magnifier</label></div>
+    <p class="big" id="wOut"></p>
+    <p class="note">Weight Range shows the full spread for any mineral, and Size Boost Finder works backwards from the weight you want.</p>
+  </section>
+
+  <section class="card">
+    <h2>Museum: how boosts add up</h2>
+    <p class="txt">Every display adds its mineral's boost (at or above its max-boost weight) plus its modifier. All of it for one stat is added together, then <b>multiplies</b> that stat: a total of +2.5 Luck means ×3.5 Luck.</p>
+    <p class="txt">A modifier adds the same amount to every stat it gives, by the display's rarity: <b>Common 0.005, Uncommon 0.0075, Rare 0.0125, Epic 0.02, Legendary 0.03, Mythic 0.05, Exotic 0.08</b>. Perfect gives Luck, Capacity and Size Boost; Mutated gives Luck, Dig Strength and Modifier Boost; Treasured and Entombed give double, on Luck only. Each rarity has its own displays (Exotic 1, Mythic 2, the rest 3), and a mineral can only be in one of them.</p>
+    <p class="note">Museum Planner and Museum Improver use exactly this.</p>
+  </section>
+
+  <section class="card">
+    <h2>Still unknown</h2>
     <ul class="txt" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-      <li>Every mineral has a <b>base weight</b> (shown on its Minerals page). Its weight is <b>base weight × (1 + Size Boost) × a roll between 0.75 and 15.5</b>.</li>
-      <li>About a quarter of minerals always roll small, near the bottom of that range. The rest spread across it, and the bigger your capacity, the more of them lean towards the heavy end. Weight Range and Size Boost Finder use this.</li>
-      <li><b>Luck doesn't change weight</b>, and neither does the modifier or which mineral it is.</li>
-      <li><b>Size Boost</b> is a straight multiplier on (1 + Size Boost). The Solar Magnifier is ×1.5 on the final weight.</li>
+      <li>Why very rare minerals show up more often than the rolls alone give.</li>
+      <li>Why Lapis Lazuli shows up more often than its listed odds say.</li>
+      <li>Why some sessions get more modifiers than the boost alone gives.</li>
+      <li>How exactly luck caps behave, and whether a Volcanic Eruption stacks with the Solar Magnifier.</li>
     </ul>
   </section>
 
