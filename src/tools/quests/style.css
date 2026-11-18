@@ -23,6 +23,8 @@
 .rw{font-size:12.5px;display:flex;flex-wrap:wrap;gap:4px}
 .rw span{padding:1px 8px;border-radius:999px;background:var(--sunk);border:1px solid var(--line)}
 .rw .bp{border-color:#3f7fd6;color:#3f7fd6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .rw .bp{border-color:#7fb2ff;color:#7fb2ff}}
+:root[data-theme="dark"] .rw .bp{border-color:#7fb2ff;color:#7fb2ff}
 .rw .buff{border-color:var(--accent);color:var(--accent)}
 .mlink{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
 .donebtn{font-size:12px;padding:4px 9px;border-radius:7px;border:1px solid var(--line);background:var(--panel);cursor:pointer;white-space:nowrap}
