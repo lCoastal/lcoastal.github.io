@@ -110,12 +110,8 @@ async function youDraw(){const m=CUR;if(!m)return;const out=document.getElementB
   const real=r.zones.filter(z=>z.pan!=null&&!/^The Void/.test(z.z)),best=(real.length?real:r.zones.filter(z=>z.pan!=null)).sort((a,b)=>b.pan-a.pan)[0];
   document.querySelectorAll("[data-yz]").forEach(td=>{const z=r.zones.find(x=>x.z===td.dataset.yz);td.textContent=z&&z.pan!=null&&hasL&&hasC?oneInP(z.pan):"—"});
   const T=(lab,v,sub)=>`<div class="yt"><span>${lab}</span><b>${v}</b>${sub?`<small>${sub}</small>`:""}</div>`;
-  const allow=k=>{try{return window.parent.ptModAllowed(m.n,k)}catch(e){return true}};
-  const only=(()=>{try{return window.parent.ptModOnly(m.n)}catch(e){return null}})();
-  const mods=only?`Only comes ${only}`:[allow("Treasured")?"Can be Treasured":"",allow("Entombed")?"Can be Entombed":""].filter(Boolean).join(" · ")||"No special modifiers";
   out.innerHTML=(hasL&&hasC&&best?T("Best zone for you",esc(best.z),`${oneInP(best.pan)} per pan`):T("Best zone for you","—","Type your luck and capacity"))
-    +(r.wt?T("Weight",`${kgf(r.wt.lo)} – ${kgf(r.wt.hi)}`,`typical ${kgf(r.wt.mid)} · top 1% from ${kgf(r.wt.top)}`):T("Weight","—","No base weight listed"))
-    +T("Special modifiers",mods,"Treasure chests and the tomb deposits")}
+    +(r.wt?T("Weight",`${kgf(r.wt.lo)} – ${kgf(r.wt.hi)}`,`typical ${kgf(r.wt.mid)} · top 1% from ${kgf(r.wt.top)}`):T("Weight","—","No base weight listed"))}
 function youWire(m){CUR=m;const y=youGet(),I={yLuck:"luck",yCap:"cap",ySb:"sb"};
   Object.entries(I).forEach(([id,k])=>{const el=document.getElementById(id);el.value=y[k]??"";el.addEventListener("input",()=>{try{window.parent.ptYou.set({[k]:el.value},window)}catch(e){}clearTimeout(youWire.t);youWire.t=setTimeout(youDraw,200)})});
   const mg=document.getElementById("yMag");mg.checked=!!y.mag;mg.onchange=()=>{try{window.parent.ptYou.set({mag:mg.checked},window)}catch(e){}youDraw()};
