@@ -8,9 +8,8 @@ const REG=P.regLuck||{};
 
 // chance an ore carries any modifier, from the Modifier Odds model (6.3% per 1x boost, compounding)
 const anyMod=e=>1-Math.pow(1-.0631,Math.max(0,+e||0)/100);
-// the die's six faces, x0.5 .. x3
-const DIE=[.5,1,1.5,2,2.5,3];
-const dieAvg=DIE.reduce((a,b)=>a+b,0)/DIE.length;   // 1.75
+// the Senet Die rolls x0.5 .. x3 each full pan; its real average works out to x1.33 (rolls lean low)
+const dieAvg=1.33, dieLo=0.5, dieHi=3;
 
 let S={base:"",mult:"",cap:"",mb:"",k:6};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-trinketluck")||"{}"))}catch(e){}
@@ -29,7 +28,7 @@ function trinketMults(){
     B,cap,mb,k,n,modPer,destPer,
     rows:[
       {key:"nomad", name:"Nomad's Compass", mult:1+0.15*k, add:0, kind:"mult"},
-      {key:"die",   name:"Senet Die",       mult:dieAvg,   add:0, kind:"die", lo:0.5, hi:3},
+      {key:"die",   name:"Senet Die",       mult:dieAvg,   add:0, kind:"die", lo:dieLo, hi:dieHi},
       {key:"umb",   name:"Beach Umbrella",  mult:1+25*modPer/B, add:25*modPer, kind:"add"},
       {key:"reac",  name:"Mass Reactor",    mult:1+25*destPer/B, add:25*destPer, kind:"add"},
     ],
@@ -40,7 +39,7 @@ const fL=v=>fmt(Math.round(v),0);
 function whyLine(r,c){
   const L0=c.B*(+S.mult>1?+S.mult:1);
   if(r.key==="nomad") return c.k>=6?"Maxed at +90% luck. Needs 5 pans each in 6 deposits this hour to hold.":`+${Math.round(15*c.k)}% luck at ${c.k} stack${c.k===1?"":"s"}. Slide to 6 for its full +90%.`;
-  if(r.key==="die") return `Rolls a die every full pan: average &times;1.75, but <span class="risk">&times;0.5 (1 in 6) halves your luck</span> and &times;3 triples it.`;
+  if(r.key==="die") return `Rolls a die every full pan: averages &times;1.33, but can <span class="risk">drop to &times;0.5 (halves your luck)</span> or spike to &times;3.`;
   if(r.key==="umb"){
     if(c.mb<=0) return `Does nothing at 0 modifier boost &mdash; it feeds on modified ores. Add modifier boost to make it work.`;
     return `${fmt(c.modPer,1)} modified ore${c.modPer<1.5?"":"s"} a pan &times; +25 base luck = +${fL(r.add)} base luck (&times;${fmt(r.mult,2)}).`;
@@ -66,7 +65,7 @@ function render(){
   $("head").innerHTML=`At base luck <b>${fmt(c.B,0)}</b>${Mshow>1?` &times; ${fmt(Mshow,2)} = <b>${fL(L0)}</b> luck`:""} &middot; ~<b>${fmt(c.n,1)}</b> ores per pan`;
 
   const bestLuck=L0*best.mult;
-  $("verdict").innerHTML=`Best for luck right now: <b>${esc(best.name)}</b> &mdash; about <b>&times;${fmt(best.mult,2)}</b> your luck`+(Mshow>1?` (&asymp; ${fL(bestLuck)})`:"")+`.`+(best.key==="die"?` It wins on average, but it's a gamble &mdash; a bad roll drops you to ${fL(L0*0.5)} luck.`:"")+(best.key==="nomad"&&c.k>=6?` You'll need to keep all 6 stacks up to beat the Senet Die's average.`:"");
+  $("verdict").innerHTML=`Best for luck right now: <b>${esc(best.name)}</b> &mdash; about <b>&times;${fmt(best.mult,2)}</b> your luck`+(Mshow>1?` (&asymp; ${fL(bestLuck)})`:"")+`.`+(best.key==="die"?` It wins on average, but it's a gamble &mdash; a bad roll drops you to ${fL(L0*0.5)} luck.`:"")+(best.key==="nomad"&&c.k>=6?` The catch is upkeep &mdash; that's 5 pans in each of 6 deposits an hour to hold all the stacks.`:"");
 
   $("ranks").innerHTML=ranked.map((r,i)=>{
     const dead=r.mult<=1.0001;
