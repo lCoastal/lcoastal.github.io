@@ -17,7 +17,6 @@ const PT_RESET = {
   minmuts: { keys: ["pmm-s", "pt-sellcalc"] },
   runes: { keys: ["pr-s"] },
   odds: { keys: ["po-s"] },
-  trinketluck: { keys: ["pt-trinketluck"] },
   bestcap: { keys: ["pt-bestcap"] },
   buildcmp: { keys: ["pt-bcmp"] },
   dredge: { keys: ["pt-dredge"] },
