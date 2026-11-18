@@ -162,7 +162,7 @@ function placed(b,picks){// put the new minerals in the displays where the same 
     for(let i=0;i<SLOTS[r];i++)if(!out[i])out[i]=nw.length?(x=>({m:x.n,u:x.u}))(nw.shift()):{m:null,u:"None"};nb[r]=out});return nb}
 const mineHTML=(n,u)=>n?`<span class="mn mlink" data-mineral="${esc(n)}" title="Open ${esc(n)}">${ic(n)}<span>${esc(n)}<small>${esc(u||"None")}</small></span></span>`:'<span class="mn"><span>Empty</span></span>';
 function statTable(a,b2){const rows=STATS.map((s,i)=>[s,a[i],b2[i]]).filter(([,x,y])=>Math.abs(x)>1e-9||Math.abs(y)>1e-9);
-  return `<table class="t"><tr><th>Stat</th><th>Now</th><th>After</th><th>Change</th></tr>${rows.map(([s,x,y])=>{const d=y-x,z=Math.abs(d)<1e-9;return `<tr><td>${s}</td><td>${fxT(x)}</td><td>${fxT(y)}</td><td class="${z?"same":d>0?"up":"down"}">${z?"same":arr(d)}</td></tr>`}).join("")}</table>`}
+  return `<table class="t"><tr><th>Stat</th><th>Now</th><th>After</th><th>Change</th></tr>${rows.map(([s,x,y])=>{const d=y-x,z=Math.abs(d)<1e-9;return `<tr><td>${s}</td><td>${fxT(x)}</td><td>${fxT(y)}</td><td class="${z?"same":d>0?"up":"down"}">${z?"=":arr(d)}</td></tr>`}).join("")}</table>`}
 let NEWB=null;
 function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
   const proof=res.done?"Every combination was checked, so this is the best possible."
@@ -226,7 +226,7 @@ async function resultImage(o){try{await document.fonts.ready}catch(e){}
     c.fillStyle="#98a2ad";c.font=`600 11px ${F}`;[["NOW",1],["AFTER",2],["CHANGE",3]].forEach(([t,i])=>c.fillText(t,cx[i]-c.measureText(t).width,y+2));y+=12;
     stats.forEach(([s,a,b],k)=>{const yy=y+k*34;c.fillStyle=k%2?"#171b1f":"#1c2126";rr(c,PAD,yy,W-PAD*2,30,6);c.fill();
       c.fillStyle="#e6e9ec";c.font=`14px ${F}`;c.fillText(s,cx[0],yy+20);c.font=`14px ${FM}`;c.fillStyle="#b9c2cb";
-      const ra=(t,x)=>c.fillText(t,x-c.measureText(t).width,yy+20);ra(fxT(a),cx[1]);ra(fxT(b),cx[2]);const d=b-a,z=Math.abs(d)<1e-9;c.fillStyle=z?"#98a2ad":d>0?"#3cc2a8":"#ef7a66";c.font=`600 14px ${FM}`;ra(z?"same":arr(d),cx[3])});
+      const ra=(t,x)=>c.fillText(t,x-c.measureText(t).width,yy+20);ra(fxT(a),cx[1]);ra(fxT(b),cx[2]);const d=b-a,z=Math.abs(d)<1e-9;c.fillStyle=z?"#e6e9ec":d>0?"#3cc2a8":"#ef7a66";c.font=`600 14px ${FM}`;ra(z?"=":arr(d),cx[3])});
     y+=stats.length*34}
   // both museums side by side, one row per rarity, so the same displays line up
   // one result board: kept ore in white, a replacement in green with the ore it replaced small and red beneath
