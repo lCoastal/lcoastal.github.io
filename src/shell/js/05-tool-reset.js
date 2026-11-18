@@ -1,12 +1,14 @@
 // "Reset this tool": puts one tool's inputs and view back to default. Saved builds, loadouts, boards and lists stay.
 const PT_RESET = {
   builds: { keys: ["pbs-current", "pbs-fold", "pbs-hidep", "pbs-rings", "pbs-view"], what: "the open sheet and view (saved builds stay)" },
+  planner: { keys: ["mp-board", "mp-board-b", "mp-cmp", "mp-cmp-hide", "mp-cmp-names"], what: "the boards and comparison view (saved loadouts stay)" },
   boosts: { keys: ["mb-incmut", "mb-stat", "mb-zone", "mb-pick", "mb-mpick", "mb-pickon", "mb-name"] },
   minerals: { keys: ["pm-filters"] },
   locations: { keys: ["pl-loc", "pl-tcopy"] },
   pans: { keys: ["pg-pans"] },
   shovels: { keys: ["pg-shovels"] },
   sluices: { keys: ["pg-sluices"] },
+  sluiceplan: { keys: ["psp-s"] },
   mododds: { keys: ["pmo-s"] },
   weightrange: { keys: ["wr-s"] },
   sizefinder: { keys: ["sf-s"] },
@@ -15,6 +17,7 @@ const PT_RESET = {
   minmuts: { keys: ["pmm-s", "pt-sellcalc"] },
   runes: { keys: ["pr-s"] },
   odds: { keys: ["po-s"] },
+  trinketluck: { keys: ["pt-trinketluck"] },
   bestcap: { keys: ["pt-bestcap"] },
   buildcmp: { keys: ["pt-bcmp"] },
   dredge: { keys: ["pt-dredge"] },
@@ -26,6 +29,9 @@ const PT_RESET = {
   mutations: { keys: ["pmu-catf", "pmu-hide", "pmu-ofmt", "pmu-pan", "pmu-tab"] },
   equipment: { keys: ["pe-f"] },
   mechanics: { keys: ["pmc-s"] },
+  calc: { keys: ["pcalc", "pc-hidepots"], what: "your gear setup and view (saved loadouts stay)" },
+  tierlist: { keys: ["pt-tier"], what: "your tier list arrangement" },
+  testlog: { keys: ["tl-s"] },
   checklist: { keys: ["pc-list"], what: "everything on the checklist" },
 };
 function ptAddReset(f, id) {
