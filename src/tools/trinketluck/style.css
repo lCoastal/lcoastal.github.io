@@ -13,16 +13,11 @@ header h1{font-family:var(--f-display);font-size:26px;margin:0 0 6px}
 .fld.nomad{grid-column:1/-1}
 .lab{font-size:12.5px;font-weight:600;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
 .lab b{color:var(--accent);font-variant-numeric:tabular-nums}
-.opt{text-transform:none;font-weight:500;color:var(--muted);opacity:.8}
 .fld input[type=number]{font-family:var(--f-mono);font-size:16px;padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--sunk);color:var(--fg);width:100%;box-sizing:border-box}
 .fld input:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
 .fld small{font-size:11.5px;line-height:1.4;color:var(--muted)}
 .fld small b{color:var(--fg)}
 input[type=range]{accent-color:var(--accent);width:100%}
-.zones{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
-.zones .zlab{font-size:12px;color:var(--muted);align-self:center;margin-right:2px}
-.zbtn{font-family:var(--f-body);font-size:12.5px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--sunk);color:var(--fg);cursor:pointer}
-.zbtn:hover{border-color:var(--accent);color:var(--accent)}
 
 /* result head + verdict */
 .head{font-size:13px;color:var(--muted);margin-bottom:10px}
@@ -55,12 +50,7 @@ input[type=range]{accent-color:var(--accent);width:100%}
 .ex p{margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
 .ex .eff{color:var(--fg)}
 .ex .get{display:block;margin-top:3px;font-size:12px}
-.fx{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-.fx h3{font-family:var(--f-display);font-size:14px;margin:0 0 8px}
-.fx .row{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:4px 0;border-bottom:1px dashed var(--line);font-size:13px}
-.fx .row span{color:var(--muted)}
-.fx code{font-family:var(--f-mono);font-size:12.5px;color:var(--accent);text-align:right}
-.fx p{font-size:12.5px;line-height:1.5;color:var(--muted);margin:10px 0 0}
+.note{font-size:11.5px;line-height:1.45;color:var(--muted);margin:14px 0 0;text-align:center}
 .foot{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
 .foot a{color:var(--accent)}
 
