@@ -89,10 +89,9 @@ function render(){
   const by=new Map();ROWS.filter(x=>!S.hideR.includes(x.m.r)).forEach(x=>{if(!by.has(x.m))by.set(x.m,[]);by.get(x.m).push(x)});
   by.forEach((list,m)=>{let zs=list.map(r=>({r,b:bestFor(r)})).sort((x,y)=>y.b.eff-x.b.eff);
     // best zone only: skip limited-time zones unless the mineral only drops there
-    // Abyssal Depth is left out unless the mineral drops nowhere else
+    // Abyssal Depth is a normal always-open zone; only The Void and event islands count as limited
     if(minQ&&!nameHit(m.n))zs=[];
     if(zoneQ)zs=zs.filter(z=>z.r.loc.toLowerCase().includes(q));
-    else{const na=zs.filter(z=>!/Abyssal Depth/i.test(z.r.loc));if(na.length)zs=na}
     // limited-time zones (The Void and event islands) go to the bottom, and best-zone mode only picks them when there's nothing else
     {const reg=zs.filter(z=>!LTD.test(z.r.loc)),ltd=zs.filter(z=>LTD.test(z.r.loc));zs=reg.concat(ltd);if(best)zs=(reg.length?reg:ltd).slice(0,1)}
     if(zs.length)by.set(m,zs);else by.delete(m)});
