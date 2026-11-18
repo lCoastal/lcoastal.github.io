@@ -18,7 +18,7 @@
 .pchip i{font-style:normal;font-weight:700;background:var(--accent);color:var(--accent-fg,#fff);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px}
 /* can afford to lose */
 .lose{display:flex;flex-direction:column;gap:6px;margin:2px 0 0}
-.lrow{display:grid;grid-template-columns:92px 1fr 64px auto;gap:8px;align-items:center;font-size:13px}
+.lrow{display:grid;grid-template-columns:92px 1fr 64px 58px;gap:8px;align-items:center;font-size:13px}
 .lrow .ls{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lrow .lrng{width:100%;accent-color:var(--accent);min-width:0}
 .lrow .lnum{width:100%;box-sizing:border-box;font-family:var(--f-mono);padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--sunk);color:var(--fg);font-size:12.5px}
