@@ -7,7 +7,7 @@ const MINS=P.mins.filter(m=>m.mu&&m.mu.b);const MIN=Object.fromEntries(MINS.map(
 const MODS=P.mods;const MOD=Object.fromEntries(MODS.map(m=>[m[0],m]));
 const MA=(n,u)=>{try{return window.parent.ptModAllowed(n,u)}catch(e){return true}};
 const MO=n=>{try{return window.parent.ptModOnly(n)}catch(e){return null}};
-const r4=v=>Math.round(v*10000)/10000,fxT=v=>r4(1+v)+"×",sg=v=>(v<0?"−":"+")+r4(Math.abs(v));
+const r4=v=>Math.round(v*10000)/10000,fxT=v=>r4(1+v)+"×",sg=v=>(v<0?"−":"+")+r4(Math.abs(v)),arr=v=>(v>0?"↑":"↓")+" "+r4(Math.abs(v));
 const ic=n=>{const m=MIN[String(n).toLowerCase()];return m&&m.ic?`<img src="${m.ic}" alt="">`:""};
 const rc=r=>"var(--c-"+r.toLowerCase()+")";
 // what one display gives: the mineral's museum boost plus its modifier on every stat that modifier touches
@@ -162,7 +162,7 @@ function placed(b,picks){// put the new minerals in the displays where the same 
     for(let i=0;i<SLOTS[r];i++)if(!out[i])out[i]=nw.length?(x=>({m:x.n,u:x.u}))(nw.shift()):{m:null,u:"None"};nb[r]=out});return nb}
 const mineHTML=(n,u)=>n?`<span class="mn mlink" data-mineral="${esc(n)}" title="Open ${esc(n)}">${ic(n)}<span>${esc(n)}<small>${esc(u||"None")}</small></span></span>`:'<span class="mn"><span>Empty</span></span>';
 function statTable(a,b2){const rows=STATS.map((s,i)=>[s,a[i],b2[i]]).filter(([,x,y])=>Math.abs(x)>1e-9||Math.abs(y)>1e-9);
-  return `<table class="t"><tr><th>Stat</th><th>Now</th><th>After</th><th>Change</th></tr>${rows.map(([s,x,y])=>{const d=y-x,z=Math.abs(d)<1e-9;return `<tr><td>${s}</td><td>${fxT(x)}</td><td>${fxT(y)}</td><td class="${z?"same":d>0?"up":"down"}">${z?"same":sg(d)}</td></tr>`}).join("")}</table>`}
+  return `<table class="t"><tr><th>Stat</th><th>Now</th><th>After</th><th>Change</th></tr>${rows.map(([s,x,y])=>{const d=y-x,z=Math.abs(d)<1e-9;return `<tr><td>${s}</td><td>${fxT(x)}</td><td>${fxT(y)}</td><td class="${z?"same":d>0?"up":"down"}">${z?"same":arr(d)}</td></tr>`}).join("")}</table>`}
 let NEWB=null;
 function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
   const proof=res.done?"Every combination was checked, so this is the best possible."
@@ -188,7 +188,7 @@ function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
     // only real gains: what it adds has to be more than what it takes away (no even swaps like -0.5 Luck for +0.5 Size Boost)
     const net=d.reduce((a,x)=>a+x,0);if(v>1e-9&&net>1e-6)T.push({r,i,s,op,d,v})})}));
   T.sort((x,y)=>y.v-x.v);const seen=new Set(),from={},top=[];for(const t of T){const k=t.r+t.i;if(seen.has(t.op.n)||(from[k]||0)>=2)continue;seen.add(t.op.n);from[k]=(from[k]||0)+1;top.push(t);if(top.length>=8)break}
-  const fxl=d=>STATS.map((s,i)=>Math.abs(d[i])>1e-9?`<span class="${d[i]>0?"up":"down"}">${s} ${sg(d[i])}</span>`:"").filter(Boolean).join(" · ");
+  const fxl=d=>STATS.map((s,i)=>Math.abs(d[i])>1e-9?`<span class="${d[i]>0?"up":"down"}">${s} ${arr(d[i])}</span>`:"").filter(Boolean).join(" · ");
   o.innerHTML=`<div class="verdict"><div><b>${res.done?"Your museum can't be improved":"No improvement found"}</b><span>${res.done?"Nothing beats it without lowering at least one stat, with the modifiers and minerals you allowed.":proof}</span></div></div>
     ${top.length?`<h3 class="sec">Best trades if you're happy to lose a little</h3><p class="hint">One display changed at a time, and each adds more stats in total than it takes away. Ranked by ${S.goal==="all"?"total gain (every stat counted by how much it grows)":S.goal==="have"?"total gain in the stats your museum boosts":S.goal}.</p><div class="acts" style="margin-top:0"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="swaps" style="margin-top:6px">${top.map(t=>`<div class="trade" style="--rc:${rc(t.r)}"><div class="top"><span class="rr">${t.r}</span>${mineHTML(t.s.m,t.s.u)}<span class="ar">→</span>${mineHTML(t.op.n,t.op.u)}</div><div class="fx">${fxl(t.d)}</div></div>`).join("")}</div>`:'<p class="hint" style="margin-top:10px">No single swap gains more than it loses either.</p>'}`;
   const ib=document.getElementById("toImg");if(ib)ib.onclick=()=>ptSaveImg("Museum trades",()=>resultImage({ok:false,top}))}
@@ -200,7 +200,7 @@ function fit(c,t,max){t=String(t);if(c.measureText(t).width<=max)return t;while(
 async function resultImage(o){try{await document.fonts.ready}catch(e){}
   const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
   const W=1100,PAD=36,RH=64,rows=o.ok?o.ch:o.top;const stats=o.ok?STATS.map((s,i)=>[s,o.cur[i],o.nt[i]]).filter(([,a,b])=>Math.abs(a)>1e-9||Math.abs(b)>1e-9):[];
-  const BW=(W-PAD*2-40)/2,CW=(BW-16)/3,CH=56,BAND=24+CH+12,BOARDS=o.ok&&o.before&&o.after?36+40+ORDER.length*BAND:0;
+  const CW=(W-PAD*2-16)/3,CH=78,BAND=24+CH+14,BOARDS=o.ok&&o.before&&o.after?36+34+ORDER.length*BAND:0;
   const H=PAD+110+28+Math.max(1,rows.length)*(RH+(o.ok?8:26))+(o.ok?52+stats.length*34:0)+BOARDS+40;
   const cv=document.createElement("canvas"),sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
@@ -219,29 +219,33 @@ async function resultImage(o){try{await document.fonts.ready}catch(e){}
     c.fillStyle="#1c2126";rr(c,PAD,y,W-PAD*2,h,10);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,PAD,y,W-PAD*2,h,10);c.stroke();c.fillStyle=col;rr(c,PAD,y,5,h,3);c.fill();
     c.fillStyle=col;c.font=`700 12px ${F}`;c.fillText(r.toUpperCase(),PAD+18,y+RH/2+4);
     await mineral(was.m,was.u,PAD+150,y,true);c.fillStyle="#98a2ad";c.font=`20px ${F}`;c.fillText("→",PAD+150+half+4,y+RH/2+7);await mineral(now.m,now.u,PAD+150+half+40,y,false);
-    if(!o.ok){let x=PAD+150;c.font=`12.5px ${FM}`;STATS.forEach((s,i)=>{const d=t.d[i];if(Math.abs(d)<1e-9)return;const txt=`${s} ${sg(d)}`;c.fillStyle=d>0?"#3cc2a8":"#ef7a66";c.fillText(txt,x,y+RH+8);x+=c.measureText(txt).width+18})}
+    if(!o.ok){let x=PAD+150;c.font=`12.5px ${FM}`;STATS.forEach((s,i)=>{const d=t.d[i];if(Math.abs(d)<1e-9)return;const txt=`${s} ${arr(d)}`;c.fillStyle=d>0?"#3cc2a8":"#ef7a66";c.fillText(txt,x,y+RH+8);x+=c.measureText(txt).width+18})}
     y+=h+8}
   if(o.ok){y+=18;c.fillStyle="#98a2ad";c.font=`600 12px ${F}`;c.fillText("WHAT IT DOES",PAD,y);y+=10;
     const cx=[PAD+14,W-PAD-330,W-PAD-200,W-PAD-14];
     c.fillStyle="#98a2ad";c.font=`600 11px ${F}`;[["NOW",1],["AFTER",2],["CHANGE",3]].forEach(([t,i])=>c.fillText(t,cx[i]-c.measureText(t).width,y+2));y+=12;
     stats.forEach(([s,a,b],k)=>{const yy=y+k*34;c.fillStyle=k%2?"#171b1f":"#1c2126";rr(c,PAD,yy,W-PAD*2,30,6);c.fill();
       c.fillStyle="#e6e9ec";c.font=`14px ${F}`;c.fillText(s,cx[0],yy+20);c.font=`14px ${FM}`;c.fillStyle="#b9c2cb";
-      const ra=(t,x)=>c.fillText(t,x-c.measureText(t).width,yy+20);ra(fxT(a),cx[1]);ra(fxT(b),cx[2]);const d=b-a,z=Math.abs(d)<1e-9;c.fillStyle=z?"#98a2ad":d>0?"#3cc2a8":"#ef7a66";c.font=`600 14px ${FM}`;ra(z?"same":sg(d),cx[3])});
+      const ra=(t,x)=>c.fillText(t,x-c.measureText(t).width,yy+20);ra(fxT(a),cx[1]);ra(fxT(b),cx[2]);const d=b-a,z=Math.abs(d)<1e-9;c.fillStyle=z?"#98a2ad":d>0?"#3cc2a8":"#ef7a66";c.font=`600 14px ${FM}`;ra(z?"same":arr(d),cx[3])});
     y+=stats.length*34}
   // both museums side by side, one row per rarity, so the same displays line up
-  if(BOARDS){y+=36;const colX=[PAD,PAD+BW+40],top0=y;
-    [["Your museum","A",o.before],["Improved","B",o.after]].forEach(([n,t],j)=>{const x=colX[j];c.fillStyle="#3cc2a8";rr(c,x,y,28,28,7);c.fill();c.fillStyle="#14181c";c.font=`700 15px ${FD}`;c.fillText(t,x+14-c.measureText(t).width/2,y+20);c.fillStyle="#e6e9ec";c.font=`700 19px ${FD}`;c.fillText(n,x+40,y+21)});
-    y+=40;
+  // one result board: kept ore in white, a replacement in green with the ore it replaced small and red beneath
+  if(BOARDS){y+=36;
+    c.font=`700 19px ${FD}`;const tw=c.measureText("Improved museum").width;c.fillStyle="#e6e9ec";c.fillText("Improved museum",PAD,y+16);
+    let lx=PAD+tw+26;c.font=`600 12px ${F}`;[["#e6e9ec","kept"],["#3cc2a8","new"],["#ef7a66","replaced"]].forEach(([cl,lab])=>{c.fillStyle=cl;c.beginPath();c.arc(lx+4,y+11,4,0,Math.PI*2);c.fill();c.fillStyle="#98a2ad";c.fillText(lab,lx+13,y+15);lx+=13+c.measureText(lab).width+18});
+    y+=34;
     for(const r of ORDER){const col=IMGC[r];
-      for(let j=0;j<2;j++){const x=colX[j],bd=j?o.after:o.before;c.fillStyle=col;c.font=`700 11.5px ${F}`;c.fillText(r.toUpperCase(),x,y+12);c.globalAlpha=.55;c.fillRect(x,y+17,BW,2);c.globalAlpha=1;
-        for(let i=0;i<SLOTS[r];i++){const sl=(bd[r]||[])[i]||{m:null,u:"None"},sx=x+i*(CW+8),sy=y+24;
-          c.fillStyle="#1c2126";rr(c,sx,sy,CW,CH,9);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,sx,sy,CW,CH,9);c.stroke();c.fillStyle=col;rr(c,sx,sy,CW,3,2);c.fill();
-          if(!sl.m){c.fillStyle="#5d6670";c.font=`italic 13px ${F}`;c.fillText("Empty",sx+12,sy+CH/2+5);continue}
-          const m=MIN[String(sl.m).toLowerCase()];let tx=sx+10;if(m&&m.ic){const im=await loadImg(m.ic);if(im)c.drawImage(im,sx+7,sy+10,38,38);tx=sx+50}
-          c.fillStyle="#e6e9ec";let fs=13.5;c.font=`700 ${fs}px ${FD}`;while(fs>10.5&&c.measureText(sl.m).width>CW-(tx-sx)-8){fs-=.5;c.font=`700 ${fs}px ${FD}`}c.fillText(fit(c,sl.m,CW-(tx-sx)-8),tx,sy+26);
-          const u=sl.u||"None";c.fillStyle=u!=="None"?"#3cc2a8":"#98a2ad";c.font=`600 10.5px ${F}`;c.fillText(fit(c,u.toUpperCase(),CW-(tx-sx)-8),tx,sy+42)}}
-      y+=BAND}
-    const sx=PAD+BW+20;c.strokeStyle="#3cc2a8";c.globalAlpha=.45;c.lineWidth=2;c.setLineDash([6,6]);c.beginPath();c.moveTo(sx,top0-4);c.lineTo(sx,y-8);c.stroke();c.setLineDash([]);c.globalAlpha=1}
+      c.fillStyle=col;c.font=`700 11.5px ${F}`;c.fillText(r.toUpperCase(),PAD,y+12);c.globalAlpha=.55;c.fillRect(PAD,y+17,W-PAD*2,2);c.globalAlpha=1;
+      for(let i=0;i<SLOTS[r];i++){const af=(o.after[r]||[])[i]||{m:null,u:"None"},bf=(o.before[r]||[])[i]||{m:null,u:"None"},
+          changed=(bf.m||null)!==(af.m||null)||((bf.u||"None")!==(af.u||"None")),sx=PAD+i*(CW+8),sy=y+24;
+        c.fillStyle="#1c2126";rr(c,sx,sy,CW,CH,10);c.fill();c.strokeStyle=changed?"rgba(60,194,168,.5)":"#2d343b";c.lineWidth=changed?1.5:1;rr(c,sx,sy,CW,CH,10);c.stroke();c.fillStyle=col;rr(c,sx,sy,CW,3,2);c.fill();
+        if(!af.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText("Empty",sx+14,sy+CH/2+5);continue}
+        const m=MIN[String(af.m).toLowerCase()];let tx=sx+12;if(m&&m.ic){const im=await loadImg(m.ic);if(im)c.drawImage(im,sx+10,sy+(changed?12:18),42,42);tx=sx+60}
+        const ny=changed?sy+26:sy+30;
+        c.fillStyle=changed?"#3cc2a8":"#e6e9ec";let fs=15;c.font=`700 ${fs}px ${FD}`;while(fs>11&&c.measureText(af.m).width>CW-(tx-sx)-12){fs-=.5;c.font=`700 ${fs}px ${FD}`}c.fillText(fit(c,af.m,CW-(tx-sx)-12),tx,ny);
+        const u=af.u||"None";c.fillStyle=u!=="None"?(changed?"#7fb0a6":"#3cc2a8"):"#98a2ad";c.font=`600 11px ${F}`;c.fillText(fit(c,u.toUpperCase(),CW-(tx-sx)-12),tx,ny+16);
+        if(changed){c.fillStyle="#ef7a66";c.font=`600 11.5px ${F}`;const ow="was "+(bf.m?bf.m+(bf.u&&bf.u!=="None"?" ("+bf.u+")":""):"empty");c.fillText(fit(c,ow,CW-(tx-sx)-12),tx,ny+34)}}
+      y+=BAND}}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 drawInputs();
 window.addEventListener("storage",()=>drawInputs());window.ptStoreChanged=()=>{};
