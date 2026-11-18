@@ -216,7 +216,7 @@ const loadImg=src=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerr
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
 function fit(c,t,max){t=String(t);if(c.measureText(t).width<=max)return t;while(t.length>1&&c.measureText(t+"…").width>max)t=t.slice(0,-1);return t+"…"}
 async function resultImage(o){try{await document.fonts.ready}catch(e){}
-  const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
+  const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace',GRN="#46d67f";
   const W=1100,PAD=36,RH=64,rows=o.ok?o.ch:o.top;const stats=o.ok?STATS.map((s,i)=>[s,o.cur[i],o.nt[i]]).filter(([,a,b])=>Math.abs(a)>1e-9||Math.abs(b)>1e-9):[];
   const CW=(W-PAD*2-16)/3,CH=78,BAND=24+CH+14,BOARDS=o.ok&&o.before&&o.after?36+34+ORDER.length*BAND:0;
   const H=PAD+110+28+Math.max(1,rows.length)*(RH+(o.ok?8:26))+(o.ok?52+stats.length*34:0)+BOARDS+40;
@@ -238,20 +238,20 @@ async function resultImage(o){try{await document.fonts.ready}catch(e){}
     c.fillStyle="#1c2126";rr(c,PAD,y,W-PAD*2,h,10);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,PAD,y,W-PAD*2,h,10);c.stroke();c.fillStyle=col;rr(c,PAD,y,5,h,3);c.fill();
     c.fillStyle=col;c.font=`700 12px ${F}`;c.fillText(r.toUpperCase(),PAD+18,y+RH/2+4);
     await mineral(was.m,was.u,PAD+150,y,true);c.fillStyle="#98a2ad";c.font=`20px ${F}`;c.fillText("→",PAD+150+half+4,y+RH/2+7);await mineral(now.m,now.u,PAD+150+half+40,y,false);
-    if(!o.ok){let x=PAD+150;c.font=`12.5px ${FM}`;STATS.forEach((s,i)=>{const d=t.d[i];if(Math.abs(d)<1e-9)return;const txt=`${s} ${arr(d)}`;c.fillStyle=d>0?"#3cc2a8":"#ef7a66";c.fillText(txt,x,y+RH+8);x+=c.measureText(txt).width+18})}
+    if(!o.ok){let x=PAD+150;c.font=`12.5px ${FM}`;STATS.forEach((s,i)=>{const d=t.d[i];if(Math.abs(d)<1e-9)return;const txt=`${s} ${arr(d)}`;c.fillStyle=d>0?GRN:"#ef7a66";c.fillText(txt,x,y+RH+8);x+=c.measureText(txt).width+18})}
     y+=h+8}
   if(o.ok){y+=18;c.fillStyle="#98a2ad";c.font=`600 12px ${F}`;c.fillText("WHAT IT DOES",PAD,y);y+=10;
     const cx=[PAD+14,W-PAD-330,W-PAD-200,W-PAD-14];
     c.fillStyle="#98a2ad";c.font=`600 11px ${F}`;[["NOW",1],["AFTER",2],["CHANGE",3]].forEach(([t,i])=>c.fillText(t,cx[i]-c.measureText(t).width,y+2));y+=12;
     stats.forEach(([s,a,b],k)=>{const yy=y+k*34;c.fillStyle=k%2?"#171b1f":"#1c2126";rr(c,PAD,yy,W-PAD*2,30,6);c.fill();
       c.fillStyle="#e6e9ec";c.font=`14px ${F}`;c.fillText(s,cx[0],yy+20);c.font=`14px ${FM}`;c.fillStyle="#b9c2cb";
-      const ra=(t,x)=>c.fillText(t,x-c.measureText(t).width,yy+20);ra(fxT(a),cx[1]);ra(fxT(b),cx[2]);const d=b-a,z=Math.abs(d)<1e-9;c.fillStyle=z?"#e6e9ec":d>0?"#3cc2a8":"#ef7a66";c.font=`600 14px ${FM}`;ra(z?"=":arr(d),cx[3])});
+      const ra=(t,x)=>c.fillText(t,x-c.measureText(t).width,yy+20);ra(fxT(a),cx[1]);ra(fxT(b),cx[2]);const d=b-a,z=Math.abs(d)<1e-9;c.fillStyle=z?"#e6e9ec":d>0?GRN:"#ef7a66";c.font=`600 14px ${FM}`;ra(z?"=":arr(d),cx[3])});
     y+=stats.length*34}
   // both museums side by side, one row per rarity, so the same displays line up
   // one result board: kept ore in white, a replacement in green with the ore it replaced small and red beneath
   if(BOARDS){y+=36;
     c.font=`700 19px ${FD}`;const tw=c.measureText("Improved museum").width;c.fillStyle="#e6e9ec";c.fillText("Improved museum",PAD,y+16);
-    let lx=PAD+tw+26;c.font=`600 12px ${F}`;[["#e6e9ec","kept"],["#3cc2a8","new"],["#ef7a66","replaced"]].forEach(([cl,lab])=>{c.fillStyle=cl;c.beginPath();c.arc(lx+4,y+11,4,0,Math.PI*2);c.fill();c.fillStyle="#98a2ad";c.fillText(lab,lx+13,y+15);lx+=13+c.measureText(lab).width+18});
+    let lx=PAD+tw+26;c.font=`600 12px ${F}`;[["#e6e9ec","kept"],[GRN,"new"],["#ef7a66","replaced"]].forEach(([cl,lab])=>{c.fillStyle=cl;c.beginPath();c.arc(lx+4,y+11,4,0,Math.PI*2);c.fill();c.fillStyle="#98a2ad";c.fillText(lab,lx+13,y+15);lx+=13+c.measureText(lab).width+18});
     y+=34;
     for(const r of ORDER){const col=IMGC[r];
       c.fillStyle=col;c.font=`700 11.5px ${F}`;c.fillText(r.toUpperCase(),PAD,y+12);c.globalAlpha=.55;c.fillRect(PAD,y+17,W-PAD*2,2);c.globalAlpha=1;
@@ -261,7 +261,7 @@ async function resultImage(o){try{await document.fonts.ready}catch(e){}
         if(!af.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText("Empty",sx+14,sy+CH/2+5);continue}
         const m=MIN[String(af.m).toLowerCase()];let tx=sx+12;if(m&&m.ic){const im=await loadImg(m.ic);if(im)c.drawImage(im,sx+10,sy+(changed?12:18),42,42);tx=sx+60}
         const ny=changed?sy+26:sy+30;
-        c.fillStyle=changed?"#3cc2a8":"#e6e9ec";let fs=15;c.font=`700 ${fs}px ${FD}`;while(fs>11&&c.measureText(af.m).width>CW-(tx-sx)-12){fs-=.5;c.font=`700 ${fs}px ${FD}`}c.fillText(fit(c,af.m,CW-(tx-sx)-12),tx,ny);
+        c.fillStyle=changed?GRN:"#e6e9ec";let fs=15;c.font=`700 ${fs}px ${FD}`;while(fs>11&&c.measureText(af.m).width>CW-(tx-sx)-12){fs-=.5;c.font=`700 ${fs}px ${FD}`}c.fillText(fit(c,af.m,CW-(tx-sx)-12),tx,ny);
         const u=af.u||"None";c.fillStyle=u!=="None"?(changed?"#7fb0a6":"#3cc2a8"):"#98a2ad";c.font=`600 11px ${F}`;c.fillText(fit(c,u.toUpperCase(),CW-(tx-sx)-12),tx,ny+16);
         if(changed){c.fillStyle="#ef7a66";c.font=`600 11.5px ${F}`;const ow="was "+(bf.m?bf.m+(bf.u&&bf.u!=="None"?" ("+bf.u+")":""):"empty");c.fillText(fit(c,ow,CW-(tx-sx)-12),tx,ny+34)}}
       y+=BAND}}
