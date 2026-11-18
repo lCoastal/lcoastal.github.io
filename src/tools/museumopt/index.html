@@ -12,7 +12,7 @@
 <div class="wrap">
   <header>
     <h1>Museum Improver</h1>
-    <p class="lede">Checks every combination of minerals and modifiers for a museum that's better than yours without lowering any stat.<br>If there is one, it lists the swaps. If not, it shows the trades worth making. Values assume each mineral is at its max-boost weight.</p>
+    <p class="lede">Checks every combination of minerals and modifiers for a museum that beats yours. By default nothing drops, but you can prioritise the stats you care about and allow others to fall.<br>If there's a better setup it lists the swaps. If not, it shows the trades worth making. Values assume each mineral is at its max-boost weight.</p>
   </header>
   <div class="split">
     <div class="col">
@@ -31,8 +31,12 @@
         <div class="chips" id="skips"></div>
       </section>
       <section class="card"><h2>What counts as better</h2>
-        <label class="fld"><span class="lab">Goal</span><select id="goal"></select></label>
-        <p class="hint">Every stat has to stay the same or go up. Among those museums, this picks the one with the most gain: every stat counted by how much it grows compared to what you have, or one stat first.</p>
+        <span class="lab">Prioritise &mdash; click in order</span>
+        <div class="prio" id="prio"></div>
+        <p class="hint">It maxes out your first pick, then the next, and so on. Leave empty to improve every stat your museum boosts, evenly.</p>
+        <span class="lab" style="display:block;margin-top:6px">Can afford to lose</span>
+        <div class="lose" id="lose"></div>
+        <p class="hint">By default nothing drops. Allow a stat to fall by up to the amount you set to unlock bigger gains elsewhere.</p>
         <button type="button" class="btn pri" id="go">Find improvements</button>
       </section>
     </div>
@@ -44,7 +48,7 @@
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
       <li><b>Your totals are the floor.</b> It adds up your museum the same way the Museum Planner does (each mineral's boost plus its modifier, at max-boost weight). A new museum has to reach every one of those totals.</li>
       <li><b>What's allowed.</b> Only the modifiers you ticked, with the game's rules: Treasured only on treasure-chest and tomb minerals, Entombed only on tomb minerals, Feather of Ma'at always Treasured. Minerals you marked as not having are left out. Whatever is on your board now always counts as possible.</li>
-      <li><b>What "better" means.</b> Every stat counts by how much it grows compared to what you have, so +0.1 on a small stat counts more than +0.1 on a big one. You can change this under Goal. Keeping minerals you already have gets a tiny bonus, so it never swaps more than it needs to.</li>
+      <li><b>What "better" means.</b> Every stat counts by how much it grows compared to what you have, so +0.1 on a small stat counts more than +0.1 on a big one. Prioritise to rank which stats matter, and use Can afford to lose to let a stat drop. Keeping minerals you already have gets a tiny bonus, so it never swaps more than it needs to.</li>
       <li><b>Cutting the search down.</b> Options that can never win are dropped first: a modifier that's beaten by another on the same mineral, a mineral beaten by at least as many others as that rarity has displays, and any set of minerals for a rarity that another set beats on everything.</li>
       <li><b>The search.</b> It then picks one set per rarity with an exact optimiser: it works out the best any museum could possibly do, splits the problem into smaller cases, and skips any case that can't beat the best museum found so far. When nothing is left to check, the answer is proven best. This usually takes under a second.</li>
       <li><b>No improvement?</b> Then it tries every single swap, one display at a time, and lists the ones with the biggest overall gain together with what each one costs.</li>

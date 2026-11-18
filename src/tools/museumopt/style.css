@@ -7,9 +7,23 @@
 #paste{width:100%;box-sizing:border-box;font:13px/1.5 var(--f-mono);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);color:var(--fg);resize:vertical}
 .hint{font-size:12.5px;color:var(--muted);margin:0}
 .ck{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer}
-.ck input{width:16px;height:16px;accent-color:var(--accent)}
+.ck input{width:16px;height:16px;accent-color:var(--accent);flex:none}
 .mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px 12px}
 .mods small{color:var(--muted);font-size:11.5px}
+/* prioritise chips */
+.prio{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 0}
+.pchip{font:600 12.5px var(--f-body);padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--sunk);color:var(--fg);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pchip:hover{border-color:var(--accent)}
+.pchip.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+.pchip i{font-style:normal;font-weight:700;background:var(--accent);color:var(--accent-fg,#fff);border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:10px}
+/* can afford to lose */
+.lose{display:flex;flex-direction:column;gap:6px;margin:2px 0 0}
+.lrow{display:grid;grid-template-columns:92px 1fr 64px auto;gap:8px;align-items:center;font-size:13px}
+.lrow .ls{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lrow .lrng{width:100%;accent-color:var(--accent);min-width:0}
+.lrow .lnum{width:100%;box-sizing:border-box;font-family:var(--f-mono);padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--sunk);color:var(--fg);font-size:12.5px}
+.lrow .lmax{color:var(--muted);font-family:var(--f-mono);font-size:11.5px;white-space:nowrap}
+@media(max-width:560px){.lrow{grid-template-columns:76px 1fr 56px}.lrow .lmax{display:none}}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips:empty{display:none}
 .cur{display:flex;flex-wrap:wrap;gap:6px}

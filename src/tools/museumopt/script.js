@@ -100,8 +100,11 @@ function solveMuseum(J){const t0=Date.now(),K=10,EPS=1e-12;
   if(res.best&&res.best.pick){out.picks={};res.best.pick.forEach((j,gi)=>out.picks[J.order[gi]]=cols[j].pick)}
   return out}
 // ================= page =================
-let S={src:"A",paste:"",mods:["None","Perfect","Treasured","Entombed"],own:false,skip:[],goal:"have"};
+let S={src:"A",paste:"",mods:["None","Perfect","Treasured","Entombed"],own:false,skip:[],priority:[],lose:{}};
 try{Object.assign(S,JSON.parse(localStorage.getItem("mo-s")||"{}"))}catch(e){}
+if(!Array.isArray(S.priority))S.priority=[];if(!S.lose||typeof S.lose!=="object")S.lose={};
+if(S.goal&&STATS.includes(S.goal)&&!S.priority.length)S.priority=[S.goal];delete S.goal;
+S.priority=S.priority.filter(s=>STATS.includes(s));
 const save=()=>{try{localStorage.setItem("mo-s",JSON.stringify(S))}catch(e){}};
 const getLS=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch(e){return null}};
 const validBoard=b=>b&&ORDER.every(r=>Array.isArray(b[r]));
@@ -121,15 +124,24 @@ function drawInputs(){const so=sources();if(!so.some(x=>x[0]===S.src))S.src="A";
   $("pasteBox").hidden=S.src!=="paste";$("paste").value=S.paste;
   $("mods").innerHTML=MODS.map(m=>`<label class="ck"><input type="checkbox" data-mod="${esc(m[0])}"${S.mods.includes(m[0])?" checked":""}><span>${m[0]==="None"?"No modifier":esc(m[0])}${m[1].length?` <small>${esc(m[1].join(", "))}${m[2]>1?" ×"+m[2]:""}</small>`:""}</span></label>`).join("");
   $("ownOnly").checked=!!S.own;
-  $("goal").innerHTML=`<option value="have">The stats your museum boosts, by how much they grow</option><option value="all">Every stat, by how much it grows</option>`+STATS.map(s=>`<option value="${s}"${S.goal===s?" selected":""}>${s} first</option>`).join("");$("goal").value=S.goal;
   $("skips").innerHTML=S.skip.map(n=>`<button type="button" class="chip" data-unskip="${esc(n)}" title="Put ${esc(n)} back">${esc(n)} ✕</button>`).join("");
   const b=curBoard(),t=b&&totalsOf(b);
+  // priority chips (click order = rank)
+  $("prio").innerHTML=STATS.map(s=>{const idx=S.priority.indexOf(s);return `<button type="button" class="pchip${idx>=0?" on":""}" data-stat="${esc(s)}">${idx>=0?`<i>${idx+1}</i>`:""}${esc(s)}</button>`}).join("");
+  // can-afford-to-lose sliders, one per boosted stat, flat value 0..current
+  const boosted=STATS.map((s,i)=>[s,i]).filter(([,i])=>t&&Math.abs(t[i])>1e-9);
+  $("lose").innerHTML=boosted.length?boosted.map(([s,i])=>{const mx=r4(Math.max(0,t[i])),val=r4(Math.max(0,Math.min(mx,+(S.lose[s]||0))));
+    return `<div class="lrow" data-stat="${esc(s)}"><span class="ls">${esc(s)}</span><input type="range" class="lrng" min="0" max="${mx}" step="any" value="${val}" aria-label="${esc(s)} you can lose"><input type="number" class="lnum" min="0" max="${mx}" step="any" value="${val||""}" placeholder="0"><span class="lmax">/ ${mx}</span></div>`}).join(""):`<p class="hint" style="margin:0">Fill your museum to set loss limits.</p>`;
   $("curSum").innerHTML=b&&filled(b)?STATS.map((s,i)=>Math.abs(t[i])>1e-9?`<span>${s} <b>${fxT(t[i])}</b></span>`:"").join("")+`<span>${filled(b)} of 18 displays</span>`:`<p class="hint">${S.src==="paste"?"Paste a setup above.":"That museum is empty. Fill it in the Museum Planner first."}</p>`}
 $("src").onchange=e=>{S.src=e.target.value;save();drawInputs()};
 $("paste").oninput=e=>{S.paste=e.target.value;save();drawInputs()};
 $("mods").addEventListener("change",e=>{const m=e.target.dataset.mod;if(!m)return;S.mods=e.target.checked?[...new Set([...S.mods,m])]:S.mods.filter(x=>x!==m);save()});
 $("ownOnly").onchange=e=>{S.own=e.target.checked;save()};
-$("goal").onchange=e=>{S.goal=e.target.value;save()};
+$("prio").addEventListener("click",e=>{const btn=e.target.closest("[data-stat]");if(!btn)return;const s=btn.dataset.stat,i=S.priority.indexOf(s);if(i>=0)S.priority.splice(i,1);else S.priority.push(s);save();drawInputs()});
+$("lose").addEventListener("input",e=>{const row=e.target.closest(".lrow");if(!row)return;const s=row.dataset.stat,mx=+e.target.max||0;let v=Math.max(0,Math.min(mx,+e.target.value||0));
+  if(+e.target.value>mx)e.target.value=mx;
+  const rng=row.querySelector(".lrng"),num=row.querySelector(".lnum");if(e.target===rng)num.value=v||"";else rng.value=v;
+  if(v>0)S.lose[s]=v;else delete S.lose[s];save()});
 $("skips").addEventListener("click",e=>{const b=e.target.closest("[data-unskip]");if(!b)return;S.skip=S.skip.filter(x=>x!==b.dataset.unskip);save();drawInputs()});
 makeAC({inp:$("skipIn"),free:true,items:MINS.filter(m=>m.mu).map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),pick:x=>{if(!S.skip.includes(x.n))S.skip.push(x.n);$("skipIn").value="";save();drawInputs()}});
 
@@ -143,8 +155,13 @@ let LAST=null;
 $("go").onclick=async()=>{const b=curBoard();if(!b||!filled(b)){$("out").innerHTML='<p class="hint">That museum is empty. Fill it in the Museum Planner or paste a setup first.</p>';return}
   const cur=totalsOf(b);const own=(()=>{try{return window.parent.ptStore.all()}catch(e){return {}}})();
   const onBoard=new Set();ORDER.forEach(r=>(b[r]||[]).forEach(s=>s&&s.m&&onBoard.add(s.m)));
-  // how much each stat counts: by how much it grows compared to now; stats outside the goal only break ties
-  const W=STATS.map((s,i)=>{const base=1/(1+Math.max(0,cur[i]));if(S.goal==="all")return base;if(S.goal==="have")return Math.abs(cur[i])>1e-9?base:base*.01;return S.goal===s?base*1000:base*.01});
+  // priority queue -> tiered weights (first pick dominates, then the next…); empty queue improves every boosted stat evenly
+  const PQ=S.priority.filter(s=>STATS.includes(s));
+  const W=STATS.map((s,i)=>{const base=1/(1+Math.max(0,cur[i]));const idx=PQ.indexOf(s);
+    if(idx>=0)return base*Math.pow(100,Math.min(4,PQ.length-1-idx));
+    return PQ.length?base*.01:(Math.abs(cur[i])>1e-9?base:base*.01)});
+  // can-afford-to-lose: drop each stat's floor by the amount set (flat, clamped to its current value)
+  const need=cur.map((v,k)=>{const lose=Math.max(0,Math.min(Math.max(0,v),+(S.lose[STATS[k]]||0)));return v-lose});
   const opts={};ORDER.forEach(r=>{opts[r]=[];MINS.filter(m=>m.r===r).forEach(m=>{
       if(!onBoard.has(m.n)&&(S.skip.includes(m.n)||(S.own&&!(own[m.n]||{}).own)))return;
       const only=MO(m.n);const mods=only?[only]:S.mods.filter(u=>MOD[u]&&MA(m.n,u));
@@ -153,7 +170,7 @@ $("go").onclick=async()=>{const b=curBoard();if(!b||!filled(b)){$("out").innerHT
       mods.forEach(u=>opts[r].push({n:m.n,u,g:gainOf(r,{m:m.n,u}),keep:ORDER.some(rr=>(b[rr]||[]).some(s=>s&&s.m===m.n&&(s.u||"None")===u))}))})});
   const KB=1e-5,curVal=cur.reduce((a,v,i)=>a+v*W[i],0)+KB*filled(b);
   $("out").innerHTML='<div class="busy"><div class="spin"></div>Checking every combination…</div>';$("go").disabled=true;
-  const res=await runSearch({opts,slots:SLOTS,order:ORDER,need:cur,W,keepBonus:KB,start:{z:curVal+1e-6,pick:null},ms:9000});
+  const res=await runSearch({opts,slots:SLOTS,order:ORDER,need,W,keepBonus:KB,start:{z:curVal+1e-6,pick:null},ms:9000});
   $("go").disabled=false;LAST={b,cur,res,W,opts};show();if(window.innerWidth<880)$("out").scrollIntoView({behavior:"smooth",block:"start"})};
 
 function placed(b,picks){// put the new minerals in the displays where the same mineral already is, the rest in order
@@ -170,8 +187,9 @@ function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
     :"With this many modifiers ticked it only checked the strongest options for each rarity, so this is very likely but not proven best. Untick modifiers you don't need for a full check.";
   if(res.picks){NEWB=placed(b,res.picks);const nt=totalsOf(NEWB);
     const ch=[];ORDER.forEach(r=>NEWB[r].forEach((s,i)=>{const was=(b[r]||[])[i]||{m:null,u:"None"};if(was.m!==s.m||(was.u||"None")!==(s.u||"None"))ch.push({r,was,s})}));
-    const up=STATS.filter((s,i)=>nt[i]>cur[i]+1e-9).length;
-    o.innerHTML=`<div class="verdict yes"><div><b>Yes, it can be improved</b><span>${ch.length} swap${ch.length===1?"":"s"} raise ${up} stat${up===1?"":"s"} without lowering any. ${proof}</span></div></div>
+    const up=STATS.filter((s,i)=>nt[i]>cur[i]+1e-9).length,down=STATS.filter((s,i)=>nt[i]<cur[i]-1e-9).length;
+    const gist=down?`raise ${up} stat${up===1?"":"s"} and lower ${down} you allowed to drop`:`raise ${up} stat${up===1?"":"s"} without lowering any`;
+    o.innerHTML=`<div class="verdict yes"><div><b>Yes, it can be improved</b><span>${ch.length} swap${ch.length===1?"":"s"} ${gist}. ${proof}</span></div></div>
       <h3 class="sec">Swaps</h3><div class="swaps">${ch.map(c=>`<div class="sw" style="--rc:${rc(c.r)}"><span class="rr">${c.r}</span><span class="old">${mineHTML(c.was.m,c.was.u)}</span><span class="ar">→</span>${mineHTML(c.s.m,c.s.u)}</div>`).join("")}</div>
       <h3 class="sec">What it does</h3>${statTable(cur,nt)}
       <div class="acts"><button type="button" class="btn pri" id="toCmp">Compare in the Museum Planner</button><button type="button" class="btn" id="toPl">Open in the Museum Planner</button><button type="button" class="btn" id="cpTxt">Copy as text</button><button type="button" class="btn" id="toImg">Save as image</button></div>`;
@@ -190,7 +208,7 @@ function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
   T.sort((x,y)=>y.v-x.v);const seen=new Set(),from={},top=[];for(const t of T){const k=t.r+t.i;if(seen.has(t.op.n)||(from[k]||0)>=2)continue;seen.add(t.op.n);from[k]=(from[k]||0)+1;top.push(t);if(top.length>=8)break}
   const fxl=d=>STATS.map((s,i)=>Math.abs(d[i])>1e-9?`<span class="${d[i]>0?"up":"down"}">${s} ${arr(d[i])}</span>`:"").filter(Boolean).join(" · ");
   o.innerHTML=`<div class="verdict"><div><b>${res.done?"Your museum can't be improved":"No improvement found"}</b><span>${res.done?"Nothing beats it without lowering at least one stat, with the modifiers and minerals you allowed.":proof}</span></div></div>
-    ${top.length?`<h3 class="sec">Best trades if you're happy to lose a little</h3><p class="hint">One display changed at a time, and each adds more stats in total than it takes away. Ranked by ${S.goal==="all"?"total gain (every stat counted by how much it grows)":S.goal==="have"?"total gain in the stats your museum boosts":S.goal}.</p><div class="acts" style="margin-top:0"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="swaps" style="margin-top:6px">${top.map(t=>`<div class="trade" style="--rc:${rc(t.r)}"><div class="top"><span class="rr">${t.r}</span>${mineHTML(t.s.m,t.s.u)}<span class="ar">→</span>${mineHTML(t.op.n,t.op.u)}</div><div class="fx">${fxl(t.d)}</div></div>`).join("")}</div>`:'<p class="hint" style="margin-top:10px">No single swap gains more than it loses either.</p>'}`;
+    ${top.length?`<h3 class="sec">Best trades if you're happy to lose a little</h3><p class="hint">One display changed at a time, and each adds more stats in total than it takes away. Ranked by ${S.priority.length?"your priorities (top: "+esc(S.priority[0])+")":"total gain in the stats your museum boosts"}.</p><div class="acts" style="margin-top:0"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="swaps" style="margin-top:6px">${top.map(t=>`<div class="trade" style="--rc:${rc(t.r)}"><div class="top"><span class="rr">${t.r}</span>${mineHTML(t.s.m,t.s.u)}<span class="ar">→</span>${mineHTML(t.op.n,t.op.u)}</div><div class="fx">${fxl(t.d)}</div></div>`).join("")}</div>`:'<p class="hint" style="margin-top:10px">No single swap gains more than it loses either.</p>'}`;
   const ib=document.getElementById("toImg");if(ib)ib.onclick=()=>ptSaveImg("Museum trades",()=>resultImage({ok:false,top}))}
 // ---- the result as a picture (drawn in the dark style; the toolkit maps colours to your theme) ----
 const IMGC={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6"};
@@ -207,7 +225,8 @@ async function resultImage(o){try{await document.fonts.ready}catch(e){}
   c.fillStyle="#98a2ad";c.font=`600 12px ${F}`;c.fillText("MUSEUM IMPROVER",PAD,PAD+8);
   c.fillStyle=o.ok?"#3cc2a8":"#e6e9ec";c.font=`700 32px ${FD}`;c.fillText(o.ok?"Yes, it can be improved":"Can't be improved",PAD,PAD+44);
   c.fillStyle="#98a2ad";c.font=`14px ${F}`;
-  const sub=o.ok?`${o.ch.length} swap${o.ch.length===1?"":"s"} raise ${STATS.filter((s,i)=>o.nt[i]>o.cur[i]+1e-9).length} stats without lowering any`:"Nothing beats it without lowering a stat. Best trades if you're happy to lose a little:";
+  const upN=o.ok?STATS.filter((s,i)=>o.nt[i]>o.cur[i]+1e-9).length:0,dnN=o.ok?STATS.filter((s,i)=>o.nt[i]<o.cur[i]-1e-9).length:0;
+  const sub=o.ok?`${o.ch.length} swap${o.ch.length===1?"":"s"} raise ${upN} stat${upN===1?"":"s"}${dnN?` and lower ${dnN} you allowed`:" without lowering any"}`:"Nothing beats it without lowering a stat. Best trades if you're happy to lose a little:";
   c.fillText(fit(c,sub,W-PAD*2-200),PAD,PAD+72);
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();
   let y=PAD+110;c.fillStyle="#98a2ad";c.font=`600 12px ${F}`;c.fillText(o.ok?"SWAPS":"BEST TRADES",PAD,y);y+=14;
