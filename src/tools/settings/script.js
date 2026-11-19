@@ -6,10 +6,7 @@ const UN=[["Qi",1e18],["Qa",1e15],["T",1e12],["B",1e9],["M",1e6]];
 const sh=(n,d)=>{for(const [u,x] of UN)if(n>=x){let v=(n/x).toFixed(d);if(v.includes("."))v=v.replace(/0+$/,"").replace(/\.$/,"");return v+u}return n.toLocaleString("en-US")};
 const ACC=(()=>{try{return PW.PT_ACCENTS}catch(e){return null}})()||{teal:["Teal","#0f7c6b","#3cc2a8"]};
 document.getElementById("acc").innerHTML=Object.entries(ACC).map(([k,[n,l,d]])=>`<button type="button" class="swb" role="radio" data-a="${k}" style="--l:${l};--d:${d}" aria-label="${n}" title="${n}"></button>`).join("");
-const FNT=(()=>{try{return PW.PT_FONTS}catch(e){return null}})()||{default:["Default",'"Chakra Petch"','"IBM Plex Sans"',""]};
-document.getElementById("fnt").innerHTML=Object.entries(FNT).map(([k,[n,h]])=>`<button type="button" class="fb" role="radio" data-f="${k}"><b style="font-family:${h.replace(/"/g,"'")},system-ui,sans-serif">Aa</b><span>${n}</span></button>`).join("");
 function draw(){const c=get();
-  document.querySelectorAll("#fnt [data-f]").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.f===(c.font&&FNT[c.font]?c.font:"default"))));
   document.querySelectorAll("#imgm [data-m]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===(c.img||"save"))));
   document.querySelectorAll("#thm [data-t]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.t===(c.theme||"auto"))));
   document.querySelectorAll("#acc [data-a]").forEach(b=>b.setAttribute("aria-checked",String(b.dataset.a===(c.accent||"teal"))));
@@ -46,8 +43,7 @@ document.addEventListener("click",e=>{const s=e.target.closest(".sw[data-k]");if
   const r=e.target.closest("#rec [data-r]");if(r){set("recent",+r.dataset.r);return}
   const im=e.target.closest("#imgm [data-m]");if(im){set("img",im.dataset.m);return}
   const t=e.target.closest("#thm [data-t]");if(t){set("theme",t.dataset.t);return}
-  const a=e.target.closest("#acc [data-a]");if(a){set("accent",a.dataset.a);return}
-  const fo=e.target.closest("#fnt [data-f]");if(fo)set("font",fo.dataset.f)});
+  const a=e.target.closest("#acc [data-a]");if(a)set("accent",a.dataset.a)});
 draw();
 
 // your stats, shared with every calculator

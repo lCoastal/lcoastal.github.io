@@ -6,14 +6,6 @@ function ptFrameInit() {
     P.ptInstallImgTheme && P.ptInstallImgTheme(window);
   } catch (e) {}
   try {
-    if (P.ptLookCSS) {
-      var lk = document.createElement("style");
-      lk.id = "pt-look";
-      lk.textContent = P.ptLookCSS();
-      (document.head || document.documentElement).appendChild(lk);
-    }
-  } catch (e) {}
-  try {
     if (P.ptAccentCSS) {
       var acs = document.createElement("style");
       acs.id = "pt-acc";
