@@ -19,7 +19,7 @@
   <section class="card pick">
     <div class="grid">
       <label class="fld"><span class="lab">Item</span><input id="item" type="search" placeholder="Type an item, e.g. Vortex Ring" aria-label="Item to craft"></label>
-      <label class="fld"><span class="lab">Size Boost <span class="opt">optional</span></span><input type="number" id="sb" min="0" inputmode="numeric" placeholder="e.g. 1515"><small>As a number (1,515% = 1515). Used to check a target weight is reachable.</small></label>
+      <label class="fld"><span class="lab">Size Boost <span class="opt">optional</span></span><input type="number" id="sb" min="0" inputmode="numeric" placeholder="e.g. 1515"><small>As a number (1,515% = 1515). Used to estimate whether a target weight is reachable.</small></label>
     </div>
   </section>
 
@@ -44,8 +44,8 @@
       <div class="row"><span>5★ needs</span><code>Σ (W × M − MW) ÷ QS ≥ 4 × N</code></div>
       <div class="row"><span>One ore at 5★</span><code>W = (MW + 4 × QS) ÷ M</code></div>
       <div class="row"><span>Lightest fix</span><code>W = (R × QS + MW) ÷ 24</code></div>
-      <div class="row"><span>Max reachable weight</span><code>15.5 × base weight × (1 + size boost ÷ 100)</code></div>
-      <p>W = ore weight (kg) · M = modifier multiplier · MW = minimum weight · QS = quality step · N = ores in the recipe · R = quality still missing.</p>
+      <div class="row"><span>Max weight (guess)</span><code>about 15.5 × base weight × (1 + size boost ÷ 100)</code></div>
+      <p>W = ore weight (kg) · M = modifier multiplier · MW = minimum weight · QS = quality step · N = ores in the recipe · R = quality still missing. The max weight is an estimate that isn't proven yet, so treat it as a rough guide.</p>
     </div>
   </section>
   <p class="foot">Last edited 19/11/26 · Made by @__coastal</p>
