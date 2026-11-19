@@ -53,7 +53,7 @@ window.ptSetSetting = (k, v) => {
         } catch (e) {}
       });
     if (k === "theme") applyTheme();
-    if (k === "accent") {
+    if (k === "accent" || k === "font") {
       ptAccentInto(document);
       [...Object.values(frames), pop].forEach((f) => {
         try {
