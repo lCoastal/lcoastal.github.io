@@ -9,7 +9,6 @@
   --muted: #5d6670;
   --line: #d6dbe0;
   --accent: #0f7c6b;
-  --gold: #a87400;
   --accent-fg: #ffffff;
   --scrim: rgba(20, 24, 28, 0.4);
   --f-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
@@ -23,7 +22,6 @@
     --muted: #98a2ad;
     --line: #2d343b;
     --accent: #3cc2a8;
-    --gold: #e0b04a;
     --accent-fg: #0d1f1b;
     --scrim: rgba(0, 0, 0, 0.6);
     color-scheme: dark;
@@ -36,7 +34,6 @@
   --muted: #98a2ad;
   --line: #2d343b;
   --accent: #3cc2a8;
-  --gold: #e0b04a;
   --accent-fg: #0d1f1b;
   --scrim: rgba(0, 0, 0, 0.6);
   color-scheme: dark;
@@ -817,7 +814,7 @@ main iframe {
   bottom: 9px;
   width: 3px;
   border-radius: 3px;
-  background: var(--gold);
+  background: var(--accent);
 }
 @media (prefers-reduced-motion: no-preference) {
   .drawer {
@@ -829,27 +826,4 @@ main iframe {
       opacity: 0.6;
     }
   }
-}
-
-/* logo next to the toolkit name */
-.logo {
-  flex: none;
-  width: 30px;
-  height: 30px;
-  display: block;
-}
-.logo .rim {
-  fill: none;
-  stroke: var(--gold);
-  stroke-width: 2.2;
-}
-.logo .nug {
-  fill: var(--gold);
-}
-.logo .hi {
-  fill: #fff;
-  opacity: 0.4;
-}
-.brand small {
-  color: color-mix(in srgb, var(--gold) 70%, var(--muted));
 }
