@@ -19,6 +19,15 @@ Wmax = 15.5 × B × (1 + S)`,
 ["Weight","Minimum Size Boost for a weight",
 `S = W ÷ (15.5 × B) − 1`,
 "S = Size Boost you need, as a number (×100 for %, so 18.35 = 1,835%) · W = the weight you want (kg) · B = the mineral's base weight (kg). With the Solar Magnifier use W ÷ 1.5 instead of W."],
+["Museum","Museum display boost at a weight",
+`boost = Bmax × (W ÷ Kmax)^0.42`,
+"boost = the stat boost the display gives · Bmax = its max boost (the mineral page shows \"max boost at X kg\") · Kmax = that X kg · W = the piece's weight (kg). Boost caps at Bmax once W reaches Kmax, and the game shows it rounded down to 2 decimals."],
+["Museum","Weight for a target display boost",
+`W = Kmax × (target ÷ Bmax)^2.38`,
+"W = weight (kg) you need · target = the boost you want · Bmax = the display's max boost · Kmax = the weight for max boost. The boost curve above, solved for weight."],
+["Museum","Share of max boost at a weight",
+`part = (W ÷ Kmax)^0.42`,
+"part = how much of the max boost you get (×100 for %) · W = the piece's weight (kg) · Kmax = the weight for max boost. Same for every mineral, so half the max-boost weight already gives about 75%."],
 ];
 const box=f=>`<button type="button" class="box" data-copy="${esc(f)}" title="Click to copy"><span class="cp">Copy</span>${esc(f)}</button>`;
 let q="";
