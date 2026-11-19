@@ -41,10 +41,8 @@ const starStr=s=>'<span class="stars">'+'&#9733;'.repeat(s)+'<span class="off">'
 function buildMats(){ensureOres();const r=REC[S.item]||[];const o=S.ores[S.item];
   const opt=cur=>MODLIST.map(m=>`<option value="${esc(m)}"${m===cur?" selected":""}>${esc(m)}${MODS[m]!==1?` ×${MODS[m]}`:""}</option>`).join("");
   $("mats").innerHTML=r.map(([mat,n,mw,qs])=>{const a=o[mat];const bw=BW[mat],mx=maxW(mat);
-    const ref=`One ore hits 5&#9733; at <b>${fmt(w5(mw,qs,1),2)} kg</b> plain${MODS.Perfect?` &middot; <b>${fmt(w5(mw,qs,MODS.Perfect),3)} kg</b> Perfect`:""}`;
     const rows=a.map((e,i)=>`<div class="orow"><input type="number" class="ow" data-mat="${esc(mat)}" data-i="${i}" min="0" step="any" value="${e.w!==""&&e.w!=null?esc(String(e.w)):""}" placeholder="kg" inputmode="decimal"><select class="ou" data-mat="${esc(mat)}" data-i="${i}">${opt(e.u||"None")}</select><span class="oq" id="q-${esc(mat)}-${i}"></span></div>`).join("");
     return `<section class="card mat"><div class="mhd"><h2>${MIC[mat]?`<img class="mic" src="${MIC[mat]}" alt="">`:""}${esc(mat)} <span class="xn">&times;${n}</span></h2><div class="mmeta">step ${fmt(qs,2)} kg${mw>0?` &middot; min ${fmt(mw,2)} kg`:""}${bw?` &middot; base ${bw} kg`:""}${mx?` &middot; your max ~${fmt(mx,1)} kg`:""}</div></div>
-      <p class="ref">${ref}</p>
       ${n>1?`<div class="fillall"><input type="number" class="faw" data-mat="${esc(mat)}" min="0" step="any" placeholder="kg" inputmode="decimal"><select class="fau" data-mat="${esc(mat)}">${opt("None")}</select><button type="button" class="fab" data-mat="${esc(mat)}">Fill all ${n}</button></div>`:""}
       <div class="orows">${rows}</div></section>`}).join("");
 }
