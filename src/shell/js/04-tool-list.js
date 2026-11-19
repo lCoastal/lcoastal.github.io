@@ -5,7 +5,7 @@ const LIST = [
   { id: "minerals", name: "Minerals", desc: "Value, drop rates, recipes and museum boost" },
   { id: "locations", name: "Locations", desc: "Toughness, NPCs and every mineral that drops there" },
   { id: "eqload", name: "Equipment Loadouts", desc: "Rings, necklace and charm laid out like in game, with totals" },
-  { id: "craft5", name: "5-Star Crafter", desc: "Enter your ores and see your star rating and what you need for 5-star" },
+  { id: "craftquality", name: "5-Star Crafter", desc: "Enter your ores and see your star rating and what you need for 5-star" },
   { id: "odds", name: "Luck Odds", desc: "Estimated chances per pan with your luck" },
   { id: "bestcap", name: "Best Luck Cap", desc: "The luck cap that finds each mineral most often, zone by zone" },
   { id: "weightrange", name: "Weight Range", desc: "Lightest, typical and heaviest weight of a mineral" },

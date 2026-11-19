@@ -19,11 +19,14 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !drawer.hidden) closeMenu();
 });
 drawRecent();
+const OLD_IDS = { craft5: "craftquality" };
 window.addEventListener("hashchange", () => {
-  const id = location.hash.slice(1);
+  const h = location.hash.slice(1);
+  const id = OLD_IDS[h] || h;
   if (TOOLS[id]) show(id);
 });
 let start = location.hash.slice(1);
+start = OLD_IDS[start] || start;
 if (!TOOLS[start]) {
   try {
     start = localStorage.getItem("pt-tool") || "builds";

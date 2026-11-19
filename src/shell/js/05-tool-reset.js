@@ -21,7 +21,7 @@ const PT_RESET = {
   buildcmp: { keys: ["pt-bcmp"] },
   dredge: { keys: ["pt-dredge"] },
   eqload: { keys: ["pt-eqload"] },
-  craft5: { keys: ["c5-s"] },
+  craftquality: { keys: ["c5-s"] },
   museumfind: { keys: ["pmf-s"] },
   museumopt: { keys: ["mo-s"] },
   quests: { keys: ["pq-f"], what: "filters (your ticked quests stay)" },
