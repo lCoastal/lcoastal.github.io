@@ -35,6 +35,7 @@
       <li>Every ore you put in gets a quality score from its weight and modifier. The item's star rating comes from the average quality of all its ores, so one great ore can make up for weaker ones.</li>
       <li>A modifier multiplies the ore's weight before quality is worked out. Perfect counts as ×24, so a small Perfect ore can be worth more than a big plain one.</li>
       <li>Each ore type has its own minimum weight and quality step per recipe. Heavier base-weight ores can grow bigger, so they reach high quality more easily.</li>
+      <li>Clicking a star under "Auto-fill for" fills in the lightest weights that reach that rating, plus a little extra (about 0.05 average quality) to be safe. Every ore of a material gets the same size compared to its base weight, so heavier base-weight ores carry more of the load, and rarer ores (lower drop chance) are kept lighter since you'll have fewer to choose from. The modifiers you've already picked are kept and counted, and the estimated max weight is respected where it can be.</li>
       <li>"Lightest fix" is the single Perfect ore that closes the whole gap on its own, picked from whichever material needs the least weight.</li>
     </ul>
     <div class="fx">

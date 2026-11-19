@@ -4,7 +4,8 @@ const C=P.craft||{rec:{},mods:{None:1}};
 const REC=C.rec, MODS=C.mods;
 const ITEMS=Object.keys(REC).sort((a,b)=>a.localeCompare(b));
 const MODLIST=Object.entries(MODS).sort((a,b)=>a[1]-b[1]||a[0].localeCompare(b[0])).map(([k])=>k); // weakest first (None=1)
-const BW={},MIC={};P.mins.forEach(m=>{if(m.bw)BW[m.n]=m.bw;if(m.ic)MIC[m.n]=m.ic});
+const BW={},MIC={},DR={};P.mins.forEach(m=>{if(m.bw)BW[m.n]=m.bw;if(m.ic)MIC[m.n]=m.ic;
+  const c=(m.ch||[]).map(x=>parseFloat(String(x[1]).replace(/,/g,""))/100).filter(v=>v>0);if(c.length)DR[m.n]=Math.max(...c)});
 const EQ={};(P.equip||[]).forEach(x=>{EQ[x.n]=x});
 const eqImg=n=>{const x=EQ[n];return x&&x.img?(P.eimg||{})[x.img]||"":""};
 const M=u=>MODS[u]||1;
@@ -36,6 +37,28 @@ function compute(){const r=REC[S.item]||[];const o=ensureOres();
   const remaining=Math.max(0,4*totalN-sumD);
   return {r,totalN,sumD,avgQ,stars,remaining,perMat}}
 
+// Auto-fill for a target star rating. Every ore of a material gets the same size (weight ÷ base weight);
+// rarer materials are kept smaller since you have fewer to pick from. Modifiers you already chose are kept.
+const PAD=0.05; // aim this much above the target average Q
+const ceilTo=(v,d)=>{const f=10**d;return Math.ceil(v*f-1e-9)/f};
+function plan(T){const r=REC[S.item]||[];const o=ensureOres();
+  const pmax=Math.max(0,...r.map(([m])=>DR[m]||0));
+  const mats=r.map(([mat,n,mw,qs])=>{const bw=BW[mat]||1,p=DR[mat];
+    const f=p&&pmax?1/(1+0.15*Math.log10(pmax/p)):1;
+    return {mat,n,mw,qs,bw,f,mx:maxW(mat),ms:o[mat].map(e=>M(e.u)),floor:mw>0?mw:0.01}});
+  const N=mats.reduce((t,m)=>t+m.n,0);
+  const need=(T-1+(T>1?PAD:0))*N;
+  const wOf=(m,k,cap)=>{let w=Math.max(m.floor,k*m.bw*m.f);if(cap&&m.mx)w=Math.min(w,Math.max(m.floor,m.mx));return w};
+  const tot=(k,cap)=>mats.reduce((t,m)=>{const w=wOf(m,k,cap);return t+m.ms.reduce((u,mm)=>u+(w*mm-m.mw)/m.qs,0)},0);
+  const solve=cap=>{let lo=0,hi=1;while(tot(hi,cap)<need&&hi<1e9)hi*=2;if(tot(hi,cap)<need)return null;
+    for(let i=0;i<80;i++){const md=(lo+hi)/2;if(tot(md,cap)>=need)hi=md;else lo=md}return hi};
+  let k=solve(true),over=false;if(k==null){k=solve(false);over=true}
+  if(k==null)return null;
+  const out=mats.map(m=>{const w=wOf(m,k,!over);const d=w<1?3:2;return {mat:m.mat,w:ceilTo(w,d),mx:m.mx}});
+  out.forEach(x=>o[x.mat].forEach(e=>{e.w=String(x.w)}));
+  return {T,over:over&&out.some(x=>x.mx&&x.w>x.mx+1e-9)}}
+let lastPlan=null;
+
 const starStr=s=>'<span class="stars">'+'&#9733;'.repeat(s)+'<span class="off">'+'&#9733;'.repeat(5-s)+'</span></span>';
 
 function buildMats(){ensureOres();const r=REC[S.item]||[];const o=S.ores[S.item];
@@ -66,21 +89,26 @@ function refresh(){const o=compute();
     if(bp&&bp.feasible===false)tip+=` <span class="warn">That's above the estimated max weight (~${fmt(bp.mx,1)} kg, not confirmed), so it might not be reachable. Spreading the gap across several ores is safer.</span>`;
     body=`<div class="vlow"><b>${starStr(o.stars)} ${o.stars}-star right now</b><span>Average quality Q ${fmt(o.avgQ,2)} — 5&#9733; needs 5.00. You're short <b>${fmt(o.remaining,2)}</b> total quality across ${o.totalN} ores.</span><p class="tip">${tip}${bp&&bp.feasible===false?"":" Or spread it over several ores — heavier or better-modified ores make up for lighter ones."}</p></div>`;
   }
-  $("verdict").innerHTML=body;
+  const pk=`<div class="pick5"><span>Auto-fill for</span><span class="sp" role="group" aria-label="Fill weights for a star rating">${[1,2,3,4,5].map(i=>`<button type="button" data-t="${i}"${lastPlan&&i<=lastPlan.T?' class="on"':""} aria-label="${i} star${i>1?"s":""}" title="Fill the lightest weights for ${i}&#9733;">&#9733;</button>`).join("")}</span>${lastPlan?`<small>Filled for ${lastPlan.T}&#9733; with a little to spare, using your modifiers. Heavier base-weight ores carry more, rarer ores are kept lighter.${lastPlan.over?` <span class="warn">Some weights are above the estimated max, so they might not be reachable.</span>`:""}</small>`:`<small>Click a star to fill in weights that reach it.</small>`}</div>`;
+  $("verdict").innerHTML=body+pk;
 }
+
+$("verdict").addEventListener("click",e=>{const b=e.target.closest(".sp button");if(!b)return;
+  const res=plan(+b.dataset.t);if(!res)return;lastPlan=res;save();buildMats();refresh()});
+$("mats").addEventListener("input",()=>{lastPlan=null},true);
 
 // item picker
 makeAC({inp:$("item"),items:ITEMS.map(n=>{const x=EQ[n];return {n,tag:x?(x.r+" "+(x.slot||"")).trim():"",ic:eqImg(n),col:x?rc(x.r):""}}),
-  cur:()=>S.item,icon:()=>eqImg(S.item),pick:x=>{S.item=x.n;save();buildMats();refresh()}});
+  cur:()=>S.item,icon:()=>eqImg(S.item),pick:x=>{S.item=x.n;lastPlan=null;save();buildMats();refresh()}});
 $("sb").value=S.sb;
-$("sb").addEventListener("input",e=>{S.sb=e.target.value;save();buildMats();refresh()});
+$("sb").addEventListener("input",e=>{S.sb=e.target.value;lastPlan=null;save();buildMats();refresh()});
 
 $("mats").addEventListener("input",e=>{const t=e.target;
   if(t.classList.contains("ow")){const{mat,i}=t.dataset;ensureOres();S.ores[S.item][mat][+i].w=t.value;save();refresh()}
   else if(t.classList.contains("ou")){const{mat,i}=t.dataset;ensureOres();S.ores[S.item][mat][+i].u=t.value;save();refresh()}
 });
 $("mats").addEventListener("change",e=>{const t=e.target;if(t.classList.contains("ou")){const{mat,i}=t.dataset;ensureOres();S.ores[S.item][mat][+i].u=t.value;save();refresh()}});
-$("mats").addEventListener("click",e=>{const b=e.target.closest(".fab");if(!b)return;const mat=b.dataset.mat;const card=b.closest(".mat");
+$("mats").addEventListener("click",e=>{const b=e.target.closest(".fab");if(!b)return;lastPlan=null;const mat=b.dataset.mat;const card=b.closest(".mat");
   const w=card.querySelector(".faw").value,u=card.querySelector(".fau").value;ensureOres();
   S.ores[S.item][mat].forEach(o=>{o.w=w;o.u=u});save();buildMats();refresh()});
 
