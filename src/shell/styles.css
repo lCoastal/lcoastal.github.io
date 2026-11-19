@@ -853,17 +853,3 @@ main iframe {
 .brand small {
   color: color-mix(in srgb, var(--gold) 70%, var(--muted));
 }
-@supports (corner-shape: bevel) {
-  *,
-  *::before,
-  *::after {
-    corner-shape: bevel;
-  }
-  .srch .mag,
-  .sbtn .mag,
-  .rx,
-  .nav.cmpt .sw,
-  .nav.cmpt .sw::after {
-    corner-shape: round;
-  }
-}
