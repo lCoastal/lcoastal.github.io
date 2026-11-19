@@ -72,3 +72,9 @@ td.pk,th.pk{width:30px;padding-left:8px!important;padding-right:0!important;vert
 .imgname input.custom{color:var(--fg);border-color:var(--accent)}
 .imgname input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .imgname + .chip.img{margin-left:0}
+
+/* name, boosts and weight share one baseline; the icon centres on that line */
+td,td.n{vertical-align:baseline}
+.mn{display:inline;white-space:nowrap}
+.mn img{display:inline-block;vertical-align:middle;margin:0 8px 0 0}
+td.pk{vertical-align:baseline}

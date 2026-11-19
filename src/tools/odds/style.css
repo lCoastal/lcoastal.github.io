@@ -71,3 +71,7 @@ table.o .up{color:var(--accent)}
 .simi.new{animation:simp .9s ease-out}
 @keyframes simp{0%{box-shadow:0 0 0 0 var(--rc)}100%{box-shadow:0 0 0 8px transparent}}
 @media (prefers-reduced-motion:reduce){.simi.new{animation:none}}
+
+/* line the numbers up with the mineral name, not the middle of the row */
+table.o td{vertical-align:baseline}
+.mn>span{align-self:baseline}

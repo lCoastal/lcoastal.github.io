@@ -251,7 +251,8 @@ main iframe {
   position: absolute;
   left: 11px;
   top: 50%;
-  transform: translateY(-50%);
+  /* the handle hangs below the circle, so lift the whole glyph a little to look centred */
+  transform: translateY(calc(-50% - 2px));
   width: 14px;
   height: 14px;
   border: 2px solid var(--muted);

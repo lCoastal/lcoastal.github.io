@@ -41,3 +41,6 @@ table.o .off td{opacity:.45}
 .tr.fl{color:var(--muted)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tr.up{color:#5fd39a}}
 :root[data-theme="dark"] .tr.up{color:#5fd39a}
+
+/* line the numbers up with the mineral name, not the middle of the row */
+table.o td{vertical-align:baseline}

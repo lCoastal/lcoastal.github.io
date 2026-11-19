@@ -117,3 +117,8 @@ table.mst td{border:0!important;padding:1px 0 1px 8px!important;text-align:right
 table.mst td:first-child{text-align:left;padding-left:0!important;font-family:var(--f-body);white-space:normal}
 table.mst td.neg{color:var(--neg)}table.mst td.na{color:var(--muted)}
 table.mst tr.hl td{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+
+/* line every cell up on the first line of text, not the middle of the row */
+table.eq td{vertical-align:baseline;padding-top:9px}
+table.eq td.ic{vertical-align:top;padding-top:6px}
+.rec span{align-items:baseline}.rec span img{align-self:center}

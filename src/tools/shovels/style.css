@@ -140,3 +140,7 @@ table.cmpt .dn{color:var(--neg)}
 .mobsort{display:none;gap:6px;align-items:center;flex-wrap:wrap}
 .mobsort select{font:inherit;color:inherit;padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:var(--sunk)}
 @media (prefers-reduced-motion:no-preference){.page{animation:pop .15s ease-out}@keyframes pop{from{transform:translateY(10px);opacity:.6}}}
+
+/* line every cell up on the item name, not the middle of the row */
+table.gear td{vertical-align:baseline;padding-top:9px}
+table.gear td.ic{vertical-align:middle;padding-top:0}
