@@ -14,6 +14,13 @@ window.ptAccentCSS = () => {
     D = `--accent:${a[2]};--accent-fg:#101418`;
   return `:root:root{${L}}@media (prefers-color-scheme:dark){:root:root:not([data-theme="light"]){${D}}}:root:root[data-theme="dark"]{${D}}`;
 };
+// the toolkit's own look, added to every tool page: gold title marker, rarity-tinted icons, cut corners
+window.ptLookCSS = () =>
+  ':root{--gold:#a87400}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--gold:#e0b04a}}:root[data-theme="dark"]{--gold:#e0b04a}' +
+  '.wrap>header h1::before{content:"";display:inline-block;width:.36em;height:.36em;margin:0 .42em .14em .06em;background:var(--gold);transform:rotate(45deg);vertical-align:middle;box-shadow:0 0 10px color-mix(in srgb,var(--gold) 45%,transparent)}' +
+  '[style*="--rc"] .icon{background:radial-gradient(circle at 50% 58%,color-mix(in srgb,var(--nc,var(--rc)) 24%,transparent),transparent 72%),var(--sunk,rgba(127,127,127,.08));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--nc,var(--rc)) 38%,transparent)}' +
+  "@supports (corner-shape:bevel){*,*::before,*::after{corner-shape:bevel}" +
+  ".rt-num,.rarh i,.sheet .tips li::before,.sheet .runes img,.swc button,.stop .num,.dot,.pchip i,.spin,.sw,.sw::after,.swb{corner-shape:round}}";
 function ptAccentInto(doc) {
   try {
     if (!doc) return;
