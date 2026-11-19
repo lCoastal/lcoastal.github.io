@@ -76,7 +76,7 @@ function refresh(){const o=compute();
   // per-ore Q badges
   o.perMat.forEach(pm=>pm.ores.forEach((or,i)=>{const el=$(`q-${pm.mat}-${i}`);if(!el)return;
     if(or.Q==null){el.className="oq";el.textContent="";return}
-    const q=or.Q;el.textContent=(q>=5?"5★-ready":"Q "+r2(q));el.className="oq "+(q>=5?"good":q>=4?"ok":q>=1?"low":"bad")}));
+    const q=or.Q;el.textContent="Q "+fmt(q,2);el.title="This ore's own quality. The item's stars come from the average of all its ores.";el.className="oq "+(q>=5?"good":q>=4?"ok":q>=1?"low":"bad")}));
   // verdict
   const totEntered=o.perMat.reduce((s,p)=>s+p.filled,0);
   let body;
@@ -87,7 +87,7 @@ function refresh(){const o=compute();
     o.perMat.forEach(pm=>{const w=(o.remaining*pm.qs+pm.mw)/mP;const feasible=pm.mx?w<=pm.mx+1e-9:true;if(!bp||w<bp.w)bp={mat:pm.mat,w,feasible,mx:pm.mx};});
     let tip=bp?`Lightest fix: one <b>Perfect ${esc(bp.mat)}</b> ore of about <b>${fmt(bp.w,bp.w<1?3:2)} kg</b> covers the whole gap (Perfect counts as ×${mP} weight).`:"";
     if(bp&&bp.feasible===false)tip+=` <span class="warn">That's above the estimated max weight (~${fmt(bp.mx,1)} kg, not confirmed), so it might not be reachable. Spreading the gap across several ores is safer.</span>`;
-    body=`<div class="vlow"><b>${starStr(o.stars)} ${o.stars}-star right now</b><span>Average quality Q ${fmt(o.avgQ,2)} — 5&#9733; needs 5.00. You're short <b>${fmt(o.remaining,2)}</b> total quality across ${o.totalN} ores.</span><p class="tip">${tip}${bp&&bp.feasible===false?"":" Or spread it over several ores — heavier or better-modified ores make up for lighter ones."}</p></div>`;
+    body=`<div class="vlow"><b>${starStr(o.stars)} ${o.stars}-star right now</b><span>Average quality Q ${fmt(o.avgQ,2)} — 5&#9733; needs 5.00. You're short <b>${fmt(o.remaining,2)}</b> total quality across ${o.totalN} ores.${totEntered<o.totalN?` <b>${o.totalN-totEntered}</b> ore${o.totalN-totEntered===1?" isn't":"s aren't"} filled in yet and count${o.totalN-totEntered===1?"s":""} as Q 1.`:""}</span><p class="tip">${tip}${bp&&bp.feasible===false?"":" Or spread it over several ores — heavier or better-modified ores make up for lighter ones."}</p></div>`;
   }
   const pk=`<div class="pick5"><span>Auto-fill for</span><span class="sp" role="group" aria-label="Fill weights for a star rating">${[1,2,3,4,5].map(i=>`<button type="button" data-t="${i}"${lastPlan&&i<=lastPlan.T?' class="on"':""} aria-label="${i} star${i>1?"s":""}" title="Fill the lightest weights for ${i}&#9733;">&#9733;</button>`).join("")}</span>${lastPlan?`<small>Filled for ${lastPlan.T}&#9733; with a little to spare, using your modifiers. Heavier base-weight ores carry more, rarer ores are kept lighter.${lastPlan.over?` <span class="warn">Some weights are above the estimated max, so they might not be reachable.</span>`:""}</small>`:`<small>Click a star to fill in weights that reach it.</small>`}</div>`;
   $("verdict").innerHTML=body+pk;
