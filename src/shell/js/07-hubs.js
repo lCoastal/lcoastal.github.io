@@ -61,6 +61,7 @@ const HUBS = [
     [
       ["equipment", "All equipment"],
       ["eqload", "Loadouts"],
+      ["craft5", "5-Star Crafter"],
     ],
   ],
   [

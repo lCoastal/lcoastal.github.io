@@ -1,0 +1,88 @@
+(()=>{
+const $=id=>document.getElementById(id);
+const C=P.craft||{rec:{},mods:{None:1}};
+const REC=C.rec, MODS=C.mods;
+const ITEMS=Object.keys(REC).sort((a,b)=>a.localeCompare(b));
+const MODLIST=Object.entries(MODS).sort((a,b)=>a[1]-b[1]||a[0].localeCompare(b[0])).map(([k])=>k); // weakest first (None=1)
+const BW={};P.mins.forEach(m=>{if(m.bw)BW[m.n]=m.bw});
+const M=u=>MODS[u]||1;
+const r4=v=>Math.round(v*10000)/10000, r2=v=>Math.round(v*100)/100;
+
+let S={item:ITEMS[0],sb:"",ores:{}};
+try{Object.assign(S,JSON.parse(localStorage.getItem("c5-s")||"{}"))}catch(e){}
+if(!REC[S.item])S.item=ITEMS[0];
+if(!S.ores||typeof S.ores!=="object")S.ores={};
+const youPush=ptYouLink(S,{sb:"sb"},()=>{buildMats();refresh()});
+const save=()=>{try{localStorage.setItem("c5-s",JSON.stringify(S))}catch(e){}youPush()};
+
+function ensureOres(){const r=REC[S.item]||[];const o=S.ores[S.item]=S.ores[S.item]||{};
+  r.forEach(([mat,n])=>{const a=o[mat]=o[mat]||[];while(a.length<n)a.push({w:"",u:"None"});if(a.length>n)a.length=n});
+  Object.keys(o).forEach(k=>{if(!r.some(x=>x[0]===k))delete o[k]});
+  return o}
+const maxW=mat=>{const bw=BW[mat];if(!bw)return null;const sb=+S.sb||0;return 15.5*bw*(1+sb/100)};
+const w5=(mw,qs,m)=>(mw+4*qs)/m; // weight one ore needs to hit Q=5 at modifier multiplier m
+
+function compute(){const r=REC[S.item]||[];const o=ensureOres();
+  let totalN=0,sumD=0,perMat=[];
+  for(const [mat,n,mw,qs] of r){totalN+=n;const a=o[mat]||[];let mSum=0,filled=0,ores=[];
+    for(let i=0;i<n;i++){const e=a[i]||{w:"",u:"None"};const w=+e.w||0,mm=M(e.u);
+      if(w>0){const d=(w*mm-mw)/qs;mSum+=d;filled++;ores.push({w,u:e.u,mm,Q:1+d});}
+      else ores.push({w:0,u:e.u,mm,Q:null});}
+    sumD+=mSum;perMat.push({mat,n,mw,qs,filled,ores,mSum,bw:BW[mat],mx:maxW(mat)});}
+  const avgQ=totalN>0?1+sumD/totalN:1;
+  const stars=Math.max(1,Math.min(5,Math.floor(avgQ)));
+  const remaining=Math.max(0,4*totalN-sumD);
+  return {r,totalN,sumD,avgQ,stars,remaining,perMat}}
+
+const starStr=s=>'<span class="stars">'+'&#9733;'.repeat(s)+'<span class="off">'+'&#9733;'.repeat(5-s)+'</span></span>';
+
+function buildMats(){ensureOres();const r=REC[S.item]||[];const o=S.ores[S.item];
+  const opt=cur=>MODLIST.map(m=>`<option value="${esc(m)}"${m===cur?" selected":""}>${esc(m)}${MODS[m]!==1?` ×${MODS[m]}`:""}</option>`).join("");
+  $("mats").innerHTML=r.map(([mat,n,mw,qs])=>{const a=o[mat];const bw=BW[mat],mx=maxW(mat);
+    const ref=`One ore hits 5&#9733; at <b>${fmt(w5(mw,qs,1),2)} kg</b> plain${MODS.Perfect?` &middot; <b>${fmt(w5(mw,qs,MODS.Perfect),3)} kg</b> Perfect`:""}`;
+    const rows=a.map((e,i)=>`<div class="orow"><input type="number" class="ow" data-mat="${esc(mat)}" data-i="${i}" min="0" step="any" value="${e.w!==""&&e.w!=null?esc(String(e.w)):""}" placeholder="kg" inputmode="decimal"><select class="ou" data-mat="${esc(mat)}" data-i="${i}">${opt(e.u||"None")}</select><span class="oq" id="q-${esc(mat)}-${i}"></span></div>`).join("");
+    return `<section class="card mat"><div class="mhd"><h2>${esc(mat)} <span class="xn">&times;${n}</span></h2><div class="mmeta">step ${fmt(qs,2)} kg${mw>0?` &middot; min ${fmt(mw,2)} kg`:""}${bw?` &middot; base ${bw} kg`:""}${mx?` &middot; your max ~${fmt(mx,1)} kg`:""}</div></div>
+      <p class="ref">${ref}</p>
+      ${n>1?`<div class="fillall"><input type="number" class="faw" data-mat="${esc(mat)}" min="0" step="any" placeholder="kg" inputmode="decimal"><select class="fau" data-mat="${esc(mat)}">${opt("None")}</select><button type="button" class="fab" data-mat="${esc(mat)}">Fill all ${n}</button></div>`:""}
+      <div class="orows">${rows}</div></section>`}).join("");
+}
+
+function refresh(){const o=compute();
+  $("rhead").innerHTML=`<b>${esc(S.item)}</b> &middot; ${o.totalN} ore${o.totalN===1?"":"s"} total`;
+  // per-ore Q badges
+  o.perMat.forEach(pm=>pm.ores.forEach((or,i)=>{const el=$(`q-${pm.mat}-${i}`);if(!el)return;
+    if(or.Q==null){el.className="oq";el.textContent="";return}
+    const q=or.Q;el.textContent=(q>=5?"5★-ready":"Q "+r2(q));el.className="oq "+(q>=5?"good":q>=4?"ok":q>=1?"low":"bad")}));
+  // verdict
+  const totEntered=o.perMat.reduce((s,p)=>s+p.filled,0);
+  let body;
+  if(o.remaining<=1e-9){body=`<div class="v5"><b>${starStr(5)} Makes 5-star</b><span>Your ores average Q ${fmt(o.avgQ,2)} — at or above the 5.0 needed. ${totEntered<o.totalN?`(Assuming the ${o.totalN-totEntered} unfilled ore${o.totalN-totEntered===1?"":"s"} are at least minimum weight.)`:""}</span></div>`;}
+  else{
+    // lightest single ore that closes the gap: a Perfect ore of weight (R·QS + MW) / 24, pick the material needing the least
+    const mP=MODS.Perfect||24;let bp=null;
+    o.perMat.forEach(pm=>{const w=(o.remaining*pm.qs+pm.mw)/mP;const feasible=pm.mx?w<=pm.mx+1e-9:true;if(!bp||w<bp.w)bp={mat:pm.mat,w,feasible,mx:pm.mx};});
+    let tip=bp?`Lightest fix: one <b>Perfect ${esc(bp.mat)}</b> ore of about <b>${fmt(bp.w,bp.w<1?3:2)} kg</b> covers the whole gap (Perfect counts as ×${mP} weight).`:"";
+    if(bp&&bp.feasible===false)tip+=` <span class="warn">Even that is above your max reachable weight (~${fmt(bp.mx,1)} kg) — spread the gap across several ores.</span>`;
+    body=`<div class="vlow"><b>${starStr(o.stars)} ${o.stars}-star right now</b><span>Average quality Q ${fmt(o.avgQ,2)} — 5&#9733; needs 5.00. You're short <b>${fmt(o.remaining,2)}</b> total quality across ${o.totalN} ores.</span><p class="tip">${tip} Or spread it over several ores — each material's per-ore 5&#9733; weight is listed below, and heavier/better-modified ores carry lighter ones.</p></div>`;
+  }
+  $("verdict").innerHTML=body;
+}
+
+// item picker
+$("item").innerHTML=ITEMS.map(n=>`<option value="${esc(n)}"${n===S.item?" selected":""}>${esc(n)}</option>`).join("");
+$("item").value=S.item;
+$("item").addEventListener("change",e=>{S.item=e.target.value;save();buildMats();refresh()});
+$("sb").value=S.sb;
+$("sb").addEventListener("input",e=>{S.sb=e.target.value;save();buildMats();refresh()});
+
+$("mats").addEventListener("input",e=>{const t=e.target;
+  if(t.classList.contains("ow")){const{mat,i}=t.dataset;ensureOres();S.ores[S.item][mat][+i].w=t.value;save();refresh()}
+  else if(t.classList.contains("ou")){const{mat,i}=t.dataset;ensureOres();S.ores[S.item][mat][+i].u=t.value;save();refresh()}
+});
+$("mats").addEventListener("change",e=>{const t=e.target;if(t.classList.contains("ou")){const{mat,i}=t.dataset;ensureOres();S.ores[S.item][mat][+i].u=t.value;save();refresh()}});
+$("mats").addEventListener("click",e=>{const b=e.target.closest(".fab");if(!b)return;const mat=b.dataset.mat;const card=b.closest(".mat");
+  const w=card.querySelector(".faw").value,u=card.querySelector(".fau").value;ensureOres();
+  S.ores[S.item][mat].forEach(o=>{o.w=w;o.u=u});save();buildMats();refresh()});
+
+buildMats();refresh();
+})();
