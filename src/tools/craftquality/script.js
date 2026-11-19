@@ -64,7 +64,7 @@ function refresh(){const o=compute();
     o.perMat.forEach(pm=>{const w=(o.remaining*pm.qs+pm.mw)/mP;const feasible=pm.mx?w<=pm.mx+1e-9:true;if(!bp||w<bp.w)bp={mat:pm.mat,w,feasible,mx:pm.mx};});
     let tip=bp?`Lightest fix: one <b>Perfect ${esc(bp.mat)}</b> ore of about <b>${fmt(bp.w,bp.w<1?3:2)} kg</b> covers the whole gap (Perfect counts as ×${mP} weight).`:"";
     if(bp&&bp.feasible===false)tip+=` <span class="warn">Even that is above your max reachable weight (~${fmt(bp.mx,1)} kg) — spread the gap across several ores.</span>`;
-    body=`<div class="vlow"><b>${starStr(o.stars)} ${o.stars}-star right now</b><span>Average quality Q ${fmt(o.avgQ,2)} — 5&#9733; needs 5.00. You're short <b>${fmt(o.remaining,2)}</b> total quality across ${o.totalN} ores.</span><p class="tip">${tip} Or spread it over several ores — each material's per-ore 5&#9733; weight is listed below, and heavier/better-modified ores carry lighter ones.</p></div>`;
+    body=`<div class="vlow"><b>${starStr(o.stars)} ${o.stars}-star right now</b><span>Average quality Q ${fmt(o.avgQ,2)} — 5&#9733; needs 5.00. You're short <b>${fmt(o.remaining,2)}</b> total quality across ${o.totalN} ores.</span><p class="tip">${tip}${bp&&bp.feasible===false?"":" Or spread it over several ores — heavier or better-modified ores make up for lighter ones."}</p></div>`;
   }
   $("verdict").innerHTML=body;
 }

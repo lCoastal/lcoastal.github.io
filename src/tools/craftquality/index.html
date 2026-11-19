@@ -30,7 +30,25 @@
 
   <div id="mats"></div>
 
-  <p class="foot">Quality steps &amp; modifier multipliers from your data &middot; formula <code>Q = 1 + (W&times;M &minus; MW) &divide; QS</code>, stars = floor(avg Q), 1&ndash;5 &middot; Made by @__coastal</p>
+  <section class="card"><h2>How it works</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px">
+      <li>Every ore you put in gets a quality score from its weight and modifier. The item's star rating comes from the average quality of all its ores, so one great ore can make up for weaker ones.</li>
+      <li>A modifier multiplies the ore's weight before quality is worked out. Perfect counts as ×24, so a small Perfect ore can be worth more than a big plain one.</li>
+      <li>Each ore type has its own minimum weight and quality step per recipe. Heavier base-weight ores can grow bigger, so they reach high quality more easily.</li>
+      <li>"Lightest fix" is the single Perfect ore that closes the whole gap on its own, picked from whichever material needs the least weight.</li>
+    </ul>
+    <div class="fx">
+      <h3>The formula</h3>
+      <div class="row"><span>Ore quality</span><code>Q = 1 + (W × M − MW) ÷ QS</code></div>
+      <div class="row"><span>Star rating</span><code>stars = floor(average Q), from 1 to 5</code></div>
+      <div class="row"><span>5★ needs</span><code>Σ (W × M − MW) ÷ QS ≥ 4 × N</code></div>
+      <div class="row"><span>One ore at 5★</span><code>W = (MW + 4 × QS) ÷ M</code></div>
+      <div class="row"><span>Lightest fix</span><code>W = (R × QS + MW) ÷ 24</code></div>
+      <div class="row"><span>Max reachable weight</span><code>15.5 × base weight × (1 + size boost ÷ 100)</code></div>
+      <p>W = ore weight (kg) · M = modifier multiplier · MW = minimum weight · QS = quality step · N = ores in the recipe · R = quality still missing.</p>
+    </div>
+  </section>
+  <p class="foot">Last edited 19/11/26 · Made by @__coastal</p>
 </div>
 <script data-file="script.js"></script>
 </body>

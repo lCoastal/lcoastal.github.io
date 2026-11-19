@@ -60,3 +60,10 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border
 .foot code{font-family:var(--f-mono);background:var(--sunk);padding:1px 5px;border-radius:5px}
 input[type=number]{-moz-appearance:textfield;appearance:textfield}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.fx{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--muted)}
+.fx h3{margin:0;font:600 12px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--fg)}
+.fx p{margin:0}
+.fx code{font-family:var(--f-mono);font-size:13px;color:var(--fg);background:none;padding:0;overflow-wrap:anywhere}
+.fx .row{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;align-items:baseline}
+@media (max-width:600px){.fx .row{grid-template-columns:1fr}}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
