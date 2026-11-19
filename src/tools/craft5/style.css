@@ -16,15 +16,22 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border
 
 /* result */
 .result{position:sticky;top:8px;z-index:3}
-.rhead{font-size:13px;color:var(--muted);margin-bottom:10px}
-.rhead b{color:var(--fg);font-family:var(--f-mono)}
+#item{font-family:var(--f-body)}
+.fld .ac{flex:none;width:100%}
+.rhead{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.rhead .eic{width:48px;height:48px;object-fit:contain;flex:none}
+.rhead span{display:flex;flex-direction:column;gap:2px}
+.rhead b{font-family:var(--f-display);font-size:17px;color:var(--fg)}
+.rhead small{font-size:12.5px;color:var(--muted)}
+.mat h2{display:inline-flex;align-items:center;gap:8px}
+.mic{width:26px;height:26px;object-fit:contain;flex:none}
 .stars{letter-spacing:2px;color:var(--star);font-size:19px;vertical-align:-1px}
 .stars .off{color:var(--line)}
 .verdict b{font-size:16px;display:inline-flex;align-items:center;gap:8px}
 .v5{background:color-mix(in srgb,var(--pos) 12%,transparent);border:1px solid color-mix(in srgb,var(--pos) 40%,transparent);border-radius:10px;padding:12px 14px}
 .v5 b{color:var(--pos)}
 .vlow{background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-.verdict span{display:block;font-size:13.5px;color:var(--muted);margin-top:5px;line-height:1.5}
+.verdict>div>span{display:block;font-size:13.5px;color:var(--muted);margin-top:5px;line-height:1.5}
 .verdict .tip{margin:9px 0 0;font-size:13.5px;color:var(--fg);line-height:1.55}
 .verdict b b,.verdict span b,.tip b{color:var(--fg);font-size:inherit;display:inline}
 .warn{color:var(--neg)}
