@@ -190,10 +190,10 @@ function discordCompactAnsi(lines){
   const colored=lines.map(line=>{
     if(line==="**My Prospecting stats**")return esc+"1;37mMy Prospecting stats"+reset;
     if(line.startsWith("Pan:"))return esc+"0;37m"+line+reset;
-    const m=line.match(/^\\*\\*([^:*]+):\\*\\*/);
-    if(!m)return line;
-    const stat=m[1],color=STAT_ANSI[stat]||"0;37";
-    return esc+color+"m"+line.replace(/^\\*\\*([^:*]+):\\*\\*/,stat+":").replace(/\\*\\*/g,"")+reset;
+    const stat=Object.keys(STAT_ANSI).find(name=>line.startsWith("**"+name+":**"));
+    if(!stat)return line;
+    const color=STAT_ANSI[stat]||"0;37";
+    return esc+color+"m"+line.replace("**"+stat+":**",stat+":").replace(/\*\*/g,"")+reset;
   });
   return "```ansi\n"+colored.join("\n")+"\n```";
 }
