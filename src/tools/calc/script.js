@@ -144,7 +144,6 @@ function renderParts(){const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(
   const sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
   const hide=new Set(S.brkHide||[]);
   const avail=BRK_STATS.filter(s=>Math.abs(R.tot[s]||0)>1e-9||s==="Luck");
-  $("brkStats").innerHTML=avail.map(s=>`<button type="button" class="chip" data-bstat="${esc(s)}" aria-pressed="${!hide.has(s)}" style="--sc:${statHex(s)}">${esc(s)}</button>`).join("");
   const row=(x,txt,neg)=>`<div class="pt${x.key&&S.only===x.key?" on":""}"${x.key?` role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"`:""}><b>${esc(x.label)}${x.sub?` <small>${esc(x.sub)}</small>`:""}</b><span class="lk2" style="color:${neg?"var(--neg,#c53030)":"var(--accent)"}">${txt}</span></div>`;
   const cards=avail.filter(s=>!hide.has(s)).map(s=>{
     const flatT=fl(R,s),mult=FLAT_ONLY.has(s)?1:1+(R.pile[s]||0);
@@ -164,9 +163,9 @@ function renderParts(){const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(
       <div class="bksub"><span>Flat points</span><span>${tv(s,flatT)}</span></div>${F.length?F.map(o=>row(o.x,sv(s,o.v),o.v<0)).join(""):'<p class="bkn">None</p>'}
       ${FLAT_ONLY.has(s)||!M.length?"":`<div class="bksub"><span>Multiplier (from ×1)</span><span>×${fmt(mult,2)}</span></div>${M.map(o=>row(o.x,(o.v<0?"−":"+")+fmt(Math.abs(o.v),2)+"×",o.v<0)).join("")}`}
       ${X.length?`<div class="bksub"><span>Multiplies the total</span><span>×${fmt(xm,2)}</span></div>${X.map(o=>row(o.x,"×"+fmt(o.v,2),o.v<1)).join("")}`:""}</div>`}).join("");
-  $("parts").innerHTML=src.length||Math.abs(R.tot.Luck||0)>0?(cards||'<p class="hint">Every stat is hidden. Turn one on above.</p>'):'<p class="hint">Add some gear or boosts to see where your stats come from.</p>';
+  $("parts").innerHTML=src.length||Math.abs(R.tot.Luck||0)>0?(cards||'<p class="hint">Every stat is switched off. Turn some on in the Breakdown column of Your stats.</p>'):'<p class="hint">Add some gear or boosts to see where your stats come from.</p>';
   const on=S.showBrk!==false;$("showBrk").checked=on;$("brkBody").hidden=!on}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-bstat]");if(!b)return;const h=new Set(S.brkHide||[]);const k=b.dataset.bstat;h.has(k)?h.delete(k):h.add(k);S.brkHide=[...h];save();renderParts()});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-bstat]");if(!b)return;const h=new Set(S.brkHide||[]);const k=b.dataset.bstat;h.has(k)?h.delete(k):h.add(k);S.brkHide=[...h];save();render()});
 $("showBrk").addEventListener("change",()=>{S.showBrk=$("showBrk").checked;save();$("brkBody").hidden=!S.showBrk});
 function renderIso(){const off=S.isoOff||[];$("isoChips").innerHTML=GROUPS.map(([g,l])=>`<button type="button" class="chip" data-iso="${g}" aria-pressed="${!off.includes(g)&&!S.only}">${l}</button>`).join("");
   const n=$("isoNote");if(S.only){const lbl=(parts(S).find(p=>p[0]===S.only)||[0,"that part"])[1];n.hidden=false;n.innerHTML=`Showing only <b>${esc(lbl)}</b>. <button type="button" class="rst" data-only-clear>Show everything</button>`}else if(off.length){n.hidden=false;n.textContent="Left out: "+off.map(g=>GROUPS.find(x=>x[0]===g)[1]).join(", ")+"."}else n.hidden=true}
@@ -281,8 +280,8 @@ function render(){
   renderIso();renderParts();renderUp();
   const r=compute(effState());
   const f=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
-  $("out").innerHTML=`<table class="out"><tr><th>Stat</th><th>Gear</th><th>Boost pile</th><th>Total</th></tr>${STATS.map(s=>{const show=r.base[s]||r.tot[s]||s==="Luck";if(!show)return "";
-    return `<tr class="${s==="Luck"?"big":""}"><td>${s}</td><td>${f(s,r.base[s]+r.flat[s])}</td><td>${["Toughness","Inventory Size"].includes(s)?"—":"×"+fmt(1+r.pile[s],2)}</td><td class="tot">${f(s,r.tot[s])}</td></tr>`}).join("")}</table>
+  $("out").innerHTML=`<table class="out"><tr><th>Stat</th><th>Gear</th><th>Boost pile</th><th>Total</th><th class="bkc" title="Show this stat in the detailed breakdown">Breakdown</th></tr>${STATS.map(s=>{const show=r.base[s]||r.tot[s]||s==="Luck";if(!show)return "";const on=!(S.brkHide||[]).includes(s);
+    return `<tr class="${s==="Luck"?"big":""}"><td>${s}</td><td>${f(s,r.base[s]+r.flat[s])}</td><td>${["Toughness","Inventory Size"].includes(s)?"—":"×"+fmt(1+r.pile[s],2)}</td><td class="tot">${f(s,r.tot[s])}</td><td class="bkc"><button type="button" class="sw2" role="switch" data-bstat="${esc(s)}" aria-checked="${on}" aria-label="Show ${esc(s)} in the detailed breakdown" title="${on?"Shown":"Hidden"} in the detailed breakdown"></button></td></tr>`}).join("")}</table>
     <p class="hint" style="margin-top:8px">${[r.ev>1?`Events multiply final luck by ×${r.ev}.`:"",r.luckMult>1?`Your tools add ×${fmt(r.luckMult,2)} luck at the end.`:"",r.mt.n?`Museum: ${r.mt.n} display${r.mt.n===1?"":"s"} counted.`:"No museum counted.",...r.notes].filter(Boolean).join(" ")}</p>`;
   const mtS=musTotals(S);$("musTxt").textContent=S.mus==="none"?"":mtS.n?Object.entries(mtS.t).filter(([,v])=>v).map(([k,v])=>`${k} ${v<0?"−":"+"}${fmt(Math.abs(v),3)}×`).join(" · "):"That museum board is empty. Fill it in on the Museum Planner page.";
 }
