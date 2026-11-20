@@ -189,8 +189,8 @@ const STAT_ANSI={
 };
 function discordCompactAnsi(lines){
   const esc="\u001b[",reset=esc+"0m";
-  const colored=lines.map(line=>{
-    if(line==="**My Prospecting stats**")return esc+"1;37mMy Prospecting stats"+reset;
+  const colored=lines.map((line,i)=>{
+    if(i===0)return esc+"1;37m"+line.replace(/\*\*/g,"")+reset;
     if(line.startsWith("Pan:"))return esc+"0;37m"+line+reset;
     const stat=Object.keys(STAT_ANSI).find(name=>line.startsWith("**"+name+":**"));
     if(!stat)return line;
@@ -207,7 +207,7 @@ $("cpBrk").onclick=async()=>{const B=clone(S);(S.isoOff||[]).forEach(g=>Object.a
   const E="\u001b[",col=(c,t,b)=>`${E}${b?"1;":""}${c}m${t}${E}0m`,gray=t=>col(30,t),
     tv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1),sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
   const W=46,VW=11,pad=(t,w)=>{t=String(t);return t.length>w?t.slice(0,w-1)+"…":t+" ".repeat(w-t.length)},rpad=(t,w)=>{t=String(t);return " ".repeat(Math.max(0,w-t.length))+t};
-  const L=[col(37,"My Prospecting stats",true)];const gear=[B.pan&&"Pan: "+B.pan+(B.panEn?" ("+B.panEn+")":""),B.shovel&&"Shovel: "+B.shovel+(B.shEn?" ("+B.shEn+")":"")].filter(Boolean).join(" · ");if(gear)L.push(gear);
+  const L=[col(37,String(S.bname||"").trim()||"My Prospecting stats",true)];const gear=[B.pan&&"Pan: "+B.pan+(B.panEn?" ("+B.panEn+")":""),B.shovel&&"Shovel: "+B.shovel+(B.shEn?" ("+B.shEn+")":"")].filter(Boolean).join(" · ");if(gear)L.push(gear);
   const lbl=x=>x.label+(x.sub?` (${x.sub})`:"");
   const line=(lab,val,good)=>"    "+pad(lab,W-5)+" "+col(good?32:31,rpad(val,VW));
   const head=(lab,val)=>"  "+gray(pad(lab.toUpperCase(),W-2))+col(37,rpad(val,VW),true);
@@ -343,19 +343,22 @@ function render(){
   const mtS=musTotals(S);$("musTxt").textContent=S.mus==="none"?"":mtS.n?Object.entries(mtS.t).filter(([,v])=>v).map(([k,v])=>`${k} ${v<0?"−":"+"}${fmt(Math.abs(v),3)}×`).join(" · "):"That museum board is empty. Fill it in on the Museum Planner page.";
 }
 // ---- save the build as an image: gear, boosts, then the stats table (what "Your stats" shows) ----
+// build name: used as the image title and file name, and as the first line of the Discord copies
+const bTitle=()=>String(S.bname||"").trim()||"My build";
+$("bName").value=S.bname||"";$("bName").addEventListener("input",()=>{S.bname=$("bName").value;save()});
 const RHX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
 const MUTHX={Silver:"#a9b4be",Gold:"#d9a520",Diamond:"#5fc8e8",Granite:"#8d8d86",Overclocked:"#e0602f",Festive:"#d23c3c",Sunforged:"#ffc457",Prismatic:"#c05bd8"};
 // copy the stat panel as text, ready to paste into Discord
 $("cpStats").onclick=async()=>{const st=effState(),t=compute(st).tot;const gear=[S.pan&&"Pan: "+S.pan,S.shovel&&"Shovel: "+S.shovel].filter(Boolean).join(" · ");
-  const lines=SHOW.filter(s=>t[s]).map(s=>`${s}: ${fv(s,t[s])}`);
+  const hid=new Set(S.brkHide||[]),lines=SHOW.filter(s=>t[s]&&!hid.has(s)).map(s=>`**${s}:** ${fv(s,t[s])}`);
   if(!lines.length){ptToast("Nothing to copy yet. Pick some gear first.");return}
-  const txt=discordCompactAnsi(["**My Prospecting stats**",gear,...lines].filter(Boolean));let ok=false;
+  const txt=discordCompactAnsi(["**"+(String(S.bname||"").trim()||"My Prospecting stats")+"**",gear,...lines].filter(Boolean));let ok=false;
   try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
   ptToast(ok?"Stats copied, paste them anywhere":"Couldn't copy, your browser blocked it")};
 $("toImg").onclick=()=>{const st=effState();const r=compute(st);
   const hasGear=st.pan||st.shovel||SLOTDEF.some(([k])=>((st.slots||{})[k]||{}).n);
   if(!hasGear){ptToast("Pick some gear first");return}
-  ptSaveImg("My build",()=>buildImage(st,r))};
+  ptSaveImg(bTitle(),()=>buildImage(st,r))};
 // ---- the saved build card: pan, shovel and museum up top, then stats, equipment and boosts ----
 async function buildImage(st,r){
   const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
@@ -406,8 +409,9 @@ async function buildImage(st,r){
   c.fillStyle=BG;c.fillRect(0,0,W,H);
   // header
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
-  c.fillStyle=TX;c.font=`700 34px ${FD}`;c.fillText("My build",PAD,PAD+30);
-  const luckTot=r.tot.Luck||0;c.font=`600 15px ${F}`;c.fillStyle=MU;const tag=`${fmt(luckTot,0)} luck · ${fmt(r.tot.Capacity||0,0)} capacity`;c.fillText(tag,PAD,PAD+54);
+  c.fillStyle=TX;c.font=`700 34px ${FD}`;c.fillText(fit(bTitle(),IW-mw-24),PAD,PAD+30);
+  c.font=`600 15px ${F}`;{let xx=PAD;stats.forEach((k,i)=>{const t1=fv(k,r.tot[k]||0)+" ",t2=k.toLowerCase(),sep=i<stats.length-1?"  ·  ":"";const w=c.measureText(t1+t2+sep).width;if(xx+w>PAD+IW){return}
+    c.fillStyle=statHex(k);c.fillText(t1,xx,PAD+54);xx+=c.measureText(t1).width;c.fillStyle=MU;c.fillText(t2+sep,xx,PAD+54);xx+=c.measureText(t2+sep).width})}
   let y=PAD+62;if(sub.length){c.font=`14px ${F}`;c.fillStyle=MU;c.fillText(fit(sub.join(" · "),IW),PAD,PAD+78);y=PAD+88}
   // hero: pan, shovel, museum
   const hw=(IW-GAP*2)/3;

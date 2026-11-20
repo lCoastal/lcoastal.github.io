@@ -142,3 +142,5 @@ table.out th.bkc{text-align:center}
 .sem b{font-family:var(--f-mono);font-size:14px;font-weight:600}
 .sem .semt{margin-left:auto;text-align:right}
 .bkh #cpBrk{margin-left:auto}
+.bname{flex:1 1 160px;min-width:120px;max-width:260px;margin-left:auto;font:500 14px var(--f-body);padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);color:var(--fg)}
+.bname:focus{outline:2px solid var(--accent);outline-offset:1px}
