@@ -136,7 +136,7 @@ $("resetAll").onclick=()=>{const b=$("resetAll");if(!b.classList.contains("arm")
 // Tries every pan, shovel and piece of equipment in your slots, works out what each one would add to the goal you
 // pick, and what it would cost: money from the shop, or the minerals you'd have to farm (turned into pans with the
 // same luck model as Luck Odds). Equipment is compared at 6★ and 100% quality, which is the best it can roll.
-const UGOALS=[["Luck",{Luck:1}],["Capacity",{Capacity:1}],["Luck + Size",{Luck:1,"Size Boost":1}],
+const UGOALS=[["Luck",{Luck:1}],["Capacity",{Capacity:1}],["Modifier Boost",{"Modifier Boost":1}],["Luck + Size",{Luck:1,"Size Boost":1}],
   ["Selling",{"Sell Boost":1,"Size Boost":.5,Luck:.3}],["Speed",{"Dig Speed":1,"Shake Speed":1,"Dig Strength":.5,"Shake Strength":.5}],
   ["Everything",{Luck:1,Capacity:1,"Size Boost":.6,"Modifier Boost":.6,"Sell Boost":.4,"Dig Speed":.3,"Shake Speed":.3}]];
 // drop model, same as Luck Odds: how often each mineral comes up in each zone
