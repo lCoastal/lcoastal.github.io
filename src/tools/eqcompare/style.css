@@ -13,14 +13,14 @@
 .empty{text-align:center;padding:18px 8px;color:var(--muted)}
 .empty .chip{margin:4px}
 .tw{overflow-x:auto;margin:-4px -4px 0;padding:4px}
-table.cmp{border-collapse:separate;border-spacing:0;width:100%;min-width:max-content}
-table.cmp th,table.cmp td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;text-align:right}
+table.cmp{border-collapse:separate;border-spacing:0;width:auto;min-width:0}
+table.cmp th,table.cmp td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:right}
 table.cmp thead th{border-bottom:2px solid var(--line);vertical-align:bottom}
 table.cmp tbody th{text-align:left;font-weight:600;white-space:nowrap;position:sticky;left:0;background:var(--panel,var(--bg));z-index:1}
 .corner{text-align:left!important;position:sticky;left:0;background:var(--panel,var(--bg));z-index:2}
 .corner span{display:block;font-weight:700}
 .corner small{color:var(--muted);font-weight:400;font-size:12px}
-th.it{min-width:150px;max-width:190px;text-align:center!important}
+th.it{width:128px;min-width:128px;max-width:150px;text-align:center!important}
 .ih{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:6px}
 .ih img{width:56px;height:56px;object-fit:contain;background:var(--sunk);border-radius:10px;padding:4px}
 .ih b{font-size:14px;line-height:1.25;white-space:normal}
@@ -38,13 +38,15 @@ table.cmp td.best b{color:var(--accent)}
 .up{color:var(--pos,#46d67f)}.dn{color:var(--neg,#f0687f)}
 tr.sep th,tr.sep td{border-top:2px solid var(--line)}
 td.tl{text-align:left!important}
-.rec{display:flex;flex-direction:column;gap:3px;font-size:12.5px;white-space:nowrap}
+.rec{display:flex;flex-direction:column;gap:3px;font-size:12px;white-space:normal}
 .rec span{display:inline-flex;align-items:center;gap:6px}
 .rec img{width:18px;height:18px;object-fit:contain}
-.nt{font-size:12px;color:var(--muted);max-width:190px;white-space:normal}
+.nt{font-size:12px;color:var(--muted);max-width:150px;white-space:normal}
 .nt div+div{margin-top:4px}
-.cm{margin-top:4px;font:500 12px var(--f-body);padding:4px 6px;border:1px solid var(--line);border-radius:7px;background:var(--sunk);color:var(--fg);max-width:150px}
+.cm{margin-top:4px;font:500 12px var(--f-body);padding:4px 6px;border:1px solid var(--line);border-radius:7px;background:var(--sunk);color:var(--fg);max-width:124px}
 .cp{margin-top:3px;border:0;background:none;color:var(--accent);font:600 12px var(--f-body);cursor:pointer;padding:2px 4px}
 .cp:hover{text-decoration:underline}
 .shw{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
 .shw .lab{margin-right:2px}
+table.cmp tbody td{text-align:center}
+table.cmp tbody td.tl{text-align:left}

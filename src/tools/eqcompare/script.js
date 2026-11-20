@@ -4,7 +4,9 @@ let S={items:[],star:"6",q:100,mut:"None",diff:false,show:{cost:true,recipe:true
 try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
 // stats that only matter in the Pharaoh's Tomb or for traps: hidden unless "Tomb & trap stats" is ticked
 const NICHE=new Set(["Tomb Time","Trap Ward","Tomb Jar Finds","Lockpick Zone"]);
-S.show=Object.assign({cost:true,recipe:true,notes:true,niche:false},S.show||{});
+// one switch for everything that isn't a main stat: craft cost, recipe, notes and the tomb stats
+if(S.extra==null)S.extra=false;
+S.show={cost:S.extra,recipe:S.extra,notes:S.extra,niche:S.extra};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const EQ=(P.equip||[]).filter(x=>x.st&&x.st.length),EQB=Object.fromEntries(EQ.map(x=>[x.n,x]));
 S.items=(S.items||[]).map(x=>typeof x==="string"?{n:x,m:""}:x).filter(x=>x&&EQB[x.n]).slice(0,MAX);
@@ -27,7 +29,7 @@ const price=x=>x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):fmt(x.price)+" "
 
 function render(){
   document.querySelectorAll("[data-star]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.star===S.star)));
-  document.querySelectorAll("[data-show]").forEach(c=>{c.checked=!!S.show[c.dataset.show]});
+  $("extra").checked=!!S.extra;S.show={cost:S.extra,recipe:S.extra,notes:S.extra,niche:S.extra};
   $("q").value=S.q;$("qv").textContent=S.q+"%";$("mut").value=S.mut;$("diff").checked=!!S.diff;
   const items=S.items.map(it=>EQB[it.n]);
   if(!items.length){$("out").innerHTML=`<div class="empty"><p>Add two or more pieces above to compare them.</p><p class="hint">Try: ${["Ring of Ra","Ring of Champions","Sun's Gift"].filter(n=>EQB[n]).map(n=>`<button type="button" class="chip" data-quick="${esc(n)}">${esc(n)}</button>`).join(" ")}</p></div>`;return}
@@ -36,7 +38,7 @@ function render(){
   const ORDER=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Walk Speed","Inventory Size","Toughness"];
   const allNames=[...new Set(st.flatMap(m=>[...m.keys()]))],hiddenN=allNames.filter(n=>NICHE.has(n)&&!S.show.niche).length;
   const names=allNames.filter(n=>S.show.niche||!NICHE.has(n)).sort((a,b)=>{const ia=ORDER.indexOf(a),ib=ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b)});
-  const head=items.map((x,i)=>`<th class="it" scope="col"><div class="ih"><button type="button" class="rm" data-rm="${i}" aria-label="Remove ${esc(x.n)}" title="Remove">×</button>${img(x)?`<img src="${img(x)}" alt="" loading="lazy">`:""}<b style="color:${rc(x.r)}">${esc(x.n)}</b><small>${esc(x.r)} · ${esc(x.slot)}${x.ev?" · event":""}</small><select class="cm" data-cm="${i}" aria-label="Mutation for ${esc(x.n)}"><option value="">${S.mut==="None"?"No mutation":esc(S.mut)} (top)</option>${MUTS.map(m=>`<option value="${m[0]}"${S.items[i].m===m[0]?" selected":""}>${m[0]==="None"?"No mutation":m[0]}</option>`).join("")}</select><button type="button" class="cp" data-cp="${i}" title="Add a copy of this piece, to compare it with another mutation">+ Copy</button>${i>0?`<span class="mv"><button type="button" data-mv="${i}" data-d="-1" aria-label="Move left" title="Move left">‹</button></span>`:""}</div></th>`).join("");
+  const head=items.map((x,i)=>`<th class="it" scope="col"><div class="ih"><button type="button" class="rm" data-rm="${i}" aria-label="Remove ${esc(x.n)}" title="Remove">×</button>${img(x)?`<img src="${img(x)}" alt="" loading="lazy">`:""}<b style="color:${rc(x.r)}">${esc(x.n)}</b><small>${esc(x.r)} · ${esc(x.slot)}${x.ev?" · event":""}</small><select class="cm" data-cm="${i}" aria-label="Mutation for ${esc(x.n)}"><option value="">Top (${S.mut==="None"?"none":esc(S.mut)})</option>${MUTS.map(m=>`<option value="${m[0]}"${S.items[i].m===m[0]?" selected":""}>${m[0]==="None"?"No mutation":m[0]}</option>`).join("")}</select><button type="button" class="cp" data-cp="${i}" title="Add a copy of this piece, to compare it with another mutation">+ Copy</button>${i>0?`<span class="mv"><button type="button" data-mv="${i}" data-d="-1" aria-label="Move left" title="Move left">‹</button></span>`:""}</div></th>`).join("");
   const rows=names.map(n=>{const vals=st.map(m=>m.has(n)?m.get(n).v:null);const have=vals.filter(v=>v!=null);const best=have.length>1?Math.max(...have):null;
     return `<tr><th scope="row"><span class="sd" style="background:${statHex(n)}"></span>${esc(n)}</th>${vals.map((v,i)=>{if(v==null)return `<td class="na">—</td>`;
       const r=st[i].get(n).r,isBest=best!=null&&Math.abs(v-best)<1e-9&&have.filter(z=>Math.abs(z-best)<1e-9).length<have.length;
@@ -50,13 +52,13 @@ function render(){
        S.show.recipe?`<th scope="row">Recipe</th>${items.map(x=>`<td class="tl">${recipe(x)}</td>`).join("")}`:"",
        S.show.notes?`<th scope="row">Notes</th>${items.map(x=>`<td class="tl nt">${notes(x)}</td>`).join("")}`:""].filter(Boolean).map((r,i)=>`<tr${i===0?' class="sep"':""}>${r}</tr>`).join("")}
     </tbody></table></div>
-    <p class="hint">The big number is each stat at ${S.star}★ and ${S.q}% quality with each column's mutation; underneath is its full range at ${S.star}★. The best value in each row is highlighted.${hiddenN?` ${hiddenN} tomb &amp; trap stat${hiddenN>1?"s are":" is"} hidden.`:""}${items.length<2?" Add another piece to compare.":""}</p>`}
+    <p class="hint">The big number is each stat at ${S.star}★ and ${S.q}% quality with each column's mutation; underneath is its full range at ${S.star}★. The best value in each row is highlighted.${hiddenN?` ${hiddenN} tomb stat${hiddenN>1?"s are":" is"} hidden.`:""}${items.length<2?" Add another piece to compare.":""}</p>`}
 
 // controls
 $("mut").innerHTML=MUTS.map(m=>`<option value="${m[0]}">${m[0]==="None"?"No mutation":m[0]+" ×"+m[1]+(Object.keys(m[2]).length?" + "+Object.entries(m[2]).map(([k,v])=>v+" "+k).join(", "):"")}</option>`).join("");
 $("mut").onchange=()=>{S.mut=$("mut").value;save();render()};
 $("q").oninput=()=>{S.q=+$("q").value;save();render()};
-document.addEventListener("change",e=>{const c=e.target.closest("[data-show]");if(!c)return;S.show[c.dataset.show]=c.checked;save();render()});
+$("extra").onchange=()=>{S.extra=$("extra").checked;save();render()};
 $("diff").onchange=()=>{S.diff=$("diff").checked;save();render()};
 $("clear").onclick=()=>{S.items=[];save();render()};
 document.addEventListener("change",e=>{const c=e.target.closest("[data-cm]");if(!c)return;S.items[+c.dataset.cm].m=c.value;save();render()});
