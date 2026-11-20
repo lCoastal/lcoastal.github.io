@@ -388,7 +388,11 @@ async function buildImage(st,r){
   // ---- measure ----
   const m=document.createElement("canvas").getContext("2d");
   const chipRows=(list,w,font)=>{m.font=font;const rows=[[]];let x=0;list.forEach(ch=>{const cw=m.measureText(ch.t).width+22;if(x+cw>w&&rows[rows.length-1].length){rows.push([]);x=0}rows[rows.length-1].push({...ch,w:cw});x+=cw+8});return rows};
-  const HERO=212,SC=4,STH=96,SECH=44,TOPH=104,RC=4,RH=98,MRH=58;
+  // pan / shovel lines: base stats, plus the passive when it's a stat (+25% Size Boost, 1.1× additional Luck)
+  const pasL=it=>{if(!it||!it.passive)return [];const ps=passive(it.passive),L2=Object.entries(ps.o).filter(([,v])=>v).map(([k,v])=>[k,(v<0?"−":"+")+fmt(Math.abs(v),0)+"%"]);if(ps.lm&&ps.lm!==1)L2.push(["Luck","×"+fmt(ps.lm,2)]);return L2};
+  const panL=pan?[["Luck",fmt(+pan.luck||0,2)],["Capacity",fmt(+pan.capacity||0,0)],["Shake Strength",fmt(+pan.strength||0,2)],...pasL(pan)]:[];
+  const shL=sh?[["Dig Strength",fmt(+sh.strength||0,2)],["Dig Speed",fmt((+sh.speed||0)*100,0)+"%"],["Toughness",fmt(+sh.toughness||0,0)],...pasL(sh)]:[];
+  const HERO=Math.max(212,122+(Math.max(panL.length,shL.length)-1)*24+(st.trinket?46:24)),SC=4,STH=96,SECH=44,TOPH=104,RC=4,RH=98,MRH=58;
   const statRowsN=Math.ceil(stats.length/SC),ringRowsN=Math.ceil(rings.length/RC),hasTop=top2.some(g=>!g.empty);
   const bRows=boosts.length?chipRows(boosts,IW-36,`13px ${F}`):[];
   const DROW=25,DCW=(IW-GAP)/2;
@@ -422,8 +426,8 @@ async function buildImage(st,r){
     c.font=`13px ${F}`;c.fillStyle=en?"#c9a7f5":MU;c.fillText(fit(en?"Enchant: "+en:"No enchant",tw),tx,y+92);
     lines.forEach(([k,v],i)=>{const yy=y+122+i*24;c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(k,tx,yy);c.font=`600 14px ${FM}`;c.fillStyle=statHex(k);c.textAlign="right";c.fillText(v,x+hw-20,yy);c.textAlign="left"});
     if(kind==="Pan"&&st.trinket){c.font=`12.5px ${F}`;c.fillStyle=MU;c.fillText(fit("Trinket: "+st.trinket,hw-40),x+20,y+HERO-16)}};
-  tool(PAD,"Pan",pan,st.panEn,pan?[["Luck",fmt(+pan.luck||0,2)],["Capacity",fmt(+pan.capacity||0,0)],["Shake Strength",fmt(+pan.strength||0,2)]].concat(pan.passive?[]:[]):[],"#e0a95b");
-  tool(PAD+hw+GAP,"Shovel",sh,st.shEn,sh?[["Dig Strength",fmt(+sh.strength||0,2)],["Dig Speed",fmt((+sh.speed||0)*100,0)+"%"],["Toughness",fmt(+sh.toughness||0,0)]]:[],"#8fb4d9");
+  tool(PAD,"Pan",pan,st.panEn,panL,"#e0a95b");
+  tool(PAD+hw+GAP,"Shovel",sh,st.shEn,shL,"#8fb4d9");
   // museum card
   {const x=PAD+(hw+GAP)*2;card(x,y,hw,HERO,"#3cc2a8");label("Museum",x+20,y+30,"#3cc2a8");
     if(!board||!mt.n){c.fillStyle=MU;c.font=`15px ${F}`;c.fillText("No museum counted",x+20,y+64)}
