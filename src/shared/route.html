@@ -168,8 +168,8 @@ function finalize(zones,as,cost,T,issues,locked){const order=zones.map(z=>z.z);
   const out=order.map(z=>{const ts=T.filter(t=>as.get(t)===z);return {z,ts,pans:cost&&ts.some(t=>t.c>0)?cost(z):0,open:ts.some(t=>t.c>0)}}).filter(z=>z.ts.length);
   out.sort((a,b)=>(!a.open)-(!b.open));
   return {zones:out,issues,T,locked}}
-// best luck cap for one mineral in one zone, same as the Best Luck Cap tool: a cap of C counts as C x 0.63
-const CAPS=[1,5,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000],CAP_EFF=0.63;
+// best luck cap for one mineral in one zone, same as the Best Luck Cap tool: a cap of C counts as C x 0.56
+const CAPS=[1,5,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000],CAP_EFF=0.56;
 function bestCap(m,loc){const L=Math.max(1,+st.luck||1);const yours=shares(loc,L)[m.n]||0;let b={cap:null,eff:yours};
   for(let i=CAPS.length-1;i>=0;i--){if(CAPS[i]>=L)continue;const e=shares(loc,CAPS[i]*CAP_EFF)[m.n]||0;if(e>b.eff*(1+1e-6))b={cap:CAPS[i],eff:e}}
   b.x=yours>0?b.eff/yours:Infinity;return b}

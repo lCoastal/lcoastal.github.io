@@ -1,6 +1,6 @@
-// A luck cap gives less luck than its number: in my tests (4 zones, 12/11/26) capped sessions behaved like
-// about 63% of the cap, while uncapped sessions matched the luck shown. So a cap of C counts as C x 0.63 here.
-const CAP_EFF=0.63;
+// A luck cap gives less luck than its number. Measured on 326k capped minerals in 17 zones (GalaxisHub log, 20/11/26):
+// every cap from 100 to 10,000 behaved like 56% of its number (0.54 - 0.60 by zone). So a cap of C counts as C x 0.56 here.
+const CAP_EFF=0.56;
 
 const $=id=>document.getElementById(id);
 const COLS=["#3cc2a8","#f2b53a","#b880ee","#68a6f0","#f0687f","#6cc46e","#e0602f","#a3adb8"];

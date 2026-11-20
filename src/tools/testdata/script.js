@@ -94,7 +94,8 @@ let pt;$("paste").addEventListener("input",()=>{clearTimeout(pt);pt=setTimeout((
 $("paste").addEventListener("paste",e=>{const t=e.clipboardData&&e.clipboardData.getData("text");if(!t)return;const a=$("paste");if(a.selectionStart===a.selectionEnd&&a.value.trim()){e.preventDefault();a.value=t;a.dispatchEvent(new Event("input"))}});
 
 function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"":r[i]||""};
-  const rows=ROWS.map(r=>({name:g(r,"name"),zone:g(r,"zone"),mod:g(r,"mod"),w:num(g(r,"weight")),sb:num(g(r,"size")),luck:num(g(r,"luck")),mb:num(g(r,"mb")),cap:num(g(r,"cap")),pan:g(r,"pan")})).filter(r=>r.name);
+  const ZAL={"abyssal depths":"Abyssal Depth","the magma furnace":"Magma Furnace","rubble creek":"Rubble Creek Sands"};const zn=z=>ZAL[String(z).trim().toLowerCase()]||z;
+  const rows=ROWS.map(r=>({name:g(r,"name"),zone:zn(g(r,"zone")),mod:g(r,"mod"),w:num(g(r,"weight")),sb:num(g(r,"size")),luck:num(g(r,"luck")),mb:num(g(r,"mb")),cap:num(g(r,"cap")),pan:g(r,"pan")})).filter(r=>r.name);
   const known=rows.filter(r=>MIN[r.name.toLowerCase()]),unknown={};rows.forEach(r=>{if(!MIN[r.name.toLowerCase()])unknown[r.name]=(unknown[r.name]||0)+1});
   let h="",txt=[];const sumBits=[`<b>${rows.length.toLocaleString()}</b> rows`];
   // ---- drop rates
@@ -141,15 +142,15 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
       h+=`<tr><td>${esc(k)}${isN?"":' <span class="thin">event / other</span>'}${thin&&isN?' <span class="thin">thin data</span>':""}</td><td>${c.toLocaleString()}</td><td>${isN?pct(o):pct(c/N)+" of all"}</td><td>${isN&&sh?pct(e):"–"}</td><td class="${cls}">${isN?fx(r):"–"}</td></tr>`;
       txt.push(`  ${k}: ${c}${isN?`, ${pct(o)} vs ${sh?pct(e):"–"}, ${fx(r)}`:" (event/other)"}`)});
     h+="</table></div>";sumBits.push(`<b>${pct(any/N,1)}</b> modified`)}
-  // ---- weights: game range is 0.75 to 15.5 × base weight × (1 + Size Boost)
+  // ---- weights: game range is 0.75 to 15.5 × base weight × (1 + Size Boost) × the zone's size factor
   if(col("weight")>=0){const WMIN=.75,WMAX=15.5,by={};known.forEach(r=>{const m=MIN[r.name.toLowerCase()];if(!(m.bw>0)||!(r.w>0))return;(by[m.n]=by[m.n]||[]).push(r)});
     const flat=Object.values(by).flat(),all=flat.map(r=>r.w/MIN[r.name.toLowerCase()].bw);
     if(all.length){const sbs=flat.map(r=>r.sb).filter(isFinite),hasS=sbs.length>0,S=hasS?med(sbs):NaN;
-      const q=r=>r.w/(MIN[r.name.toLowerCase()].bw*(1+r.sb));
+      const q=r=>r.w/(MIN[r.name.toLowerCase()].bw*(1+r.sb)*zoneSize(r.zone));
       const allQ=hasS?flat.filter(r=>isFinite(r.sb)).map(q):[];let out=0;allQ.forEach(x=>{if(x<WMIN*.995||x>WMAX*1.005)out++});
       const pc=x=>isFinite(x)?(x*100).toFixed(1)+"%":"–";
-      h+=`<h3 class="sec">Weights</h3><p class="note">The game rolls weights from <b>0.75 × base × (1 + Size Boost)</b> up to <b>15.5 × base × (1 + Size Boost)</b>.${hasS?` Size Boost ${S.toFixed(2)}×. ${out?`<b>${out.toLocaleString()}</b> minerals fell outside that range: a base weight is probably off.`:"Every mineral fell inside that range."}`:" Add the Size Boost column to compare against it."}<br>Smallest and biggest show how close your lightest and heaviest got to the limits: 100% means it hit the limit.</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Base</th><th>Lightest kg</th><th>Smallest possible</th><th>Smallest</th><th>Heaviest kg</th><th>Biggest possible</th><th>Biggest</th></tr>`;
-      txt.push("","WEIGHTS (range 0.75 to 15.5 x base x (1 + size boost))"+(hasS?`, size boost ${S.toFixed(2)}x, ${out} outside`:""));
+      h+=`<h3 class="sec">Weights</h3><p class="note">The game rolls weights from <b>0.75 × base × (1 + Size Boost)</b> up to <b>15.5 × base × (1 + Size Boost)</b>, times the zone's size factor (×0.80 to ×1.20) when the file has a Zone column.${hasS?` Size Boost ${S.toFixed(2)}×. ${out?`<b>${out.toLocaleString()}</b> minerals fell outside that range: a base weight is probably off.`:"Every mineral fell inside that range."}`:" Add the Size Boost column to compare against it."}<br>Smallest and biggest show how close your lightest and heaviest got to the limits: 100% means it hit the limit.</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Base</th><th>Lightest kg</th><th>Smallest possible</th><th>Smallest</th><th>Heaviest kg</th><th>Biggest possible</th><th>Biggest</th></tr>`;
+      txt.push("","WEIGHTS (range 0.75 to 15.5 x base x (1 + size boost) x zone factor)"+(hasS?`, size boost ${S.toFixed(2)}x, ${out} outside`:""));
       Object.entries(by).sort((a,b)=>b[1].length-a[1].length).forEach(([n,rs])=>{const m=MIN[n.toLowerCase()],ws=rs.map(r=>r.w),lo=mn(ws),hi=mx(ws);
         const qs=hasS?rs.filter(r=>isFinite(r.sb)).map(q):[],ql=qs.length?mn(qs):NaN,qh=qs.length?mx(qs):NaN;
         const smin=hasS?WMIN*m.bw*(1+S):NaN,smax=hasS?WMAX*m.bw*(1+S):NaN,ps=ql/WMIN,pb=qh/WMAX;

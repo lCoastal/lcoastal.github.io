@@ -22,7 +22,7 @@ function ensureOres(){const r=REC[S.item]||[];const o=S.ores[S.item]=S.ores[S.it
   r.forEach(([mat,n])=>{const a=o[mat]=o[mat]||[];while(a.length<n)a.push({w:"",u:"None"});if(a.length>n)a.length=n});
   Object.keys(o).forEach(k=>{if(!r.some(x=>x[0]===k))delete o[k]});
   return o}
-const maxW=mat=>{const bw=BW[mat];if(!bw)return null;const sb=+S.sb||0;return 15.5*bw*(1+sb/100)};
+const maxW=mat=>{const bw=BW[mat];if(!bw)return null;const sb=+S.sb||0;return 15.5*bw*(1+sb/100)*zoneSize(S.wz)};
 const w5=(mw,qs,m)=>(mw+4*qs)/m; // weight one ore needs to hit Q=5 at modifier multiplier m
 
 function compute(){const r=REC[S.item]||[];const o=ensureOres();
@@ -101,6 +101,7 @@ $("mats").addEventListener("input",()=>{lastPlan=null},true);
 makeAC({inp:$("item"),items:ITEMS.map(n=>{const x=EQ[n];return {n,tag:x?(x.r+" "+(x.slot||"")).trim():"",ic:eqImg(n),col:x?rc(x.r):""}}),
   cur:()=>S.item,icon:()=>eqImg(S.item),pick:x=>{S.item=x.n;lastPlan=null;save();buildMats();refresh()}});
 $("sb").value=S.sb;
+$("wz").innerHTML=zoneSizeOpts(S.wz||"");$("wz").onchange=e=>{S.wz=e.target.value;lastPlan=null;save();buildMats();refresh()};
 $("sb").addEventListener("input",e=>{S.sb=e.target.value;lastPlan=null;save();buildMats();refresh()});
 
 $("mats").addEventListener("input",e=>{const t=e.target;

@@ -26,7 +26,7 @@
     <p class="txt">The best fit so far is that about <b>29%</b> of minerals roll just once, about <b>3%</b> roll roughly <b>luck ÷ 23</b> times, about <b>19%</b> roll about <b>0.4 × luck</b> times and about <b>49%</b> roll about <b>1.74 × luck</b> times, keeping the rarest result. On top of that, minerals with base odds between about <b>1 in 18 million and 1 in 1.5 billion</b> (most Mythics) come up about <b>1.86×</b> more often than the rolls alone predict. That's why the gain slows down: going from 100 to 1,000 luck matters far more than 10,000 to 11,000 for anything that isn't very rare.</p>
     <p class="txt">The wiki's Stat Systems Guide uses a simpler split (a quarter once, a quarter at half luck, half at full luck). Testing fits the split above much better, especially for mid-rarity minerals like Jade and Onyx and for very rare ones at high luck.</p>
     <p class="txt"><b>Ties and duplicates.</b> Minerals with exactly the same listed odds share their chance evenly. The Duplicator trinket gives Mythic and Exotic ores a 10% chance to be duplicated, so with it you see a few more of those than the luck alone gives.</p>
-    <p class="txt"><b>Luck caps may give less than they say.</b> A capped session seems to behave like about 63% of the cap. That's less certain than the rest of this page; Best Luck Cap and Dredge use it.</p>
+    <p class="txt"><b>Luck caps give less than they say.</b> A capped session behaves like about <b>56% of the cap</b>: measured on 326,000 capped minerals in 17 zones, every cap from 100 to 10,000 landed between 54% and 60%. Best Luck Cap, Dredge, Build Compare and the farm routes use it.</p>
     <p class="txt"><b>Events change your luck too.</b> A Meteor Shower doubles your final luck and weather events (Nimue's Blessing, Blizzard, Swamp Fog, Starfall) multiply it by 1.5, and they stack. Hallows' Eve, the Luck Totem and most other boosts add to your multiplier instead. Autopan without the Mastered enchant digs at 51% quality, which gives about two thirds of your luck. Best Luck Cap, Dredge and Luck Odds have a setting for events and autopan.</p>
     <p class="txt"><b>The Senet Die</b> rolls once per full pan and multiplies all of your luck for that pan, events included: ×0.5, ×0.75, ×1, ×1.25, ×1.5 or ×3, each equally likely. On average that's <b>×1.33</b>.</p>
     <div class="row"><label class="fld"><span class="lab">Your luck</span><input type="number" id="luck" min="1" value="1000"></label></div>
@@ -53,8 +53,9 @@
   <section class="card">
     <h2>Weight: how heavy a mineral comes out</h2>
     <p class="txt">A mineral's weight is <b>base weight × (1 + Size Boost) × a roll between 0.75 and 15.5</b>, with Size Boost as a number (1,476% is 14.76). So the lightest you can get is 0.75 × base × (1 + Size Boost) and the heaviest 15.5 × base × (1 + Size Boost). The Solar Magnifier multiplies the final weight by 1.5, and a Volcanic Eruption doubles sizes in its zones.</p>
+    <p class="txt"><b>The zone matters too.</b> Every zone multiplies weights by its own factor, from <b>×0.80 in Rubble Creek</b> to <b>×1.20 in Timelocked Sanctuary</b>; most zones are within a few percent of ×1. Pick the zone below to include it.</p>
     <p class="txt">The roll isn't spread evenly. About <b>a quarter</b> of minerals always roll small, right near the bottom. The rest spread across the whole range, evenly at low capacity, and the bigger your pan, the more of them lean towards the heavy end. The heaviest possible doesn't change with capacity, only how often you get close to it. <b>Luck, the modifier and which mineral it is make no difference.</b></p>
-    <div class="row"><label class="fld"><span class="lab">Base weight (kg)</span><input type="number" id="bw" min="0" step="0.01" value="0.2"></label><label class="fld"><span class="lab">Size Boost (%)</span><input type="number" id="sb" min="0" step="1" value="1476"></label><label class="fld"><span class="lab">Capacity</span><input type="number" id="wcap" min="1" value="7240"></label><label class="ck"><input type="checkbox" id="mag"> Solar Magnifier</label></div>
+    <div class="row"><label class="fld"><span class="lab">Base weight (kg)</span><input type="number" id="bw" min="0" step="0.01" value="0.2"></label><label class="fld"><span class="lab">Size Boost (%)</span><input type="number" id="sb" min="0" step="1" value="1476"></label><label class="fld"><span class="lab">Capacity</span><input type="number" id="wcap" min="1" value="7240"></label><label class="fld"><span class="lab">Zone</span><select id="wz"></select></label><label class="ck"><input type="checkbox" id="mag"> Solar Magnifier</label></div>
     <p class="big" id="wOut"></p>
     <p class="note">Weight Range shows the full spread for any mineral, and Size Boost Finder works backwards from the weight you want.</p>
   </section>
@@ -76,7 +77,7 @@
     </ul>
   </section>
 
-  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 17/11/26 · Made by @__coastal</p>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 20/11/26 · Made by @__coastal</p>
 </div>
 <script data-file="script.js"></script>
 </body>

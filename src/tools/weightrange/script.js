@@ -19,7 +19,7 @@ const oneIn=p=>p>=.5?fmt(p*100,0)+"% of them":"1 in "+fmt(Math.round(1/p),0);
 
 ["sb","cap"].forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});
 $("min").value=S.min;
-$("mag").checked=!!S.mag;$("mag").onchange=e=>{S.mag=e.target.checked;save();render()};
+$("wz").innerHTML=zoneSizeOpts(S.wz||"");$("wz").onchange=e=>{S.wz=e.target.value;save();render()};$("mag").checked=!!S.mag;$("mag").onchange=e=>{S.mag=e.target.checked;save();render()};
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;
   S.sb=String(Math.round((t["Size Boost"]||0)*10)/10);S.cap=String(Math.round(t.Capacity)||S.cap);$("sb").value=S.sb;$("cap").value=S.cap;save();render()};
 // picker: minerals and zones in one list
@@ -50,7 +50,7 @@ function mineral(m,sb,cap,model,M){
   const base=m.bw*(1+sb/100);
   $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b class="mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}" style="color:${rc(m.r)}">${esc(m.n)}</b><br><span>${esc(m.r)} · base weight ${m.bw} kg · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}</span></div>`;
   const tile=(l,v,s)=>`<div><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
-  $("sum").innerHTML=tile("Lightest possible",kg(base*WT_MIN*M),"")+tile("Typical",kg(base*model.q(.5)*M),"half come out heavier")+tile("Average",kg(base*model.mean*M),"")+tile("Heaviest possible",kg(base*WT_MAX*M),"the same in every zone");
+  $("sum").innerHTML=tile("Lightest possible",kg(base*WT_MIN*M),"")+tile("Typical",kg(base*model.q(.5)*M),"half come out heavier")+tile("Average",kg(base*model.mean*M),"")+tile("Heaviest possible",kg(base*WT_MAX*M),"doesn't change with capacity");
   // eruption max only for minerals that drop nowhere else
   const zs=[...new Set((m.ch||[]).map(c=>baseLoc(c[0])))],onlyEr=zs.length&&zs.every(z=>ERUPT.has(z));
   if(onlyEr)$("sum").lastElementChild.querySelector("small").textContent=kg(base*WT_MAX*2*M)+" in a Volcanic Eruption";
@@ -61,7 +61,7 @@ function mineral(m,sb,cap,model,M){
 
 function zone(z,sb,cap,model,M){
   const list=ZONES[z].slice().sort((a,b)=>a.p-b.p),er=ERUPT.has(z),f=1+sb/100,half=model.q(.5);
-  $("zhead").innerHTML=`<div><b>${esc(z)}</b><br><span>${list.length} minerals · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${er?" · has Volcanic Eruptions":""}</span></div>`;
+  $("zhead").innerHTML=`<div><b>${esc(z)}</b><br><span>${list.length} minerals · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${zoneSize(z)!==1?` · zone weights ×${zoneSize(z).toFixed(2)}`:""}${er?" · has Volcanic Eruptions":""}</span></div>`;
   const hiAll=Math.max(...list.map(x=>x.m.bw))*f*WT_MAX*M*(er?2:1),loAll=Math.min(...list.map(x=>x.m.bw))*f*WT_MIN*M,lg=v=>Math.log(v/loAll)/Math.log(hiAll/loAll)*100;
   $("ztbl").innerHTML=`<table class="z"><thead><tr><th>Mineral</th><th>Lightest</th><th>Typical</th><th>Heaviest</th>${er?"<th>In an eruption</th>":""}<th class="hide-s"></th></tr></thead><tbody>${list.map(({m})=>{const b=m.bw*f*M,lo=b*WT_MIN,hi=b*WT_MAX;
     return `<tr data-m="${esc(m.n)}" title="Open ${esc(m.n)}"><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}<span><span style="color:${rc(m.r)}">${esc(m.n)}</span><small>${esc(m.r)} · base ${m.bw} kg</small></span></span></td><td>${kg(lo)}</td><td>${kg(b*half)}</td><td class="hv">${kg(hi)}</td>${er?`<td class="er">${kg(m.bw*f*WT_MAX*2*M)}</td>`:""}<td class="hide-s" style="width:22%"><div class="rngbar"><i style="left:${lg(lo).toFixed(1)}%;right:${(100-lg(hi)).toFixed(1)}%"></i></div></td></tr>`}).join("")}</tbody></table>
@@ -77,7 +77,7 @@ chartEl.addEventListener("mousemove",e=>{const r=e.target.closest(".pb"),tip=$("
 chartEl.addEventListener("mouseleave",()=>{const tip=$("tip");if(tip)tip.hidden=true;chartEl.querySelectorAll(".pb.on").forEach(x=>x.classList.remove("on"))});
 chartEl.addEventListener("click",e=>e.target.dispatchEvent(new MouseEvent("mousemove",{clientX:e.clientX,clientY:e.clientY,bubbles:true})));
 function render(){
-  const q=String(S.min).trim().toLowerCase(),m=BY[q],z=!m&&ZBY[q],sb=Math.max(0,+S.sb||0),cap=+S.cap||0,M=S.mag?1.5:1,model=wtModel(cap||4000);
+  const q=String(S.min).trim().toLowerCase(),m=BY[q],z=!m&&ZBY[q],sb=Math.max(0,+S.sb||0),cap=+S.cap||0,M=(S.mag?1.5:1)*(z?zoneSize(z):zoneSize(S.wz)),model=wtModel(cap||4000);
   $("out").hidden=!m;$("zout").hidden=!z;
   if(m)mineral(m,sb,cap,model,M);else if(z)zone(z,sb,cap,model,M);
 }

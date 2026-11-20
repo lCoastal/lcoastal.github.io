@@ -16,7 +16,7 @@ const AC=makeAC({inp:$("min"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m
 // registered after the picker so it can still tell typed text from the current pick
 $("min").value=S.min;$("min").addEventListener("input",e=>{S.min=e.target.value;save();render()});
 $("good").value=S.good;$("good").onchange=e=>{S.good=e.target.value;save();render()};
-$("mag").checked=!!S.mag;$("mag").onchange=e=>{S.mag=e.target.checked;save();render()};
+$("wz").innerHTML=zoneSizeOpts(S.wz||"");$("wz").onchange=e=>{S.wz=e.target.value;save();render()};$("mag").checked=!!S.mag;$("mag").onchange=e=>{S.mag=e.target.checked;save();render()};
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;
   S.sb=String(Math.round((t["Size Boost"]||0)*10)/10);S.cap=String(Math.round(t.Capacity)||S.cap);$("sb").value=S.sb;$("cap").value=S.cap;save();render()};
 
@@ -36,7 +36,7 @@ function chart(w,B,M,model,lo,hi,rec,mine){
     ${tk.map(s=>`<text x="${xs(s)}" y="${H-Bm+16}" text-anchor="${s===tk[0]?"start":s===tk[4]?"end":"middle"}">${pc(s)}</text>`).join("")}</svg>`}
 
 function render(){
-  const m=BY[String(S.min).trim().toLowerCase()],w=+S.kg||0,cap=+S.cap||0,good=+S.good||.1,M=S.mag?1.5:1;
+  const m=BY[String(S.min).trim().toLowerCase()],w=+S.kg||0,cap=+S.cap||0,good=+S.good||.1,M=(S.mag?1.5:1)*zoneSize(S.wz);
   if(!m||!(w>0)){$("out").hidden=true;return}
   $("out").hidden=false;
   const model=wtModel(cap||4000),B=m.bw;

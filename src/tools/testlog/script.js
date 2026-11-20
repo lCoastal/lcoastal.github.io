@@ -3,6 +3,12 @@ const $=id=>document.getElementById(id);
 // Each session: when, where, setup, how much was logged, what was tested, what it showed, what changed on the site.
 const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables",kg:"Weights"};
 const S=[
+{id:"galaxis-2011",date:"20/11/26",title:"GalaxisHub log: 26 zones, capped and uncapped luck",zone:"26 zones",topics:["lk","cp","md","kg"],kind:"lk",
+ setup:{Luck:"Caps 1 – 10,000, and 2,500 – 99,000 uncapped",Capacity:"7,817 – 10,493",["Modifier Boost"]:"4.75×",["Size Boost"]:"7.15× and 7.55×",Zones:"26 zones, from Rubble Creek to Timelocked Sanctuary"},
+ amount:{Pans:6080,Minerals:650265},
+ tested:["What a luck cap really gives, with more than half the log panned at a cap","Whether weights still fit 0.75 to 15.5 × base × (1 + Size Boost) in zones other than Meteor Falls","Minerals per pan and the modifier rate at a new capacity and Modifier Boost"],
+ found:["Every cap from 100 to 10,000 behaved like 56% of its number (54–60% in each of 17 zones, 326,000 capped minerals). Uncapped luck came out at about 86% of the luck shown, so a cap is about 0.65× of uncapped luck, close to the old 63%","Each zone multiplies weights by its own factor: ×0.80 in Rubble Creek, ×0.93 in Fortune River, about ×1 in most zones, ×1.12 in Infernal Heart, Abyssal Depth and Windswept Beach, ×1.20 in Timelocked Sanctuary. The factor was the same at both Size Boosts and hours apart","With the zone factor, weights stay between 0.75 and 15.5 × base × (1 + Size Boost) (Gold reached 15.0–15.5 in every long session), and the spread matched the weight model: median 11.1–11.6× vs 11.2–11.5×, top 10% 14.5× vs 14.5×, 27.6% small vs 26%","Minerals per pan at 8,160 capacity (2,220 pans): 109.3 vs 109.7 predicted. Some zones ran lower (Abyssal Depth about 19%, Fortune River about 15%), on short runs","Modifier rate 26.5% vs 27% predicted at 4.75×, the lowest boost checked since the refit; the mix within about 10% for the common ones, Cosmic, Mutated and Perfect a little more often than predicted","A few base weights look slightly off: Selenite about 10% heavier than listed, Pyrelith and Golden Pearl about 8%, Pearl about 8% lighter"],
+ changed:["Luck caps now count as 0.56 × the cap everywhere (was 0.63): Best Luck Cap, Dredge, Build Compare and the farm routes","New zone size factor: Weight Range, Size Boost Finder, Mechanics and the 5-Star Crafter's max weight let you pick a zone; Test Data Check uses each row's zone","Formulas: weight formulas now include the zone factor, plus a zone table and the luck cap formula"]},
 {id:"logger4-1711",date:"17/11/26",title:"Long check run at two capacities",zone:"Meteor Falls",topics:["lk","my","cp","md","kg"],kind:"lk",
  setup:{Luck:"26,400 – 267,000",Capacity:"7,240 then 5,462",["Modifier Boost"]:"16.6×"},
  amount:{Pans:8180,Minerals:776278},
@@ -74,10 +80,11 @@ const S=[
 const FIND=[
  ["Luck works like extra rolls of the zone's drop table, keeping the rarest. Best fit: 29% roll once, 3% about luck ÷ 23 times, 19% about 0.41 × luck, 49% about 1.74 × luck.",["big-1111","fixed-1211","sand-1311","night-1711","frd-1711"]],
  ["Very rare minerals (base odds about 1 in 18 million to 1 in 1.5 billion, most Mythics) drop about 1.86× more often than the rolls alone say. Seen in 8 of 11 zones.",["big-1111","sand-1311","night-1711","mods-1711","logger3-1711","logger4-1711"]],
- ["A full pan holds about 0.678 × capacity^0.565 minerals on average (≈20 at 400, 87 at 5,462, 102 at 7,240), never fewer than ½ × √capacity and not more than about 2.5 × √capacity. Luck doesn't change it.",["frd-1711","night-1711","logger3-1711","logger4-1711"]],
- ["Chance of a normal modifier is 1 − 0.937^boost (×): about 10% at 1.1×, 36% at 6×, 45% at 9×, 69% at 16.6×. Luck doesn't change it.",["low-1211","big-1111","fixed-1211","mods-1711"]],
+ ["A full pan holds about 0.678 × capacity^0.565 minerals on average (≈20 at 400, 87 at 5,462, 102 at 7,240), never fewer than ½ × √capacity and not more than about 2.5 × √capacity. Luck doesn't change it.",["galaxis-2011","frd-1711","night-1711","logger3-1711","logger4-1711"]],
+ ["Chance of a normal modifier is 1 − 0.937^boost (×): about 10% at 1.1×, 36% at 6×, 45% at 9×, 69% at 16.6×. Luck doesn't change it.",["low-1211","big-1111","fixed-1211","mods-1711","galaxis-2011"]],
  ["Which modifier you get works like luck: about 11.7 × boost^0.84 + 2 per 1,000 luck rolls, keeping the rarest.",["big-1111","fixed-1211","mods-1711"]],
- ["A mineral weighs base × (1 + Size Boost) × k, with k from 0.75 to 15.5. About 26% roll small; the rest lean heavier the bigger your pan.",["weights-kg-1711","logger4-1711"]],
+ ["A mineral weighs base × (1 + Size Boost) × zone factor × k, with k from 0.75 to 15.5. About 26% roll small; the rest lean heavier the bigger your pan. Zones multiply weights by ×0.80 (Rubble Creek) up to ×1.20 (Timelocked Sanctuary).",["weights-kg-1711","logger4-1711","galaxis-2011"]],
+ ["A luck cap pans like 56% of its number, the same for every cap from 100 to 10,000 and in every zone tested.",["galaxis-2011"]],
  ["The toolkit's drop chances match the game's own weights in 34 of 35 zones.",["weights-1711"]],
 ];
 const OPEN=[
@@ -86,8 +93,8 @@ const OPEN=[
  "Why the modifier rate at the same boost is about 40% in some sessions and 52–57% in others (zone, weather or a totem?).",
  "The Void: fixed table (Voidstone 1 in 91.4M) or rotating pool (1 in 138M)?",
  "Modifier Boost above 16.6× and luck above 267,000 are untested.",
- "How weights spread below 1,856 or above 7,240 capacity, and whether a Volcanic Eruption stacks with the Solar Magnifier.",
- "The \"luck caps give about 63% of the cap\" result came from the old luck model and needs re-checking.",
+ "How weights spread below 1,856 or above 9,245 capacity, and whether a Volcanic Eruption stacks with the Solar Magnifier.",
+ "Why zones change weights (×0.80 to ×1.20), and the factor for zones not logged yet (Meteor Falls is assumed ×1).",
 ];
 const ORDER=S.map(x=>x.id);
 // only show setup values that matter for what the session tested

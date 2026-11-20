@@ -16,13 +16,13 @@ function render(){
   $("luckT").innerHTML="<tr><th>Listed chance</th><th>At your luck</th><th>Change</th></tr>"+[.2,.05,.01,.001,.0001,.00001].map(b=>{const e=eff(b,L);return`<tr><td>${p(b)} (${oneIn(b)})</td><td>${p(e)} (${oneIn(e)})</td><td>${(e/b).toFixed(e/b>=100?0:1)}×</td></tr>`}).join("");
   const c=Math.max(1,+S.cap||1),q=Math.min(1,Math.max(0,(+S.pick||0)/100)),n=panItems(c),per=1-Math.pow(1-q,n);
   $("capOut").innerHTML=`Between <b>${Math.round(.5*Math.sqrt(c))}</b> and <b>${Math.round(2.5*Math.sqrt(c))}</b> minerals per pan, <b>${n.toFixed(1)}</b> on average, so a ${p(q)} chance per mineral comes up in <b>${p(per)}</b> of pans (${oneIn(per)}).`;
-  const B=Math.max(0,+S.bw||0),SB=Math.max(0,+S.sb||0)/100,M=S.mag?1.5:1,wm=wtModel(Math.max(1,+S.wcap||1)),base=B*(1+SB)*M,kg=v=>v>=100?v.toFixed(1)+" kg":v.toFixed(2)+" kg";
+  const B=Math.max(0,+S.bw||0),SB=Math.max(0,+S.sb||0)/100,M=(S.mag?1.5:1)*zoneSize(S.wz),wm=wtModel(Math.max(1,+S.wcap||1)),base=B*(1+SB)*M,kg=v=>v>=100?v.toFixed(1)+" kg":v.toFixed(2)+" kg";
   $("wOut").innerHTML=B>0?`Lightest <b>${kg(base*.75)}</b> · half come out heavier than <b>${kg(base*wm.q(.5))}</b> · heaviest <b>${kg(base*15.5)}</b>`:"";
   const {s,list,tot}=modShares((+S.mbp||0)/100,S.night,L),mx=Math.max(...Object.values(s));
   $("modT").innerHTML="<tr><th>Modifier</th><th>With no boost</th><th>At your boost</th><th class='bw'></th></tr>"+[...list].reverse().map(([k,w])=>`<tr><td>${k}</td><td>${p(w/tot)}</td><td>${p(s[k])}</td><td class="bw"><div class="bar" style="width:${(s[k]/mx*100).toFixed(1)}%"></div></td></tr>`).join("")+`<tr><td colspan="4" style="font-family:var(--f-body);text-align:left;color:var(--muted)">Shares are of modified minerals. Of everything you pan, multiply by the share that gets a modifier (about ${p(1-Math.pow(.937,(+S.mbp||0)/100))} at your boost).</td></tr>`;
 }
 [["luck","luck"],["cap","cap"],["pick","pick"],["mb","mbp"],["bw","bw"],["sb","sb"],["wcap","wcap"]].forEach(([id,k])=>{$(id).value=S[k];$(id).addEventListener("input",()=>{S[k]=$(id).value;save();render()})});
-$("mag").checked=!!S.mag;$("mag").onchange=()=>{S.mag=$("mag").checked;save();render()};
+$("wz").innerHTML=zoneSizeOpts(S.wz||"");$("wz").onchange=()=>{S.wz=$("wz").value;save();render()};$("mag").checked=!!S.mag;$("mag").onchange=()=>{S.mag=$("mag").checked;save();render()};
 $("night").checked=!!S.night;$("night").onchange=()=>{S.night=$("night").checked;save();render()};
 render();
 })();
