@@ -22,6 +22,7 @@ const PT_RESET = {
   dredge: { keys: ["pt-dredge"] },
   eqload: { keys: ["pt-eqload"] },
   craftquality: { keys: ["c5-s"] },
+  eqcompare: { keys: ["eqc-s"] },
   museumfind: { keys: ["pmf-s"] },
   museumopt: { keys: ["mo-s"] },
   quests: { keys: ["pq-f"], what: "filters (your ticked quests stay)" },

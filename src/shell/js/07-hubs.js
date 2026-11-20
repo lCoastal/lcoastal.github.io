@@ -62,6 +62,7 @@ const HUBS = [
       ["equipment", "All equipment"],
       ["eqload", "Loadouts"],
       ["craftquality", "5-Star Crafter"],
+      ["eqcompare", "Equipment Compare"],
     ],
   ],
   [

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Equipment Compare</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Equipment Compare</h1>
+    <p class="lede">Put up to 6 rings, necklaces or charms side by side. Every stat is lined up in one table with the best value in each row highlighted, along with craft costs and recipes.</p>
+  </header>
+
+  <section class="card">
+    <div class="ctl">
+      <label class="fld add"><span class="lab">Add equipment</span><input id="add" type="search" placeholder="Type a name, e.g. Ring of Ra" aria-label="Add equipment to compare"></label>
+      <div class="fld"><span class="lab">Stars</span><div class="seg" id="star" role="group" aria-label="Star level"><button type="button" data-star="5">5&#9733;</button><button type="button" data-star="6">6&#9733;</button></div></div>
+      <label class="fld q"><span class="lab">Quality <b id="qv"></b></span><input type="range" id="q" min="0" max="100" step="1" aria-label="Quality percent"></label>
+      <label class="fld"><span class="lab">Mutation</span><select id="mut" aria-label="Mutation for every item"></select></label>
+    </div>
+    <div class="ctl2">
+      <label class="ck"><input type="checkbox" id="diff"> Show the difference from the first item</label>
+      <button type="button" class="btn sm" id="clear">Clear all</button>
+    </div>
+  </section>
+
+  <section class="card" id="out"></section>
+
+  <p class="foot">Last edited 20/11/26 · Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>
