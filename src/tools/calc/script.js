@@ -305,6 +305,23 @@ function upCandidates(){
     if(used.length<2)return;const b1=best[x.n],nn=used.length;
     add({kind:`Rings ×${nn}`,replaces:Object.entries(used.reduce((o,u)=>(o[u.was]=(o[u.was]||0)+1,o),{})).map(([n,c])=>(c>1?c+"× ":"")+n).join(", "),name:`${x.n} ×${nn}`,rarity:x.r,money:(b1.money||0)*nn,other:b1.other?b1.other+` (×${nn})`:"",limited:b1.limited,pans:(b1.pans||0)*nn,unknown:b1.unknown,
       state:st,apply:()=>{used.forEach(u=>{S.slots[u.k]=Object.assign({},S.slots[u.k],{n:x.n,l:"6",q:100})})},recipe:b1.recipe?`${nn}× (${b1.recipe})`:""})});
+  // pan enchants: each one you don't have. Effort = rolls to hit it on the best enchant table (one roll counted as 10 pans),
+  // or 1 when there's an Enchant Book for it
+  const EN=P.ench||{pan:[]};
+  if(base.pan)EN.pan.forEach(e=>{if(e.n===base.panEn)return;const st=clone(base);st.panEn=e.n;const ps=(e.ch||[]).map(x=>parseFloat(x)/100).filter(x=>x>0),best=ps.length?Math.max(...ps):0;
+    add({kind:"Pan enchant",name:e.n,replaces:base.panEn||"",where:e.src?e.src:best?`~1 in ${fmt(1/best,0)} rolls`:"",money:0,pans:e.src?0:best?Math.round(10/best):0,unknown:!e.src&&!best,limited:false,state:st,apply:()=>{S.panEn=e.n},enchant:true})});
+  // museum: for each rarity row, the best mineral you don't display yet, in that row's emptiest or weakest slot
+  // (at full size and no modifier; effort = pans to find one at your luck)
+  const mb=base.mus&&base.mus!=="none"?musBoard(base):null;
+  if(mb){const shown=new Set();MORDER.forEach(r=>(mb[r]||[]).forEach(sl=>{if(sl&&sl.m&&sl.m!=="Any")shown.add(String(sl.m).toLowerCase())}));
+    MORDER.forEach(r=>{const row=Array.from({length:MSLOTS[r]},(_,i)=>(mb[r]||[])[i]||{m:null,u:"None"});
+      // weakest slot: empty first, else the one whose removal costs the least for this goal
+      let wi=row.findIndex(sl=>!sl.m);if(wi<0){let lo=Infinity;row.forEach((sl,i)=>{const b2=JSON.parse(JSON.stringify(mb));b2[r]=row.map((q,j)=>j===i?{m:null,u:"None"}:q);const t2=clone(base);t2.mus="custom";t2.museumBoard=b2;const sc=uScore(compute(t2).tot,w);if(s0-sc<lo){lo=s0-sc;wi=i}})}
+      let bestM=null;P.mins.filter(m=>m.r===r&&!shown.has(m.n.toLowerCase())).forEach(m=>{const b2=JSON.parse(JSON.stringify(mb));b2[r]=row.map((q,j)=>j===wi?{m:m.n,u:"None"}:q);const t2=clone(base);t2.mus="custom";t2.museumBoard=b2;
+        const g=uScore(compute(t2).tot,w)-s0;if(g>1e-9&&(!bestM||g>bestM.g))bestM={m,g,st:t2,b2}});
+      if(!bestM)return;const pn=pansFor(bestM.m.n),was=row[wi].m;
+      add({kind:`Museum (${r})`,name:bestM.m.n,replaces:was?(was==="Any"?"Any "+r:was):"",rarity:r,money:0,pans:pn==null?0:pn,unknown:pn==null,limited:false,state:bestM.st,
+        apply:()=>{S.mus="custom";S.museumBoard=bestM.b2},where:[pn==null?"not panned":"",base.mus!=="custom"?"Try it copies your museum into a custom one":""].filter(Boolean).join(" · ")})})}
   const effort=c=>Math.max(1,(c.pans||0)+(c.money||0)/1000)*(c.unknown?20:1);
   out.forEach(c=>{c.effort=effort(c);c.value=c.gain/c.effort});
   const keep=S.upEvent?out:out.filter(c=>!c.limited);
