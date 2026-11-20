@@ -250,25 +250,95 @@ $("cpStats").onclick=async()=>{const st=effState(),t=compute(st).tot;const gear=
   try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
   ptToast(ok?"Stats copied, paste them anywhere":"Couldn't copy, your browser blocked it")};
 $("toImg").onclick=()=>{const st=effState();const r=compute(st);
-  const gear=[];const pan=G.pans.find(x=>x.name===st.pan),sh=G.shovels.find(x=>x.name===st.shovel);
-  if(pan)gear.push({cells:[{t:"Pan",col:"#98a2ad"},{t:pan.name,b:true,ic:G.img[pan.image],sub:[st.panEn?"Enchant: "+st.panEn:"No enchant",st.trinket?"Trinket: "+st.trinket:""].filter(Boolean).join(" · ")},{t:"—",col:"#98a2ad"},{t:"—",col:"#98a2ad"},{t:"—",col:"#98a2ad"}]});
-  if(sh)gear.push({cells:[{t:"Shovel",col:"#98a2ad"},{t:sh.name,b:true,ic:G.img[sh.image],sub:st.shEn?"Enchant: "+st.shEn:"No enchant"},{t:"—",col:"#98a2ad"},{t:"—",col:"#98a2ad"},{t:"—",col:"#98a2ad"}]});
-  SLOTDEF.forEach(([k,l])=>{const v=(st.slots||{})[k];if(!v||!v.n)return;const x=EQB[v.n];const m=v.m||"None";
-    gear.push({cells:[{t:l,col:"#98a2ad"},{t:v.n,b:true,ic:x&&P.eimg[x.img],sub:x?x.r:"",subcol:x?(RHX[x.r]||"#98a2ad"):"#98a2ad"},{t:v.l==="0"?"0★":v.l==="5"?"5★":"6★",mono:true,col:"#f2b53a"},{t:m==="None"?"None":m,col:MUTHX[m]||"#98a2ad",b:m!=="None"},{t:(v.q??100)+"%",mono:true}]})});
+  const hasGear=st.pan||st.shovel||SLOTDEF.some(([k])=>((st.slots||{})[k]||{}).n);
+  if(!hasGear){ptToast("Pick some gear first");return}
+  ptSaveImg("My build",()=>buildImage(st,r))};
+// ---- the saved build card: pan, shovel and museum up top, then stats, equipment and boosts ----
+async function buildImage(st,r){
+  const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
+  try{await document.fonts.ready}catch(e){}
+  const W=1300,PAD=40,GAP=16,IW=W-PAD*2,BG="#14181c",CARD="#1b2026",LINE="#2a3139",TX="#e6e9ec",MU="#98a2ad",GOLD="#f2b53a";
+  // ---- gather ----
+  const pan=G.pans.find(x=>x.name===st.pan),sh=G.shovels.find(x=>x.name===st.shovel);
+  const board=st.mus!=="none"?musBoard(st):null,mt=musTotals(st);
+  const musName=st.mus==="board"?"Museum Planner board":st.mus==="custom"?"Custom museum":String(st.mus||"").startsWith("lo:")?st.mus.slice(3):"";
+  const disp=[];if(board)Object.entries(board).forEach(([rar,arr])=>(arr||[]).forEach(sl=>{if(sl&&sl.m){const m=MIN[String(sl.m).toLowerCase()];disp.push({n:sl.m,ic:m&&m.ic,r:m?m.r:rar,any:sl.m==="Any"})}}));
+  const RO=["Ascended","Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];disp.sort((a,b)=>RO.indexOf(a.r)-RO.indexOf(b.r));
+  const musStats=Object.entries(mt.t).filter(([,v])=>Math.abs(v)>1e-9).sort((a,b)=>b[1]-a[1]);
+  const gear=[];SLOTDEF.forEach(([k,l])=>{const v=(st.slots||{})[k];if(!v||!v.n)return;const x=EQB[v.n];gear.push({slot:l,n:v.n,ic:x&&P.eimg[x.img],r:x?x.r:"",st:v.l==="0"?0:v.l==="5"?5:6,mu:v.m||"None",q:v.q??100})});
   const boosts=[];const lab=k=>{const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
-  Object.entries(st.b||{}).forEach(([k,v])=>{if(v)boosts.push({t:lab(k),col:"#e6e9ec"})});
+  Object.entries(st.b||{}).forEach(([k,v])=>{if(v)boosts.push({t:lab(k),col:TX})});
   (st.pots||[]).forEach(n=>boosts.push({t:n,col:"#b880ee"}));(st.runes||[]).forEach(n=>boosts.push({t:n+" rune",col:"#68a6f0"}));
-  const n=st.n||{};if(+n.friendTotem>=0)boosts.push({t:`Friendship Totem (${+n.friendTotem} nearby)`,col:"#e6e9ec"});if(+n.friends>0)boosts.push({t:`${+n.friends} friend${+n.friends===1?"":"s"} online`,col:"#e6e9ec"});
-  if(+n.mastery>0)boosts.push({t:`Location mastery +${n.mastery}×`,col:"#e6e9ec"});if(+n.flatLuck>0)boosts.push({t:`+${fmt(+n.flatLuck,0)} flat luck`,col:statHex("Luck")});if(+n.flatDig>0)boosts.push({t:`+${fmt(+n.flatDig,0)} flat dig strength`,col:statHex("Dig Strength")});
-  const mt=musTotals(st);if(st.mus!=="none"&&mt.n)boosts.push({t:`Museum: ${mt.n} display${mt.n===1?"":"s"}`,col:"#3cc2a8"});
-  const stats=STATS.filter(x=>r.base[x]||r.tot[x]||x==="Luck").map(x=>({cells:[{t:x,b:true,col:statHex(x)},{t:fv(x,r.base[x]+r.flat[x]),mono:true},{t:["Toughness","Inventory Size"].includes(x)?"—":"×"+fmt(1+r.pile[x],2),mono:true,col:"#98a2ad"},{t:fv(x,r.tot[x]),mono:true,b:true}]}));
-  const secs=[];if(gear.length)secs.push({h:"Gear",cols:[{h:"Slot",w:.14},{h:"Item",w:.42},{h:"Stars",w:.12,al:"r"},{h:"Mutation",w:.18,al:"r"},{h:"Quality",w:.14,al:"r"}],rows:gear});
-  if(boosts.length)secs.push({h:"Boosts",cols:[{h:"Active",w:1}],rows:[{cells:[{chips:boosts}]}]});
-  secs.push({h:"Stats",cols:[{h:"Stat",w:.34},{h:"Gear",w:.22,al:"r"},{h:"Boost pile",w:.2,al:"r"},{h:"Total",w:.24,al:"r"}],rows:stats});
+  const n=st.n||{};if(+n.friendTotem>=0)boosts.push({t:`Friendship Totem (${+n.friendTotem} nearby)`,col:TX});if(+n.friends>0)boosts.push({t:`${+n.friends} friend${+n.friends===1?"":"s"} online`,col:TX});
+  if(+n.mastery>0)boosts.push({t:`Location mastery +${n.mastery}×`,col:TX});if(+n.flatLuck>0)boosts.push({t:`+${fmt(+n.flatLuck,0)} flat luck`,col:statHex("Luck")});if(+n.flatDig>0)boosts.push({t:`+${fmt(+n.flatDig,0)} flat dig strength`,col:statHex("Dig Strength")});
+  const stats=SHOW.filter(x=>Math.abs(r.tot[x]||0)>1e-9||x==="Luck");
   const sub=[];const ex=[r.ev>1?`events ×${r.ev} luck`:"",r.luckMult>1?`tools ×${fmt(r.luckMult,2)} luck`:""].filter(Boolean);if(ex.length)sub.push("Includes "+ex.join(" and "));
   if((S.isoOff||[]).length||S.only)sub.push("Only some parts counted");
-  if(!gear.length&&!boosts.length){ptToast("Pick some gear first");return}
-  ptSaveImg("My build",()=>ptTableImage({title:"My build",sub,sections:secs}))};
+  // ---- measure ----
+  const m=document.createElement("canvas").getContext("2d");
+  const chipRows=(list,w,font)=>{m.font=font;const rows=[[]];let x=0;list.forEach(ch=>{const cw=m.measureText(ch.t).width+22;if(x+cw>w&&rows[rows.length-1].length){rows.push([]);x=0}rows[rows.length-1].push({...ch,w:cw});x+=cw+8});return rows};
+  const HERO=212,SC=4,STH=96,GC=3,GTH=78,SECH=44;
+  const statRowsN=Math.ceil(stats.length/SC),gearRowsN=Math.ceil(gear.length/GC);
+  const bRows=boosts.length?chipRows(boosts,IW-36,`13px ${F}`):[];
+  let H=PAD+(sub.length?88:62)+HERO+GAP+SECH+statRowsN*(STH+12)+(gear.length?SECH+gearRowsN*(GTH+12):0)+(boosts.length?SECH+bRows.length*32+28:0)+PAD-4;
+  // ---- images ----
+  const srcs=[pan&&G.img[pan.image],sh&&G.img[sh.image],...gear.map(g=>g.ic),...disp.slice(0,16).map(d=>d.ic)].filter(Boolean);
+  const IMG={};await Promise.all([...new Set(srcs)].map(s=>new Promise(res=>{const i=new Image();i.onload=()=>{IMG[s]=i;res()};i.onerror=()=>res();i.src=s})));
+  // ---- draw ----
+  const cv=document.createElement("canvas"),sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
+  const rr=(x,y,w,h,rad)=>{c.beginPath();c.moveTo(x+rad,y);c.arcTo(x+w,y,x+w,y+h,rad);c.arcTo(x+w,y+h,x,y+h,rad);c.arcTo(x,y+h,x,y,rad);c.arcTo(x,y,x+w,y,rad);c.closePath()};
+  const fit=(t,w)=>{t=String(t);if(c.measureText(t).width<=w)return t;while(t.length>1&&c.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"};
+  const card=(x,y,w,h,edge)=>{c.fillStyle=CARD;rr(x,y,w,h,14);c.fill();c.strokeStyle=LINE;c.lineWidth=1;rr(x+.5,y+.5,w-1,h-1,14);c.stroke();if(edge){c.save();rr(x,y,w,h,14);c.clip();c.fillStyle=edge;c.fillRect(x,y,4,h);c.restore()}};
+  const label=(t,x,y,col)=>{c.fillStyle=col||MU;c.font=`700 11.5px ${F}`;let xx=x;for(const ch of t.toUpperCase()){c.fillText(ch,xx,y);xx+=c.measureText(ch).width+1.3}};
+  const img=(src,x,y,s,tile)=>{if(tile){c.fillStyle="#12161a";rr(x,y,s,s,10);c.fill()}const i=IMG[src];if(!i)return;const k=Math.min((s-(tile?8:0))/i.width,(s-(tile?8:0))/i.height),w=i.width*k,h=i.height*k;c.drawImage(i,x+(s-w)/2,y+(s-h)/2,w,h)};
+  const sec=(t,y)=>{c.fillStyle=TX;c.font=`700 20px ${FD}`;c.fillText(t,PAD,y+26)};
+  c.fillStyle=BG;c.fillRect(0,0,W,H);
+  // header
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.fillStyle=TX;c.font=`700 34px ${FD}`;c.fillText("My build",PAD,PAD+30);
+  const luckTot=r.tot.Luck||0;c.font=`600 15px ${F}`;c.fillStyle=MU;const tag=`${fmt(luckTot,0)} luck · ${fmt(r.tot.Capacity||0,0)} capacity`;c.fillText(tag,PAD,PAD+54);
+  let y=PAD+62;if(sub.length){c.font=`14px ${F}`;c.fillStyle=MU;c.fillText(fit(sub.join(" · "),IW),PAD,PAD+78);y=PAD+88}
+  // hero: pan, shovel, museum
+  const hw=(IW-GAP*2)/3;
+  const tool=(x,kind,it,en,lines,edge)=>{card(x,y,hw,HERO,edge);label(kind,x+20,y+30,edge);
+    if(!it){c.fillStyle=MU;c.font=`15px ${F}`;c.fillText("None picked",x+20,y+64);return}
+    img(G.img[it.image],x+20,y+46,92,true);const tx=x+128,tw=hw-148;
+    c.fillStyle=it["name color"]||TX;c.font=`700 20px ${FD}`;c.fillText(fit(it.name,tw),tx,y+70);
+    c.font=`13px ${F}`;c.fillStyle=en?"#c9a7f5":MU;c.fillText(fit(en?"Enchant: "+en:"No enchant",tw),tx,y+92);
+    lines.forEach(([k,v],i)=>{const yy=y+122+i*24;c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(k,tx,yy);c.font=`600 14px ${FM}`;c.fillStyle=statHex(k);c.textAlign="right";c.fillText(v,x+hw-20,yy);c.textAlign="left"});
+    if(kind==="Pan"&&st.trinket){c.font=`12.5px ${F}`;c.fillStyle=MU;c.fillText(fit("Trinket: "+st.trinket,hw-40),x+20,y+HERO-16)}};
+  tool(PAD,"Pan",pan,st.panEn,pan?[["Luck",fmt(+pan.luck||0,2)],["Capacity",fmt(+pan.capacity||0,0)],["Shake Strength",fmt(+pan.strength||0,2)]].concat(pan.passive?[]:[]):[],"#e0a95b");
+  tool(PAD+hw+GAP,"Shovel",sh,st.shEn,sh?[["Dig Strength",fmt(+sh.strength||0,2)],["Dig Speed",fmt((+sh.speed||0)*100,0)+"%"],["Toughness",fmt(+sh.toughness||0,0)]]:[],"#8fb4d9");
+  // museum card
+  {const x=PAD+(hw+GAP)*2;card(x,y,hw,HERO,"#3cc2a8");label("Museum",x+20,y+30,"#3cc2a8");
+    if(!board||!mt.n){c.fillStyle=MU;c.font=`15px ${F}`;c.fillText("No museum counted",x+20,y+64)}
+    else{c.fillStyle=TX;c.font=`700 20px ${FD}`;c.fillText(fit(musName,hw-40),x+20,y+62);c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(`${mt.n} display${mt.n===1?"":"s"}`,x+20,y+84);
+      const ms=musStats.slice(0,4);ms.forEach(([k,v],i)=>{const col=i%2,row=Math.floor(i/2),xx=x+20+col*((hw-40)/2),yy=y+112+row*24;c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(fit(k,(hw-40)/2-80),xx,yy);c.font=`600 14px ${FM}`;c.fillStyle=statHex(k);c.textAlign="right";c.fillText("+"+fmt(v,2)+"×",xx+(hw-40)/2-14,yy);c.textAlign="left"});
+      const icS=26,per=Math.floor((hw-40+6)/(icS+6)),shown=disp.slice(0,per);shown.forEach((d,i)=>{const xx=x+20+i*(icS+6),yy=y+HERO-icS-18;c.fillStyle=(RHX[d.r]||MU)+"26";rr(xx,yy,icS,icS,7);c.fill();if(IMG[d.ic]){const im=IMG[d.ic],k=Math.min((icS-4)/im.width,(icS-4)/im.height);c.drawImage(im,xx+(icS-im.width*k)/2,yy+(icS-im.height*k)/2,im.width*k,im.height*k)}else if(d.any){c.fillStyle=RHX[d.r]||MU;c.font=`700 15px ${F}`;c.textAlign="center";c.fillText("?",xx+icS/2,yy+icS/2+5.5);c.textAlign="left"}});
+      if(disp.length>per){c.font=`12px ${F}`;c.fillStyle=MU;c.textAlign="right";c.fillText(`+${disp.length-per}`,x+hw-20,y+HERO-26);c.textAlign="left"}}}
+  y+=HERO+GAP;
+  // stats
+  sec("Stats",y);y+=SECH;const sw=(IW-12*(SC-1))/SC;
+  stats.forEach((k,i)=>{const x=PAD+(i%SC)*(sw+12),yy=y+Math.floor(i/SC)*(STH+12),col=statHex(k);card(x,yy,sw,STH);
+    c.fillStyle=col;c.beginPath();c.arc(x+22,yy+26,4,0,Math.PI*2);c.fill();c.font=`600 13px ${F}`;c.fillStyle=MU;c.fillText(fit(k,sw-50),x+34,yy+30.5);
+    c.font=`600 28px ${FM}`;c.fillStyle=col;c.fillText(fit(fv(k,r.tot[k]||0),sw-40),x+18,yy+66);
+    const flat=["Toughness","Inventory Size"].includes(k);c.font=`12px ${F}`;c.fillStyle=MU;c.fillText(fit(flat?"from gear":`${fv(k,(r.base[k]||0)+(r.flat[k]||0))} × ${fmt(1+(r.pile[k]||0),2)}`,sw-36),x+18,yy+86)});
+  y+=statRowsN*(STH+12);
+  // equipment
+  if(gear.length){sec("Equipment",y);y+=SECH;const gw=(IW-12*(GC-1))/GC;
+    gear.forEach((g,i)=>{const x=PAD+(i%GC)*(gw+12),yy=y+Math.floor(i/GC)*(GTH+12);card(x,yy,gw,GTH,RHX[g.r]);
+      img(g.ic,x+16,yy+13,52,true);const tx=x+80,tw=gw-96;
+      c.font=`600 15.5px ${F}`;c.fillStyle=RHX[g.r]||TX;c.fillText(fit(g.n,tw),tx,yy+32);
+      c.font=`12.5px ${F}`;c.fillStyle=MU;const s1=g.slot+" · ";c.fillText(s1,tx,yy+56);let xx=tx+c.measureText(s1).width;
+      c.fillStyle=GOLD;c.font=`600 12.5px ${FM}`;const stt=g.st+"★";c.fillText(stt,xx,yy+56);xx+=c.measureText(stt).width;
+      c.font=`12.5px ${F}`;c.fillStyle=MU;c.fillText(" · ",xx,yy+56);xx+=c.measureText(" · ").width;
+      const mcol=g.mu==="None"?MU:(MUTHX[g.mu]||TX);c.fillStyle=mcol;c.font=g.mu==="None"?`12.5px ${F}`:`600 12.5px ${F}`;const mt2=g.mu==="None"?"No mutation":g.mu;c.fillText(fit(mt2,x+gw-16-xx-48),xx,yy+56);
+      c.textAlign="right";c.font=`600 12.5px ${FM}`;c.fillStyle=g.q>=100?TX:MU;c.fillText(g.q+"%",x+gw-16,yy+56);c.textAlign="left"});
+    y+=gearRowsN*(GTH+12)}
+  // boosts
+  if(boosts.length){sec("Boosts",y);y+=SECH;card(PAD,y,IW,bRows.length*32+16);
+    bRows.forEach((row,j)=>{let xx=PAD+18;row.forEach(ch=>{const yy=y+12+j*32;c.strokeStyle=ch.col+"88";c.lineWidth=1;rr(xx,yy,ch.w,24,12);c.stroke();c.fillStyle=ch.col+"14";rr(xx,yy,ch.w,24,12);c.fill();c.fillStyle=ch.col;c.font=`13px ${F}`;c.fillText(ch.t,xx+11,yy+16.5);xx+=ch.w+8})})}
+  return await new Promise(res=>cv.toBlob(res,"image/png"))}
 // ---- gear picker with hover preview ----
 const clone=o=>JSON.parse(JSON.stringify(o));
 // rings the game only lets you wear one of at a time
@@ -345,7 +415,7 @@ const boostTxt=m=>m&&m.mu?m.mu.b.map(([s,v])=>`${s} ${v<0?"−":"+"}${Math.abs(v
 function musEditor(){const ed=$("musEd");$("musCopy").hidden=S.mus==="custom";if(S.mus!=="custom"){ed.innerHTML="";return}
   if(!S.museumBoard)S.museumBoard=blankBoard();const bd=S.museumBoard;
   ed.innerHTML=MORDER.map(r=>{const opts=P.mins.filter(m=>m.r===r&&m.mu);return `<div class="mrow" style="--rc:${rc(r)}"><span class="rl">${r}</span><div class="mslots">${(bd[r]||[]).map((sl,i)=>`<div class="msl">
-    <select data-mm="${r}|${i}" aria-label="${r} display ${i+1}"><option value="">— empty —</option>${opts.map(m=>`<option value="${esc(m.n)}"${m.n===sl.m?" selected":""}>${esc(m.n)} · ${esc(boostTxt(m))}</option>`).join("")}</select>
+    <select data-mm="${r}|${i}" aria-label="${r} display ${i+1}"><option value="">— empty —</option><option value="Any"${sl.m==="Any"?" selected":""}>Anything (only the modifier counts)</option>${opts.map(m=>`<option value="${esc(m.n)}"${m.n===sl.m?" selected":""}>${esc(m.n)} · ${esc(boostTxt(m))}</option>`).join("")}</select>
     <select data-mu="${r}|${i}" aria-label="${r} display ${i+1} modifier">${P.mods.map(md=>`<option value="${esc(md[0])}"${md[0]===(sl.u||"None")?" selected":""}>${md[0]==="None"?"No modifier":esc(md[0])}</option>`).join("")}</select></div>`).join("")}</div></div>`}).join("")}
 $("musCopy").onclick=()=>{const src=S.mus==="custom"?null:musBoard();const bd=blankBoard();if(src)MORDER.forEach(r=>(src[r]||[]).forEach((sl,i)=>{if(bd[r][i]&&sl)bd[r][i]={m:sl.m||null,u:sl.u||"None"}}));
   if(S.mus!=="custom"||!S.museumBoard)S.museumBoard=bd;S.mus="custom";save();fillMus();musEditor();render()};
@@ -375,7 +445,7 @@ window.ptTotals=()=>compute(S).tot;
 // stats for a build from Build Sheets, split by where they come from; never changes the calculator's own setup
 window.ptBreakdown=st=>{const EN=P.ench||{pan:[],shovel:[]};const R=(t,names,suf)=>resolveName(t,names,suf)||"";
   const slots={};Object.entries(st.slots||{}).forEach(([k,v])=>{if(!v||!v.n){slots[k]={};return}const slot=(SLOTDEF.find(d=>d[0]===k)||[])[2];slots[k]=Object.assign({},v,{n:R(v.n,EQ.filter(x=>x.slot===slot).map(x=>x.n),"")})});
-  const bd=clone(st.museumBoard||blankBoard());MORDER.forEach(r=>(bd[r]||[]).forEach(sl=>{if(sl&&sl.m)sl.m=R(sl.m,P.mins.filter(x=>x.r===r).map(x=>x.n),"")||null}));
+  const bd=clone(st.museumBoard||blankBoard());MORDER.forEach(r=>(bd[r]||[]).forEach(sl=>{if(sl&&sl.m)sl.m=sl.m==="Any"?"Any":R(sl.m,P.mins.filter(x=>x.r===r).map(x=>x.n),"")||null}));
   const T={pan:R(st.pan,G.pans.map(x=>x.name),"pan"),shovel:R(st.shovel,G.shovels.map(x=>x.name),"shovel"),panEn:R(st.panEn,EN.pan.map(e=>e.n),""),shEn:R(st.shEn,EN.shovel.map(e=>e.n),""),trinket:"",slots,mus:"custom",museumBoard:bd,b:{},n:{friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0},pots:[],runes:[]};
   const full=compute(T),noJ=compute(Object.assign(clone(T),{slots:{}})),noT=compute(Object.assign(clone(T),{pan:"",shovel:"",panEn:"",shEn:""}));
   return STATS.filter(x=>x!=="Inventory Size").map(x=>({s:x,tools:noJ.base[x],jewelry:noT.base[x],museum:full.pile[x],total:full.tot[x]})).filter(r=>r.tools||r.jewelry||r.museum||r.total)};
