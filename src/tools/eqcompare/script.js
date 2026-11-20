@@ -3,7 +3,7 @@ const KEY="eqc-s",MAX=6;
 let S={items:[],star:"6",q:100,mut:"None",diff:false,show:{cost:true,recipe:true,notes:true,niche:false}};
 try{Object.assign(S,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
 // stats that only matter in the Pharaoh's Tomb or for traps: hidden unless "Tomb & trap stats" is ticked
-const NICHE=new Set(["Tomb Time","Trap Ward","Tomb Jar Finds","Lockpick Zone","Status Timer Speed"]);
+const NICHE=new Set(["Tomb Time","Trap Ward","Tomb Jar Finds","Lockpick Zone"]);
 S.show=Object.assign({cost:true,recipe:true,notes:true,niche:false},S.show||{});
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const EQ=(P.equip||[]).filter(x=>x.st&&x.st.length),EQB=Object.fromEntries(EQ.map(x=>[x.n,x]));
