@@ -271,6 +271,14 @@ function recipeCost(x){let pans=0,unknown=0;(x.rec||[]).forEach(([q,n])=>{const 
 const uScore=(tot,w)=>Object.entries(w).reduce((a,[s,k])=>a+k*Math.log(1+Math.max(0,tot[s]||0)),0);
 function upGoal(){const g=UGOALS.find(g=>g[0]===S.upGoal)||UGOALS[0];return g}
 // every swap worth trying, with what it gives and what it costs
+// chance an ore gets one particular modifier, at a Modifier Boost (in %) and luck. Same model as Modifier Odds:
+// "any modifier" from the boost, then which one from rolls that keep the rarest.
+const MODW_C=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
+function modChanceCalc(u,mbPct,luck){const anyMod=e=>1-Math.pow(1-.0631,Math.max(0,+e||0)/100);
+  const list=MODW_C.filter(([k])=>k!=="Lunar"||u==="Lunar");if(!list.some(([k])=>k===u))return 0;const tot=list.reduce((a,x)=>a+x[1],0);
+  const f=N=>{let a=0;const o={};list.forEach(([k,w2])=>{const p=w2/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-p),N);a+=p});return o};
+  const L=Math.max(1,11.662*Math.pow(Math.max(1,mbPct)/100,.838)+1.96352*Math.max(0,luck)/1000),parts=[f(1),f(Math.max(1,L*.172)),f(L)];
+  return anyMod(mbPct)*(.313*parts[0][u]+.127*parts[1][u]+.559*parts[2][u])}
 function upCandidates(){
   const base=effState(),now=compute(base),w=upGoal()[1];const s0=uScore(now.tot,w);
   const out=[];const add=(c)=>{const t=compute(c.state).tot;const gain=uScore(t,w)-s0;if(gain<=1e-9)return;
@@ -322,6 +330,16 @@ function upCandidates(){
       if(!bestM)return;const pn=pansFor(bestM.m.n),was=row[wi].m;
       add({kind:`Museum (${r})`,name:bestM.m.n,replaces:was?(was==="Any"?"Any "+r:was):"",rarity:r,money:0,pans:pn==null?0:pn,unknown:pn==null,limited:false,state:bestM.st,
         apply:()=>{S.mus="custom";S.museumBoard=bestM.b2},where:[pn==null?"not panned":"",base.mus!=="custom"?"Try it copies your museum into a custom one":""].filter(Boolean).join(" · ")})})}
+  // museum modifiers: for every display, the best modifier for this goal. Effort = pans to find the mineral ÷ the chance it
+  // rolls that modifier at your Modifier Boost and luck (same model as Modifier Odds and the farm routes)
+  if(mb){const T=compute(base).tot,mbx=Math.max(0,T["Modifier Boost"]||0),lk=T.Luck||0;
+    MORDER.forEach(r=>(mb[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const curU=sl.u||"None";let bestU=null;
+      Object.keys(MODS).forEach(u=>{if(u===curU||u==="None"||u==="Lunar")return;const b2=JSON.parse(JSON.stringify(mb));b2[r][i]={m:sl.m,u};const t2=clone(base);t2.mus="custom";t2.museumBoard=b2;
+        const g=uScore(compute(t2).tot,w)-s0;if(g<=1e-9)return;const ch=modChanceCalc(u,mbx,lk);const find=sl.m==="Any"?Math.min(...P.mins.filter(m=>m.r===r).map(m=>pansFor(m.n)).filter(v=>v!=null)):pansFor(sl.m);
+        const pn=find!=null&&isFinite(find)&&ch>0?find/ch:null;const c={g,u,pn,st:t2,b2,ch};const val=(S.upSort||"value")==="gain"?g:g/Math.max(1,pn==null?1e9:pn);if(!bestU||val>bestU.val)bestU={...c,val}});
+      if(!bestU)return;const nm=sl.m==="Any"?`Any ${r}`:sl.m;
+      add({kind:`Museum modifier (${r})`,name:`${bestU.u} ${nm}`,replaces:curU==="None"?"no modifier":curU,rarity:r,money:0,pans:bestU.pn==null?0:bestU.pn,unknown:bestU.pn==null,limited:false,state:bestU.st,
+        apply:()=>{S.mus="custom";S.museumBoard=bestU.b2},where:[bestU.ch>0?`${bestU.u} on ~1 in ${fmt(1/bestU.ch,0)} ores`:"",base.mus!=="custom"?"Try it copies your museum into a custom one":""].filter(Boolean).join(" · ")})}))}
   const effort=c=>Math.max(1,(c.pans||0)+(c.money||0)/1000)*(c.unknown?20:1);
   out.forEach(c=>{c.effort=effort(c);c.value=c.gain/c.effort});
   const keep=S.upEvent?out:out.filter(c=>!c.limited);
