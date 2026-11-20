@@ -282,20 +282,28 @@ function upCandidates(){
     add({kind:"Pan",name:p.name,where:p.location,money:uMoney(p.price),pans:0,limited:limited(p),state:st,apply:()=>{S.pan=p.name}})});
   G.shovels.forEach(p=>{if(p.name===S.shovel)return;const st=clone(base);st.shovel=p.name;
     add({kind:"Shovel",name:p.name,where:p.location,money:uMoney(p.price),pans:0,limited:limited(p),state:st,apply:()=>{S.shovel=p.name}})});
-  // equipment: the best slot for each piece you aren't already wearing
-  const worn=new Set(SLOTDEF.map(([k])=>(S.slots[k]||{}).n).filter(Boolean));
+  // equipment: the best slot for each piece. Rings can be worn more than once, so a ring you already wear
+  // is still suggested for your other ring slots; only the slot that already holds it is skipped.
   const best={};
   SLOTDEF.forEach(([k,label,slot])=>{
     EQ.filter(x=>x.slot===slot).forEach(x=>{
-      if(worn.has(x.n))return;
-      const cur=S.slots[k]||{};const st=clone(base);st.slots=Object.assign({},st.slots,{[k]:{n:x.n,l:"6",q:100,m:cur.m||"None"}});
+      const cur=S.slots[k]||{};if(cur.n===x.n)return;const st=clone(base);st.slots=Object.assign({},st.slots,{[k]:{n:x.n,l:"6",q:100,m:cur.m||"None"}});
       const t=compute(st).tot;const g=uScore(t,w)-s0;if(g<=1e-9)return;
       if(!best[x.n]||g>best[x.n].gain){const c=recipeCost(x);
-        best[x.n]={kind:label,name:x.n,rarity:x.r,money:x.cur==="$"?uMoney(x.price):0,
+        best[x.n]={kind:label,replaces:cur.n||"",name:x.n,rarity:x.r,money:x.cur==="$"?uMoney(x.price):0,
           other:x.cur!=="$"?fmt(uMoney(x.price),0)+" "+x.cur:"",limited:!!x.ev,pans:c.pans,unknown:c.unknown,gain:g,
           state:st,apply:()=>{S.slots[k]=Object.assign({},S.slots[k],{n:x.n,l:"6",q:100})},
           recipe:(x.rec||[]).map(([q,n])=>q+"× "+n).join(", ")}}})});
   Object.values(best).forEach(c=>add(c));
+  // the same ring in several slots: swap it into every ring slot it beats (weakest first) as one suggestion
+  const ringK=SLOTDEF.filter(d=>d[2]==="Ring").map(d=>d[0]);
+  EQ.filter(x=>x.slot==="Ring"&&best[x.n]).forEach(x=>{let st=clone(base),sc=s0;const used=[];
+    for(;;){let pick=null;ringK.forEach(k=>{const cur=st.slots[k]||{};if(cur.n===x.n)return;const t2=clone(st);t2.slots=Object.assign({},t2.slots,{[k]:{n:x.n,l:"6",q:100,m:cur.m||"None"}});
+        const g=uScore(compute(t2).tot,w);if(g>sc+1e-9&&(!pick||g>pick.g))pick={k,g,t2,was:cur.n||"empty"}});
+      if(!pick)break;st=pick.t2;sc=pick.g;used.push(pick)}
+    if(used.length<2)return;const b1=best[x.n],nn=used.length;
+    add({kind:`Rings ×${nn}`,replaces:Object.entries(used.reduce((o,u)=>(o[u.was]=(o[u.was]||0)+1,o),{})).map(([n,c])=>(c>1?c+"× ":"")+n).join(", "),name:`${x.n} ×${nn}`,rarity:x.r,money:(b1.money||0)*nn,other:b1.other?b1.other+` (×${nn})`:"",limited:b1.limited,pans:(b1.pans||0)*nn,unknown:b1.unknown,
+      state:st,apply:()=>{used.forEach(u=>{S.slots[u.k]=Object.assign({},S.slots[u.k],{n:x.n,l:"6",q:100})})},recipe:b1.recipe?`${nn}× (${b1.recipe})`:""})});
   const effort=c=>Math.max(1,(c.pans||0)+(c.money||0)/1000)*(c.unknown?20:1);
   out.forEach(c=>{c.effort=effort(c);c.value=c.gain/c.effort});
   const keep=S.upEvent?out:out.filter(c=>!c.limited);
@@ -315,7 +323,7 @@ function renderUp(){
       .map(([s,v])=>`<span class="${v<0?"neg":"gain"}">${esc(s)} <b>${fv2(s,v)}</b></span>`).join("");
     const money=c.money?uMoneyTxt(c.money):c.other||(c.limited?"event":"");
     const grind=c.pans?uPansTxt(c.pans):"";
-    const meta=c.kind+(c.where?" · "+c.where:"")+(c.recipe?" · "+c.recipe:"")+(c.unknown?" · some materials aren't panned":"");
+    const meta=c.kind+(c.replaces?" (instead of "+c.replaces+")":"")+(c.where?" · "+c.where:"")+(c.recipe?" · "+c.recipe:"")+(c.unknown?" · some materials aren't panned":"");
     return `<div class="upi"><span class="upn"><b>${esc(c.name)}</b><span class="uph" title="${esc(meta)}">${esc(meta)}</span><span class="upg">${gains}</span></span>
       <span class="upm">${esc(money)}</span><span class="upp">${esc(grind)}</span>
       <button type="button" class="btn sm" data-uptry="${i}">Try it</button></div>`}).join("");
