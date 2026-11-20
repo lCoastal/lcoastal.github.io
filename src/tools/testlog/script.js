@@ -3,6 +3,12 @@ const $=id=>document.getElementById(id);
 // Each session: when, where, setup, how much was logged, what was tested, what it showed, what changed on the site.
 const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables",kg:"Weights"};
 const S=[
+{id:"galaxis2-2011",date:"20/11/26",title:"GalaxisHub log 2: re-check on fresh data, Size Boost 12.6×",zone:"29 zones, mostly Sandstone Stream",topics:["lk","kg"],kind:"lk",
+ setup:{Luck:"Caps 1 – 50,000, and up to 123,000 uncapped",Capacity:"8,160 – 9,245",["Modifier Boost"]:"4.75×",["Size Boost"]:"7.15× and 12.6×",Zones:"29 zones; 543,000 of the minerals from Sandstone Stream"},
+ amount:{Minerals:652655},
+ tested:["Whether the zone size factors from the first GalaxisHub log hold on separate data and at a new Size Boost","Whether a luck cap still works like 56% of its number","Whether anything in the log makes weights 1.5× or 2× heavier (Solar Magnifier)"],
+ found:["Zone factors repeat: Rubble Creek 0.80 (0.80 before), Rubble Creek Deposits 0.88 (0.89), Sandstone Stream 1.00 (1.00), Volcanic Sands 0.95–0.96 (0.96), and the same at Size Boost 12.6×, which the first log never had","Caps again behave like 56% of their number: exactly 0.56 for caps of 100 to 50,000 (72,000 capped minerals), 0.54–0.58 for caps of 1 and 10. Uncapped luck came out at 0.96× the luck shown","No stretch of the log has weights 1.5× or 2× above the normal range. The heaviest Gold anywhere is 16.96× its base × (1 + Size Boost) × zone, against a normal top of 15.5×","For about 7 minutes (09:41–09:49, mostly Rubble Creek) every weight was 1.10× heavier, smallest and biggest alike. What caused it isn't known: it isn't in the logged Size Boost"],
+ changed:["Nothing: the zone factors and the 0.56 luck cap already in the toolkit both held up"]},
 {id:"galaxis-2011",date:"20/11/26",title:"GalaxisHub log: 26 zones, capped and uncapped luck",zone:"26 zones",topics:["lk","cp","md","kg"],kind:"lk",
  setup:{Luck:"Caps 1 – 10,000, and 2,500 – 99,000 uncapped",Capacity:"7,817 – 10,493",["Modifier Boost"]:"4.75×",["Size Boost"]:"7.15× and 7.55×",Zones:"26 zones, from Rubble Creek to Timelocked Sanctuary"},
  amount:{Pans:6080,Minerals:650265},
@@ -84,7 +90,7 @@ const FIND=[
  ["Chance of a normal modifier is 1 − 0.937^boost (×): about 10% at 1.1×, 36% at 6×, 45% at 9×, 69% at 16.6×. Luck doesn't change it.",["low-1211","big-1111","fixed-1211","mods-1711","galaxis-2011"]],
  ["Which modifier you get works like luck: about 11.7 × boost^0.84 + 2 per 1,000 luck rolls, keeping the rarest.",["big-1111","fixed-1211","mods-1711"]],
  ["A mineral weighs base × (1 + Size Boost) × zone factor × k, with k from 0.75 to 15.5. About 26% roll small; the rest lean heavier the bigger your pan. Zones multiply weights by ×0.80 (Rubble Creek) up to ×1.20 (Timelocked Sanctuary).",["weights-kg-1711","logger4-1711","galaxis-2011"]],
- ["A luck cap pans like 56% of its number, the same for every cap from 100 to 10,000 and in every zone tested.",["galaxis-2011"]],
+ ["A luck cap pans like 56% of its number, the same for every cap from 100 to 50,000 and in every zone tested.",["galaxis-2011","galaxis2-2011"]],
  ["The toolkit's drop chances match the game's own weights in 34 of 35 zones.",["weights-1711"]],
 ];
 const OPEN=[
@@ -95,6 +101,7 @@ const OPEN=[
  "Modifier Boost above 16.6× and luck above 267,000 are untested.",
  "How weights spread below 1,856 or above 9,245 capacity, and whether a Volcanic Eruption stacks with the Solar Magnifier.",
  "Why zones change weights (×0.80 to ×1.20), and the factor for zones not logged yet (Meteor Falls is assumed ×1).",
+ "How much the Solar Magnifier really changes weights: the toolkit and the official wiki say ×1.5, no log has shown it yet.",
 ];
 const ORDER=S.map(x=>x.id);
 // only show setup values that matter for what the session tested
