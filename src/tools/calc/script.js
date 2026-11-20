@@ -136,6 +136,8 @@ function brkSources(B){const L=[];const lab=k=>{const e=document.querySelector(`
 // how much detail: 0 just stats, 1 semi (flat × multiplier = total), 2 full breakdown. Old saves: "show breakdown" off = 0
 const brkLvl=()=>S.brkLevel!=null?+S.brkLevel:(S.showBrk===false?0:2);
 const LVLN=["Just stats","Semi","Full breakdown"];
+// multiplier lines: small museum bonuses (a Common display's +0.005×) need more than 2 decimals; trailing zeros are dropped
+const mxf=v=>v>=100?fmt(v,2):String(+v.toFixed(4));
 const BRK_STATS=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Walk Speed","Inventory Size","Toughness"];
 const FLAT_ONLY=new Set(["Toughness","Inventory Size"]);
 // per-stat breakdown data, shared by the page and the saved image
@@ -160,11 +162,11 @@ function renderParts(){const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(
   const sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
   const row=(x,txt,neg)=>`<div class="pt${x.key&&S.only===x.key?" on":""}"${x.key?` role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"`:""}><b>${esc(x.label)}${x.sub?` <small>${esc(x.sub)}</small>`:""}</b><span class="lk2" style="color:${neg?"var(--neg,#c53030)":"var(--accent)"}">${txt}</span></div>`;
   const lv=brkLvl();
-  const cards=lv===1?D.stats.map(({s,flatT,mult,xm,total,fo1})=>`<div class="bks bksemi"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b></div><div class="sem"><div><small>Flat points</small><b>${tv(s,flatT)}</b></div><div><small>Multiplier</small><b>${fo1?"—":"×"+fmt(mult,2)}</b></div>${xm!==1?`<div><small>Events &amp; tools</small><b>×${fmt(xm,2)}</b></div>`:""}<div class="semt"><small>Total</small><b style="color:${statHex(s)}">${tv(s,total)}</b></div></div></div>`).join(""):D.stats.map(({s,flatT,mult,xm,total,F,M,X,fo1})=>{
-    const formula=fo1||(mult===1&&xm===1)?"":`${tv(s,flatT)} × ${fmt(mult,2)}${xm!==1?` × ${fmt(xm,2)}`:""} = `;
+  const cards=lv===1?D.stats.map(({s,flatT,mult,xm,total,fo1})=>`<div class="bks bksemi"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b></div><div class="sem"><div><small>Flat points</small><b>${tv(s,flatT)}</b></div><div><small>Multiplier</small><b>${fo1?"—":"×"+mxf(mult)}</b></div>${xm!==1?`<div><small>Events &amp; tools</small><b>×${fmt(xm,2)}</b></div>`:""}<div class="semt"><small>Total</small><b style="color:${statHex(s)}">${tv(s,total)}</b></div></div></div>`).join(""):D.stats.map(({s,flatT,mult,xm,total,F,M,X,fo1})=>{
+    const formula=fo1||(mult===1&&xm===1)?"":`${tv(s,flatT)} × ${mxf(mult)}${xm!==1?` × ${fmt(xm,2)}`:""} = `;
     return `<div class="bks"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b><span>${formula}<em>${tv(s,total)}</em></span></div>
       <div class="bksub"><span>Flat points</span><span>${tv(s,flatT)}</span></div>${F.length?F.map(o=>row(o.x,sv(s,o.v),o.v<0)).join(""):'<p class="bkn">None</p>'}
-      ${fo1||!M.length?"":`<div class="bksub"><span>Multiplier (from ×1)</span><span>×${fmt(mult,2)}</span></div>${M.map(o=>row(o.x,(o.v<0?"−":"+")+fmt(Math.abs(o.v),2)+"×",o.v<0)).join("")}`}
+      ${fo1||!M.length?"":`<div class="bksub"><span>Multiplier (from ×1)</span><span>×${mxf(mult)}</span></div>${M.map(o=>row(o.x,(o.v<0?"−":"+")+mxf(Math.abs(o.v))+"×",o.v<0)).join("")}`}
       ${X.length?`<div class="bksub"><span>Multiplies the total</span><span>×${fmt(xm,2)}</span></div>${X.map(o=>row(o.x,"×"+fmt(o.v,2),o.v<1)).join("")}`:""}</div>`}).join("");
   $("parts").innerHTML=D.src.length||Math.abs(D.R.tot.Luck||0)>0?(cards||'<p class="hint">Every stat is switched off. Turn some on in the Breakdown column of Your stats.</p>'):'<p class="hint">Add some gear or boosts to see where your stats come from.</p>';
   $("brkLvl").value=String(lv);$("brkLvl").setAttribute("aria-valuetext",LVLN[lv]);document.querySelectorAll("[data-lvl]").forEach(b=>b.classList.toggle("on",+b.dataset.lvl===lv));
@@ -209,12 +211,12 @@ $("cpBrk").onclick=async()=>{const B=clone(S);(S.isoOff||[]).forEach(g=>Object.a
   const lbl=x=>x.label+(x.sub?` (${x.sub})`:"");
   const line=(lab,val,good)=>"    "+pad(lab,W-5)+" "+col(good?32:31,rpad(val,VW));
   const head=(lab,val)=>"  "+gray(pad(lab.toUpperCase(),W-2))+col(37,rpad(val,VW),true);
-  D.stats.forEach(d=>{const c=ANSI[d.s]||37,sum=d.fo1||(d.mult===1&&d.xm===1)?"":`${tv(d.s,d.flatT)} × ${fmt(d.mult,2)}${d.xm!==1?` × ${fmt(d.xm,2)}`:""}`;
+  D.stats.forEach(d=>{const c=ANSI[d.s]||37,sum=d.fo1||(d.mult===1&&d.xm===1)?"":`${tv(d.s,d.flatT)} × ${mxf(d.mult)}${d.xm!==1?` × ${fmt(d.xm,2)}`:""}`;
     if(lv===0){L.push(col(c,pad(d.s,W),true)+col(37,rpad(tv(d.s,d.total),VW),true));return}
     if(lv===1){L.push(col(c,pad(d.s,16),true)+gray(pad(sum?sum+" =":"",W-16))+col(37,rpad(tv(d.s,d.total),VW),true));return}
     L.push("");L.push(col(c,pad(d.s,W),true)+col(37,rpad(tv(d.s,d.total),VW),true));if(sum)L.push("  "+gray(sum));
     L.push(head("Flat points",tv(d.s,d.flatT)));d.F.forEach(o=>L.push(line(lbl(o.x),sv(d.s,o.v),o.v>=0)));
-    if(!d.fo1&&d.M.length){L.push(head("Multiplier","×"+fmt(d.mult,2)));d.M.forEach(o=>L.push(line(lbl(o.x),(o.v<0?"−":"+")+fmt(Math.abs(o.v),2)+"×",o.v>=0)))}
+    if(!d.fo1&&d.M.length){L.push(head("Multiplier","×"+mxf(d.mult)));d.M.forEach(o=>L.push(line(lbl(o.x),(o.v<0?"−":"+")+mxf(Math.abs(o.v))+"×",o.v>=0)))}
     if(d.X.length){L.push(head("Multiplies the total","×"+fmt(d.xm,2)));d.X.forEach(o=>L.push(line(lbl(o.x),"×"+fmt(o.v,2),o.v>=1)))}});
   if(lv<2)L.splice(gear?2:1,0,"");
   const txt="```ansi\n"+L.join("\n")+"\n```";let ok=false;
@@ -472,13 +474,13 @@ async function buildImage(st,r){
     DET.forEach((d,i)=>{const p=dPos[i],x=PAD+p.c*(DCW+GAP),y0=y+p.y,col=statHex(d.s);card(x,y0,DCW,p.h,col);
       c.font=`700 19px ${FD}`;c.fillStyle=col;c.fillText(d.s,x+20,y0+32);
       c.textAlign="right";c.font=`600 22px ${FM}`;c.fillStyle=TX;c.fillText(tv(d.s,d.total),x+DCW-20,y0+33);
-      const fm=d.fo1||(d.mult===1&&d.xm===1)?"":`${tv(d.s,d.flatT)} × ${fmt(d.mult,2)}${d.xm!==1?` × ${fmt(d.xm,2)}`:""}`;c.font=`12.5px ${FM}`;c.fillStyle=MU;c.fillText(fm,x+DCW-20,y0+50);c.textAlign="left";
+      const fm=d.fo1||(d.mult===1&&d.xm===1)?"":`${tv(d.s,d.flatT)} × ${mxf(d.mult)}${d.xm!==1?` × ${fmt(d.xm,2)}`:""}`;c.font=`12.5px ${FM}`;c.fillStyle=MU;c.fillText(fm,x+DCW-20,y0+50);c.textAlign="left";
       let yy=y0+58;const head=(t,v)=>{c.strokeStyle=LINE;c.beginPath();c.moveTo(x+16,yy+.5);c.lineTo(x+DCW-16,yy+.5);c.stroke();label(t,x+20,yy+20);c.textAlign="right";c.font=`600 13px ${FM}`;c.fillStyle=TX;c.fillText(v,x+DCW-20,yy+20);c.textAlign="left";yy+=30};
       const line=(o,txt)=>{const neg=o.v<0||(txt.startsWith("×")&&o.v<1);c.font=`600 13.5px ${F}`;c.fillStyle=TX;const lb=o.x.label;const lw=Math.min(c.measureText(lb).width,DCW-150);c.fillText(fit(lb,DCW-150),x+20,yy+16);
         if(o.x.sub){c.font=`12px ${F}`;c.fillStyle=MU;c.fillText(fit(o.x.sub,DCW-150-lw-8),x+20+lw+8,yy+16)}
         c.textAlign="right";c.font=`600 13px ${FM}`;c.fillStyle=neg?"#f0687f":"#3cc2a8";c.fillText(txt,x+DCW-20,yy+16);c.textAlign="left";yy+=DROW};
       head("Flat points",tv(d.s,d.flatT));if(d.F.length)d.F.forEach(o=>line(o,(o.v<0?"−":"+")+tv(d.s,Math.abs(o.v))));else{c.font=`12.5px ${F}`;c.fillStyle=MU;c.fillText("None",x+20,yy+16);yy+=DROW}
-      if(!d.fo1&&d.M.length){head("Multiplier (from ×1)","×"+fmt(d.mult,2));d.M.forEach(o=>line(o,(o.v<0?"−":"+")+fmt(Math.abs(o.v),2)+"×"))}
+      if(!d.fo1&&d.M.length){head("Multiplier (from ×1)","×"+mxf(d.mult));d.M.forEach(o=>line(o,(o.v<0?"−":"+")+mxf(Math.abs(o.v))+"×"))}
       if(d.X.length){head("Multiplies the total","×"+fmt(d.xm,2));d.X.forEach(o=>line(o,"×"+fmt(o.v,2)))}})}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 // ---- gear picker with hover preview ----
