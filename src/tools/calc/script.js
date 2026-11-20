@@ -425,6 +425,10 @@ document.addEventListener("input",e=>{const t=e.target;if(t.dataset.q){(S.slots[
 document.querySelector(".seg").addEventListener("click",e=>{const b=e.target.closest("[data-all]");if(!b)return;SLOTDEF.forEach(([k])=>{(S.slots[k]=S.slots[k]||{}).l=b.dataset.all;document.querySelector(`[data-lvl="${k}"]`).value=b.dataset.all});save();render()});
 window.onStoreChange=()=>{if(S.owned)all()};
 // the museum may have changed while this tool was hidden
-window.addEventListener("focus",()=>{fillMus();render()});
+// coming back to this tab: re-read the museum, but only rebuild when it actually changed.
+// Rebuilding on every focus replaced the buttons under the mouse, so the first click on the page got lost.
+const musSig=()=>{try{return ["mp-board","mp-loadouts"].map(k=>localStorage.getItem(k)||"").join("|")}catch(e){return ""}};
+let lastMus=musSig();
+window.addEventListener("focus",()=>{const sg=musSig();if(sg===lastMus)return;lastMus=sg;fillMus();render()});
 window.ptRefresh=()=>{fillMus();render()};
 all();
