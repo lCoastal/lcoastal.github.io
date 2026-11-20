@@ -52,7 +52,7 @@ const RARS=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
 const PROG=Object.keys(P.reqs||{});const EVENT_AREAS=["Haunted Creek","North Pole"];
 const TIMED={"Infernal Heart":"Only open from :15 to :45 each hour. Check the Event Clock and arrive at :15.","Timelocked Sanctuary":"Only open from :45 to :15 each hour. Arrive at :45 to get the full 30 minutes."};
 // route settings are shared by every page that plans a route
-const st={stats:true,luck:1000,mb:250,cap:100,pph:"",far:"",void:false,evt:false,mag:false,ord:"quick"};
+const st={stats:true,luck:1000,mb:250,cap:100,pph:"",far:"",void:false,evt:false,pyr:true,mag:false,ord:"quick"};
 try{Object.assign(st,JSON.parse(localStorage.getItem("pt-route")||"{}"))}catch(e){}
 // luck / capacity / pans per hour are shared with the other tools that ask for them
 (()=>{try{const y=window.parent.ptYou.get();["luck","cap","pph"].forEach(k=>{if(y[k]!==undefined&&y[k]!==null&&y[k]!=="")st[k]=y[k]})}catch(e){}})();
@@ -111,9 +111,12 @@ function eAll(it){it=it.filter(x=>x.c>0);if(!it.length)return 0;const l=it.map(x
   if(l.length===1)return Math.max(1,l[0].c/l[0].r);
   const lo=Math.log(1e-3/Math.max(...l.map(x=>x.r))),hi=Math.log(Math.max(...l.map(x=>(3*x.c+40)/x.r))),N=360,h=(hi-lo)/N;let s=0;
   for(let i=0;i<=N;i++){const t=Math.exp(lo+i*h);let pr=1;for(const x of l)pr*=erl(x.c,x.r*t);s+=(i===0||i===N?.5:1)*(1-pr)*t}return Math.max(1,s*h)}
-const whyOut=loc=>{const b=baseLoc(loc);if(/The Void/.test(loc)&&!st.void)return "void";if(EVENT_AREAS.includes(b)&&!st.evt)return "event";
+// the Pyramid (Pharaoh's Tomb): its dig spots need a Sun Seal, so it can be left out of the route
+const PYR=new Set((P.locs||[]).filter(l=>l.rg==="Pharaoh's Tomb").map(l=>l.n));
+const isPyr=loc=>PYR.has(baseLoc(loc))||PYR.has(loc);
+const whyOut=loc=>{const b=baseLoc(loc);if(!st.pyr&&isPyr(loc))return "pyramid";if(/The Void/.test(loc)&&!st.void)return "void";if(EVENT_AREAS.includes(b)&&!st.evt)return "event";
   if(st.far){const fi=PROG.indexOf(st.far),i=PROG.indexOf(b);if(i>fi&&!EVENT_AREAS.includes(b)&&b!=="The Void")return "locked"}return ""};
-const locOK=loc=>{const b=baseLoc(loc);if(/The Void/.test(loc)&&!st.void)return false;if(EVENT_AREAS.includes(b)&&!st.evt)return false;
+const locOK=loc=>{const b=baseLoc(loc);if(!st.pyr&&isPyr(loc))return false;if(/The Void/.test(loc)&&!st.void)return false;if(EVENT_AREAS.includes(b)&&!st.evt)return false;
   if(st.far){const fi=PROG.indexOf(st.far),i=PROG.indexOf(b);if(i>fi&&!EVENT_AREAS.includes(b)&&b!=="The Void")return false}return true};
 // items: [{m, u, c}] where c = how many still needed (0 = done, kept for display)
 function plan(items,opt={}){const L=Math.max(1,+st.luck||1),n=panItems(st.cap);const issues=[];const T=[];const locked=[];const special=[];
@@ -127,7 +130,7 @@ function plan(items,opt={}){const L=Math.max(1,+st.luck||1),n=panItems(st.cap);c
       if(!all.length)issues.push(`<b>${nm}</b>: no drop location is listed for it.`);
       else if(lockedZ.length){locked.push(it);const near=[...lockedZ].sort((x,y)=>PROG.indexOf(x)-PROG.indexOf(y))[0];
         issues.push(`<b>${nm}</b>: <span style="color:var(--neg)">not reachable yet.</span> It drops in ${esc(lockedZ.join(", "))}, ${lockedZ.length>1?"all":"which is"} further than ${esc(st.far)}. ${lockedZ.length>1?`The nearest one to unlock is <b>${esc(near)}</b>.`:`Unlock <b>${esc(near)}</b> first.`}${why.includes("void")?" It can also come from The Void if you turn on Include The Void.":""}${why.includes("event")?" It also drops in an event area (turn on Include event areas).":""}`)}
-      else issues.push(`<b>${nm}</b>: only drops in ${esc(all.join(", "))}${why.includes("void")?", so turn on Include The Void":""}${why.includes("event")?(why.includes("void")?" or":", so turn on")+" Include event areas":""}.`);return}
+      else issues.push(`<b>${nm}</b>: only drops in ${esc(all.join(", "))}${why.includes("void")?", so turn on Include The Void":""}${why.includes("pyramid")?(why.includes("void")?" or":", so turn on")+" Include Pyramid":""}${why.includes("event")?(why.includes("void")?" or":", so turn on")+" Include event areas":""}.`);return}
     T.push({...it,cands,lunar:it.u==="Lunar"})});
   const as=new Map();
   if(opt.lock&&opt.lock.order){// locked: keep the saved stops, order and who goes where; only odds and ticks update
@@ -165,6 +168,13 @@ function finalize(zones,as,cost,T,issues,locked){const order=zones.map(z=>z.z);
   const out=order.map(z=>{const ts=T.filter(t=>as.get(t)===z);return {z,ts,pans:cost&&ts.some(t=>t.c>0)?cost(z):0,open:ts.some(t=>t.c>0)}}).filter(z=>z.ts.length);
   out.sort((a,b)=>(!a.open)-(!b.open));
   return {zones:out,issues,T,locked}}
+// best luck cap for one mineral in one zone, same as the Best Luck Cap tool: a cap of C counts as C x 0.63
+const CAPS=[1,5,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000],CAP_EFF=0.63;
+function bestCap(m,loc){const L=Math.max(1,+st.luck||1);const yours=shares(loc,L)[m.n]||0;let b={cap:null,eff:yours};
+  for(let i=CAPS.length-1;i>=0;i--){if(CAPS[i]>=L)continue;const e=shares(loc,CAPS[i]*CAP_EFF)[m.n]||0;if(e>b.eff*(1+1e-6))b={cap:CAPS[i],eff:e}}
+  b.x=yours>0?b.eff/yours:Infinity;return b}
+const capTxt=(m,loc)=>{const b=bestCap(m,loc);return b.cap==null?`<span title="${esc("Best luck cap: none. Pan at your own luck for "+m.n+" here.")}">No cap</span>`:
+  `<span title="${esc("Best luck cap for "+m.n+" here: "+fmt(b.cap,0)+(isFinite(b.x)?" ("+fmt(b.x,b.x<10?2:0)+"x as often as at your luck)":"")+". A cap changes the odds of everything you pan, so only use it when this is the one you're after.")}">Cap ${fmt(b.cap,0)}</span>`};
 const oneIn=p=>!st.stats?baseOdds(p):p>=.5?fmt(p*100,0)+"% per pan":`~1 in ${fmt(Math.round(1/p),0)} pans`;
 const dur=p=>{const pph=+st.pph;if(!(pph>0))return "";const h=p/pph;return h<1?fmt(Math.max(1,h*60),0)+" min":h<48?fmt(h,1)+" h":fmt(h/24,1)+" days"};
 const big=p=>p<1e4?fmt(p,0):p<1e6?fmt(p/1e3,1)+"k":p<1e9?fmt(p/1e6,1)+"M":fmt(p/1e9,1)+"B";
@@ -193,7 +203,7 @@ function stopsHTML(R,opts={}){const zs=R.zones;let k=0;
     if(st.stats&&slow&&left.length>1&&eAll([{p:slow.cands[Z.z],c:slow.c}])>Z.pans*.7)tips.push(`<b>Most of the wait is ${esc(slow.m.n)}.</b> The others usually come well before it.`);
     const need=t=>opts.tick?"":t.c>0?`Need ${fmt(t.c,0)}`:"Done";
     const row=(t,req)=>{const p=t.cands[Z.z];const g=!t.c;const T2=opts.tick?"label":"div";
-      return `<${T2} class="rt-t${g?" got":""}${req?"":" opt"}${opts.tick?"":" nock"}">${opts.tick?`<input type="checkbox" data-got="${esc(KEY(t))}"${g?" checked":""}>`:""}<span class="rt-tn">${t.m.ic?`<img src="${t.m.ic}" alt="">`:""}<span><span data-mineral="${esc(t.m.n)}">${esc(t.m.n)}</span>${t.u&&t.u!=="None"?` · <b>${esc(t.u)}</b>`:""}${tag(t,Z,req)}${t.lunar?`<span class="rt-time" title="${esc("Time-gated: Lunar only rolls at night.\nPan here after dark, or it won't drop at all.")}">Night only</span>`:""}<small><span class="rt-rr" style="--rc:${rc(t.m.r)}">${esc(t.m.r)}</span>${need(t)?" · "+need(t):""}${req?"":" · optional here"}${opts.kg&&t.m.mu&&t.m.mu.kg?` · full boost at ${t.m.mu.kg} kg`:""}</small></span></span><span class="rt-odd">${st.stats?`${oneIn(p)}<small>${big(1/p)} pans each</small>`:`<small>${baseOdds(p)}</small>`}</span></${T2}>`};
+      return `<${T2} class="rt-t${g?" got":""}${req?"":" opt"}${opts.tick?"":" nock"}">${opts.tick?`<input type="checkbox" data-got="${esc(KEY(t))}"${g?" checked":""}>`:""}<span class="rt-tn">${t.m.ic?`<img src="${t.m.ic}" alt="">`:""}<span><span data-mineral="${esc(t.m.n)}">${esc(t.m.n)}</span>${t.u&&t.u!=="None"?` · <b>${esc(t.u)}</b>`:""}${tag(t,Z,req)}${t.lunar?`<span class="rt-time" title="${esc("Time-gated: Lunar only rolls at night.\nPan here after dark, or it won't drop at all.")}">Night only</span>`:""}<small><span class="rt-rr" style="--rc:${rc(t.m.r)}">${esc(t.m.r)}</span>${need(t)?" · "+need(t):""}${req?"":" · optional here"}${opts.kg&&t.m.mu&&t.m.mu.kg?` · full boost at ${t.m.mu.kg} kg`:""}</small></span></span><span class="rt-odd">${st.stats?`${capTxt(t.m,Z.z)}<small>best luck cap · ${oneIn(p)} at your luck</small>`:`<small>${baseOdds(p)}</small>`}</span></${T2}>`};
     return `<article class="rt-stop${fin?" fin":""}"><div class="rt-sh"><h3><span class="rt-num">${fin?"✓":k}</span><span data-location="${esc(b)}" class="lk">${esc(Z.z)}</span></h3>
       <div class="rt-est">${fin?"Done":st.stats?`Expected pans<b>${big(Z.pans)}</b>${dur(Z.pans)}`:`Items here<b>${left.length}</b>`}</div></div>
       <div class="rt-items">${Z.ts.map(t=>row(t,true)).join("")}${extra.map(t=>row(t,false)).join("")}</div>
@@ -215,7 +225,7 @@ function settingsHTML(withMod){return `<div class="rt-row"><label class="rt-ck">
   <label class="rt-fld rt-s"><span class="lab">Capacity</span><input type="number" data-rt="cap" min="1"></label>
   <label class="rt-fld rt-s"><span class="lab">Pans per hour</span><input type="number" data-rt="pph" min="0" placeholder="optional"></label>
   <label class="rt-fld"><span class="lab">Furthest area unlocked</span><select data-rt="far"><option value="">Everything</option>${PROG.filter(z=>!EVENT_AREAS.includes(z)&&z!=="The Void").map(z=>`<option>${esc(z)}</option>`).join("")}</select></label></div>
-  <div class="rt-row"><label class="rt-ck"><input type="checkbox" data-rt="void"> Include The Void</label><label class="rt-ck"><input type="checkbox" data-rt="evt"> Include event areas</label>
+  <div class="rt-row"><label class="rt-ck"><input type="checkbox" data-rt="void"> Include The Void</label><label class="rt-ck"><input type="checkbox" data-rt="evt"> Include event areas</label><label class="rt-ck"><input type="checkbox" data-rt="pyr"> Include Pyramid</label>
   <span class="rt-row" style="gap:6px"><span class="lab">Order</span><button type="button" class="chip" data-rto="quick">${"Quickest stops first"}</button><button type="button" class="chip" data-rto="prog">Follow the map</button></span>
   <button type="button" class="btn rt-s" data-rtcalc>Use my Stat Calculator stats</button></div>`}
 function bind(root,onChange){
