@@ -170,6 +170,33 @@ function renderParts(){const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(
   $("brkLvl").value=String(lv);$("brkLvl").setAttribute("aria-valuetext",LVLN[lv]);document.querySelectorAll("[data-lvl]").forEach(b=>b.classList.toggle("on",+b.dataset.lvl===lv));
   $("brkBody").hidden=lv===0;$("parts").classList.toggle("semi",lv===1)}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-bstat]");if(!b)return;const h=new Set(S.brkHide||[]);const k=b.dataset.bstat;h.has(k)?h.delete(k):h.add(k);S.brkHide=[...h];save();render()});
+// Discord ANSI colors for compact copies ONLY. Full breakdown stays Markdown.
+const STAT_ANSI={
+  "Modifier Boost":"2;32", // dark green
+  "Luck":"1;33",
+  "Capacity":"1;35",
+  "Size Boost":"1;36",
+  "Sell Boost":"1;34",
+  "Dig Strength":"1;31",
+  "Shake Strength":"1;33",
+  "Dig Speed":"1;36",
+  "Shake Speed":"1;35",
+  "Walk Speed":"1;34",
+  "Inventory Size":"1;37",
+  "Toughness":"1;31"
+};
+function discordCompactAnsi(lines){
+  const esc="\u001b[",reset=esc+"0m";
+  const colored=lines.map(line=>{
+    if(line==="**My Prospecting stats**")return esc+"1;37mMy Prospecting stats"+reset;
+    if(line.startsWith("Pan:"))return esc+"0;37m"+line+reset;
+    const m=line.match(/^\\*\\*([^:*]+):\\*\\*/);
+    if(!m)return line;
+    const stat=m[1],color=STAT_ANSI[stat]||"0;37";
+    return esc+color+"m"+line.replace(/^\\*\\*([^:*]+):\\*\\*/,stat+":").replace(/\\*\\*/g,"")+reset;
+  });
+  return "```ansi\n"+colored.join("\n")+"\n```";
+}
 // copy the breakdown as Discord text, at the level the slider is on
 $("cpBrk").onclick=async()=>{const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(B,strip(B,g)));const D=brkData(B),lv=brkLvl();
   if(!D.stats.length){ptToast("No stats to copy yet");return}
@@ -184,7 +211,7 @@ $("cpBrk").onclick=async()=>{const B=clone(S);(S.isoOff||[]).forEach(g=>Object.a
     if(!d.fo1&&d.M.length){L.push(`> __Multiplier: ×${fmt(d.mult,2)}__`);d.M.forEach(o=>L.push(`> - ${lbl(o.x)}: ${(o.v<0?"−":"+")+fmt(Math.abs(o.v),2)}×`))}
     if(d.X.length){L.push(`> __Multiplies the total: ×${fmt(d.xm,2)}__`);d.X.forEach(o=>L.push(`> - ${lbl(o.x)}: ×${fmt(o.v,2)}`))}
     L.push("")});
-  const txt=L.join("\n").trim();let ok=false;
+  const txt=lv===2?L.join("\n").trim():discordCompactAnsi(L);let ok=false;
   try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
   ptToast(!ok?"Couldn't copy, your browser blocked it":txt.length>2000?`Copied, but it's ${fmt(txt.length,0)} characters: Discord allows 2,000 (4,000 with Nitro). Switch some stats off or use Semi`:"Copied, paste it into Discord")};
 $("brkLvl").addEventListener("input",()=>{S.brkLevel=+$("brkLvl").value;save();renderParts()});
@@ -314,7 +341,7 @@ const MUTHX={Silver:"#a9b4be",Gold:"#d9a520",Diamond:"#5fc8e8",Granite:"#8d8d86"
 $("cpStats").onclick=async()=>{const st=effState(),t=compute(st).tot;const gear=[S.pan&&"Pan: "+S.pan,S.shovel&&"Shovel: "+S.shovel].filter(Boolean).join(" · ");
   const lines=SHOW.filter(s=>t[s]).map(s=>`${s}: ${fv(s,t[s])}`);
   if(!lines.length){ptToast("Nothing to copy yet. Pick some gear first.");return}
-  const txt=["**My Prospecting stats**",gear,...lines].filter(Boolean).join("\n");let ok=false;
+  const txt=discordCompactAnsi(["**My Prospecting stats**",gear,...lines].filter(Boolean));let ok=false;
   try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
   ptToast(ok?"Stats copied, paste them anywhere":"Couldn't copy, your browser blocked it")};
 $("toImg").onclick=()=>{const st=effState();const r=compute(st);
