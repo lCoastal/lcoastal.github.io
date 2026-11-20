@@ -111,15 +111,62 @@ function shares(base,full){const P=parts(base),n=P.length,memo=new Map();
   // whatever you'd have with none of these sources
   const zero=val(0),bd={};SHOWN.forEach(s=>{if(Math.abs(zero[s]||0)>1e-6)bd[s]=zero[s]});rows.push({key:null,label:"Base (without any of these)",d:bd});
   return rows.filter(x=>Object.keys(x.d).length)}
-function renderParts(){const base=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(base,strip(base,g)));const full=compute(base);
-  const rows=shares(base,full);
-  rows.sort((a,b)=>(b.d.Luck||0)-(a.d.Luck||0));
-  const fv=(s,v)=>(v<0?"−":"+")+(PCT.has(s)?fmt(Math.abs(v),1)+"%":fmt(Math.abs(v),s==="Luck"||s==="Capacity"?0:1));
-  // grouped by stat: each stat, its total, then every source that adds to it, biggest first
+// ---- detailed breakdown: every stat is flat points × a multiplier; each source shows what it adds to either side ----
+// One line per source: every ring on its own line, every museum display, every potion, totem and rune.
+// Each line is "what changes if you take just that away"; anything left over (two sources boosting each other) is shown as "Overlap".
+function brkSources(B){const L=[];const lab=k=>{const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
+  if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn=""},minus:B.panEn?0:null})}
+  if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn=""},minus:B.shEn?0:null})}
+  SLOTDEF.forEach(([k,l])=>{const v=(B.slots||{})[k];if(v&&v.n)L.push({key:"slot:"+k,label:`${l}: ${v.n}`,sub:[v.l==="0"?"0★":v.l==="5"?"5★":"6★",v.m&&v.m!=="None"?v.m:"",(v.q??100)<100?(v.q??100)+"%":""].filter(Boolean).join(" · "),cut:t=>{t.slots=Object.assign({},t.slots);delete t.slots[k]}})});
+  const bd=B.mus!=="none"?musBoard(B):null;
+  if(bd)MORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const u=sl.u||"None";
+    L.push({key:"group:museum",label:`Museum: ${sl.m==="Any"?"Any "+r:sl.m}`,sub:[sl.m==="Any"?"":r,u==="None"?"":u].filter(Boolean).join(" · "),cut:t=>{const b2=JSON.parse(JSON.stringify(musBoard(t)||{}));if(b2[r]&&b2[r][i])b2[r][i]={m:null,u:"None"};t.mus="custom";t.museumBoard=b2}})}));
+  Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather")return;L.push({key:"group:boosts",label:lab(k),cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
+  (B.pots||[]).forEach(n=>L.push({key:"group:boosts",label:"Potion: "+n,cut:t=>{t.pots=(t.pots||[]).filter(x=>x!==n)}}));
+  (B.runes||[]).forEach(n=>L.push({key:"group:boosts",label:"Rune: "+n,cut:t=>{t.runes=(t.runes||[]).filter(x=>x!==n)}}));
+  const n=B.n||{};
+  if(+n.friendTotem>=0)L.push({key:"group:boosts",label:`Friendship Totem (${+n.friendTotem} nearby)`,cut:t=>{t.n=Object.assign({},t.n,{friendTotem:-1})}});
+  if(+n.friends>0)L.push({key:"group:boosts",label:`${+n.friends} friend${+n.friends===1?"":"s"} online`,cut:t=>{t.n=Object.assign({},t.n,{friends:0})}});
+  if(+n.mastery>0)L.push({key:"group:boosts",label:"Location mastery",cut:t=>{t.n=Object.assign({},t.n,{mastery:0})}});
+  if(+n.flatLuck>0)L.push({key:"group:boosts",label:"Flat luck (quests, potions)",cut:t=>{t.n=Object.assign({},t.n,{flatLuck:0})}});
+  if(+n.flatDig>0)L.push({key:"group:boosts",label:"Flat dig strength",cut:t=>{t.n=Object.assign({},t.n,{flatDig:0})}});
+  if(B.b&&B.b.meteor)L.push({key:"group:events",label:"Meteor shower",cut:t=>{t.b=Object.assign({},t.b,{meteor:false})}});
+  if(B.b&&B.b.weather)L.push({key:"group:events",label:"Weather event",cut:t=>{t.b=Object.assign({},t.b,{weather:false})}});
+  return L}
+const BRK_STATS=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Walk Speed","Inventory Size","Toughness"];
+const FLAT_ONLY=new Set(["Toughness","Inventory Size"]);
+function renderParts(){const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(B,strip(B,g)));const R=compute(B);
+  const src=brkSources(B).map(x=>{const t=clone(B);x.cut(t);const W=compute(t);return {...x,W}});
+  // pan/shovel lines: take the enchant's own share out so the two lines don't count it twice
+  src.forEach((x,i)=>{if(x.minus===0){const en=src[i-1];x.minusOf=en}});
+  const fl=(o,s)=>(o.base[s]||0)+(o.flat[s]||0);
   const tv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
-  const groups=SHOWN.map(st=>({st,src:rows.filter(x=>x.d[st]).map(x=>({key:x.key,label:x.label,v:x.d[st]})).sort((a,b)=>b.v-a.v)})).filter(g=>g.src.length);
-  $("parts").innerHTML=groups.length?groups.map(g=>`<div class="bks"><div class="bkst"><b style="color:${statHex(g.st)}">${esc(g.st)}</b><span>${tv(g.st,full.tot[g.st]||0)} total</span></div>${g.src.map(x=>`<div class="pt${x.key&&S.only===x.key?" on":""}"${x.key?` role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"`:""}><b>${esc(x.label)}</b><span class="lk2" style="color:${x.v<0?"var(--neg,#c53030)":"var(--accent)"}">${fv(g.st,x.v)}</span></div>`).join("")}</div>`).join(""):'<p class="hint">Add some gear or boosts to see where your stats come from.</p>';
+  const sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
+  const hide=new Set(S.brkHide||[]);
+  const avail=BRK_STATS.filter(s=>Math.abs(R.tot[s]||0)>1e-9||s==="Luck");
+  $("brkStats").innerHTML=avail.map(s=>`<button type="button" class="chip" data-bstat="${esc(s)}" aria-pressed="${!hide.has(s)}" style="--sc:${statHex(s)}">${esc(s)}</button>`).join("");
+  const row=(x,txt,neg)=>`<div class="pt${x.key&&S.only===x.key?" on":""}"${x.key?` role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"`:""}><b>${esc(x.label)}${x.sub?` <small>${esc(x.sub)}</small>`:""}</b><span class="lk2" style="color:${neg?"var(--neg,#c53030)":"var(--accent)"}">${txt}</span></div>`;
+  const cards=avail.filter(s=>!hide.has(s)).map(s=>{
+    const flatT=fl(R,s),mult=FLAT_ONLY.has(s)?1:1+(R.pile[s]||0);
+    const F=[],M=[],X=[];let fSum=0,mSum=0;
+    src.forEach(x=>{let df=flatT-fl(x.W,s),dm=FLAT_ONLY.has(s)?0:(R.pile[s]||0)-(x.W.pile[s]||0);
+      if(x.minusOf){df-=flatT-fl(x.minusOf.W,s);dm-=FLAT_ONLY.has(s)?0:(R.pile[s]||0)-(x.minusOf.W.pile[s]||0)}
+      if(Math.abs(df)>1e-9){F.push({x,v:df});fSum+=df}
+      if(Math.abs(dm)>1e-9){M.push({x,v:dm});mSum+=dm}
+      if(s==="Luck"){const re=R.ev/(x.W.ev||1),rl=R.luckMult/(x.W.luckMult||1);if(Math.abs(re-1)>1e-9)X.push({x,v:re});if(Math.abs(rl-1)>1e-9)X.push({x,v:rl})}});
+    const fo=flatT-fSum,mo=(mult-1)-mSum;
+    if(Math.abs(fo)>1e-6)F.push({x:{label:"Overlap",sub:"sources boosting each other"},v:fo});
+    if(!FLAT_ONLY.has(s)&&Math.abs(mo)>1e-6)M.push({x:{label:"Overlap",sub:"sources boosting each other"},v:mo});
+    F.sort((a,b)=>b.v-a.v);M.sort((a,b)=>b.v-a.v);
+    const xm=s==="Luck"?(R.ev||1)*(R.luckMult||1):1;
+    const formula=FLAT_ONLY.has(s)||(mult===1&&xm===1)?"":`${tv(s,flatT)} × ${fmt(mult,2)}${xm!==1?` × ${fmt(xm,2)}`:""} = `;
+    return `<div class="bks"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b><span>${formula}<em>${tv(s,R.tot[s]||0)}</em></span></div>
+      <div class="bksub"><span>Flat points</span><span>${tv(s,flatT)}</span></div>${F.length?F.map(o=>row(o.x,sv(s,o.v),o.v<0)).join(""):'<p class="bkn">None</p>'}
+      ${FLAT_ONLY.has(s)||!M.length?"":`<div class="bksub"><span>Multiplier (from ×1)</span><span>×${fmt(mult,2)}</span></div>${M.map(o=>row(o.x,(o.v<0?"−":"+")+fmt(Math.abs(o.v),2)+"×",o.v<0)).join("")}`}
+      ${X.length?`<div class="bksub"><span>Multiplies the total</span><span>×${fmt(xm,2)}</span></div>${X.map(o=>row(o.x,"×"+fmt(o.v,2),o.v<1)).join("")}`:""}</div>`}).join("");
+  $("parts").innerHTML=src.length||Math.abs(R.tot.Luck||0)>0?(cards||'<p class="hint">Every stat is hidden. Turn one on above.</p>'):'<p class="hint">Add some gear or boosts to see where your stats come from.</p>';
   const on=S.showBrk!==false;$("showBrk").checked=on;$("brkBody").hidden=!on}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-bstat]");if(!b)return;const h=new Set(S.brkHide||[]);const k=b.dataset.bstat;h.has(k)?h.delete(k):h.add(k);S.brkHide=[...h];save();renderParts()});
 $("showBrk").addEventListener("change",()=>{S.showBrk=$("showBrk").checked;save();$("brkBody").hidden=!S.showBrk});
 function renderIso(){const off=S.isoOff||[];$("isoChips").innerHTML=GROUPS.map(([g,l])=>`<button type="button" class="chip" data-iso="${g}" aria-pressed="${!off.includes(g)&&!S.only}">${l}</button>`).join("");
   const n=$("isoNote");if(S.only){const lbl=(parts(S).find(p=>p[0]===S.only)||[0,"that part"])[1];n.hidden=false;n.innerHTML=`Showing only <b>${esc(lbl)}</b>. <button type="button" class="rst" data-only-clear>Show everything</button>`}else if(off.length){n.hidden=false;n.textContent="Left out: "+off.map(g=>GROUPS.find(x=>x[0]===g)[1]).join(", ")+"."}else n.hidden=true}
