@@ -287,7 +287,8 @@ function upCandidates(){
   const best={};
   SLOTDEF.forEach(([k,label,slot])=>{
     EQ.filter(x=>x.slot===slot).forEach(x=>{
-      const cur=S.slots[k]||{};if(cur.n===x.n)return;const st=clone(base);st.slots=Object.assign({},st.slots,{[k]:{n:x.n,l:"6",q:100,m:cur.m||"None"}});
+      const cur=S.slots[k]||{};if(cur.n===x.n)return;
+      if(ONE_ONLY.has(x.n)&&SLOTDEF.some(([kk])=>kk!==k&&(base.slots[kk]||{}).n===x.n))return;const st=clone(base);st.slots=Object.assign({},st.slots,{[k]:{n:x.n,l:"6",q:100,m:cur.m||"None"}});
       const t=compute(st).tot;const g=uScore(t,w)-s0;if(g<=1e-9)return;
       if(!best[x.n]||g>best[x.n].gain){const c=recipeCost(x);
         best[x.n]={kind:label,replaces:cur.n||"",name:x.n,rarity:x.r,money:x.cur==="$"?uMoney(x.price):0,
@@ -297,7 +298,7 @@ function upCandidates(){
   Object.values(best).forEach(c=>add(c));
   // the same ring in several slots: swap it into every ring slot it beats (weakest first) as one suggestion
   const ringK=SLOTDEF.filter(d=>d[2]==="Ring").map(d=>d[0]);
-  EQ.filter(x=>x.slot==="Ring"&&best[x.n]).forEach(x=>{let st=clone(base),sc=s0;const used=[];
+  EQ.filter(x=>x.slot==="Ring"&&best[x.n]&&!ONE_ONLY.has(x.n)).forEach(x=>{let st=clone(base),sc=s0;const used=[];
     for(;;){let pick=null;ringK.forEach(k=>{const cur=st.slots[k]||{};if(cur.n===x.n)return;const t2=clone(st);t2.slots=Object.assign({},t2.slots,{[k]:{n:x.n,l:"6",q:100,m:cur.m||"None"}});
         const g=uScore(compute(t2).tot,w);if(g>sc+1e-9&&(!pick||g>pick.g))pick={k,g,t2,was:cur.n||"empty"}});
       if(!pick)break;st=pick.t2;sc=pick.g;used.push(pick)}
@@ -505,7 +506,8 @@ async function buildImage(st,r){
 // ---- gear picker with hover preview ----
 const clone=o=>JSON.parse(JSON.stringify(o));
 // rings the game only lets you wear one of at a time
-const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"]);
+// rings the game only lets you wear once: the known list plus anything whose description says so
+const ONE_ONLY=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra",...EQ.filter(x=>/only one can be worn/i.test(x.d||"")).map(x=>x.n)]);
 const takenElsewhere=(k,n)=>ONE_ONLY.has(n)&&SLOTDEF.some(([kk])=>kk!==k&&(S.slots[kk]||{}).n===n);
 const slotOf=k=>k==="pan"||k==="shovel"?null:SLOTDEF.find(d=>d[0]===k);
 const curName=k=>k==="pan"?S.pan:k==="shovel"?S.shovel:((S.slots[k]||{}).n||"");
