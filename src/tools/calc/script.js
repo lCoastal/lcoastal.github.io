@@ -335,7 +335,7 @@ function upCandidates(){
   if(mb){const T=compute(base).tot,mbx=Math.max(0,T["Modifier Boost"]||0),lk=T.Luck||0;
     MORDER.forEach(r=>(mb[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const curU=sl.u||"None";let bestU=null;
       Object.keys(MODS).forEach(u=>{if(u===curU||u==="None"||u==="Lunar")return;const b2=JSON.parse(JSON.stringify(mb));b2[r][i]={m:sl.m,u};const t2=clone(base);t2.mus="custom";t2.museumBoard=b2;
-        const g=uScore(compute(t2).tot,w)-s0;if(g<=1e-9)return;const ch=modChanceCalc(u,mbx,lk);const find=sl.m==="Any"?Math.min(...P.mins.filter(m=>m.r===r).map(m=>pansFor(m.n)).filter(v=>v!=null)):pansFor(sl.m);
+        const ch=modChanceCalc(u,mbx,lk);if(ch<=0&&!S.upEvent)return;const g=uScore(compute(t2).tot,w)-s0;if(g<=1e-9)return;const find=sl.m==="Any"?Math.min(...P.mins.filter(m=>m.r===r).map(m=>pansFor(m.n)).filter(v=>v!=null)):pansFor(sl.m);
         const pn=find!=null&&isFinite(find)&&ch>0?find/ch:null;const c={g,u,pn,st:t2,b2,ch};const val=(S.upSort||"value")==="gain"?g:g/Math.max(1,pn==null?1e9:pn);if(!bestU||val>bestU.val)bestU={...c,val}});
       if(!bestU)return;const nm=sl.m==="Any"?`Any ${r}`:sl.m;
       add({kind:`Museum modifier (${r})`,name:`${bestU.u} ${nm}`,replaces:curU==="None"?"no modifier":curU,rarity:r,money:0,pans:bestU.pn==null?0:bestU.pn,unknown:bestU.pn==null,limited:false,state:bestU.st,
