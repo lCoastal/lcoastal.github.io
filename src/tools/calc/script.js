@@ -133,6 +133,9 @@ function brkSources(B){const L=[];const lab=k=>{const e=document.querySelector(`
   if(B.b&&B.b.meteor)L.push({key:"group:events",label:"Meteor shower",cut:t=>{t.b=Object.assign({},t.b,{meteor:false})}});
   if(B.b&&B.b.weather)L.push({key:"group:events",label:"Weather event",cut:t=>{t.b=Object.assign({},t.b,{weather:false})}});
   return L}
+// how much detail: 0 just stats, 1 semi (flat × multiplier = total), 2 full breakdown. Old saves: "show breakdown" off = 0
+const brkLvl=()=>S.brkLevel!=null?+S.brkLevel:(S.showBrk===false?0:2);
+const LVLN=["Just stats","Semi","Full breakdown"];
 const BRK_STATS=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Walk Speed","Inventory Size","Toughness"];
 const FLAT_ONLY=new Set(["Toughness","Inventory Size"]);
 // per-stat breakdown data, shared by the page and the saved image
@@ -156,16 +159,36 @@ function renderParts(){const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(
   const tv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
   const sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
   const row=(x,txt,neg)=>`<div class="pt${x.key&&S.only===x.key?" on":""}"${x.key?` role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"`:""}><b>${esc(x.label)}${x.sub?` <small>${esc(x.sub)}</small>`:""}</b><span class="lk2" style="color:${neg?"var(--neg,#c53030)":"var(--accent)"}">${txt}</span></div>`;
-  const cards=D.stats.map(({s,flatT,mult,xm,total,F,M,X,fo1})=>{
+  const lv=brkLvl();
+  const cards=lv===1?D.stats.map(({s,flatT,mult,xm,total,fo1})=>`<div class="bks bksemi"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b></div><div class="sem"><div><small>Flat points</small><b>${tv(s,flatT)}</b></div><div><small>Multiplier</small><b>${fo1?"—":"×"+fmt(mult,2)}</b></div>${xm!==1?`<div><small>Events &amp; tools</small><b>×${fmt(xm,2)}</b></div>`:""}<div class="semt"><small>Total</small><b style="color:${statHex(s)}">${tv(s,total)}</b></div></div></div>`).join(""):D.stats.map(({s,flatT,mult,xm,total,F,M,X,fo1})=>{
     const formula=fo1||(mult===1&&xm===1)?"":`${tv(s,flatT)} × ${fmt(mult,2)}${xm!==1?` × ${fmt(xm,2)}`:""} = `;
     return `<div class="bks"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b><span>${formula}<em>${tv(s,total)}</em></span></div>
       <div class="bksub"><span>Flat points</span><span>${tv(s,flatT)}</span></div>${F.length?F.map(o=>row(o.x,sv(s,o.v),o.v<0)).join(""):'<p class="bkn">None</p>'}
       ${fo1||!M.length?"":`<div class="bksub"><span>Multiplier (from ×1)</span><span>×${fmt(mult,2)}</span></div>${M.map(o=>row(o.x,(o.v<0?"−":"+")+fmt(Math.abs(o.v),2)+"×",o.v<0)).join("")}`}
       ${X.length?`<div class="bksub"><span>Multiplies the total</span><span>×${fmt(xm,2)}</span></div>${X.map(o=>row(o.x,"×"+fmt(o.v,2),o.v<1)).join("")}`:""}</div>`}).join("");
   $("parts").innerHTML=D.src.length||Math.abs(D.R.tot.Luck||0)>0?(cards||'<p class="hint">Every stat is switched off. Turn some on in the Breakdown column of Your stats.</p>'):'<p class="hint">Add some gear or boosts to see where your stats come from.</p>';
-  const on=S.showBrk!==false;$("showBrk").checked=on;$("brkBody").hidden=!on}
+  $("brkLvl").value=String(lv);$("brkLvl").setAttribute("aria-valuetext",LVLN[lv]);document.querySelectorAll("[data-lvl]").forEach(b=>b.classList.toggle("on",+b.dataset.lvl===lv));
+  $("brkBody").hidden=lv===0;$("parts").classList.toggle("semi",lv===1)}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-bstat]");if(!b)return;const h=new Set(S.brkHide||[]);const k=b.dataset.bstat;h.has(k)?h.delete(k):h.add(k);S.brkHide=[...h];save();render()});
-$("showBrk").addEventListener("change",()=>{S.showBrk=$("showBrk").checked;save();$("brkBody").hidden=!S.showBrk});
+// copy the breakdown as Discord text, at the level the slider is on
+$("cpBrk").onclick=async()=>{const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(B,strip(B,g)));const D=brkData(B),lv=brkLvl();
+  if(!D.stats.length){ptToast("No stats to copy yet");return}
+  const tv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1),sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
+  const L=["**My Prospecting stats**"];const gear=[B.pan&&"Pan: "+B.pan+(B.panEn?" ("+B.panEn+")":""),B.shovel&&"Shovel: "+B.shovel+(B.shEn?" ("+B.shEn+")":"")].filter(Boolean).join(" · ");if(gear)L.push(gear);L.push("");
+  const lbl=x=>x.label+(x.sub?` (${x.sub})`:"");
+  D.stats.forEach(d=>{const sum=d.fo1||(d.mult===1&&d.xm===1)?"":`${tv(d.s,d.flatT)} × ${fmt(d.mult,2)}${d.xm!==1?` × ${fmt(d.xm,2)}`:""} = `;
+    if(lv===0){L.push(`**${d.s}:** ${tv(d.s,d.total)}`);return}
+    if(lv===1){L.push(`**${d.s}:** ${sum}**${tv(d.s,d.total)}**`);return}
+    L.push(`**${d.s}: ${tv(d.s,d.total)}**${sum?` (${sum.replace(/ = $/,"")})`:""}`);
+    L.push(`> __Flat points: ${tv(d.s,d.flatT)}__`);d.F.forEach(o=>L.push(`> - ${lbl(o.x)}: ${sv(d.s,o.v)}`));
+    if(!d.fo1&&d.M.length){L.push(`> __Multiplier: ×${fmt(d.mult,2)}__`);d.M.forEach(o=>L.push(`> - ${lbl(o.x)}: ${(o.v<0?"−":"+")+fmt(Math.abs(o.v),2)}×`))}
+    if(d.X.length){L.push(`> __Multiplies the total: ×${fmt(d.xm,2)}__`);d.X.forEach(o=>L.push(`> - ${lbl(o.x)}: ×${fmt(o.v,2)}`))}
+    L.push("")});
+  const txt=L.join("\n").trim();let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
+  ptToast(!ok?"Couldn't copy, your browser blocked it":txt.length>2000?`Copied, but it's ${fmt(txt.length,0)} characters: Discord allows 2,000 (4,000 with Nitro). Switch some stats off or use Semi`:"Copied, paste it into Discord")};
+$("brkLvl").addEventListener("input",()=>{S.brkLevel=+$("brkLvl").value;save();renderParts()});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-lvl]");if(!b)return;S.brkLevel=+b.dataset.lvl;save();renderParts()});
 function renderIso(){const off=S.isoOff||[];$("isoChips").innerHTML=GROUPS.map(([g,l])=>`<button type="button" class="chip" data-iso="${g}" aria-pressed="${!off.includes(g)&&!S.only}">${l}</button>`).join("");
   const n=$("isoNote");if(S.only){const lbl=(parts(S).find(p=>p[0]===S.only)||[0,"that part"])[1];n.hidden=false;n.innerHTML=`Showing only <b>${esc(lbl)}</b>. <button type="button" class="rst" data-only-clear>Show everything</button>`}else if(off.length){n.hidden=false;n.textContent="Left out: "+off.map(g=>GROUPS.find(x=>x[0]===g)[1]).join(", ")+"."}else n.hidden=true}
 document.addEventListener("click",e=>{const c=e.target.closest("[data-iso]");if(c){S.only=null;const g=c.dataset.iso;const off=new Set(S.isoOff||[]);off.has(g)?off.delete(g):off.add(g);S.isoOff=[...off];save();render();return}
@@ -321,7 +344,7 @@ async function buildImage(st,r){
   const n=st.n||{};if(+n.friendTotem>=0)boosts.push({t:`Friendship Totem (${+n.friendTotem} nearby)`,col:TX});if(+n.friends>0)boosts.push({t:`${+n.friends} friend${+n.friends===1?"":"s"} online`,col:TX});
   if(+n.mastery>0)boosts.push({t:`Location mastery +${n.mastery}×`,col:TX});if(+n.flatLuck>0)boosts.push({t:`+${fmt(+n.flatLuck,0)} flat luck`,col:statHex("Luck")});if(+n.flatDig>0)boosts.push({t:`+${fmt(+n.flatDig,0)} flat dig strength`,col:statHex("Dig Strength")});
   const hideS=new Set(S.brkHide||[]),stats=SHOW.filter(x=>(Math.abs(r.tot[x]||0)>1e-9||x==="Luck")&&!hideS.has(x));
-  const DET=S.showBrk!==false?brkData(st).stats:null;
+  const LV=brkLvl(),DET=LV===2?brkData(st).stats:null;
   const sub=[];const ex=[r.ev>1?`events ×${r.ev} luck`:"",r.luckMult>1?`tools ×${fmt(r.luckMult,2)} luck`:""].filter(Boolean);if(ex.length)sub.push("Includes "+ex.join(" and "));
   if((S.isoOff||[]).length||S.only)sub.push("Only some parts counted");
   // ---- measure ----
@@ -411,7 +434,7 @@ async function buildImage(st,r){
     stats.forEach((k,i)=>{const x=PAD+(i%SC)*(sw+12),yy=y+Math.floor(i/SC)*(STH+12),col=statHex(k);card(x,yy,sw,STH);
       c.fillStyle=col;c.beginPath();c.arc(x+22,yy+26,4,0,Math.PI*2);c.fill();c.font=`600 13px ${F}`;c.fillStyle=MU;c.fillText(fit(k,sw-50),x+34,yy+30.5);
       c.font=`600 28px ${FM}`;c.fillStyle=col;c.fillText(fit(fv(k,r.tot[k]||0),sw-40),x+18,yy+66);
-      const flat=["Toughness","Inventory Size"].includes(k);c.font=`12px ${F}`;c.fillStyle=MU;c.fillText(fit(flat?"from gear":`${fv(k,(r.base[k]||0)+(r.flat[k]||0))} × ${fmt(1+(r.pile[k]||0),2)}${k==="Luck"&&(r.ev||1)*(r.luckMult||1)!==1?` × ${fmt((r.ev||1)*(r.luckMult||1),2)}`:""}`,sw-36),x+18,yy+86)})}
+      const flat=["Toughness","Inventory Size"].includes(k);c.font=`12px ${F}`;c.fillStyle=MU;if(LV===1)c.fillText(fit(flat?"from gear":`${fv(k,(r.base[k]||0)+(r.flat[k]||0))} × ${fmt(1+(r.pile[k]||0),2)}${k==="Luck"&&(r.ev||1)*(r.luckMult||1)!==1?` × ${fmt((r.ev||1)*(r.luckMult||1),2)}`:""}`,sw-36),x+18,yy+86)})}
   if(DET&&DET.length){sec("Stats",y);y+=SECH;const tv=(s2,v)=>PCT.has(s2)?fmt(v,1)+"%":fmt(v,s2==="Luck"||s2==="Capacity"?0:1);
     DET.forEach((d,i)=>{const p=dPos[i],x=PAD+p.c*(DCW+GAP),y0=y+p.y,col=statHex(d.s);card(x,y0,DCW,p.h,col);
       c.font=`700 19px ${FD}`;c.fillStyle=col;c.fillText(d.s,x+20,y0+32);
