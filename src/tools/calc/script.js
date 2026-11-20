@@ -205,7 +205,7 @@ function renderUp(){
   $("upSort").insertAdjacentHTML("beforeend",`<button type="button" class="chip" data-uev="1" aria-pressed="${!!S.upEvent}" title="Event and limited-time gear you can't just go and get">Include event gear</button>`);
   if(!on){$("upList").innerHTML="";$("upHint").textContent="";return}
   const list=upCandidates().slice(0,10);
-  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality. "Pans" is roughly how many pans the recipe's minerals would take at your luck and capacity, in the best zone for each. "Best for the effort" counts $1,000 as about one pan.`;
+  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality.`;
   if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
   $("upList").innerHTML=list.map((c,i)=>{
     const gains=Object.entries(c.d).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3)
