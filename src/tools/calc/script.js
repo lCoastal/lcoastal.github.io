@@ -265,7 +265,11 @@ async function buildImage(st,r){
   const disp=[];if(board)Object.entries(board).forEach(([rar,arr])=>(arr||[]).forEach(sl=>{if(sl&&sl.m){const m=MIN[String(sl.m).toLowerCase()];disp.push({n:sl.m,ic:m&&m.ic,r:m?m.r:rar,any:sl.m==="Any"})}}));
   const RO=["Ascended","Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];disp.sort((a,b)=>RO.indexOf(a.r)-RO.indexOf(b.r));
   const musStats=Object.entries(mt.t).filter(([,v])=>Math.abs(v)>1e-9).sort((a,b)=>b[1]-a[1]);
-  const gear=[];SLOTDEF.forEach(([k,l])=>{const v=(st.slots||{})[k];if(!v||!v.n)return;const x=EQB[v.n];gear.push({slot:l,n:v.n,ic:x&&P.eimg[x.img],r:x?x.r:"",st:v.l==="0"?0:v.l==="5"?5:6,mu:v.m||"None",q:v.q??100})});
+  const gOf=(k,l)=>{const v=(st.slots||{})[k];if(!v||!v.n)return {slot:l,empty:true};const x=EQB[v.n];return {slot:l,n:v.n,ic:x&&P.eimg[x.img],r:x?x.r:"",st:v.l==="0"?0:v.l==="5"?5:6,mu:v.m||"None",q:v.q??100}};
+  const top2=[gOf("neck","Necklace"),gOf("charm","Charm")],rings=SLOTDEF.filter(d=>d[2]==="Ring").map(([k,l])=>gOf(k,l)).filter(g=>!g.empty);
+  const gear=[...top2.filter(g=>!g.empty),...rings];
+  const MODCOL={Perfect:"#5ef1e1",Treasured:"#ffd849",Entombed:"#40c8be",Lunar:"#ffe99b",Voidtorn:"#a35bff",Mutated:"#a07bff",Cosmic:"#ff5f9e",Electrified:"#ffeb0b",Iridescent:"#f36bff",Irradiated:"#67ff20",Crystalline:"#b7e6ff",Scorching:"#ff861c",Glowing:"#fff292",Pure:"#ffffff",Shiny:"#d4e7ff"};
+  const MROWS=board?MORDER.map(r=>({r,slots:Array.from({length:MSLOTS[r]},(_,i)=>{const sl=(board[r]||[])[i]||{};const mm=sl.m&&sl.m!=="Any"?MIN[String(sl.m).toLowerCase()]:null;return {m:sl.m||null,any:sl.m==="Any",ic:mm&&mm.ic,u:sl.u||"None"}})})):[];
   const boosts=[];const lab=k=>{const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   Object.entries(st.b||{}).forEach(([k,v])=>{if(v)boosts.push({t:lab(k),col:TX})});
   (st.pots||[]).forEach(n=>boosts.push({t:n,col:"#b880ee"}));(st.runes||[]).forEach(n=>boosts.push({t:n+" rune",col:"#68a6f0"}));
@@ -277,12 +281,12 @@ async function buildImage(st,r){
   // ---- measure ----
   const m=document.createElement("canvas").getContext("2d");
   const chipRows=(list,w,font)=>{m.font=font;const rows=[[]];let x=0;list.forEach(ch=>{const cw=m.measureText(ch.t).width+22;if(x+cw>w&&rows[rows.length-1].length){rows.push([]);x=0}rows[rows.length-1].push({...ch,w:cw});x+=cw+8});return rows};
-  const HERO=212,SC=4,STH=96,GC=3,GTH=78,SECH=44;
-  const statRowsN=Math.ceil(stats.length/SC),gearRowsN=Math.ceil(gear.length/GC);
+  const HERO=212,SC=4,STH=96,SECH=44,TOPH=104,RC=4,RH=98,MRH=58;
+  const statRowsN=Math.ceil(stats.length/SC),ringRowsN=Math.ceil(rings.length/RC),hasTop=top2.some(g=>!g.empty);
   const bRows=boosts.length?chipRows(boosts,IW-36,`13px ${F}`):[];
-  let H=PAD+(sub.length?88:62)+HERO+GAP+SECH+statRowsN*(STH+12)+(gear.length?SECH+gearRowsN*(GTH+12):0)+(boosts.length?SECH+bRows.length*32+28:0)+PAD-4;
+  let H=PAD+(sub.length?88:62)+HERO+GAP+SECH+statRowsN*(STH+12)+(hasTop?SECH+TOPH+12:0)+(rings.length?SECH+ringRowsN*(RH+12):0)+(MROWS.length?SECH+MROWS.length*MRH+20:0)+(boosts.length?SECH+bRows.length*32+28:0)+PAD-4;
   // ---- images ----
-  const srcs=[pan&&G.img[pan.image],sh&&G.img[sh.image],...gear.map(g=>g.ic),...disp.slice(0,16).map(d=>d.ic)].filter(Boolean);
+  const srcs=[pan&&G.img[pan.image],sh&&G.img[sh.image],...gear.map(g=>g.ic),...MROWS.flatMap(x=>x.slots.map(q=>q.ic))].filter(Boolean);
   const IMG={};await Promise.all([...new Set(srcs)].map(s=>new Promise(res=>{const i=new Image();i.onload=()=>{IMG[s]=i;res()};i.onerror=()=>res();i.src=s})));
   // ---- draw ----
   const cv=document.createElement("canvas"),sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
@@ -314,8 +318,7 @@ async function buildImage(st,r){
     if(!board||!mt.n){c.fillStyle=MU;c.font=`15px ${F}`;c.fillText("No museum counted",x+20,y+64)}
     else{c.fillStyle=TX;c.font=`700 20px ${FD}`;c.fillText(fit(musName,hw-40),x+20,y+62);c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(`${mt.n} display${mt.n===1?"":"s"}`,x+20,y+84);
       const ms=musStats.slice(0,4);ms.forEach(([k,v],i)=>{const col=i%2,row=Math.floor(i/2),xx=x+20+col*((hw-40)/2),yy=y+112+row*24;c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(fit(k,(hw-40)/2-80),xx,yy);c.font=`600 14px ${FM}`;c.fillStyle=statHex(k);c.textAlign="right";c.fillText("+"+fmt(v,2)+"×",xx+(hw-40)/2-14,yy);c.textAlign="left"});
-      const icS=26,per=Math.floor((hw-40+6)/(icS+6)),shown=disp.slice(0,per);shown.forEach((d,i)=>{const xx=x+20+i*(icS+6),yy=y+HERO-icS-18;c.fillStyle=(RHX[d.r]||MU)+"26";rr(xx,yy,icS,icS,7);c.fill();if(IMG[d.ic]){const im=IMG[d.ic],k=Math.min((icS-4)/im.width,(icS-4)/im.height);c.drawImage(im,xx+(icS-im.width*k)/2,yy+(icS-im.height*k)/2,im.width*k,im.height*k)}else if(d.any){c.fillStyle=RHX[d.r]||MU;c.font=`700 15px ${F}`;c.textAlign="center";c.fillText("?",xx+icS/2,yy+icS/2+5.5);c.textAlign="left"}});
-      if(disp.length>per){c.font=`12px ${F}`;c.fillStyle=MU;c.textAlign="right";c.fillText(`+${disp.length-per}`,x+hw-20,y+HERO-26);c.textAlign="left"}}}
+      c.font=`12.5px ${F}`;c.fillStyle=MU;c.fillText("Every slot is listed below",x+20,y+HERO-20)}}
   y+=HERO+GAP;
   // stats
   sec("Stats",y);y+=SECH;const sw=(IW-12*(SC-1))/SC;
@@ -324,17 +327,39 @@ async function buildImage(st,r){
     c.font=`600 28px ${FM}`;c.fillStyle=col;c.fillText(fit(fv(k,r.tot[k]||0),sw-40),x+18,yy+66);
     const flat=["Toughness","Inventory Size"].includes(k);c.font=`12px ${F}`;c.fillStyle=MU;c.fillText(fit(flat?"from gear":`${fv(k,(r.base[k]||0)+(r.flat[k]||0))} × ${fmt(1+(r.pile[k]||0),2)}`,sw-36),x+18,yy+86)});
   y+=statRowsN*(STH+12);
-  // equipment
-  if(gear.length){sec("Equipment",y);y+=SECH;const gw=(IW-12*(GC-1))/GC;
-    gear.forEach((g,i)=>{const x=PAD+(i%GC)*(gw+12),yy=y+Math.floor(i/GC)*(GTH+12);card(x,yy,gw,GTH,RHX[g.r]);
-      img(g.ic,x+16,yy+13,52,true);const tx=x+80,tw=gw-96;
-      c.font=`600 15.5px ${F}`;c.fillStyle=RHX[g.r]||TX;c.fillText(fit(g.n,tw),tx,yy+32);
-      c.font=`12.5px ${F}`;c.fillStyle=MU;const s1=g.slot+" · ";c.fillText(s1,tx,yy+56);let xx=tx+c.measureText(s1).width;
-      c.fillStyle=GOLD;c.font=`600 12.5px ${FM}`;const stt=g.st+"★";c.fillText(stt,xx,yy+56);xx+=c.measureText(stt).width;
-      c.font=`12.5px ${F}`;c.fillStyle=MU;c.fillText(" · ",xx,yy+56);xx+=c.measureText(" · ").width;
-      const mcol=g.mu==="None"?MU:(MUTHX[g.mu]||TX);c.fillStyle=mcol;c.font=g.mu==="None"?`12.5px ${F}`:`600 12.5px ${F}`;const mt2=g.mu==="None"?"No mutation":g.mu;c.fillText(fit(mt2,x+gw-16-xx-48),xx,yy+56);
-      c.textAlign="right";c.font=`600 12.5px ${FM}`;c.fillStyle=g.q>=100?TX:MU;c.fillText(g.q+"%",x+gw-16,yy+56);c.textAlign="left"});
-    y+=gearRowsN*(GTH+12)}
+  // equipment: necklace and charm as two big cards, then the rings
+  const stars=(g,x,yy,fs)=>{c.font=`600 ${fs}px ${FM}`;c.fillStyle=GOLD;const t=g.st+"★";c.fillText(t,x,yy);return x+c.measureText(t).width};
+  const mutTxt=(g,x,yy,fs,w)=>{const none=g.mu==="None";c.fillStyle=none?MU:(MUTHX[g.mu]||TX);c.font=none?`${fs}px ${F}`:`600 ${fs}px ${F}`;c.fillText(fit(none?"No mutation":g.mu,w),x,yy)};
+  if(hasTop){sec("Necklace & Charm",y);y+=SECH;const tw2=(IW-GAP)/2;
+    top2.forEach((g,i)=>{const x=PAD+i*(tw2+GAP);card(x,y,tw2,TOPH,g.empty?null:RHX[g.r]);
+      if(g.empty){label(g.slot,x+22,y+32);c.fillStyle=MU;c.font=`15px ${F}`;c.fillText("Empty",x+22,y+62);return}
+      img(g.ic,x+20,y+16,72,true);const tx=x+108,tw=tw2-128;label(g.slot,tx,y+30);
+      c.font=`700 19px ${FD}`;c.fillStyle=RHX[g.r]||TX;c.fillText(fit(g.n,tw),tx,y+56);
+      c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(g.r,tx,y+82);let xx=tx+c.measureText(g.r+"   ").width;xx=stars(g,xx,y+82,13);
+      c.font=`13px ${F}`;c.fillStyle=MU;c.fillText("  ·  ",xx,y+82);xx+=c.measureText("  ·  ").width;mutTxt(g,xx,y+82,13,x+tw2-20-xx-60);
+      c.textAlign="right";c.font=`600 13px ${FM}`;c.fillStyle=g.q>=100?TX:MU;c.fillText(g.q+"% quality",x+tw2-20,y+82);c.textAlign="left"});
+    y+=TOPH+12}
+  if(rings.length){sec(`Rings (${rings.length} of 8)`,y);y+=SECH;const rw=(IW-12*(RC-1))/RC;
+    rings.forEach((g,i)=>{const x=PAD+(i%RC)*(rw+12),yy=y+Math.floor(i/RC)*(RH+12);card(x,yy,rw,RH,RHX[g.r]);
+      img(g.ic,x+18,yy+18,60,true);label(g.slot,x+86,yy+30);c.textAlign="right";c.font=`600 12.5px ${FM}`;c.fillStyle=g.q>=100?TX:MU;c.fillText(g.q+"%",x+rw-16,yy+30);c.textAlign="left";
+      c.font=`700 16px ${FD}`;c.fillStyle=RHX[g.r]||TX;c.fillText(fit(g.n,rw-104),x+86,yy+56);
+      const xx=stars(g,x+86,yy+80,13);c.font=`13px ${F}`;c.fillStyle=MU;c.fillText("  ·  ",xx,yy+80);mutTxt(g,xx+c.measureText("  ·  ").width,yy+80,13,x+rw-16-xx-30)});
+    y+=ringRowsN*(RH+12)}
+  // museum: all 18 slots, by rarity. "ANY" = no mineral bonus, only the modifier counts
+  if(MROWS.length){sec(`Museum (${mt.n} of 18 filled)`,y);y+=SECH;card(PAD,y,IW,MROWS.length*MRH+8);
+    const LW=120,sw3=(IW-LW-40-12*2)/3;
+    MROWS.forEach((row,j)=>{const yy=y+4+j*MRH;if(j){c.strokeStyle=LINE;c.beginPath();c.moveTo(PAD+16,yy+.5);c.lineTo(PAD+IW-16,yy+.5);c.stroke()}
+      c.fillStyle=RHX[row.r]||TX;c.font=`700 14px ${F}`;c.fillText(row.r,PAD+20,yy+34);
+      row.slots.forEach((q,i)=>{const x=PAD+20+LW+i*(sw3+12),ic=40,iy=yy+9;
+        c.fillStyle=(RHX[row.r]||MU)+(q.m?"22":"0d");rr(x,iy,ic,ic,9);c.fill();
+        if(q.any){c.fillStyle=RHX[row.r]||TX;c.font=`700 11px ${F}`;c.textAlign="center";c.fillText("ANY",x+ic/2,iy+ic/2+4);c.textAlign="left"}
+        else if(q.ic&&IMG[q.ic]){const im=IMG[q.ic],k=Math.min((ic-6)/im.width,(ic-6)/im.height);c.drawImage(im,x+(ic-im.width*k)/2,iy+(ic-im.height*k)/2,im.width*k,im.height*k)}
+        const tx=x+ic+12,tw=sw3-ic-14;
+        if(!q.m){c.fillStyle=MU;c.font=`13px ${F}`;c.fillText("Empty",tx,yy+34);return}
+        c.fillStyle=q.any?MU:TX;c.font=`600 14px ${F}`;c.fillText(fit(q.any?`Any ${row.r}`:q.m,tw),tx,yy+25);
+        const u=q.u,ul=u==="None"?"No modifier":u==="Any"?"Any modifier":String(u).startsWith("Any of: ")?String(u).slice(8).split("/").join(" or "):u;
+        c.fillStyle=MODCOL[u]||MU;c.font=MODCOL[u]?`600 12.5px ${F}`:`12.5px ${F}`;c.fillText(fit(ul+(q.any&&u!=="None"&&u!=="Any"?" (modifier only)":""),tw),tx,yy+44)})});
+    y+=MROWS.length*MRH+20}
   // boosts
   if(boosts.length){sec("Boosts",y);y+=SECH;card(PAD,y,IW,bRows.length*32+16);
     bRows.forEach((row,j)=>{let xx=PAD+18;row.forEach(ch=>{const yy=y+12+j*32;c.strokeStyle=ch.col+"88";c.lineWidth=1;rr(xx,yy,ch.w,24,12);c.stroke();c.fillStyle=ch.col+"14";rr(xx,yy,ch.w,24,12);c.fill();c.fillStyle=ch.col;c.font=`13px ${F}`;c.fillText(ch.t,xx+11,yy+16.5);xx+=ch.w+8})})}
