@@ -352,6 +352,9 @@ function upCandidates(){
   // potions and limited consumables you don't have on yet. Halloween and Christmas treats only show with "Include event gear".
   ((P.x2||{}).potions||[]).forEach(po=>{if((base.pots||[]).includes(po.n))return;const st=clone(base);st.pots=[...(base.pots||[]),po.n];
     const m=/\$/.test(po.cost||"")?uMoney(po.cost):0;add({kind:"Potion",name:po.n,where:[po.fx,po.where].filter(Boolean).join(" · "),money:m,other:m?"":String(po.cost||"").replace(/Meteor Shards/i,"shards"),pans:0,limited:false,state:st,apply:()=>{S.pots=[...(S.pots||[]),po.n]}})});
+  // totems and the XP Cookie (the cookie only comes from Cookie Time and the Christmas shop, so it counts as event)
+  [["luckTotem","Luck Totem","2× luck · 300 Meteor Shards"],["strTotem","Strength Totem","2× dig and shake strength · 180 Meteor Shards"],["lumTotem","Luminant Totem","1.5× capacity, +50% speeds · 600 Meteor Shards"],["cookie","XP Cookie","+1× most stats · 1 min",true]].forEach(([k,n,fx,ev])=>{
+    if((base.b||{})[k])return;const st=clone(base);st.b=Object.assign({},st.b,{[k]:true});add({kind:ev?"Consumable":"Totem",name:n,where:fx,money:0,pans:0,limited:!!ev,state:st,apply:()=>{S.b[k]=true}})});
   const CEV={"Candy Corn":1,"Ghost Gummy":1,"Gingerbread Cookie":1};
   CONS.forEach(c=>{if((base.cons||[]).includes(c.n))return;const st=clone(base);st.cons=[...(base.cons||[]),c.n];
     add({kind:"Consumable",name:c.n,where:c.fx,money:0,pans:0,limited:!!CEV[c.n],state:st,apply:()=>{S.cons=[...(S.cons||[]),c.n]}})});
@@ -412,8 +415,11 @@ const upRow=(c,i,btns)=>{const gains=Object.entries(c.d).sort((a,b)=>Math.abs(b[
     const meta=c.kind+(c.replaces?" (instead of "+c.replaces+")":"")+(c.where?" · "+c.where:"")+(c.recipe?" · "+c.recipe:"")+(c.unknown?" · some materials aren't panned":"");
     return `<div class="upi${btns.length>1?" pth":""}">${btns.length>1?`<span class="upnum">${i+1}</span>`:""}<span class="upn"><b>${esc(c.name)}</b><span class="uph" title="${esc(meta)}">${esc(meta)}</span><span class="upg">${gains}</span></span>
       <span class="upm">${esc(money)}</span><span class="upp">${esc(grind)}</span><span class="upb">${btns.join("")}</span></div>`};
+// boosts multiply (gear + flat points), so a goal stat at 0 from gear can't be raised by museum, totems or cookies
+function zeroNote(){const R=compute(effState());const z=Object.keys(upGoal()[1]).filter(k=>((R.base[k]||0)+(R.flat[k]||0))<=1e-9);
+  return z.length?`<br><b>${esc(z.join(", "))}</b> is 0 from your gear, and museum, totem and cookie boosts multiply what gear gives, so they can't raise it yet. Gear with ${esc(z.join(" or "))} comes first.`:""}
 function renderPath(){const steps=upPath(8);const sk=(S.upSkip||[]).length;
-  $("upHint").innerHTML=`Each step is picked after the ones above it are done. Equipment is shown at 6★ and 100% quality.`+(sk?` <button type="button" class="rst" data-upunskip="1">Bring back ${sk} skipped</button>`:"");
+  $("upHint").innerHTML=`Each step is picked after the ones above it are done. Equipment is shown at 6★ and 100% quality.`+zeroNote()+(sk?` <button type="button" class="rst" data-upunskip="1">Bring back ${sk} skipped</button>`:"");
   if(!steps.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';UPLAST=[];return}
   const tm=steps.reduce((a,c)=>a+(c.money||0),0),tp=steps.reduce((a,c)=>a+(c.pans||0),0);
   $("upList").innerHTML=steps.map((c,i)=>upRow(c,i,[`<button type="button" class="btn sm" data-upto="${i}" title="Applies steps 1 to ${i+1}">${i?"Do 1–"+(i+1):"Do it"}</button>`,`<button type="button" class="btn sm ghost" data-upskip="${i}" title="Leave this out and work the path out again">Skip</button>`])).join("")
@@ -422,7 +428,7 @@ function renderPath(){const steps=upPath(8);const sk=(S.upSkip||[]).length;
 function renderUpList(){
   if(S.upMode==="path")return renderPath();
   const list=upCandidates().slice(0,10);
-  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality.`;
+  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality.`+zeroNote();
   if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
   $("upList").innerHTML=list.map((c,i)=>upRow(c,i,[`<button type="button" class="btn sm" data-uptry="${i}">Try it</button>`])).join("");
   UPLAST=list}
