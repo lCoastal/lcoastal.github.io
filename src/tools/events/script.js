@@ -16,9 +16,10 @@ function tick(){const now=new Date();const secH=now.getUTCMinutes()*60+now.getUT
   const U=nextUpdate(now),aa=U.aa,up=U.up,live=now>=aa&&now<new Date(up.getTime()+3600e3);
   const wd=d=>d.toLocaleDateString([], {weekday:"long"});
   h+=`<div class="tm" style="--tc:var(--c-exotic)"><span class="lab">Saturday update</span><b>Admin Abuse ${clock(aa)} · Update ${clock(up)}</b><span class="st ${live?"open":"shut"}">${live?(now<up?"Admin Abuse is on now":"Update is out"):wd(aa)+", your time"}</span><span class="cd">${live?(now<up?mmss((up-now)/1000):"Live"):mmss((aa-now)/1000)}</span><small>${live&&now<up?"Until the update":"Until Admin Abuse"}. Only on weeks with an update.</small><span id="aaSlot"></span></div>`;
-  $("timers").innerHTML=h;$("aaSlot").replaceWith(CPAA)}
+  $("timers").innerHTML=h;$("aaSlot").replaceWith(AAW)}
 // one copy button that's moved into the card on every tick, not rebuilt, so it stays put and keeps its hover/focus
-const CPAA=document.createElement("button");CPAA.type="button";CPAA.className="btn sm";CPAA.id="cpAA";CPAA.textContent="Copy for Discord";CPAA.style.cssText="align-self:flex-start;margin-top:4px";
+const CPAA=document.createElement("button");CPAA.type="button";CPAA.className="btn sm";CPAA.id="cpAA";CPAA.textContent="Copy for Discord";// it sits in the site's own action group from the start, so the shared code doesn't move it around every tick
+const AAW=document.createElement("span");AAW.className="pt-acts";AAW.style.marginTop="4px";AAW.appendChild(CPAA);
 // offset (ms) of a time zone at a moment, from Intl (handles summer time)
 function tzOff(d,tz){const p=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:tz,hourCycle:"h23",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).formatToParts(d).map(x=>[x.type,x.value]));
   return Date.UTC(+p.year,+p.month-1,+p.day,+p.hour%24,+p.minute,+p.second)-d.getTime()}
