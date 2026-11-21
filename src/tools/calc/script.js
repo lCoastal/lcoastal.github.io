@@ -286,7 +286,17 @@ const uPansTxt=p=>!p?"":p>=1e9?fmt(p/1e9,1)+"B pans":p>=1e6?fmt(p/1e6,1)+"M pans
 // what the recipe would cost you in pans (unknown minerals are skipped and flagged)
 function recipeCost(x){let pans=0,unknown=0;(x.rec||[]).forEach(([q,n])=>{const p=pansFor(n);if(p==null)unknown++;else pans+=q*p});return {pans,unknown}}
 const uScore=(tot,w)=>Object.entries(w).reduce((a,[s,k])=>a+k*Math.log(1+Math.max(0,tot[s]||0)),0);
-function upGoal(){const g=UGOALS.find(g=>g[0]===S.upGoal)||UGOALS[0];return g}
+// Custom goal: a weight per stat. Scores use log(1+stat), so a weight is how much a % gain in that stat is worth:
+// Luck 2, Capacity 1 means +10% luck counts as much as +20% capacity.
+const UCSTATS=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed"];
+const ucW=()=>{const w=S.upW||{Luck:1};const o={};UCSTATS.forEach(s=>{if(+w[s]>0)o[s]=+w[s]});return Object.keys(o).length?o:{Luck:1}};
+function upGoal(){if(S.upGoal==="Custom")return ["Custom",ucW()];const g=UGOALS.find(g=>g[0]===S.upGoal)||UGOALS[0];return g}
+function renderUcw(){const el=$("upCustom");const on=S.upGoal==="Custom";el.hidden=!on;if(!on){el.innerHTML="";return}const w=S.upW||{Luck:1};
+  el.innerHTML=UCSTATS.map(s=>{const v=+w[s]||0;return `<label><span style="color:${statHex(s)}">${esc(s)}</span><input type="range" min="0" max="5" step="0.5" value="${v}" data-ucw="${esc(s)}" aria-label="${esc(s)} weight"><span class="v${v>0?" on":""}">${v?fmt(v,1).replace(/\.0$/,""):"off"}</span></label>`}).join("")+`<p class="hint" id="ucwH">${ucHint()}</p>`}
+function ucHint(){const e=Object.entries(ucW()).sort((a,b)=>b[1]-a[1]);if(e.length<2)return `Only ${esc(e[0][0])} counts. Raise another stat to weigh them against each other.`;
+  const [a,b]=[e[0],e[e.length-1]];return `With these weights, +10% ${esc(a[0])} counts as much as +${fmt(10*a[1]/b[1],0)}% ${esc(b[0])}.`}
+document.addEventListener("input",e=>{const r=e.target.closest&&e.target.closest("[data-ucw]");if(!r)return;S.upW=Object.assign({Luck:1},S.upW||{},{[r.dataset.ucw]:+r.value});
+  const v=r.parentElement.querySelector(".v");v.textContent=+r.value?String(+r.value):"off";v.classList.toggle("on",+r.value>0);$("ucwH").innerHTML=ucHint();save();clearTimeout(window._ucT);window._ucT=setTimeout(renderUpList,150)});
 // every swap worth trying, with what it gives and what it costs
 // chance an ore gets one particular modifier, at a Modifier Boost (in %) and luck. Same model as Modifier Odds:
 // "any modifier" from the boost, then which one from rolls that keep the rarest.
@@ -330,6 +340,15 @@ function upCandidates(){
     if(used.length<2)return;const b1=best[x.n],nn=used.length;
     add({kind:`Rings ×${nn}`,replaces:Object.entries(used.reduce((o,u)=>(o[u.was]=(o[u.was]||0)+1,o),{})).map(([n,c])=>(c>1?c+"× ":"")+n).join(", "),name:`${x.n} ×${nn}`,rarity:x.r,money:(b1.money||0)*nn,other:b1.other?b1.other+` (×${nn})`:"",limited:b1.limited,pans:(b1.pans||0)*nn,unknown:b1.unknown,
       state:st,apply:()=>{used.forEach(u=>{S.slots[u.k]=Object.assign({},S.slots[u.k],{n:x.n,l:"6",q:100})})},recipe:b1.recipe?`${nn}× (${b1.recipe})`:""})});
+  // equipment mutations: for each worn piece, the mutation that helps this goal most (no cost counted).
+  // Festive and Sunforged need event / tomb catalysts, so they only show with "Include event gear".
+  const MLIM=new Set(((P.ench||{}).muts||[]).filter(m=>m.ev&&!/^also/i.test(m.ev)).map(m=>m.n));const bestMut={};
+  SLOTDEF.forEach(([k,label])=>{const cur=(base.slots||{})[k];if(!cur||!cur.n)return;const curM=cur.m||"None";let bm=null;
+    MUTS.forEach(([u])=>{if(u===curM||u==="None"||(MLIM.has(u)&&!S.upEvent))return;const st=clone(base);st.slots=Object.assign({},st.slots,{[k]:Object.assign({},cur,{m:u})});const g=uScore(compute(st).tot,w)-s0;
+      if(g>1e-9&&(!bm||g>bm.g))bm={u,g,st}});
+    if(!bm)return;const key=cur.n+"|"+curM;if(bestMut[key]&&bestMut[key].gain>=bm.g)return;
+    bestMut[key]={kind:`Mutation (${label})`,name:`${bm.u} ${cur.n}`,replaces:curM==="None"?"no mutation":curM,money:0,pans:0,limited:MLIM.has(bm.u),gain:bm.g,state:bm.st,apply:()=>{S.slots[k]=Object.assign({},S.slots[k],{m:bm.u})}}});
+  Object.values(bestMut).forEach(c=>add(c));
   // pan enchants: each one you don't have. Effort = rolls to hit it on the best enchant table (one roll counted as 10 pans),
   // or 1 when there's an Enchant Book for it
   const EN=P.ench||{pan:[]};
@@ -353,21 +372,27 @@ function upCandidates(){
     MORDER.forEach(r=>(mb[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const curU=sl.u||"None";let bestU=null;
       Object.keys(MODS).forEach(u=>{if(u===curU||u==="None"||u==="Lunar")return;const b2=JSON.parse(JSON.stringify(mb));b2[r][i]={m:sl.m,u};const t2=clone(base);t2.mus="custom";t2.museumBoard=b2;
         const ch=modChanceCalc(u,mbx,lk);if(ch<=0&&!S.upEvent)return;const g=uScore(compute(t2).tot,w)-s0;if(g<=1e-9)return;const find=sl.m==="Any"?Math.min(...P.mins.filter(m=>m.r===r).map(m=>pansFor(m.n)).filter(v=>v!=null)):pansFor(sl.m);
-        const pn=find!=null&&isFinite(find)&&ch>0?find/ch:null;const c={g,u,pn,st:t2,b2,ch};const val=(S.upSort||"value")==="gain"?g:g/Math.max(1,pn==null?1e9:pn);if(!bestU||val>bestU.val)bestU={...c,val}});
-      if(!bestU)return;const nm=sl.m==="Any"?`Any ${r}`:sl.m;
-      add({kind:`Museum modifier (${r})`,name:`${bestU.u} ${nm}`,replaces:curU==="None"?"no modifier":curU,rarity:r,money:0,pans:bestU.pn==null?0:bestU.pn,unknown:bestU.pn==null,limited:false,state:bestU.st,
+        const pn=find!=null&&isFinite(find)&&ch>0?find/ch:null;const c={g,u,pn,st:t2,b2,ch};const val=g;if(!bestU||val>bestU.val)bestU={...c,val}});
+      if(!bestU)return;
+      // the mineral itself adds nothing to this goal: suggest "Any" of that rarity, so any mineral with the modifier will do
+      if(sl.m!=="Any"){const b3=JSON.parse(JSON.stringify(bestU.b2));b3[r][i]={m:"Any",u:bestU.u};const t3=clone(base);t3.mus="custom";t3.museumBoard=b3;
+        if(uScore(compute(t3).tot,w)>=uScore(compute(bestU.st).tot,w)-1e-9){const fa=Math.min(...P.mins.filter(m=>m.r===r).map(m=>pansFor(m.n)).filter(v=>v!=null));
+          bestU={...bestU,b2:b3,st:t3,any:true,pn:isFinite(fa)&&bestU.ch>0?fa/bestU.ch:bestU.pn}}}
+      const nm=bestU.any||sl.m==="Any"?`Any ${r}`:sl.m;
+      add({kind:`Museum modifier (${r})`,name:`${bestU.u} ${nm}`,replaces:(bestU.any?sl.m+", ":"")+(curU==="None"?"no modifier":curU),rarity:r,money:0,pans:bestU.pn==null?0:bestU.pn,unknown:bestU.pn==null,limited:false,state:bestU.st,
         apply:()=>{S.mus="custom";S.museumBoard=bestU.b2},where:[bestU.ch>0?`${bestU.u} on ~1 in ${fmt(1/bestU.ch,0)} ores`:"",base.mus!=="custom"?"Try it copies your museum into a custom one":""].filter(Boolean).join(" · ")})}))}
   const effort=c=>Math.max(1,(c.pans||0)+(c.money||0)/1000)*(c.unknown?20:1);
   out.forEach(c=>{c.effort=effort(c);c.value=c.gain/c.effort});
   const keep=S.upEvent?out:out.filter(c=>!c.limited);
-  keep.sort((a,b)=>(S.upSort||"value")==="value"?b.value-a.value:b.gain-a.gain);
+  keep.sort((a,b)=>b.gain-a.gain);
   return keep}
 function renderUp(){
   const on=S.showUp!==false;$("showUp").checked=on;$("upBody").hidden=!on;
-  $("upGoal").innerHTML=UGOALS.map(([n])=>`<button type="button" class="chip" data-ug="${esc(n)}" aria-pressed="${(S.upGoal||"Luck")===n}">${esc(n)}</button>`).join("");
-  $("upSort").innerHTML=[["value","Best for the effort"],["gain","Biggest gain"]].map(([v,n])=>`<button type="button" class="chip" data-us="${v}" aria-pressed="${(S.upSort||"value")===v}">${n}</button>`).join("");
-  $("upSort").insertAdjacentHTML("beforeend",`<button type="button" class="chip" data-uev="1" aria-pressed="${!!S.upEvent}" title="Event and limited-time gear you can't just go and get">Include event gear</button>`);
+  $("upGoal").innerHTML=[...UGOALS.map(([n])=>n),"Custom"].map(n=>`<button type="button" class="chip" data-ug="${esc(n)}" aria-pressed="${(S.upGoal||"Luck")===n}">${esc(n)}</button>`).join("");renderUcw();
+  $("upSort").innerHTML=(`<button type="button" class="chip" data-uev="1" aria-pressed="${!!S.upEvent}" title="Event and limited-time gear you can't just go and get">Include event gear</button>`);
   if(!on){$("upList").innerHTML="";$("upHint").textContent="";return}
+  renderUpList()}
+function renderUpList(){
   const list=upCandidates().slice(0,10);
   $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality.`;
   if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
@@ -386,7 +411,6 @@ let UPLAST=[],UPUNDO=null;
 $("showUp").addEventListener("change",()=>{S.showUp=$("showUp").checked;save();renderUp()});
 document.addEventListener("click",e=>{
   const g=e.target.closest("[data-ug]");if(g){S.upGoal=g.dataset.ug;save();renderUp();return}
-  const so=e.target.closest("[data-us]");if(so){S.upSort=so.dataset.us;save();renderUp();return}
   const ev=e.target.closest("[data-uev]");if(ev){S.upEvent=!S.upEvent;save();renderUp();return}
   const t=e.target.closest("[data-uptry]");if(t){const c=UPLAST[+t.dataset.uptry];if(!c)return;
     UPUNDO=clone(S);c.apply();save();all();toastUp(`Tried ${c.name}`);return}

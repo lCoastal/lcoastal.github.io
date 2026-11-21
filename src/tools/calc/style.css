@@ -144,3 +144,11 @@ table.out th.bkc{text-align:center}
 .bkh #cpBrk{margin-left:auto}
 .bname{flex:1 1 160px;min-width:120px;max-width:260px;margin-left:auto;font:500 14px var(--f-body);padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);color:var(--fg)}
 .bname:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+/* custom goal: one weight per stat */
+.ucw{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 16px;padding:4px 0 2px}
+.ucw label{display:grid;grid-template-columns:110px 1fr 34px;align-items:center;gap:8px;font-size:13px}
+.ucw input[type=range]{width:100%}
+.ucw .v{font-family:var(--mono,monospace);text-align:right;color:var(--muted)}
+.ucw .v.on{color:var(--fg)}
+.ucw .hint{grid-column:1/-1;margin:2px 0 0}
