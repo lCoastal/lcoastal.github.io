@@ -9,7 +9,7 @@ const MUT=Object.fromEntries(MUTS.map(m=>[m[0],m]));
 const mutLabel=m=>m[0]==="None"?"No mutation":`${m[0]} ×${m[1]}${Object.keys(m[2]).length?" +":""}`;
 const MULT={Common:.005,Uncommon:.0075,Rare:.0125,Epic:.02,Legendary:.03,Mythic:.05,Exotic:.08};
 const MODS=Object.fromEntries(P.mods.map(m=>[m[0],m]));
-window.S=null;let S={pan:"",shovel:"",slots:{},mus:"board",b:{},n:{friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0},owned:false};
+window.S=null;let S={pan:"Rusty Pan",shovel:"Rusty Shovel",slots:{},mus:"board",b:{},n:{friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0},owned:false};
 window.S=S;try{const s=JSON.parse(localStorage.getItem("pcalc")||"null");if(s)S=Object.assign(S,s,{b:Object.assign({},s.b),n:Object.assign(S.n,s.n)})}catch(e){}
 {const seen=new Set();Object.keys(S.slots).sort().forEach(k=>{const v=S.slots[k];if(v&&["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"].includes(v.n)){if(seen.has(v.n))v.n="";else seen.add(v.n)}})}
 window.S=S;Object.values(S.slots).forEach(v=>{if(v&&v.l==="p"){v.l="6";v.m="Prismatic"}});
@@ -37,6 +37,8 @@ function fillMus(){const src=musSources();if(!src.some(s=>s[0]===S.mus))S.mus="b
 function passive(p){const o={};let lm=1;String(p||"").split(/,\s*/).forEach(t=>{let m=t.match(/^([+\-−]?\d+(?:\.\d+)?)%\s*(Size Boost|Modifier Boost|Sell Boost)/i);if(m){const k=m[2].toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());o[k]=(o[k]||0)+parseFloat(m[1].replace("−","-"))}
   m=t.match(/(\d+(?:\.\d+)?)\s*×\s*additional Luck/i);if(m)lm*=parseFloat(m[1])});return {o,lm}}
 const eqVal=(s,l,q,mult)=>{const lo=l==="5"?s[1]:s[3],hi=l==="5"?s[2]:s[4];return (lo+(hi-lo)*q/100)*mult};
+// permanent quest buffs: kept when boosts are reset
+const PERM=["trader","lighthouse","ancient","spirits"];
 // limited-time consumables: kept apart from potions. Values from the wiki's Relics page.
 const CONS=[{n:"Luck Booster",fx:"2× luck · 15 min",p:{Luck:1}},{n:"Candy Corn",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Gingerbread Cookie",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Ghost Gummy",fx:"+0.5× strength · 10 min",p:{"Dig Strength":.5,"Shake Strength":.5}}];
 // Sun Blessing (Pharaoh's Pan / Shovel passive): one charge meter, so it counts once even with both
@@ -54,7 +56,9 @@ function compute(S0){const S=S0||window.S;
   // Embalmer's Salt: +0.25% sell value per item panned, up to +100%. Counted as maxed out, added like gear.
   if(S.trinket==="Embalmer's Salt")base["Sell Boost"]+=100;
   SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
-  const flat=Object.fromEntries(STATS.map(s=>[s,0]));flat.Luck=Math.max(0,+S.n.flatLuck||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
+  const flat=Object.fromEntries(STATS.map(s=>[s,0]));flat.Luck=Math.max(0,+S.n.flatLuck||0);
+  // permanent quest luck (flat points): Lighthouse +3, Ancient +5, Spirits +50, Dredge Master +3 a quest, login Experience +5 a point
+  flat.Luck+=(S.b.lighthouse?3:0)+(S.b.ancient?5:0)+(S.b.spirits?50:0)+3*Math.max(0,+S.n.dredge||0)+5*Math.max(0,+S.n.xp||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
   // Trader's Recommendation: permanent quest reward, +20 flat Sell Boost. Almost everyone has it, so it's on unless unticked.
   if(S.b.trader!==false)flat["Sell Boost"]+=20;
   const pile=Object.fromEntries(STATS.map(s=>[s,0]));const mt=musTotals(S);Object.entries(mt.t).forEach(([k,v])=>{if(k in pile)pile[k]+=v});
@@ -91,7 +95,7 @@ function strip(st,g){const t=clone(st);
   if(g==="tools"){t.pan="";t.shovel="";t.panEn="";t.shEn="";t.trinket=""}
   else if(g==="jewelry"){t.slots={}}
   else if(g==="museum"){t.mus="none"}
-  else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0};t.pots=[];t.runes=[];t.cons=[]}
+  else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};PERM.forEach(k=>keep[k]=t.b[k]);t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:t.n.dredge,xp:t.n.xp};t.pots=[];t.runes=[];t.cons=[]}
   else if(g==="events"){t.b=Object.assign({},t.b,{meteor:false,weather:false})}
   return t}
 // S.only: null = count everything, otherwise a single part key like "slot:r0", "slot:r0,r1" (same item in several slots) or "group:museum"
@@ -132,7 +136,7 @@ function shares(base,full){const P=parts(base),n=P.length,memo=new Map();
 // ---- detailed breakdown: every stat is flat points × a multiplier; each source shows what it adds to either side ----
 // One line per source: every ring on its own line, every museum display, every potion, totem and rune.
 // Each line is "what changes if you take just that away"; anything left over (two sources boosting each other) is shown as "Overlap".
-const BLAB={trader:"Trader's Recommendation",daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
+const BLAB={trader:"Trader's Recommendation",lighthouse:"Lighthouse Blessing",ancient:"Ancient Blessing",spirits:"Blessing of the Spirits",daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
 function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";t.sunKeep=true},minus:B.panEn?0:null})}
   if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:B.shEn==="Rhythmic"?(rhyOn(B)?"Rhythmic (Assuming a full streak)":"Rhythmic (streak off)"):`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
@@ -142,7 +146,7 @@ function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const 
   const bd=B.mus!=="none"?musBoard(B):null;
   if(bd)MORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const u=sl.u||"None";
     L.push({key:"group:museum",label:`Museum: ${sl.m==="Any"?"Any "+r:sl.m}`,sub:[sl.m==="Any"?"":r,u==="None"?"":u].filter(Boolean).join(" · "),cut:t=>{const b2=JSON.parse(JSON.stringify(musBoard(t)||{}));if(b2[r]&&b2[r][i])b2[r][i]={m:null,u:"None"};t.mus="custom";t.museumBoard=b2}})}));
-  Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather")return;L.push({key:"group:boosts",label:lab(k),cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
+  Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather"||k==="trader")return;L.push({key:"group:boosts",label:lab(k),cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
   (B.pots||[]).forEach(n=>L.push({key:"group:boosts",label:"Potion: "+n,cut:t=>{t.pots=(t.pots||[]).filter(x=>x!==n)}}));
   (B.cons||[]).forEach(n=>L.push({key:"group:boosts",label:"Consumable: "+n,cut:t=>{t.cons=(t.cons||[]).filter(x=>x!==n)}}));
   (B.runes||[]).forEach(n=>L.push({key:"group:boosts",label:"Rune: "+n,cut:t=>{t.runes=(t.runes||[]).filter(x=>x!==n)}}));
@@ -151,7 +155,9 @@ function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const 
   if(+n.friends>0)L.push({key:"group:boosts",label:`${+n.friends} friend${+n.friends===1?"":"s"} online`,cut:t=>{t.n=Object.assign({},t.n,{friends:0})}});
   if(+n.mastery>0)L.push({key:"group:boosts",label:"Location mastery",cut:t=>{t.n=Object.assign({},t.n,{mastery:0})}});
   if(B.b.trader!==false)L.push({key:"group:boosts",label:"Trader's Recommendation",cut:t=>{t.b=Object.assign({},t.b,{trader:false})}});
-  if(+n.flatLuck>0)L.push({key:"group:boosts",label:"Flat luck (quests, potions)",cut:t=>{t.n=Object.assign({},t.n,{flatLuck:0})}});
+  if(+n.dredge>0)L.push({key:"group:boosts",label:`Dredge Master (${fmt(+n.dredge,0)} quests)`,cut:t=>{t.n=Object.assign({},t.n,{dredge:0})}});
+  if(+n.xp>0)L.push({key:"group:boosts",label:`Login Experience (${fmt(+n.xp,0)} points)`,cut:t=>{t.n=Object.assign({},t.n,{xp:0})}});
+  if(+n.flatLuck>0)L.push({key:"group:boosts",label:"Other flat luck",cut:t=>{t.n=Object.assign({},t.n,{flatLuck:0})}});
   if(+n.flatDig>0)L.push({key:"group:boosts",label:"Flat dig strength",cut:t=>{t.n=Object.assign({},t.n,{flatDig:0})}});
   if(B.b&&B.b.meteor)L.push({key:"group:events",label:"Meteor shower",cut:t=>{t.b=Object.assign({},t.b,{meteor:false})}});
   if(B.b&&B.b.weather)L.push({key:"group:events",label:"Weather event",cut:t=>{t.b=Object.assign({},t.b,{weather:false})}});
@@ -255,7 +261,7 @@ document.addEventListener("click",e=>{const c=e.target.closest("[data-iso]");if(
   const r=e.target.closest("[data-reset]");if(r){if(!r.classList.contains("arm")){r.classList.add("arm");r.textContent="Sure?";setTimeout(()=>{r.classList.remove("arm");r.textContent="Reset"},2500);return}resetGroup(r.dataset.reset);return}});
 document.addEventListener("keydown",e=>{const p=e.target.closest&&e.target.closest("[data-only]");if(p&&(e.key==="Enter"||e.key===" ")){e.preventDefault();p.click()}});
 function resetGroup(g){if(g==="tools"){S.pan="";S.shovel="";S.panEn="";S.shEn=""}else if(g==="jewelry"){S.slots={}}else if(g==="museum"){S.mus="none";S.museumBoard=null}
-  else if(g==="boosts"){S.b={};S.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0};S.pots=[];S.runes=[];S.cons=[]}S.only=null;save();all()}
+  else if(g==="boosts"){const kb={};PERM.forEach(k=>{if(k in S.b)kb[k]=S.b[k]});S.b=kb;S.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:S.n.dredge,xp:S.n.xp};S.pots=[];S.runes=[];S.cons=[]}S.only=null;save();all()}
 $("resetAll").onclick=()=>{const b=$("resetAll");if(!b.classList.contains("arm")){b.classList.add("arm");b.textContent="Reset everything?";setTimeout(()=>{b.classList.remove("arm");b.textContent="Reset everything"},2500);return}
   ["tools","jewelry","museum","boosts"].forEach(g=>resetGroup(g));S.isoOff=[];S.only=null;S.owned=false;b.classList.remove("arm");b.textContent="Reset everything";save();all()};
 // ---- what to upgrade next ----------------------------------------------------

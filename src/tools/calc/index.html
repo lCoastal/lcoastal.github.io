@@ -51,10 +51,16 @@
         <div class="rowc">
           <label class="num">Friendship Totem, players nearby <input type="number" min="-1" max="19" data-n="friendTotem" aria-describedby="ftH"></label>
           <label class="num">Friends online <input type="number" min="0" max="5" data-n="friends"></label>
-          <label class="num">Location mastery <select data-n="mastery"><option value="0">None</option><option value="0.15">+0.15×</option><option value="0.2">+0.20×</option><option value="0.25">+0.25×</option></select></label></div>
+          <label class="num">Location mastery <select data-n="mastery"><option value="0">None</option><option value="0.05">+0.05×</option><option value="0.1">+0.10×</option><option value="0.15">+0.15×</option><option value="0.2">+0.20×</option><option value="0.25">+0.25×</option></select></label></div>
         <p class="hint" id="ftH">Friendship Totem: −1 = no totem, 0 = just you (+0.4×), each extra player adds +0.2×.</p>
         <div class="rowc">
-          <label class="num">Flat luck (quests, potions) <input type="number" min="0" data-n="flatLuck"></label>
+          <label class="num">Other flat luck (potions, etc.) <input type="number" min="0" data-n="flatLuck"></label></div>
+        <div class="rowc"><span class="lab">Permanent buffs</span>
+          <label class="ck" title="Sunset Beach: Restoring the Lighthouse quest"><input type="checkbox" data-b="lighthouse"> Lighthouse Blessing (+3 luck)</label>
+          <label class="ck" title="The figure behind the waterfall in Crystal Caverns"><input type="checkbox" data-b="ancient"> Ancient Blessing (+5 luck)</label>
+          <label class="ck" title="Deeproot Spring: Spirits of the Grotto quest"><input type="checkbox" data-b="spirits"> Blessing of the Spirits (+50 luck)</label>
+          <label class="num" title="+3 luck for each Dredge Master quest you've done">Dredge Master quests <input type="number" min="0" data-n="dredge"></label>
+          <label class="num" title="Daily login: 1 point on day 5 and 2 on day 10 of each 10-day cycle, +5 luck each">Login Experience points <input type="number" min="0" data-n="xp"></label>
           <label class="ck" title="Permanent: the Trader at Rubble Creek gives +10% each for Special Orders 2 and 3"><input type="checkbox" data-b="trader"> Trader's Recommendation (+20% Sell Boost)</label>
           <label class="num">Flat dig strength <input type="number" min="0" data-n="flatDig"></label></div>
         <div class="rowc"><span class="lab">Events</span>
