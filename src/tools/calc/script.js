@@ -51,6 +51,8 @@ function compute(S0){const S=S0||window.S;
     if(pe)Object.entries(pe.a).forEach(([k,v])=>{if(k in base)base[k]+=v});
     const p=passive(pan.passive);Object.entries(p.o).forEach(([k,v])=>base[k]+=v);luckMult*=p.lm;if(/totem/i.test(pan.passive||""))notes.push(`${pan.name} also boosts totems (not counted).`)}
   if(sh){base["Dig Strength"]+=num(sh.strength)||0;base["Dig Speed"]+=(num(sh.speed)||0)*100;base.Toughness=(num(sh.toughness)||0)+(se&&se.tough?se.tough:0);if(se&&!se.tough&&se.n!=="Rhythmic")notes.push(`${se.n}: ${se.d}`);const p=passive(sh.passive);luckMult*=p.lm;if(/25% buffs from Totems/i.test(sh.passive||""))totemMult=1.25}
+  // Embalmer's Salt: +0.25% sell value per item panned, up to +100%. Counted as maxed out, added like gear.
+  if(S.trinket==="Embalmer's Salt")base["Sell Boost"]+=100;
   SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
   const flat=Object.fromEntries(STATS.map(s=>[s,0]));flat.Luck=Math.max(0,+S.n.flatLuck||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
   const pile=Object.fromEntries(STATS.map(s=>[s,0]));const mt=musTotals(S);Object.entries(mt.t).forEach(([k,v])=>{if(k in pile)pile[k]+=v});
@@ -132,6 +134,7 @@ const BLAB={daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Em
 function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";t.sunKeep=true},minus:B.panEn?0:null})}
   if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:B.shEn==="Rhythmic"?(rhyOn(B)?"Rhythmic (Assuming a full streak)":"Rhythmic (streak off)"):`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
+  if(B.trinket==="Embalmer's Salt")L.push({key:"pan:",label:"Trinket: Embalmer's Salt (Assuming it's maxed)",cut:t=>{t.trinket=""}});
   if(sunOn(B)){const g=sunGear(B);L.push({key:g[0]===B.shovel&&g.length===1?"shovel:":"pan:",label:"Sun Blessing (Assuming it's charged)",cut:t=>{t.noSun=true}})}
   SLOTDEF.forEach(([k,l])=>{const v=(B.slots||{})[k];if(v&&v.n)L.push({key:"slot:"+k,label:`${l}: ${v.n}`,sub:[v.l==="0"?"0★":v.l==="5"?"5★":"6★",v.m&&v.m!=="None"?v.m:"",(v.q??100)<100?(v.q??100)+"%":""].filter(Boolean).join(" · "),cut:t=>{t.slots=Object.assign({},t.slots);delete t.slots[k]}})});
   const bd=B.mus!=="none"?musBoard(B):null;
@@ -352,6 +355,7 @@ function upCandidates(){
   // potions and limited consumables you don't have on yet. Halloween and Christmas treats only show with "Include event gear".
   ((P.x2||{}).potions||[]).forEach(po=>{if((base.pots||[]).includes(po.n))return;const st=clone(base);st.pots=[...(base.pots||[]),po.n];
     const m=/\$/.test(po.cost||"")?uMoney(po.cost):0;add({kind:"Potion",name:po.n,where:[po.fx,po.where].filter(Boolean).join(" · "),money:m,other:m?"":String(po.cost||"").replace(/Meteor Shards/i,"shards"),pans:0,limited:false,state:st,apply:()=>{S.pots=[...(S.pots||[]),po.n]}})});
+  if(base.trinket!=="Embalmer's Salt"){const st=clone(base);st.trinket="Embalmer's Salt";add({kind:"Trinket",name:"Embalmer's Salt",replaces:base.trinket||"",where:"maxed out: +100% Sell Boost",money:0,pans:0,limited:false,state:st,apply:()=>{S.trinket="Embalmer's Salt"}})}
   // totems and the XP Cookie (the cookie only comes from Cookie Time and the Christmas shop, so it counts as event)
   [["luckTotem","Luck Totem","2× luck · 300 Meteor Shards"],["strTotem","Strength Totem","2× dig and shake strength · 180 Meteor Shards"],["lumTotem","Luminant Totem","1.5× capacity, +50% speeds · 600 Meteor Shards"],["cookie","XP Cookie","+1× most stats · 1 min",true]].forEach(([k,n,fx,ev])=>{
     if((base.b||{})[k])return;const st=clone(base);st.b=Object.assign({},st.b,{[k]:true});add({kind:ev?"Consumable":"Totem",name:n,where:fx,money:0,pans:0,limited:!!ev,state:st,apply:()=>{S.b[k]=true}})});
@@ -684,7 +688,7 @@ function fillEnch(){const EN=P.ench||{pan:[],shovel:[]};
   $("trinket").innerHTML=`<option value="">No trinket</option>`+TRN.map(t=>`<option value="${esc(t.n)}"${t.n===S.trinket?" selected":""}>${esc(t.n)}</option>`).join("");
   const tk=TRN.find(t=>t.n===S.trinket);
   const pe=EN.pan.find(e=>e.n===S.panEn),se=EN.shovel.find(e=>e.n===S.shEn);
-  $("enNote").textContent=[tk?`${tk.n}: ${tk.fx} (not counted in the stats, it depends on what you pan)`:"",pe?`${pe.n}: `+[...Object.entries(pe.m).map(([k,v])=>`${v}× pan ${k.toLowerCase()}`),...Object.entries(pe.a).map(([k,v])=>`${v>0?"+":"−"}${Math.abs(v)}${["Shake Speed","Size Boost","Modifier Boost","Sell Boost"].includes(k)?"%":""} ${k.toLowerCase()}`)].join(", ")+".":"",se?`${se.n}: ${se.d}`:""].filter(Boolean).join(" ")}
+  $("enNote").textContent=[tk?tk.n==="Embalmer's Salt"?`${tk.n}: counted as maxed out, +100% Sell Boost (it builds up 0.25% per item panned and resets when you sell).`:`${tk.n}: ${tk.fx} (not counted in the stats, it depends on what you pan)`:"",pe?`${pe.n}: `+[...Object.entries(pe.m).map(([k,v])=>`${v}× pan ${k.toLowerCase()}`),...Object.entries(pe.a).map(([k,v])=>`${v>0?"+":"−"}${Math.abs(v)}${["Shake Speed","Size Boost","Modifier Boost","Sell Boost"].includes(k)?"%":""} ${k.toLowerCase()}`)].join(", ")+".":"",se?`${se.n}: ${se.d}`:""].filter(Boolean).join(" ")}
 // ---- custom museum editor ----
 const MORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"],MSLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
 const blankBoard=()=>Object.fromEntries(MORDER.map(r=>[r,Array.from({length:MSLOTS[r]},()=>({m:null,u:"None"}))]));
