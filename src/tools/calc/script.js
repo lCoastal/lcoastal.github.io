@@ -369,7 +369,8 @@ function upCandidates(){
     add({kind:"Pan enchant",name:e.n,replaces:base.panEn||"",where:e.src?e.src:best?`~1 in ${fmt(1/best,0)} rolls`:"",money:0,pans:e.src?0:best?Math.round(10/best):0,unknown:!e.src&&!best,limited:false,state:st,apply:()=>{S.panEn=e.n},enchant:true})});
   // museum: for each rarity row, the best mineral you don't display yet, in that row's emptiest or weakest slot
   // (at full size and no modifier; effort = pans to find one at your luck)
-  const mb=base.mus&&base.mus!=="none"?musBoard(base):null;
+  // no museum yet (or "No museum"): start from an empty one, so its slots still get suggestions
+  const mb=(base.mus&&base.mus!=="none"?musBoard(base):null)||blankBoard();
   if(mb){const shown=new Set();MORDER.forEach(r=>(mb[r]||[]).forEach(sl=>{if(sl&&sl.m&&sl.m!=="Any")shown.add(String(sl.m).toLowerCase())}));
     MORDER.forEach(r=>{const row=Array.from({length:MSLOTS[r]},(_,i)=>(mb[r]||[])[i]||{m:null,u:"None"});
       // weakest slot: empty first, else the one whose removal costs the least for this goal
