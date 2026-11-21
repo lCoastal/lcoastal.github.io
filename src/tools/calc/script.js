@@ -341,8 +341,8 @@ function upCandidates(){
     add({kind:`Rings ×${nn}`,replaces:Object.entries(used.reduce((o,u)=>(o[u.was]=(o[u.was]||0)+1,o),{})).map(([n,c])=>(c>1?c+"× ":"")+n).join(", "),name:`${x.n} ×${nn}`,rarity:x.r,money:(b1.money||0)*nn,other:b1.other?b1.other+` (×${nn})`:"",limited:b1.limited,pans:(b1.pans||0)*nn,unknown:b1.unknown,
       state:st,apply:()=>{used.forEach(u=>{S.slots[u.k]=Object.assign({},S.slots[u.k],{n:x.n,l:"6",q:100})})},recipe:b1.recipe?`${nn}× (${b1.recipe})`:""})});
   // equipment mutations: for each worn piece, the mutation that helps this goal most (no cost counted).
-  // Festive and Sunforged need event / tomb catalysts, so they only show with "Include event gear".
-  const MLIM=new Set(((P.ench||{}).muts||[]).filter(m=>m.ev&&!/^also/i.test(m.ev)).map(m=>m.n));const bestMut={};
+  // Festive needs the Christmas event, so it only shows with "Include event gear".
+  const MLIM=new Set(((P.ench||{}).muts||[]).filter(m=>/event/i.test(m.ev||"")).map(m=>m.n));const bestMut={};
   SLOTDEF.forEach(([k,label])=>{const cur=(base.slots||{})[k];if(!cur||!cur.n)return;const curM=cur.m||"None";let bm=null;
     MUTS.forEach(([u])=>{if(u===curM||u==="None"||(MLIM.has(u)&&!S.upEvent))return;const st=clone(base);st.slots=Object.assign({},st.slots,{[k]:Object.assign({},cur,{m:u})});const g=uScore(compute(st).tot,w)-s0;
       if(g>1e-9&&(!bm||g>bm.g))bm={u,g,st}});
