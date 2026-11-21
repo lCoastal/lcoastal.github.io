@@ -55,6 +55,8 @@ function compute(S0){const S=S0||window.S;
   if(S.trinket==="Embalmer's Salt")base["Sell Boost"]+=100;
   SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
   const flat=Object.fromEntries(STATS.map(s=>[s,0]));flat.Luck=Math.max(0,+S.n.flatLuck||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
+  // Trader's Recommendation: permanent quest reward, +20 flat Sell Boost. Almost everyone has it, so it's on unless unticked.
+  if(S.b.trader!==false)flat["Sell Boost"]+=20;
   const pile=Object.fromEntries(STATS.map(s=>[s,0]));const mt=musTotals(S);Object.entries(mt.t).forEach(([k,v])=>{if(k in pile)pile[k]+=v});
   const b=S.b;
   // potions add flat points (their % lines go straight onto the % stats)
@@ -130,7 +132,7 @@ function shares(base,full){const P=parts(base),n=P.length,memo=new Map();
 // ---- detailed breakdown: every stat is flat points × a multiplier; each source shows what it adds to either side ----
 // One line per source: every ring on its own line, every museum display, every potion, totem and rune.
 // Each line is "what changes if you take just that away"; anything left over (two sources boosting each other) is shown as "Overlap".
-const BLAB={daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
+const BLAB={trader:"Trader's Recommendation",daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
 function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";t.sunKeep=true},minus:B.panEn?0:null})}
   if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:B.shEn==="Rhythmic"?(rhyOn(B)?"Rhythmic (Assuming a full streak)":"Rhythmic (streak off)"):`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
@@ -148,6 +150,7 @@ function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const 
   if(+n.friendTotem>=0)L.push({key:"group:boosts",label:`Friendship Totem (${+n.friendTotem} nearby)`,cut:t=>{t.n=Object.assign({},t.n,{friendTotem:-1})}});
   if(+n.friends>0)L.push({key:"group:boosts",label:`${+n.friends} friend${+n.friends===1?"":"s"} online`,cut:t=>{t.n=Object.assign({},t.n,{friends:0})}});
   if(+n.mastery>0)L.push({key:"group:boosts",label:"Location mastery",cut:t=>{t.n=Object.assign({},t.n,{mastery:0})}});
+  if(B.b.trader!==false)L.push({key:"group:boosts",label:"Trader's Recommendation",cut:t=>{t.b=Object.assign({},t.b,{trader:false})}});
   if(+n.flatLuck>0)L.push({key:"group:boosts",label:"Flat luck (quests, potions)",cut:t=>{t.n=Object.assign({},t.n,{flatLuck:0})}});
   if(+n.flatDig>0)L.push({key:"group:boosts",label:"Flat dig strength",cut:t=>{t.n=Object.assign({},t.n,{flatDig:0})}});
   if(B.b&&B.b.meteor)L.push({key:"group:events",label:"Meteor shower",cut:t=>{t.b=Object.assign({},t.b,{meteor:false})}});
@@ -765,7 +768,7 @@ function fillRunes(){const RU=(S.runes||[]).filter(n=>!["Sunblessed","Abyssal","
 window.ptSetRunes=list=>{S.runes=list||[];S.b.sun=S.runes.includes("Sunblessed")||S.runes.includes("Abyssal");S.b.solo=S.runes.includes("Solitude");S.b.purity=S.runes.includes("Purity");S.b.vet=S.runes.includes("Veteran");save();all()};
 $("runePage").onclick=()=>{try{window.parent.ptCallTool("runes","ptOpenItem","")}catch(e){}};
 function all(){fillEnch();fillPots();fillCons();fillRhy();fillRunes();$("allMut").innerHTML=`<option value="">Set all mutations…</option>`+MUTS.map(m=>`<option value="${m[0]}">${m[0]==="None"?"No mutation":m[0]}</option>`).join("");fillTools();buildSlots();paintPicks();fillMus();musEditor();
-  document.querySelectorAll("[data-b]").forEach(i=>i.checked=!!S.b[i.dataset.b]);document.querySelectorAll("[data-n]").forEach(i=>i.value=S.n[i.dataset.n]??0);$("ownedOnly").checked=!!S.owned;render()}
+  document.querySelectorAll("[data-b]").forEach(i=>i.checked=i.dataset.b==="trader"?S.b.trader!==false:!!S.b[i.dataset.b]);document.querySelectorAll("[data-n]").forEach(i=>i.value=S.n[i.dataset.n]??0);$("ownedOnly").checked=!!S.owned;render()}
 document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="potAdd"){if(t.value){S.pots=[...(S.pots||[]),t.value];fillPots()}else return}
   else if(t.id==="consAdd"){if(t.value){S.cons=[...(S.cons||[]),t.value];fillCons()}else return}
