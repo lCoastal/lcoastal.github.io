@@ -37,6 +37,13 @@ function fillMus(){const src=musSources();if(!src.some(s=>s[0]===S.mus))S.mus="b
 function passive(p){const o={};let lm=1;String(p||"").split(/,\s*/).forEach(t=>{let m=t.match(/^([+\-−]?\d+(?:\.\d+)?)%\s*(Size Boost|Modifier Boost|Sell Boost)/i);if(m){const k=m[2].toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());o[k]=(o[k]||0)+parseFloat(m[1].replace("−","-"))}
   m=t.match(/(\d+(?:\.\d+)?)\s*×\s*additional Luck/i);if(m)lm*=parseFloat(m[1])});return {o,lm}}
 const eqVal=(s,l,q,mult)=>{const lo=l==="5"?s[1]:s[3],hi=l==="5"?s[2]:s[4];return (lo+(hi-lo)*q/100)*mult};
+// Beach Umbrella and Mass Reactor add base luck for the next pan, from how many minerals a pan holds.
+// Minerals per pan (from our logs): average 0.678 × capacity^0.565, most ≈ 2.5 × √capacity.
+// Umbrella: +25 per modified mineral (chance 1 − 0.937^(Modifier Boost ×)). Reactor: +25 per mineral over 20.
+const TRROLL={"Beach Umbrella":1,"Mass Reactor":1};
+function trkLuck(n,cap,mb,max){const c=Math.max(0,cap),k=max?2.5*Math.sqrt(c):.678*Math.pow(c,.565),pm=1-Math.pow(.937,Math.max(0,mb)/100);
+  return {n:k,pm,luck:n==="Beach Umbrella"?25*k*pm:Math.max(0,25*(k-20))}}
+const TRLAB=(n,max)=>TRROLL[n]?`${n} (${max?"max":"average"} roll)`:n;
 // permanent quest buffs: kept when boosts are reset
 const PERM=["trader","lighthouse","ancient","spirits"];
 // Tomb Mastery levels 1–5: flat luck (in-game panel; each level also adds 3s of tomb time)
@@ -86,15 +93,20 @@ function compute(S0){const S=S0||window.S;
   if(b.egg){pile.Luck+=.5;pile.Capacity+=.5;pile["Modifier Boost"]+=.5;pile["Walk Speed"]+=.5}
   (S.cons||[]).forEach(cn=>{const c=CONS.find(x=>x.n===cn);if(c)Object.entries(c.p).forEach(([k,v])=>pile[k]+=v)});
   if(b.cookie)STATS.forEach(s=>{if(!["Toughness","Inventory Size"].includes(s))pile[s]+=1});
+  // luck trinkets
+  if(S.trinket==="Nomad's Compass")pile.Luck+=.9;   // always stacked: 6 deposits × +15%
+  if(S.trinket==="Senet Die")luckMult*=1.33;         // x0.5–x3 per full pan, counted as ×1.33
+  let trk=null;if(TRROLL[S.trinket]){const cap=(base.Capacity+flat.Capacity)*(1+pile.Capacity),mb=(base["Modifier Boost"]+flat["Modifier Boost"])*(1+pile["Modifier Boost"]);
+    trk=trkLuck(S.trinket,cap,mb,!!S.trkMax);base.Luck+=trk.luck}
   let ev=1;if(b.meteor)ev*=2;if(b.weather)ev*=1.5;
   const tot={};STATS.forEach(s=>{tot[s]=["Toughness","Inventory Size"].includes(s)?base[s]+flat[s]:(base[s]+flat[s])*(1+pile[s])});
   tot.Luck*=ev*luckMult;
   if((S.runes||[]).includes("Equalizer")){const a=(tot["Dig Speed"]+tot["Shake Speed"])/2;tot["Dig Speed"]=a;tot["Shake Speed"]=a}
-  return {base,flat,pile,tot,ev,luckMult,mt,notes,toughness:base.Toughness}}
+  return {base,flat,pile,tot,ev,luckMult,mt,notes,trk,toughness:base.Toughness}}
 // ---- isolate parts: which groups count, and what each single part adds ----
 const GROUPS=[["tools","Tools"],["jewelry","Jewelry"],["museum","Museum"],["boosts","Boosts"],["events","Events"]];
 function strip(st,g){const t=clone(st);
-  if(g==="tools"){t.pan="";t.shovel="";t.panEn="";t.shEn="";t.trinket=""}
+  if(g==="tools"){t.pan="";t.shovel="";t.panEn="";t.shEn="";t.trinket="";t.trkMax=false}
   else if(g==="jewelry"){t.slots={}}
   else if(g==="museum"){t.mus="none"}
   else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};PERM.forEach(k=>keep[k]=t.b[k]);t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:t.n.dredge,xp:t.n.xp,tomb:t.n.tomb};t.pots=[];t.runes=[];t.cons=[]}
@@ -107,7 +119,7 @@ function effState(){let t=clone(S);const off=S.isoOff||[];off.forEach(g=>{t=stri
     else{const [k,v]=keep.split(":");if(k==="pan"){o.pan=S.pan;o.panEn=S.panEn}else if(k==="shovel"){o.shovel=S.shovel;o.shEn=S.shEn}else if(k==="slot"){o.slots={};v.split(",").forEach(x=>{o.slots[x]=S.slots[x]})}}
     t=o}
   return t}
-function pick(st,g){if(g==="tools")return {pan:st.pan,shovel:st.shovel,panEn:st.panEn,shEn:st.shEn,trinket:st.trinket};if(g==="jewelry")return {slots:st.slots};if(g==="museum")return {mus:st.mus,museumBoard:st.museumBoard};
+function pick(st,g){if(g==="tools")return {pan:st.pan,shovel:st.shovel,panEn:st.panEn,shEn:st.shEn,trinket:st.trinket,trkMax:st.trkMax};if(g==="jewelry")return {slots:st.slots};if(g==="museum")return {mus:st.mus,museumBoard:st.museumBoard};
   if(g==="boosts")return {b:Object.assign({},st.b,{meteor:false,weather:false}),n:st.n,pots:st.pots,runes:st.runes,cons:st.cons};if(g==="events")return {b:{meteor:st.b.meteor,weather:st.b.weather}};return {}}
 function parts(st){const P2=[];if(st.pan)P2.push(["pan:","Pan: "+st.pan+(st.panEn?" ("+st.panEn+")":""),t=>{t.pan="";t.panEn=""}]);
   if(st.shovel)P2.push(["shovel:","Shovel: "+st.shovel+(st.shEn?" ("+st.shEn+")":""),t=>{t.shovel="";t.shEn=""}]);
@@ -142,6 +154,7 @@ const BLAB={trader:"Trader's Recommendation",lighthouse:"Lighthouse Blessing",an
 function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";t.sunKeep=true},minus:B.panEn?0:null})}
   if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:B.shEn==="Rhythmic"?(rhyOn(B)?"Rhythmic (Assuming a full streak)":"Rhythmic (streak off)"):`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
+  if(TRROLL[B.trinket]||B.trinket==="Nomad's Compass"||B.trinket==="Senet Die")L.push({key:"pan:",label:"Trinket: "+(B.trinket==="Nomad's Compass"?"Nomad's Compass (Assuming 6 deposits stacked)":B.trinket==="Senet Die"?"Senet Die (Assuming ×1.33)":`${B.trinket} (Assuming the ${B.trkMax?"max":"average"} roll)`),cut:t=>{t.trinket=""}});
   if(B.trinket==="Embalmer's Salt")L.push({key:"pan:",label:"Trinket: Embalmer's Salt (Assuming it's maxed)",cut:t=>{t.trinket=""}});
   if(sunOn(B)){const g=sunGear(B);L.push({key:g[0]===B.shovel&&g.length===1?"shovel:":"pan:",label:"Sun Blessing (Assuming it's charged)",cut:t=>{t.noSun=true}})}
   SLOTDEF.forEach(([k,l])=>{const v=(B.slots||{})[k];if(v&&v.n)L.push({key:"slot:"+k,label:`${l}: ${v.n}`,sub:[v.l==="0"?"0★":v.l==="5"?"5★":"6★",v.m&&v.m!=="None"?v.m:"",(v.q??100)<100?(v.q??100)+"%":""].filter(Boolean).join(" · "),cut:t=>{t.slots=Object.assign({},t.slots);delete t.slots[k]}})});
@@ -367,6 +380,10 @@ function upCandidates(){
   // potions and limited consumables you don't have on yet. Halloween and Christmas treats only show with "Include event gear".
   ((P.x2||{}).potions||[]).forEach(po=>{if((base.pots||[]).includes(po.n))return;const st=clone(base);st.pots=[...(base.pots||[]),po.n];
     const m=/\$/.test(po.cost||"")?uMoney(po.cost):0;add({kind:"Potion",name:po.n,where:[po.fx,po.where].filter(Boolean).join(" · "),money:m,other:m?"":String(po.cost||"").replace(/Meteor Shards/i,"shards"),pans:0,limited:false,state:st,apply:()=>{S.pots=[...(S.pots||[]),po.n]}})});
+  // luck trinkets, Beach Umbrella and Mass Reactor at both the average and the max roll
+  [["Beach Umbrella",false],["Beach Umbrella",true],["Mass Reactor",false],["Mass Reactor",true],["Nomad's Compass",false],["Senet Die",false]].forEach(([n,mx])=>{
+    if(base.trinket===n&&(!TRROLL[n]||!!base.trkMax===mx))return;const st=clone(base);st.trinket=n;st.trkMax=mx;
+    add({kind:"Trinket",name:TRLAB(n,mx),replaces:base.trinket?TRLAB(base.trinket,!!base.trkMax):"",where:n==="Nomad's Compass"?"6 deposits stacked: +0.9× luck":n==="Senet Die"?"counted as ×1.33 luck":"",money:0,pans:0,limited:false,state:st,apply:()=>{S.trinket=n;S.trkMax=mx}})});
   if(base.trinket!=="Embalmer's Salt"){const st=clone(base);st.trinket="Embalmer's Salt";add({kind:"Trinket",name:"Embalmer's Salt",replaces:base.trinket||"",where:"maxed out: +100% Sell Boost",money:0,pans:0,limited:false,state:st,apply:()=>{S.trinket="Embalmer's Salt"}})}
   // totems and the XP Cookie (the cookie only comes from Cookie Time and the Christmas shop, so it counts as event)
   [["luckTotem","Luck Totem","2× luck · 300 Meteor Shards"],["strTotem","Strength Totem","2× dig and shake strength · 180 Meteor Shards"],["lumTotem","Luminant Totem","1.5× capacity, +50% speeds · 600 Meteor Shards"],["cookie","XP Cookie","+1× most stats · 1 min",true]].forEach(([k,n,fx,ev])=>{
@@ -563,7 +580,7 @@ async function buildImage(st,r){
     c.fillStyle=it["name color"]||TX;c.font=`700 20px ${FD}`;c.fillText(fit(it.name,tw),tx,y+70);
     c.font=`13px ${F}`;c.fillStyle=en?"#c9a7f5":MU;c.fillText(fit(en?"Enchant: "+en:"No enchant",tw),tx,y+92);
     lines.forEach(([k,v],i)=>{const yy=y+122+i*24;c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(k,tx,yy);c.font=`600 14px ${FM}`;c.fillStyle=statHex(k);c.textAlign="right";c.fillText(v,x+hw-20,yy);c.textAlign="left"});
-    if(kind==="Pan"&&st.trinket){c.font=`12.5px ${F}`;c.fillStyle=MU;c.fillText(fit("Trinket: "+st.trinket,hw-40),x+20,y+HERO-16)}};
+    if(kind==="Pan"&&st.trinket){c.font=`12.5px ${F}`;c.fillStyle=MU;c.fillText(fit("Trinket: "+TRLAB(st.trinket,st.trkMax),hw-40),x+20,y+HERO-16)}};
   tool(PAD,"Pan",pan,st.panEn,panL,"#e0a95b");
   tool(PAD+hw+GAP,"Shovel",sh,st.shEn,shL,"#8fb4d9");
   // museum card
@@ -696,12 +713,17 @@ document.addEventListener("mouseout",e=>{if(e.target.closest("[data-pick]")&&!(e
 function fillEnch(){const EN=P.ench||{pan:[],shovel:[]};
   $("panEn").innerHTML=`<option value="">No enchant</option>`+EN.pan.map(e=>`<option value="${esc(e.n)}"${e.n===S.panEn?" selected":""}>${esc(e.n)}</option>`).join("");
   $("shEn").innerHTML=`<option value="">No enchant</option>`+EN.shovel.map(e=>`<option value="${esc(e.n)}"${e.n===S.shEn?" selected":""}>${esc(e.n)}</option>`).join("");
-  // trinkets: their perks only kick in on certain pans (modified items, treasure maps…), so they're listed, not added to the stats
+  // trinkets: the luck ones and Embalmer's Salt are counted; the rest only kick in on certain pans, so they're listed
   const TRN=((P.x2||{}).trinkets||[]);if(S.trinket&&!TRN.some(t=>t.n===S.trinket))S.trinket="";
   $("trinket").innerHTML=`<option value="">No trinket</option>`+TRN.map(t=>`<option value="${esc(t.n)}"${t.n===S.trinket?" selected":""}>${esc(t.n)}</option>`).join("");
-  const tk=TRN.find(t=>t.n===S.trinket);
+  const tk=TRN.find(t=>t.n===S.trinket);$("trkRollW").hidden=!TRROLL[S.trinket];$("trkRoll").value=S.trkMax?"max":"avg";
+  const tr=TRROLL[S.trinket]?compute(S).trk:null;
+  const tkTxt=!tk?"":tk.n==="Embalmer's Salt"?`${tk.n}: counted as maxed out, +100% Sell Boost (it builds up 0.25% per item panned and resets when you sell).`
+    :tr?`${tk.n}: counted at the ${S.trkMax?"max":"average"} roll, about ${fmt(tr.n,0)} minerals a pan${tk.n==="Beach Umbrella"?` × ${fmt(tr.pm*100,0)}% modified`:" (20 kept)"} = +${fmt(tr.luck,0)} base luck.`
+    :tk.n==="Nomad's Compass"?`${tk.n}: counted as always stacked, 6 deposits × +15% = +0.9× luck.`:tk.n==="Senet Die"?`${tk.n}: rolls ×0.5 to ×3 luck each full pan, counted as ×1.33.`
+    :`${tk.n}: ${tk.fx} (not counted in the stats, it depends on what you pan)`;
   const pe=EN.pan.find(e=>e.n===S.panEn),se=EN.shovel.find(e=>e.n===S.shEn);
-  $("enNote").textContent=[tk?tk.n==="Embalmer's Salt"?`${tk.n}: counted as maxed out, +100% Sell Boost (it builds up 0.25% per item panned and resets when you sell).`:`${tk.n}: ${tk.fx} (not counted in the stats, it depends on what you pan)`:"",pe?`${pe.n}: `+[...Object.entries(pe.m).map(([k,v])=>`${v}× pan ${k.toLowerCase()}`),...Object.entries(pe.a).map(([k,v])=>`${v>0?"+":"−"}${Math.abs(v)}${["Shake Speed","Size Boost","Modifier Boost","Sell Boost"].includes(k)?"%":""} ${k.toLowerCase()}`)].join(", ")+".":"",se?`${se.n}: ${se.d}`:""].filter(Boolean).join(" ")}
+  $("enNote").textContent=[tkTxt,pe?`${pe.n}: `+[...Object.entries(pe.m).map(([k,v])=>`${v}× pan ${k.toLowerCase()}`),...Object.entries(pe.a).map(([k,v])=>`${v>0?"+":"−"}${Math.abs(v)}${["Shake Speed","Size Boost","Modifier Boost","Sell Boost"].includes(k)?"%":""} ${k.toLowerCase()}`)].join(", ")+".":"",se?`${se.n}: ${se.d}`:""].filter(Boolean).join(" ")}
 // ---- custom museum editor ----
 const MORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"],MSLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
 const blankBoard=()=>Object.fromEntries(MORDER.map(r=>[r,Array.from({length:MSLOTS[r]},()=>({m:null,u:"None"}))]));
@@ -784,7 +806,7 @@ document.addEventListener("change",e=>{const t=e.target;
   else if(t.id==="rhy"){S.rhy=t.checked}
   else if(t.dataset.mm){const [r,i]=t.dataset.mm.split("|");S.museumBoard[r][+i].m=t.value||null}
   else if(t.dataset.mu){const [r,i]=t.dataset.mu.split("|");S.museumBoard[r][+i].u=t.value}
-  else if(t.id==="mus"){S.mus=t.value;musEditor()}else if(t.id==="panEn"){S.panEn=t.value;fillEnch()}else if(t.id==="shEn"){S.shEn=t.value;fillEnch();fillRhy()}else if(t.id==="trinket"){S.trinket=t.value;fillEnch()}
+  else if(t.id==="mus"){S.mus=t.value;musEditor()}else if(t.id==="panEn"){S.panEn=t.value;fillEnch()}else if(t.id==="shEn"){S.shEn=t.value;fillEnch();fillRhy()}else if(t.id==="trinket"){S.trinket=t.value;fillEnch()}else if(t.id==="trkRoll"){S.trkMax=t.value==="max";fillEnch()}
   else if(t.id==="ownedOnly"){S.owned=t.checked;save();all();return}
   else if(t.dataset.lvl){(S.slots[t.dataset.lvl]=S.slots[t.dataset.lvl]||{}).l=t.value}
   else if(t.dataset.mut){(S.slots[t.dataset.mut]=S.slots[t.dataset.mut]||{}).m=t.value}
