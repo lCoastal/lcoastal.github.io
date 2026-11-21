@@ -53,7 +53,9 @@ const CONS=[{n:"Luck Booster",fx:"2× luck · 15 min",p:{Luck:1}},{n:"Candy Corn
 // Sun Blessing (Pharaoh's Pan / Shovel passive): one charge meter, so it counts once even with both
 const sunGear=S=>{const pan=G.pans.find(x=>x.name===S.pan),sh=G.shovels.find(x=>x.name===S.shovel);const has=x=>x&&/Sun Blessing/i.test((x.passive||"")+" "+(x.description||""));return [has(pan)?S.pan:"",has(sh)?S.shovel:""].filter(Boolean)};
 const sunOn=S=>!S.noSun&&(sunGear(S).length>0||!!S.sunKeep);
-const rhyOn=S=>S.shEn==="Rhythmic"&&S.rhy!==false;
+// streak enchants, counted at a full perfect-dig streak while the tick is on: Rhythmic up to 1.3× luck, Non Euclidean up to 2× capacity
+const STREAK={"Rhythmic":["Luck",.3],"Non Euclidean":["Capacity",1]};
+const rhyOn=S=>!!STREAK[S.shEn]&&S.rhy!==false;
 function compute(S0){const S=S0||window.S;
   const base=Object.fromEntries(STATS.map(s=>[s,0]));let luckMult=1,totemMult=1;const notes=[];
   const pan=G.pans.find(x=>x.name===S.pan),sh=G.shovels.find(x=>x.name===S.shovel);
@@ -61,7 +63,7 @@ function compute(S0){const S=S0||window.S;
   if(pan){const pm=k=>pe&&pe.m[k]?pe.m[k]:1;base.Luck+=(num(pan.luck)||0)*pm("Luck");base.Capacity+=(num(pan.capacity)||0)*pm("Capacity");base["Shake Strength"]+=(num(pan.strength)||0)*pm("Shake Strength");const sp=String(pan.speed).includes("%")?num(pan.speed):(num(pan.speed)||0)*100;base["Shake Speed"]+=sp;
     if(pe)Object.entries(pe.a).forEach(([k,v])=>{if(k in base)base[k]+=v});
     const p=passive(pan.passive);Object.entries(p.o).forEach(([k,v])=>base[k]+=v);luckMult*=p.lm;if(/totem/i.test(pan.passive||""))notes.push(`${pan.name} also boosts totems (not counted).`)}
-  if(sh){base["Dig Strength"]+=num(sh.strength)||0;base["Dig Speed"]+=(num(sh.speed)||0)*100;base.Toughness=(num(sh.toughness)||0)+(se&&se.tough?se.tough:0);if(se&&!se.tough&&se.n!=="Rhythmic")notes.push(`${se.n}: ${se.d}`);const p=passive(sh.passive);luckMult*=p.lm;if(/25% buffs from Totems/i.test(sh.passive||""))totemMult=1.25}
+  if(sh){base["Dig Strength"]+=num(sh.strength)||0;base["Dig Speed"]+=(num(sh.speed)||0)*100;base.Toughness=(num(sh.toughness)||0)+(se&&se.tough?se.tough:0);if(se&&!se.tough&&!STREAK[se.n])notes.push(`${se.n}: ${se.d}`);const p=passive(sh.passive);luckMult*=p.lm;if(/25% buffs from Totems/i.test(sh.passive||""))totemMult=1.25}
   // Embalmer's Salt: +0.25% sell value per item panned, up to +100%. Counted as maxed out, added like gear.
   if(S.trinket==="Embalmer's Salt")base["Sell Boost"]+=100;
   SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
@@ -87,7 +89,7 @@ function compute(S0){const S=S0||window.S;
   // Sun Blessing at full charge (assumed): +2× luck, +100% dig/shake speed, +0.4× capacity
   if(sunOn(S)){pile.Luck+=2;pile["Dig Speed"]+=1;pile["Shake Speed"]+=1;pile.Capacity+=.4}
   // Rhythmic shovel enchant at a full perfect-dig streak (assumed when ticked)
-  if(rhyOn(S))pile.Luck+=.3;
+  if(rhyOn(S)){const [st,v]=STREAK[S.shEn];pile[st]+=v}
   if(b.daily)pile.Luck+=1;if(b.dailyStr)pile["Dig Strength"]+=1;
   if(b.empower){pile.Luck+=.4;pile.Capacity+=.4}
   if(b.egg){pile.Luck+=.5;pile.Capacity+=.5;pile["Modifier Boost"]+=.5;pile["Walk Speed"]+=.5}
@@ -97,7 +99,7 @@ function compute(S0){const S=S0||window.S;
   if(S.trinket==="Nomad's Compass")luckMult*=1.9;  // always stacked: 6 deposits × +15%, multiplies total luck
   if(S.trinket==="Senet Die")luckMult*=1.33;         // x0.5–x3 per full pan, counted as ×1.33
   let trk=null;if(TRROLL[S.trinket]){const cap=(base.Capacity+flat.Capacity)*(1+pile.Capacity),mb=(base["Modifier Boost"]+flat["Modifier Boost"])*(1+pile["Modifier Boost"]);
-    trk=trkLuck(S.trinket,cap,mb,!!S.trkMax);base.Luck+=trk.luck}
+    trk=trkLuck(S.trinket,cap,mb,!!S.trkMax);if(S.trkFix!=null)trk.luck=S.trkFix;base.Luck+=trk.luck}
   let ev=1;if(b.meteor)ev*=2;if(b.weather)ev*=1.5;
   const tot={};STATS.forEach(s=>{tot[s]=["Toughness","Inventory Size"].includes(s)?base[s]+flat[s]:(base[s]+flat[s])*(1+pile[s])});
   tot.Luck*=ev*luckMult;
@@ -149,11 +151,11 @@ function shares(base,full){const P=parts(base),n=P.length,memo=new Map();
   return rows.filter(x=>Object.keys(x.d).length)}
 // ---- detailed breakdown: every stat is flat points × a multiplier; each source shows what it adds to either side ----
 // One line per source: every ring on its own line, every museum display, every potion, totem and rune.
-// Each line is "what changes if you take just that away"; anything left over (two sources boosting each other) is shown as "Overlap".
+// Each line is "what changes if you take just that away"; anything left over (two sources boosting each other) is shown as "Combined effect".
 const BLAB={trader:"Trader's Recommendation",lighthouse:"Lighthouse Blessing",ancient:"Ancient Blessing",spirits:"Blessing of the Spirits",daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
 function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";t.sunKeep=true},minus:B.panEn?0:null})}
-  if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:B.shEn==="Rhythmic"?(rhyOn(B)?"Rhythmic (Assuming a full streak)":"Rhythmic (streak off)"):`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
+  if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:STREAK[B.shEn]?`${B.shEn} (${rhyOn(B)?"Assuming a full streak":"streak off"})`:`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
   if(TRROLL[B.trinket]||B.trinket==="Nomad's Compass"||B.trinket==="Senet Die")L.push({key:"pan:",label:"Trinket: "+(B.trinket==="Nomad's Compass"?"Nomad's Compass (×1.9, Assuming 6 deposits stacked)":B.trinket==="Senet Die"?"Senet Die (Assuming ×1.33)":`${B.trinket} (Assuming the ${B.trkMax?"max":"average"} roll)`),cut:t=>{t.trinket=""}});
   if(B.trinket==="Embalmer's Salt")L.push({key:"pan:",label:"Trinket: Embalmer's Salt (Assuming it's maxed)",cut:t=>{t.trinket=""}});
   if(sunOn(B)){const g=sunGear(B);L.push({key:g[0]===B.shovel&&g.length===1?"shovel:":"pan:",label:"Sun Blessing (Assuming it's charged)",cut:t=>{t.noSun=true}})}
@@ -188,7 +190,9 @@ const FLAT_ONLY=new Set(["Toughness","Inventory Size"]);
 // per-stat breakdown data, shared by the page and the saved image
 // returns [{s,flatT,mult,xm,total,F:[{x,v}],M:[{x,v}],X:[{x,v}]}] for every stat you have that isn't switched off
 function brkData(B){const R=compute(B);
-  const src=brkSources(B).map(x=>{const t=clone(B);x.cut(t);return {...x,W:compute(t)}});
+  // the Umbrella / Reactor luck is credited to the trinket alone: other lines keep it fixed, so a capacity
+  // source doesn't also claim the luck the Reactor gets from that capacity
+  const src=brkSources(B).map(x=>{const t=clone(B);if(R.trk)t.trkFix=R.trk.luck;x.cut(t);if(!t.trinket)delete t.trkFix;return {...x,W:compute(t)}});
   src.forEach((x,i)=>{if(x.minus===0)x.minusOf=src[i-1]});
   const fl=(o,s)=>(o.base[s]||0)+(o.flat[s]||0),hide=new Set(S.brkHide||[]);
   const stats=BRK_STATS.filter(s=>(Math.abs(R.tot[s]||0)>1e-9||s==="Luck")&&!hide.has(s));
@@ -197,7 +201,7 @@ function brkData(B){const R=compute(B);
       if(x.minusOf){df-=flatT-fl(x.minusOf.W,s);dm-=fo1?0:(R.pile[s]||0)-(x.minusOf.W.pile[s]||0)}
       if(Math.abs(df)>1e-9){F.push({x,v:df});fSum+=df}if(Math.abs(dm)>1e-9){M.push({x,v:dm});mSum+=dm}
       if(s==="Luck"){const re=R.ev/(x.W.ev||1),rl=R.luckMult/(x.W.luckMult||1);if(Math.abs(re-1)>1e-9)X.push({x,v:re});if(Math.abs(rl-1)>1e-9)X.push({x,v:rl})}});
-    const ov={label:"Overlap",sub:"sources boosting each other"};
+    const ov={label:"Combined effect",sub:"two of your things working together, e.g. Mass Reactor luck that comes from your capacity"};
     if(Math.abs(flatT-fSum)>1e-6)F.push({x:ov,v:flatT-fSum});if(!fo1&&Math.abs(mult-1-mSum)>1e-6)M.push({x:ov,v:mult-1-mSum});
     F.sort((a,b)=>b.v-a.v);M.sort((a,b)=>b.v-a.v);
     return {s,flatT,mult,xm:s==="Luck"?(R.ev||1)*(R.luckMult||1):1,total:R.tot[s]||0,F,M,X,fo1}});
@@ -533,7 +537,7 @@ async function buildImage(st,r){
   const boosts=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   Object.entries(st.b||{}).forEach(([k,v])=>{if(v)boosts.push({t:lab(k),col:TX})});
   (st.pots||[]).forEach(n=>boosts.push({t:n,col:"#b880ee"}));(st.cons||[]).forEach(n=>boosts.push({t:n,col:"#e0a050"}));
-  if(sunOn(st))boosts.push({t:"Sun Blessing (assumed charged)",col:"#ffc800"});if(rhyOn(st))boosts.push({t:"Rhythmic full streak (assumed)",col:TX});(st.runes||[]).forEach(n=>boosts.push({t:n+" rune",col:"#68a6f0"}));
+  if(sunOn(st))boosts.push({t:"Sun Blessing (assumed charged)",col:"#ffc800"});if(rhyOn(st))boosts.push({t:st.shEn+" full streak (assumed)",col:TX});(st.runes||[]).forEach(n=>boosts.push({t:n+" rune",col:"#68a6f0"}));
   const n=st.n||{};if(+n.friendTotem>=0)boosts.push({t:`Friendship Totem (${+n.friendTotem} nearby)`,col:TX});if(+n.friends>0)boosts.push({t:`${+n.friends} friend${+n.friends===1?"":"s"} online`,col:TX});
   if(+n.mastery>0)boosts.push({t:`Location mastery +${n.mastery}×`,col:TX});if(+n.flatLuck>0)boosts.push({t:`+${fmt(+n.flatLuck,0)} flat luck`,col:statHex("Luck")});if(+n.flatDig>0)boosts.push({t:`+${fmt(+n.flatDig,0)} flat dig strength`,col:statHex("Dig Strength")});
   const hideS=new Set(S.brkHide||[]),stats=SHOW.filter(x=>(Math.abs(r.tot[x]||0)>1e-9||x==="Luck")&&!hideS.has(x));
@@ -794,7 +798,7 @@ function fillCons(){S.cons=(S.cons||[]).filter(n=>CONS.some(c=>c.n===n));
   $("consList").innerHTML=S.cons.map(n=>`<span class="chip" style="cursor:default">${esc(n)} <button type="button" data-rmcons="${esc(n)}" aria-label="Remove ${esc(n)}" style="border:0;background:none;cursor:pointer;color:var(--muted);font-size:14px;padding:0 0 0 4px">×</button></span>`).join("")||'<span class="hint">None active.</span>'}
 $("consClear").onclick=()=>{if(!(S.cons||[]).length)return;S.cons=[];save();fillCons();render();toast("Consumables cleared")};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-rmcons]");if(!b)return;S.cons=(S.cons||[]).filter(n=>n!==b.dataset.rmcons);save();fillCons();render()});
-function fillRhy(){$("rhyWrap").hidden=S.shEn!=="Rhythmic";$("rhy").checked=S.rhy!==false}
+function fillRhy(){const k=STREAK[S.shEn];$("rhyWrap").hidden=!k;$("rhy").checked=S.rhy!==false;if(k)$("rhyTxt").textContent=`Full perfect-dig streak (+${k[1]}× ${k[0].toLowerCase()})`}
 function fillRunes(){const RU=(S.runes||[]).filter(n=>!["Sunblessed","Abyssal","Solitude","Purity","Veteran"].includes(n));$("runeList").innerHTML=RU.map(n=>`<span class="chip" style="cursor:default">${esc(n)}</span>`).join("")||'<span class="hint">None</span>'}
 window.ptSetRunes=list=>{S.runes=list||[];S.b.sun=S.runes.includes("Sunblessed")||S.runes.includes("Abyssal");S.b.solo=S.runes.includes("Solitude");S.b.purity=S.runes.includes("Purity");S.b.vet=S.runes.includes("Veteran");save();all()};
 $("runePage").onclick=()=>{try{window.parent.ptCallTool("runes","ptOpenItem","")}catch(e){}};
