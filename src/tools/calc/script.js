@@ -81,6 +81,7 @@ function compute(S0){const S=S0||window.S;
   const RU=S.runes||[];if(RU.includes("Speed I"))flat["Walk Speed"]+=2;if(RU.includes("Mountain Climber"))flat["Walk Speed"]+=3;
   if(RU.includes("Summit Seeker")){const wb=Math.max(0,base["Walk Speed"]+flat["Walk Speed"]);flat["Dig Speed"]+=5*wb;flat["Shake Speed"]+=5*wb}
   RU.filter(n=>/Critical|Annihilation|Discovery|Explorer|Eternity|Singularity|Volcanic|Bunny|Seeker/.test(n)).forEach(n=>{const r=((P.x2||{}).runes||[]).find(x=>x.n===n);if(r)notes.push(`${n}: ${r.d}`)});
+  if(S.totemKeep)totemMult=S.totemKeep; // breakdown: the shovel's totem bonus is credited to the totem lines
   if(b.luckTotem)pile.Luck+=1*totemMult;
   if(b.strTotem){pile["Dig Strength"]+=1*totemMult;pile["Shake Strength"]+=1*totemMult}
   if(b.lumTotem){pile.Capacity+=.5*totemMult;flat["Shake Speed"]+=50;flat["Dig Speed"]+=50}
@@ -104,7 +105,7 @@ function compute(S0){const S=S0||window.S;
   const tot={};STATS.forEach(s=>{tot[s]=["Toughness","Inventory Size"].includes(s)?base[s]+flat[s]:(base[s]+flat[s])*(1+pile[s])});
   tot.Luck*=ev*luckMult;
   if((S.runes||[]).includes("Equalizer")){const a=(tot["Dig Speed"]+tot["Shake Speed"])/2;tot["Dig Speed"]=a;tot["Shake Speed"]=a}
-  return {base,flat,pile,tot,ev,luckMult,mt,notes,trk,toughness:base.Toughness}}
+  return {base,flat,pile,tot,ev,luckMult,mt,notes,trk,totemMult,toughness:base.Toughness}}
 // ---- isolate parts: which groups count, and what each single part adds ----
 const GROUPS=[["tools","Tools"],["jewelry","Jewelry"],["museum","Museum"],["boosts","Boosts"],["events","Events"]];
 function strip(st,g){const t=clone(st);
@@ -152,10 +153,11 @@ function shares(base,full){const P=parts(base),n=P.length,memo=new Map();
 // ---- detailed breakdown: every stat is flat points × a multiplier; each source shows what it adds to either side ----
 // One line per source: every ring on its own line, every museum display, every potion, totem and rune.
 // Each line is "what changes if you take just that away"; anything left over (two sources boosting each other) is shown as "Combined effect".
+const TMB=B=>{const sh=G.shovels.find(x=>x.name===B.shovel);return sh&&/25% buffs from Totems/i.test(sh.passive||"")?1.25:1};
 const BLAB={trader:"Trader's Recommendation",lighthouse:"Lighthouse Blessing",ancient:"Ancient Blessing",spirits:"Blessing of the Spirits",daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
-function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
-  if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";t.sunKeep=true},minus:B.panEn?0:null})}
-  if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:STREAK[B.shEn]?`${B.shEn} (${rhyOn(B)?"Assuming a full streak":"streak off"})`:`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
+function brkSources(B){const L=[];const sunB=sunOn(B);const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
+  if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";if(sunB)t.sunKeep=true},minus:B.panEn?0:null})}
+  if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:STREAK[B.shEn]?`${B.shEn} (${rhyOn(B)?"Assuming a full streak":"streak off"})`:`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});const tmB=compute(B).totemMult;L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";if(sunB)t.sunKeep=true;if(tmB!==1)t.totemKeep=tmB},minus:B.shEn?0:null})}
   if(TRROLL[B.trinket]||B.trinket==="Nomad's Compass"||B.trinket==="Senet Die")L.push({key:"pan:",label:"Trinket: "+(B.trinket==="Nomad's Compass"?"Nomad's Compass (×1.9, Assuming 6 deposits stacked)":B.trinket==="Senet Die"?"Senet Die (Assuming ×1.33)":`${B.trinket} (Assuming the ${B.trkMax?"max":"average"} roll)`),cut:t=>{t.trinket=""}});
   if(B.trinket==="Embalmer's Salt")L.push({key:"pan:",label:"Trinket: Embalmer's Salt (Assuming it's maxed)",cut:t=>{t.trinket=""}});
   if(sunOn(B)){const g=sunGear(B);L.push({key:g[0]===B.shovel&&g.length===1?"shovel:":"pan:",label:"Sun Blessing (Assuming it's charged)",cut:t=>{t.noSun=true}})}
@@ -163,12 +165,12 @@ function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const 
   const bd=B.mus!=="none"?musBoard(B):null;
   if(bd)MORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const u=sl.u||"None";
     L.push({key:"group:museum",label:`Museum: ${sl.m==="Any"?"Any "+r:sl.m}`,sub:[sl.m==="Any"?"":r,u==="None"?"":u].filter(Boolean).join(" · "),cut:t=>{const b2=JSON.parse(JSON.stringify(musBoard(t)||{}));if(b2[r]&&b2[r][i])b2[r][i]={m:null,u:"None"};t.mus="custom";t.museumBoard=b2}})}));
-  Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather"||k==="trader")return;L.push({key:"group:boosts",label:lab(k),cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
+  Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather"||k==="trader")return;L.push({key:"group:boosts",label:lab(k),sub:/Totem$/.test(k)&&TMB(B)!==1?`incl. the shovel's +${fmt((TMB(B)-1)*100,0)}% totem bonus`:"",cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
   (B.pots||[]).forEach(n=>L.push({key:"group:boosts",label:"Potion: "+n,cut:t=>{t.pots=(t.pots||[]).filter(x=>x!==n)}}));
   (B.cons||[]).forEach(n=>L.push({key:"group:boosts",label:"Consumable: "+n,cut:t=>{t.cons=(t.cons||[]).filter(x=>x!==n)}}));
   (B.runes||[]).forEach(n=>L.push({key:"group:boosts",label:"Rune: "+n,cut:t=>{t.runes=(t.runes||[]).filter(x=>x!==n)}}));
   const n=B.n||{};
-  if(+n.friendTotem>=0)L.push({key:"group:boosts",label:`Friendship Totem (${+n.friendTotem} nearby)`,cut:t=>{t.n=Object.assign({},t.n,{friendTotem:-1})}});
+  if(+n.friendTotem>=0)L.push({key:"group:boosts",label:`Friendship Totem (${+n.friendTotem} nearby)`,sub:TMB(B)!==1?`incl. the shovel's +${fmt((TMB(B)-1)*100,0)}% totem bonus`:"",cut:t=>{t.n=Object.assign({},t.n,{friendTotem:-1})}});
   if(+n.friends>0)L.push({key:"group:boosts",label:`${+n.friends} friend${+n.friends===1?"":"s"} online`,cut:t=>{t.n=Object.assign({},t.n,{friends:0})}});
   if(+n.mastery>0)L.push({key:"group:boosts",label:"Location mastery",cut:t=>{t.n=Object.assign({},t.n,{mastery:0})}});
   if(B.b.trader!==false)L.push({key:"group:boosts",label:"Trader's Recommendation",cut:t=>{t.b=Object.assign({},t.b,{trader:false})}});
