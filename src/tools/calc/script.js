@@ -349,6 +349,12 @@ function upCandidates(){
     if(!bm)return;const key=cur.n+"|"+curM;if(bestMut[key]&&bestMut[key].gain>=bm.g)return;
     bestMut[key]={kind:`Mutation (${label})`,name:`${bm.u} ${cur.n}`,replaces:curM==="None"?"no mutation":curM,money:0,pans:0,limited:MLIM.has(bm.u),gain:bm.g,state:bm.st,apply:()=>{S.slots[k]=Object.assign({},S.slots[k],{m:bm.u})}}});
   Object.values(bestMut).forEach(c=>add(c));
+  // potions and limited consumables you don't have on yet. Halloween and Christmas treats only show with "Include event gear".
+  ((P.x2||{}).potions||[]).forEach(po=>{if((base.pots||[]).includes(po.n))return;const st=clone(base);st.pots=[...(base.pots||[]),po.n];
+    const m=/\$/.test(po.cost||"")?uMoney(po.cost):0;add({kind:"Potion",name:po.n,where:[po.fx,po.where].filter(Boolean).join(" · "),money:m,other:m?"":po.cost||"",pans:0,limited:false,state:st,apply:()=>{S.pots=[...(S.pots||[]),po.n]}})});
+  const CEV={"Candy Corn":1,"Ghost Gummy":1,"Gingerbread Cookie":1};
+  CONS.forEach(c=>{if((base.cons||[]).includes(c.n))return;const st=clone(base);st.cons=[...(base.cons||[]),c.n];
+    add({kind:"Consumable",name:c.n,where:c.fx,money:0,pans:0,limited:!!CEV[c.n],state:st,apply:()=>{S.cons=[...(S.cons||[]),c.n]}})});
   // pan enchants: each one you don't have. Effort = rolls to hit it on the best enchant table (one roll counted as 10 pans),
   // or 1 when there's an Enchant Book for it
   const EN=P.ench||{pan:[]};
