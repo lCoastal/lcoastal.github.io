@@ -50,9 +50,10 @@ const PERM=["trader","lighthouse","ancient","spirits"];
 const TOMB=[0,50,100,200,350,500];
 // limited-time consumables: kept apart from potions. Values from the wiki's Relics page.
 const CONS=[{n:"Luck Booster",fx:"2× luck · 15 min",p:{Luck:1}},{n:"Candy Corn",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Gingerbread Cookie",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Ghost Gummy",fx:"+0.5× strength · 10 min",p:{"Dig Strength":.5,"Shake Strength":.5}}];
-// Sun Blessing (Pharaoh's Pan / Shovel passive): one charge meter, so it counts once even with both
+// Sun Blessing (Pharaoh's Pan / Shovel passive): one charge meter, counted once, and only with both pieces on
 const sunGear=S=>{const pan=G.pans.find(x=>x.name===S.pan),sh=G.shovels.find(x=>x.name===S.shovel);const has=x=>x&&/Sun Blessing/i.test((x.passive||"")+" "+(x.description||""));return [has(pan)?S.pan:"",has(sh)?S.shovel:""].filter(Boolean)};
-const sunOn=S=>!S.noSun&&(sunGear(S).length>0||!!S.sunKeep);
+// the bar only fills with both Pharaoh pieces on (pan and shovel)
+const sunOn=S=>!S.noSun&&(sunGear(S).length>1||!!S.sunKeep);
 // streak enchants, counted at a full perfect-dig streak while the tick is on: Rhythmic up to 1.3× luck, Non Euclidean up to 2× capacity
 const STREAK={"Rhythmic":["Luck",.3],"Non Euclidean":["Capacity",1]};
 const rhyOn=S=>!!STREAK[S.shEn]&&S.rhy!==false;
@@ -88,6 +89,7 @@ function compute(S0){const S=S0||window.S;
   const ft=Math.min(19,Math.floor(+S.n.friendTotem));if(ft>=0)pile.Luck+=(0.4+0.2*ft)*totemMult;
   pile.Luck+=Math.max(0,Math.min(.5,.1*(+S.n.friends||0)))+(b.sun?.2:0)+(b.solo?.2:0)+(+S.n.mastery||0);
   // Sun Blessing at full charge (assumed): +2× luck, +100% dig/shake speed, +0.4× capacity
+  if(!S.noSun&&!S.sunKeep&&sunGear(S).length===1)notes.push("Sun Blessing needs both the Pharaoh's Pan and the Pharaoh's Shovel, so it isn't counted with just one.");
   if(sunOn(S)){pile.Luck+=2;pile["Dig Speed"]+=1;pile["Shake Speed"]+=1;pile.Capacity+=.4}
   // Rhythmic shovel enchant at a full perfect-dig streak (assumed when ticked)
   if(rhyOn(S)){const [st,v]=STREAK[S.shEn];pile[st]+=v}
