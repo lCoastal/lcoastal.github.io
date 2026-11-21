@@ -39,6 +39,8 @@ function passive(p){const o={};let lm=1;String(p||"").split(/,\s*/).forEach(t=>{
 const eqVal=(s,l,q,mult)=>{const lo=l==="5"?s[1]:s[3],hi=l==="5"?s[2]:s[4];return (lo+(hi-lo)*q/100)*mult};
 // permanent quest buffs: kept when boosts are reset
 const PERM=["trader","lighthouse","ancient","spirits"];
+// Tomb Mastery levels 1–5: flat luck (in-game panel; each level also adds 3s of tomb time)
+const TOMB=[0,50,100,200,350,500];
 // limited-time consumables: kept apart from potions. Values from the wiki's Relics page.
 const CONS=[{n:"Luck Booster",fx:"2× luck · 15 min",p:{Luck:1}},{n:"Candy Corn",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Gingerbread Cookie",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Ghost Gummy",fx:"+0.5× strength · 10 min",p:{"Dig Strength":.5,"Shake Strength":.5}}];
 // Sun Blessing (Pharaoh's Pan / Shovel passive): one charge meter, so it counts once even with both
@@ -58,7 +60,7 @@ function compute(S0){const S=S0||window.S;
   SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
   const flat=Object.fromEntries(STATS.map(s=>[s,0]));flat.Luck=Math.max(0,+S.n.flatLuck||0);
   // permanent quest luck (flat points): Lighthouse +3, Ancient +5, Spirits +50, Dredge Master +3 a quest, login Experience +5 a point
-  flat.Luck+=(S.b.lighthouse?3:0)+(S.b.ancient?5:0)+(S.b.spirits?50:0)+3*Math.max(0,+S.n.dredge||0)+5*Math.max(0,+S.n.xp||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
+  flat.Luck+=(S.b.lighthouse?3:0)+(S.b.ancient?5:0)+(S.b.spirits?50:0)+3*Math.max(0,+S.n.dredge||0)+5*Math.max(0,+S.n.xp||0)+(TOMB[+S.n.tomb||0]||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
   // Trader's Recommendation: permanent quest reward, +20 flat Sell Boost. Almost everyone has it, so it's on unless unticked.
   if(S.b.trader!==false)flat["Sell Boost"]+=20;
   const pile=Object.fromEntries(STATS.map(s=>[s,0]));const mt=musTotals(S);Object.entries(mt.t).forEach(([k,v])=>{if(k in pile)pile[k]+=v});
@@ -95,7 +97,7 @@ function strip(st,g){const t=clone(st);
   if(g==="tools"){t.pan="";t.shovel="";t.panEn="";t.shEn="";t.trinket=""}
   else if(g==="jewelry"){t.slots={}}
   else if(g==="museum"){t.mus="none"}
-  else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};PERM.forEach(k=>keep[k]=t.b[k]);t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:t.n.dredge,xp:t.n.xp};t.pots=[];t.runes=[];t.cons=[]}
+  else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};PERM.forEach(k=>keep[k]=t.b[k]);t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:t.n.dredge,xp:t.n.xp,tomb:t.n.tomb};t.pots=[];t.runes=[];t.cons=[]}
   else if(g==="events"){t.b=Object.assign({},t.b,{meteor:false,weather:false})}
   return t}
 // S.only: null = count everything, otherwise a single part key like "slot:r0", "slot:r0,r1" (same item in several slots) or "group:museum"
@@ -156,6 +158,7 @@ function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const 
   if(+n.mastery>0)L.push({key:"group:boosts",label:"Location mastery",cut:t=>{t.n=Object.assign({},t.n,{mastery:0})}});
   if(B.b.trader!==false)L.push({key:"group:boosts",label:"Trader's Recommendation",cut:t=>{t.b=Object.assign({},t.b,{trader:false})}});
   if(+n.dredge>0)L.push({key:"group:boosts",label:`Dredge Master (${fmt(+n.dredge,0)} quests)`,cut:t=>{t.n=Object.assign({},t.n,{dredge:0})}});
+  if(+n.tomb>0)L.push({key:"group:boosts",label:`Tomb Mastery ${n.tomb}`,cut:t=>{t.n=Object.assign({},t.n,{tomb:0})}});
   if(+n.xp>0)L.push({key:"group:boosts",label:`Login Experience (${fmt(+n.xp,0)} points)`,cut:t=>{t.n=Object.assign({},t.n,{xp:0})}});
   if(+n.flatLuck>0)L.push({key:"group:boosts",label:"Other flat luck",cut:t=>{t.n=Object.assign({},t.n,{flatLuck:0})}});
   if(+n.flatDig>0)L.push({key:"group:boosts",label:"Flat dig strength",cut:t=>{t.n=Object.assign({},t.n,{flatDig:0})}});
@@ -261,7 +264,7 @@ document.addEventListener("click",e=>{const c=e.target.closest("[data-iso]");if(
   const r=e.target.closest("[data-reset]");if(r){if(!r.classList.contains("arm")){r.classList.add("arm");r.textContent="Sure?";setTimeout(()=>{r.classList.remove("arm");r.textContent="Reset"},2500);return}resetGroup(r.dataset.reset);return}});
 document.addEventListener("keydown",e=>{const p=e.target.closest&&e.target.closest("[data-only]");if(p&&(e.key==="Enter"||e.key===" ")){e.preventDefault();p.click()}});
 function resetGroup(g){if(g==="tools"){S.pan="";S.shovel="";S.panEn="";S.shEn=""}else if(g==="jewelry"){S.slots={}}else if(g==="museum"){S.mus="none";S.museumBoard=null}
-  else if(g==="boosts"){const kb={};PERM.forEach(k=>{if(k in S.b)kb[k]=S.b[k]});S.b=kb;S.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:S.n.dredge,xp:S.n.xp};S.pots=[];S.runes=[];S.cons=[]}S.only=null;save();all()}
+  else if(g==="boosts"){const kb={};PERM.forEach(k=>{if(k in S.b)kb[k]=S.b[k]});S.b=kb;S.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:S.n.dredge,xp:S.n.xp,tomb:S.n.tomb};S.pots=[];S.runes=[];S.cons=[]}S.only=null;save();all()}
 $("resetAll").onclick=()=>{const b=$("resetAll");if(!b.classList.contains("arm")){b.classList.add("arm");b.textContent="Reset everything?";setTimeout(()=>{b.classList.remove("arm");b.textContent="Reset everything"},2500);return}
   ["tools","jewelry","museum","boosts"].forEach(g=>resetGroup(g));S.isoOff=[];S.only=null;S.owned=false;b.classList.remove("arm");b.textContent="Reset everything";save();all()};
 // ---- what to upgrade next ----------------------------------------------------
