@@ -398,6 +398,7 @@ function upCandidates(){
 function renderUp(){
   const on=S.showUp!==false;$("showUp").checked=on;$("upBody").hidden=!on;
   $("upGoal").innerHTML=[...UGOALS.map(([n])=>n),"Custom"].map(n=>`<button type="button" class="chip" data-ug="${esc(n)}" aria-pressed="${(S.upGoal||"Luck")===n}">${esc(n)}</button>`).join("");renderUcw();
+  $("upCat").innerHTML=(S.upMode==="path"?[]:UCAT).map(([v,n])=>`<button type="button" class="chip" data-ucat="${v}" aria-pressed="${(S.upCat||"all")===v}">${n}</button>`).join("");$("upCat").parentElement.hidden=S.upMode==="path";
   $("upSort").innerHTML=[["list","Top 10"],["path","Upgrade path"]].map(([v,n])=>`<button type="button" class="chip" data-um="${v}" aria-pressed="${(S.upMode||"list")===v}">${n}</button>`).join("")+(`<button type="button" class="chip" data-uev="1" aria-pressed="${!!S.upEvent}" title="Event and limited-time gear you can't just go and get">Include event gear</button>`);
   if(!on){$("upList").innerHTML="";$("upHint").textContent="";return}
   renderUpList()}
@@ -425,9 +426,12 @@ function renderPath(){const steps=upPath(8);const sk=(S.upSkip||[]).length;
   $("upList").innerHTML=steps.map((c,i)=>upRow(c,i,[`<button type="button" class="btn sm" data-upto="${i}" title="Applies steps 1 to ${i+1}">${i?"Do 1–"+(i+1):"Do it"}</button>`,`<button type="button" class="btn sm ghost" data-upskip="${i}" title="Leave this out and work the path out again">Skip</button>`])).join("")
     +`<div class="uptot"><span>Whole path</span><span class="upm">${tm?esc(uMoneyTxt(tm)):""}</span><span class="upp">${tp?esc(uPansTxt(tp)):""}</span><span></span></div>`;
   UPLAST=steps}
+// what kind of suggestion it is, for the filter
+const UCAT=[["all","All"],["gear","Gear"],["museum","Museum"],["mut","Mutations & enchants"],["boost","Potions & boosts"]];
+const ucat=c=>/^Museum/.test(c.kind)?"museum":/^(Mutation|Pan enchant)/.test(c.kind)?"mut":/^(Potion|Consumable|Totem)$/.test(c.kind)?"boost":"gear";
 function renderUpList(){
   if(S.upMode==="path")return renderPath();
-  const list=upCandidates().slice(0,10);
+  const cf=S.upCat||"all";const list=upCandidates().filter(c=>cf==="all"||ucat(c)===cf).slice(0,10);
   $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality.`+zeroNote();
   if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
   $("upList").innerHTML=list.map((c,i)=>upRow(c,i,[`<button type="button" class="btn sm" data-uptry="${i}">Try it</button>`])).join("");
@@ -437,6 +441,7 @@ let UPLAST=[],UPUNDO=null;
 $("showUp").addEventListener("change",()=>{S.showUp=$("showUp").checked;save();renderUp()});
 document.addEventListener("click",e=>{
   const g=e.target.closest("[data-ug]");if(g){S.upGoal=g.dataset.ug;save();renderUp();return}
+  const uc=e.target.closest("[data-ucat]");if(uc){S.upCat=uc.dataset.ucat;save();renderUp();return}
   const um=e.target.closest("[data-um]");if(um){S.upMode=um.dataset.um;save();renderUp();return}
   const sk=e.target.closest("[data-upskip]");if(sk){const c=UPLAST[+sk.dataset.upskip];if(c){S.upSkip=[...(S.upSkip||[]),upKey(c)];save();renderUpList()}return}
   if(e.target.closest("[data-upunskip]")){S.upSkip=[];save();renderUpList();return}
