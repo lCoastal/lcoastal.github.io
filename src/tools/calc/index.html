@@ -23,7 +23,7 @@
         <div class="grid2 tools2"><div class="tcol"><div class="fld"><span class="lab">Pan</span><button type="button" class="pick" data-pick="pan" aria-haspopup="listbox"></button></div>
           <label class="fld sub"><span class="lab">Pan enchant</span><select id="panEn"></select></label><label class="fld sub"><span class="lab">Trinket</span><select id="trinket"></select></label></div>
           <div class="tcol"><div class="fld"><span class="lab">Shovel</span><button type="button" class="pick" data-pick="shovel" aria-haspopup="listbox"></button></div>
-          <label class="fld sub"><span class="lab">Shovel enchant</span><select id="shEn"></select></label></div></div><p class="hint" id="enNote"></p></section>
+          <label class="fld sub"><span class="lab">Shovel enchant</span><select id="shEn"></select></label><label class="ck" id="rhyWrap" hidden title="Rhythmic adds luck for each perfect dig in a streak, up to +0.3×"><input type="checkbox" id="rhy"> Full perfect-dig streak (+0.3× luck)</label></div></div><p class="hint" id="enNote"></p></section>
       <section class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h2>Jewelry <button type="button" class="rst" data-reset="jewelry">Reset</button></h2>
         <span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="seg" role="group" aria-label="Set every slot's stars"><button type="button" data-all="0">No ★</button><button type="button" data-all="5">All 5★</button><button type="button" data-all="6">All 6★</button></span><select id="allMut" data-ptmut aria-label="Set every slot's mutation"><option value="">Set all mutations…</option></select></span></div>
         <p class="hint">Stars set the stat range (0★ uses the same range as 5★), quality is where the roll lands inside it (0% worst, 100% best), and the mutation multiplies the result on top.<br>This is a planner, so quality is spread evenly over every stat. In game a 50% item isn't always 50% on each stat: it could be 100% luck and 0% sell boost, which still averages out to 50%.</p>
@@ -40,9 +40,14 @@
           <label class="ck"><input type="checkbox" data-b="sun"> Sunblessed / Abyssal rune</label>
           <label class="ck"><input type="checkbox" data-b="solo"> Solitude rune</label>
           <label class="ck"><input type="checkbox" data-b="purity"> Purity rune (+1× luck, no modifiers)</label>
-          <label class="ck"><input type="checkbox" data-b="vet"> Veteran rune (+0.25× luck in a fully mastered region)</label></div>
+          <label class="ck"><input type="checkbox" data-b="vet"> Veteran rune (+0.25× luck in a fully mastered region)</label>
+          <label class="ck"><input type="checkbox" data-b="daily"> Daily login luck (2× luck)</label>
+          <label class="ck"><input type="checkbox" data-b="dailyStr"> Daily login strength (2× dig strength)</label>
+          <label class="ck"><input type="checkbox" data-b="empower"> Empowering sluice (1.4× luck and capacity)</label>
+          <label class="ck"><input type="checkbox" data-b="egg"> Easter Sluice, Egg Hunter (1.5× luck, capacity, modifier boost, walk speed)</label></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="lab">Other runes</span><span id="runeList" class="rowc"></span><button type="button" class="btn" id="runePage">Pick on the Runes page</button></div>
         <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="lab">Potions</span><select id="potAdd" aria-label="Add a potion"><option value="">Add a potion…</option></select><button type="button" class="btn" id="potMoney" title="Adds every potion you can buy with money, except the Traveling Merchant's ones">Add all money potions</button><button type="button" class="btn" id="potClear">Clear</button><button type="button" class="btn" id="potShow" aria-pressed="true" aria-controls="potList" title="Only hides the list. Active potions still count in your stats.">Hide potions</button></div><div id="potList" class="rowc"></div><span class="hint" id="potHid" hidden></span></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="lab">Limited consumables</span><select id="consAdd" aria-label="Add a limited consumable"><option value="">Add a consumable…</option></select><button type="button" class="btn" id="consClear">Clear</button></div><div id="consList" class="rowc"></div></div>
         <div class="rowc">
           <label class="num">Friendship Totem, players nearby <input type="number" min="-1" max="19" data-n="friendTotem" aria-describedby="ftH"></label>
           <label class="num">Friends online <input type="number" min="0" max="5" data-n="friends"></label>
@@ -70,7 +75,7 @@
   </div>
   <div class="picker" id="picker" hidden><div class="pl"><input id="pkQ" type="search" placeholder="Search…" aria-label="Search items" autocomplete="off" role="combobox" aria-controls="pkList" aria-expanded="true"><div class="pklist" id="pkList" role="listbox"></div></div><div class="pvp" id="pkPv" aria-live="polite"></div></div>
 <div class="tip" id="tip" hidden></div>
-  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 20/11/26 · Made by @__coastal</p>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 21/11/26 · Made by @__coastal</p>
 </div>
 <script data-file="script.js"></script>
 

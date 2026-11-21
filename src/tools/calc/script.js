@@ -37,6 +37,12 @@ function fillMus(){const src=musSources();if(!src.some(s=>s[0]===S.mus))S.mus="b
 function passive(p){const o={};let lm=1;String(p||"").split(/,\s*/).forEach(t=>{let m=t.match(/^([+\-−]?\d+(?:\.\d+)?)%\s*(Size Boost|Modifier Boost|Sell Boost)/i);if(m){const k=m[2].toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());o[k]=(o[k]||0)+parseFloat(m[1].replace("−","-"))}
   m=t.match(/(\d+(?:\.\d+)?)\s*×\s*additional Luck/i);if(m)lm*=parseFloat(m[1])});return {o,lm}}
 const eqVal=(s,l,q,mult)=>{const lo=l==="5"?s[1]:s[3],hi=l==="5"?s[2]:s[4];return (lo+(hi-lo)*q/100)*mult};
+// limited-time consumables: kept apart from potions. Values from the wiki's Relics page.
+const CONS=[{n:"Luck Booster",fx:"2× luck · 15 min",p:{Luck:1}},{n:"Candy Corn",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Gingerbread Cookie",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Ghost Gummy",fx:"+0.5× strength · 10 min",p:{"Dig Strength":.5,"Shake Strength":.5}}];
+// Sun Blessing (Pharaoh's Pan / Shovel passive): one charge meter, so it counts once even with both
+const sunGear=S=>{const pan=G.pans.find(x=>x.name===S.pan),sh=G.shovels.find(x=>x.name===S.shovel);const has=x=>x&&/Sun Blessing/i.test((x.passive||"")+" "+(x.description||""));return [has(pan)?S.pan:"",has(sh)?S.shovel:""].filter(Boolean)};
+const sunOn=S=>!S.noSun&&(sunGear(S).length>0||!!S.sunKeep);
+const rhyOn=S=>S.shEn==="Rhythmic"&&S.rhy!==false;
 function compute(S0){const S=S0||window.S;
   const base=Object.fromEntries(STATS.map(s=>[s,0]));let luckMult=1,totemMult=1;const notes=[];
   const pan=G.pans.find(x=>x.name===S.pan),sh=G.shovels.find(x=>x.name===S.shovel);
@@ -44,7 +50,7 @@ function compute(S0){const S=S0||window.S;
   if(pan){const pm=k=>pe&&pe.m[k]?pe.m[k]:1;base.Luck+=(num(pan.luck)||0)*pm("Luck");base.Capacity+=(num(pan.capacity)||0)*pm("Capacity");base["Shake Strength"]+=(num(pan.strength)||0)*pm("Shake Strength");const sp=String(pan.speed).includes("%")?num(pan.speed):(num(pan.speed)||0)*100;base["Shake Speed"]+=sp;
     if(pe)Object.entries(pe.a).forEach(([k,v])=>{if(k in base)base[k]+=v});
     const p=passive(pan.passive);Object.entries(p.o).forEach(([k,v])=>base[k]+=v);luckMult*=p.lm;if(/totem/i.test(pan.passive||""))notes.push(`${pan.name} also boosts totems (not counted).`)}
-  if(sh){base["Dig Strength"]+=num(sh.strength)||0;base["Dig Speed"]+=(num(sh.speed)||0)*100;base.Toughness=(num(sh.toughness)||0)+(se&&se.tough?se.tough:0);if(se&&!se.tough)notes.push(`${se.n}: ${se.d}`);const p=passive(sh.passive);luckMult*=p.lm;if(/25% buffs from Totems/i.test(sh.passive||""))totemMult=1.25}
+  if(sh){base["Dig Strength"]+=num(sh.strength)||0;base["Dig Speed"]+=(num(sh.speed)||0)*100;base.Toughness=(num(sh.toughness)||0)+(se&&se.tough?se.tough:0);if(se&&!se.tough&&se.n!=="Rhythmic")notes.push(`${se.n}: ${se.d}`);const p=passive(sh.passive);luckMult*=p.lm;if(/25% buffs from Totems/i.test(sh.passive||""))totemMult=1.25}
   SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
   const flat=Object.fromEntries(STATS.map(s=>[s,0]));flat.Luck=Math.max(0,+S.n.flatLuck||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
   const pile=Object.fromEntries(STATS.map(s=>[s,0]));const mt=musTotals(S);Object.entries(mt.t).forEach(([k,v])=>{if(k in pile)pile[k]+=v});
@@ -61,6 +67,14 @@ function compute(S0){const S=S0||window.S;
   if(b.lumTotem){pile.Capacity+=.5*totemMult;flat["Shake Speed"]+=50;flat["Dig Speed"]+=50}
   const ft=Math.min(19,Math.floor(+S.n.friendTotem));if(ft>=0)pile.Luck+=(0.4+0.2*ft)*totemMult;
   pile.Luck+=Math.max(0,Math.min(.5,.1*(+S.n.friends||0)))+(b.sun?.2:0)+(b.solo?.2:0)+(+S.n.mastery||0);
+  // Sun Blessing at full charge (assumed): +2× luck, +100% dig/shake speed, +0.4× capacity
+  if(sunOn(S)){pile.Luck+=2;pile["Dig Speed"]+=1;pile["Shake Speed"]+=1;pile.Capacity+=.4}
+  // Rhythmic shovel enchant at a full perfect-dig streak (assumed when ticked)
+  if(rhyOn(S))pile.Luck+=.3;
+  if(b.daily)pile.Luck+=1;if(b.dailyStr)pile["Dig Strength"]+=1;
+  if(b.empower){pile.Luck+=.4;pile.Capacity+=.4}
+  if(b.egg){pile.Luck+=.5;pile.Capacity+=.5;pile["Modifier Boost"]+=.5;pile["Walk Speed"]+=.5}
+  (S.cons||[]).forEach(cn=>{const c=CONS.find(x=>x.n===cn);if(c)Object.entries(c.p).forEach(([k,v])=>pile[k]+=v)});
   if(b.cookie)STATS.forEach(s=>{if(!["Toughness","Inventory Size"].includes(s))pile[s]+=1});
   let ev=1;if(b.meteor)ev*=2;if(b.weather)ev*=1.5;
   const tot={};STATS.forEach(s=>{tot[s]=["Toughness","Inventory Size"].includes(s)?base[s]+flat[s]:(base[s]+flat[s])*(1+pile[s])});
@@ -73,7 +87,7 @@ function strip(st,g){const t=clone(st);
   if(g==="tools"){t.pan="";t.shovel="";t.panEn="";t.shEn="";t.trinket=""}
   else if(g==="jewelry"){t.slots={}}
   else if(g==="museum"){t.mus="none"}
-  else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0};t.pots=[];t.runes=[]}
+  else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0};t.pots=[];t.runes=[];t.cons=[]}
   else if(g==="events"){t.b=Object.assign({},t.b,{meteor:false,weather:false})}
   return t}
 // S.only: null = count everything, otherwise a single part key like "slot:r0", "slot:r0,r1" (same item in several slots) or "group:museum"
@@ -84,7 +98,7 @@ function effState(){let t=clone(S);const off=S.isoOff||[];off.forEach(g=>{t=stri
     t=o}
   return t}
 function pick(st,g){if(g==="tools")return {pan:st.pan,shovel:st.shovel,panEn:st.panEn,shEn:st.shEn,trinket:st.trinket};if(g==="jewelry")return {slots:st.slots};if(g==="museum")return {mus:st.mus,museumBoard:st.museumBoard};
-  if(g==="boosts")return {b:Object.assign({},st.b,{meteor:false,weather:false}),n:st.n,pots:st.pots,runes:st.runes};if(g==="events")return {b:{meteor:st.b.meteor,weather:st.b.weather}};return {}}
+  if(g==="boosts")return {b:Object.assign({},st.b,{meteor:false,weather:false}),n:st.n,pots:st.pots,runes:st.runes,cons:st.cons};if(g==="events")return {b:{meteor:st.b.meteor,weather:st.b.weather}};return {}}
 function parts(st){const P2=[];if(st.pan)P2.push(["pan:","Pan: "+st.pan+(st.panEn?" ("+st.panEn+")":""),t=>{t.pan="";t.panEn=""}]);
   if(st.shovel)P2.push(["shovel:","Shovel: "+st.shovel+(st.shEn?" ("+st.shEn+")":""),t=>{t.shovel="";t.shEn=""}]);
   // the same item worn in several slots is one source: "Gold Ring ×3", worked out by taking all of them off together
@@ -114,15 +128,18 @@ function shares(base,full){const P=parts(base),n=P.length,memo=new Map();
 // ---- detailed breakdown: every stat is flat points × a multiplier; each source shows what it adds to either side ----
 // One line per source: every ring on its own line, every museum display, every potion, totem and rune.
 // Each line is "what changes if you take just that away"; anything left over (two sources boosting each other) is shown as "Overlap".
-function brkSources(B){const L=[];const lab=k=>{const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
-  if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn=""},minus:B.panEn?0:null})}
-  if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn=""},minus:B.shEn?0:null})}
+const BLAB={daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
+function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
+  if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";t.sunKeep=true},minus:B.panEn?0:null})}
+  if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:B.shEn==="Rhythmic"?(rhyOn(B)?"Rhythmic (Assuming a full streak)":"Rhythmic (streak off)"):`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
+  if(sunOn(B)){const g=sunGear(B);L.push({key:g[0]===B.shovel&&g.length===1?"shovel:":"pan:",label:"Sun Blessing (Assuming it's charged)",cut:t=>{t.noSun=true}})}
   SLOTDEF.forEach(([k,l])=>{const v=(B.slots||{})[k];if(v&&v.n)L.push({key:"slot:"+k,label:`${l}: ${v.n}`,sub:[v.l==="0"?"0★":v.l==="5"?"5★":"6★",v.m&&v.m!=="None"?v.m:"",(v.q??100)<100?(v.q??100)+"%":""].filter(Boolean).join(" · "),cut:t=>{t.slots=Object.assign({},t.slots);delete t.slots[k]}})});
   const bd=B.mus!=="none"?musBoard(B):null;
   if(bd)MORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const u=sl.u||"None";
     L.push({key:"group:museum",label:`Museum: ${sl.m==="Any"?"Any "+r:sl.m}`,sub:[sl.m==="Any"?"":r,u==="None"?"":u].filter(Boolean).join(" · "),cut:t=>{const b2=JSON.parse(JSON.stringify(musBoard(t)||{}));if(b2[r]&&b2[r][i])b2[r][i]={m:null,u:"None"};t.mus="custom";t.museumBoard=b2}})}));
   Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather")return;L.push({key:"group:boosts",label:lab(k),cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
   (B.pots||[]).forEach(n=>L.push({key:"group:boosts",label:"Potion: "+n,cut:t=>{t.pots=(t.pots||[]).filter(x=>x!==n)}}));
+  (B.cons||[]).forEach(n=>L.push({key:"group:boosts",label:"Consumable: "+n,cut:t=>{t.cons=(t.cons||[]).filter(x=>x!==n)}}));
   (B.runes||[]).forEach(n=>L.push({key:"group:boosts",label:"Rune: "+n,cut:t=>{t.runes=(t.runes||[]).filter(x=>x!==n)}}));
   const n=B.n||{};
   if(+n.friendTotem>=0)L.push({key:"group:boosts",label:`Friendship Totem (${+n.friendTotem} nearby)`,cut:t=>{t.n=Object.assign({},t.n,{friendTotem:-1})}});
@@ -232,7 +249,7 @@ document.addEventListener("click",e=>{const c=e.target.closest("[data-iso]");if(
   const r=e.target.closest("[data-reset]");if(r){if(!r.classList.contains("arm")){r.classList.add("arm");r.textContent="Sure?";setTimeout(()=>{r.classList.remove("arm");r.textContent="Reset"},2500);return}resetGroup(r.dataset.reset);return}});
 document.addEventListener("keydown",e=>{const p=e.target.closest&&e.target.closest("[data-only]");if(p&&(e.key==="Enter"||e.key===" ")){e.preventDefault();p.click()}});
 function resetGroup(g){if(g==="tools"){S.pan="";S.shovel="";S.panEn="";S.shEn=""}else if(g==="jewelry"){S.slots={}}else if(g==="museum"){S.mus="none";S.museumBoard=null}
-  else if(g==="boosts"){S.b={};S.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0};S.pots=[];S.runes=[]}S.only=null;save();all()}
+  else if(g==="boosts"){S.b={};S.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0};S.pots=[];S.runes=[];S.cons=[]}S.only=null;save();all()}
 $("resetAll").onclick=()=>{const b=$("resetAll");if(!b.classList.contains("arm")){b.classList.add("arm");b.textContent="Reset everything?";setTimeout(()=>{b.classList.remove("arm");b.textContent="Reset everything"},2500);return}
   ["tools","jewelry","museum","boosts"].forEach(g=>resetGroup(g));S.isoOff=[];S.only=null;S.owned=false;b.classList.remove("arm");b.textContent="Reset everything";save();all()};
 // ---- what to upgrade next ----------------------------------------------------
@@ -420,9 +437,10 @@ async function buildImage(st,r){
   const gear=[...top2.filter(g=>!g.empty),...rings];
   const MODCOL={Perfect:"#5ef1e1",Treasured:"#ffd849",Entombed:"#40c8be",Lunar:"#ffe99b",Voidtorn:"#a35bff",Mutated:"#a07bff",Cosmic:"#ff5f9e",Electrified:"#ffeb0b",Iridescent:"#f36bff",Irradiated:"#67ff20",Crystalline:"#b7e6ff",Scorching:"#ff861c",Glowing:"#fff292",Pure:"#ffffff",Shiny:"#d4e7ff"};
   const MROWS=board?MORDER.map(r=>({r,slots:Array.from({length:MSLOTS[r]},(_,i)=>{const sl=(board[r]||[])[i]||{};const mm=sl.m&&sl.m!=="Any"?MIN[String(sl.m).toLowerCase()]:null;return {m:sl.m||null,any:sl.m==="Any",ic:mm&&mm.ic,u:sl.u||"None"}})})):[];
-  const boosts=[];const lab=k=>{const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
+  const boosts=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   Object.entries(st.b||{}).forEach(([k,v])=>{if(v)boosts.push({t:lab(k),col:TX})});
-  (st.pots||[]).forEach(n=>boosts.push({t:n,col:"#b880ee"}));(st.runes||[]).forEach(n=>boosts.push({t:n+" rune",col:"#68a6f0"}));
+  (st.pots||[]).forEach(n=>boosts.push({t:n,col:"#b880ee"}));(st.cons||[]).forEach(n=>boosts.push({t:n,col:"#e0a050"}));
+  if(sunOn(st))boosts.push({t:"Sun Blessing (assumed charged)",col:"#ffc800"});if(rhyOn(st))boosts.push({t:"Rhythmic full streak (assumed)",col:TX});(st.runes||[]).forEach(n=>boosts.push({t:n+" rune",col:"#68a6f0"}));
   const n=st.n||{};if(+n.friendTotem>=0)boosts.push({t:`Friendship Totem (${+n.friendTotem} nearby)`,col:TX});if(+n.friends>0)boosts.push({t:`${+n.friends} friend${+n.friends===1?"":"s"} online`,col:TX});
   if(+n.mastery>0)boosts.push({t:`Location mastery +${n.mastery}×`,col:TX});if(+n.flatLuck>0)boosts.push({t:`+${fmt(+n.flatLuck,0)} flat luck`,col:statHex("Luck")});if(+n.flatDig>0)boosts.push({t:`+${fmt(+n.flatDig,0)} flat dig strength`,col:statHex("Dig Strength")});
   const hideS=new Set(S.brkHide||[]),stats=SHOW.filter(x=>(Math.abs(r.tot[x]||0)>1e-9||x==="Luck")&&!hideS.has(x));
@@ -673,16 +691,24 @@ $("potMoney").onclick=()=>{const add=moneyPots().map(p=>p.n).filter(n=>!(S.pots|
 $("potShow").onclick=()=>{let hid=false;try{hid=localStorage.getItem("pc-hidepots")==="1"}catch(e){}try{localStorage.setItem("pc-hidepots",hid?"0":"1")}catch(e){}fillPots()};
 $("potClear").onclick=()=>{if(!(S.pots||[]).length)return;S.pots=[];save();fillPots();render();toast("Potions cleared")};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-rmpot]");if(!b)return;S.pots=(S.pots||[]).filter(n=>n!==b.dataset.rmpot);save();fillPots();render()});
+function fillCons(){S.cons=(S.cons||[]).filter(n=>CONS.some(c=>c.n===n));
+  $("consAdd").innerHTML=`<option value="">Add a consumable…</option>`+CONS.filter(c=>!S.cons.includes(c.n)).map(c=>`<option value="${esc(c.n)}">${esc(c.n)} · ${esc(c.fx)}</option>`).join("");
+  $("consList").innerHTML=S.cons.map(n=>`<span class="chip" style="cursor:default">${esc(n)} <button type="button" data-rmcons="${esc(n)}" aria-label="Remove ${esc(n)}" style="border:0;background:none;cursor:pointer;color:var(--muted);font-size:14px;padding:0 0 0 4px">×</button></span>`).join("")||'<span class="hint">None active.</span>'}
+$("consClear").onclick=()=>{if(!(S.cons||[]).length)return;S.cons=[];save();fillCons();render();toast("Consumables cleared")};
+document.addEventListener("click",e=>{const b=e.target.closest("[data-rmcons]");if(!b)return;S.cons=(S.cons||[]).filter(n=>n!==b.dataset.rmcons);save();fillCons();render()});
+function fillRhy(){$("rhyWrap").hidden=S.shEn!=="Rhythmic";$("rhy").checked=S.rhy!==false}
 function fillRunes(){const RU=(S.runes||[]).filter(n=>!["Sunblessed","Abyssal","Solitude","Purity","Veteran"].includes(n));$("runeList").innerHTML=RU.map(n=>`<span class="chip" style="cursor:default">${esc(n)}</span>`).join("")||'<span class="hint">None</span>'}
 window.ptSetRunes=list=>{S.runes=list||[];S.b.sun=S.runes.includes("Sunblessed")||S.runes.includes("Abyssal");S.b.solo=S.runes.includes("Solitude");S.b.purity=S.runes.includes("Purity");S.b.vet=S.runes.includes("Veteran");save();all()};
 $("runePage").onclick=()=>{try{window.parent.ptCallTool("runes","ptOpenItem","")}catch(e){}};
-function all(){fillEnch();fillPots();fillRunes();$("allMut").innerHTML=`<option value="">Set all mutations…</option>`+MUTS.map(m=>`<option value="${m[0]}">${m[0]==="None"?"No mutation":m[0]}</option>`).join("");fillTools();buildSlots();paintPicks();fillMus();musEditor();
+function all(){fillEnch();fillPots();fillCons();fillRhy();fillRunes();$("allMut").innerHTML=`<option value="">Set all mutations…</option>`+MUTS.map(m=>`<option value="${m[0]}">${m[0]==="None"?"No mutation":m[0]}</option>`).join("");fillTools();buildSlots();paintPicks();fillMus();musEditor();
   document.querySelectorAll("[data-b]").forEach(i=>i.checked=!!S.b[i.dataset.b]);document.querySelectorAll("[data-n]").forEach(i=>i.value=S.n[i.dataset.n]??0);$("ownedOnly").checked=!!S.owned;render()}
 document.addEventListener("change",e=>{const t=e.target;
   if(t.id==="potAdd"){if(t.value){S.pots=[...(S.pots||[]),t.value];fillPots()}else return}
+  else if(t.id==="consAdd"){if(t.value){S.cons=[...(S.cons||[]),t.value];fillCons()}else return}
+  else if(t.id==="rhy"){S.rhy=t.checked}
   else if(t.dataset.mm){const [r,i]=t.dataset.mm.split("|");S.museumBoard[r][+i].m=t.value||null}
   else if(t.dataset.mu){const [r,i]=t.dataset.mu.split("|");S.museumBoard[r][+i].u=t.value}
-  else if(t.id==="mus"){S.mus=t.value;musEditor()}else if(t.id==="panEn"){S.panEn=t.value;fillEnch()}else if(t.id==="shEn"){S.shEn=t.value;fillEnch()}else if(t.id==="trinket"){S.trinket=t.value;fillEnch()}
+  else if(t.id==="mus"){S.mus=t.value;musEditor()}else if(t.id==="panEn"){S.panEn=t.value;fillEnch()}else if(t.id==="shEn"){S.shEn=t.value;fillEnch();fillRhy()}else if(t.id==="trinket"){S.trinket=t.value;fillEnch()}
   else if(t.id==="ownedOnly"){S.owned=t.checked;save();all();return}
   else if(t.dataset.lvl){(S.slots[t.dataset.lvl]=S.slots[t.dataset.lvl]||{}).l=t.value}
   else if(t.dataset.mut){(S.slots[t.dataset.mut]=S.slots[t.dataset.mut]||{}).m=t.value}
