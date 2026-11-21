@@ -45,7 +45,7 @@ function render(){
   $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b class="mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}">${esc(m.n)} at ${fmt(w,2)} kg</b><br><span>Base weight ${B} kg · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${cap&&(cap<1856||cap>7240)?' · <span class="warn">the chances are a rougher estimate at this capacity</span>':""}</span></div>`;
   const tile=(l,v,s,c)=>`<div${c?` class="${c}"`:""}><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
   const goodTxt=$("good").selectedOptions[0].textContent;
-  let h=tile("Minimum Size Boost",pc(minSB),minSB<=0?"no Size Boost needed to make it possible":"possible, but only with a perfect roll")
+  let h=tile("Minimum Size Boost",pc(minSB),minSB<=0?"no Size Boost needed to make it possible":"if 15.5× really is the top roll (best guess)")
     +tile("Recommended",pc(recSB),goodTxt+" reach it","rec")
     +tile("Half of them reach it",pc(halfSB),"");
   if(mine!=null)h+=tile("Your chance now",oneIn(chance(w,B,M,mine,model)),"per "+m.n+" at "+pc(mine));
