@@ -94,7 +94,7 @@ function compute(S0){const S=S0||window.S;
   (S.cons||[]).forEach(cn=>{const c=CONS.find(x=>x.n===cn);if(c)Object.entries(c.p).forEach(([k,v])=>pile[k]+=v)});
   if(b.cookie)STATS.forEach(s=>{if(!["Toughness","Inventory Size"].includes(s))pile[s]+=1});
   // luck trinkets
-  if(S.trinket==="Nomad's Compass")pile.Luck+=.9;   // always stacked: 6 deposits × +15%
+  if(S.trinket==="Nomad's Compass")luckMult*=1.9;  // always stacked: 6 deposits × +15%, multiplies total luck
   if(S.trinket==="Senet Die")luckMult*=1.33;         // x0.5–x3 per full pan, counted as ×1.33
   let trk=null;if(TRROLL[S.trinket]){const cap=(base.Capacity+flat.Capacity)*(1+pile.Capacity),mb=(base["Modifier Boost"]+flat["Modifier Boost"])*(1+pile["Modifier Boost"]);
     trk=trkLuck(S.trinket,cap,mb,!!S.trkMax);base.Luck+=trk.luck}
@@ -154,7 +154,7 @@ const BLAB={trader:"Trader's Recommendation",lighthouse:"Lighthouse Blessing",an
 function brkSources(B){const L=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";t.sunKeep=true},minus:B.panEn?0:null})}
   if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:B.shEn==="Rhythmic"?(rhyOn(B)?"Rhythmic (Assuming a full streak)":"Rhythmic (streak off)"):`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";t.sunKeep=true},minus:B.shEn?0:null})}
-  if(TRROLL[B.trinket]||B.trinket==="Nomad's Compass"||B.trinket==="Senet Die")L.push({key:"pan:",label:"Trinket: "+(B.trinket==="Nomad's Compass"?"Nomad's Compass (Assuming 6 deposits stacked)":B.trinket==="Senet Die"?"Senet Die (Assuming ×1.33)":`${B.trinket} (Assuming the ${B.trkMax?"max":"average"} roll)`),cut:t=>{t.trinket=""}});
+  if(TRROLL[B.trinket]||B.trinket==="Nomad's Compass"||B.trinket==="Senet Die")L.push({key:"pan:",label:"Trinket: "+(B.trinket==="Nomad's Compass"?"Nomad's Compass (×1.9, Assuming 6 deposits stacked)":B.trinket==="Senet Die"?"Senet Die (Assuming ×1.33)":`${B.trinket} (Assuming the ${B.trkMax?"max":"average"} roll)`),cut:t=>{t.trinket=""}});
   if(B.trinket==="Embalmer's Salt")L.push({key:"pan:",label:"Trinket: Embalmer's Salt (Assuming it's maxed)",cut:t=>{t.trinket=""}});
   if(sunOn(B)){const g=sunGear(B);L.push({key:g[0]===B.shovel&&g.length===1?"shovel:":"pan:",label:"Sun Blessing (Assuming it's charged)",cut:t=>{t.noSun=true}})}
   SLOTDEF.forEach(([k,l])=>{const v=(B.slots||{})[k];if(v&&v.n)L.push({key:"slot:"+k,label:`${l}: ${v.n}`,sub:[v.l==="0"?"0★":v.l==="5"?"5★":"6★",v.m&&v.m!=="None"?v.m:"",(v.q??100)<100?(v.q??100)+"%":""].filter(Boolean).join(" · "),cut:t=>{t.slots=Object.assign({},t.slots);delete t.slots[k]}})});
@@ -383,7 +383,7 @@ function upCandidates(){
   // luck trinkets, Beach Umbrella and Mass Reactor at both the average and the max roll
   [["Beach Umbrella",false],["Beach Umbrella",true],["Mass Reactor",false],["Mass Reactor",true],["Nomad's Compass",false],["Senet Die",false]].forEach(([n,mx])=>{
     if(base.trinket===n&&(!TRROLL[n]||!!base.trkMax===mx))return;const st=clone(base);st.trinket=n;st.trkMax=mx;
-    add({kind:"Trinket",name:TRLAB(n,mx),replaces:base.trinket?TRLAB(base.trinket,!!base.trkMax):"",where:n==="Nomad's Compass"?"6 deposits stacked: +0.9× luck":n==="Senet Die"?"counted as ×1.33 luck":"",money:0,pans:0,limited:false,state:st,apply:()=>{S.trinket=n;S.trkMax=mx}})});
+    add({kind:"Trinket",name:TRLAB(n,mx),replaces:base.trinket?TRLAB(base.trinket,!!base.trkMax):"",where:n==="Nomad's Compass"?"6 deposits stacked: ×1.9 total luck":n==="Senet Die"?"counted as ×1.33 luck":"",money:0,pans:0,limited:false,state:st,apply:()=>{S.trinket=n;S.trkMax=mx}})});
   if(base.trinket!=="Embalmer's Salt"){const st=clone(base);st.trinket="Embalmer's Salt";add({kind:"Trinket",name:"Embalmer's Salt",replaces:base.trinket||"",where:"maxed out: +100% Sell Boost",money:0,pans:0,limited:false,state:st,apply:()=>{S.trinket="Embalmer's Salt"}})}
   // totems and the XP Cookie (the cookie only comes from Cookie Time and the Christmas shop, so it counts as event)
   [["luckTotem","Luck Totem","2× luck · 300 Meteor Shards"],["strTotem","Strength Totem","2× dig and shake strength · 180 Meteor Shards"],["lumTotem","Luminant Totem","1.5× capacity, +50% speeds · 600 Meteor Shards"],["cookie","XP Cookie","+1× most stats · 1 min",true]].forEach(([k,n,fx,ev])=>{
@@ -720,7 +720,7 @@ function fillEnch(){const EN=P.ench||{pan:[],shovel:[]};
   const tr=TRROLL[S.trinket]?compute(S).trk:null;
   const tkTxt=!tk?"":tk.n==="Embalmer's Salt"?`${tk.n}: counted as maxed out, +100% Sell Boost (it builds up 0.25% per item panned and resets when you sell).`
     :tr?`${tk.n}: counted at the ${S.trkMax?"max":"average"} roll, about ${fmt(tr.n,0)} minerals a pan${tk.n==="Beach Umbrella"?` × ${fmt(tr.pm*100,0)}% modified`:" (20 kept)"} = +${fmt(tr.luck,0)} base luck.`
-    :tk.n==="Nomad's Compass"?`${tk.n}: counted as always stacked, 6 deposits × +15% = +0.9× luck.`:tk.n==="Senet Die"?`${tk.n}: rolls ×0.5 to ×3 luck each full pan, counted as ×1.33.`
+    :tk.n==="Nomad's Compass"?`${tk.n}: counted as always stacked, 6 deposits × +15% = ×1.9 on your total luck.`:tk.n==="Senet Die"?`${tk.n}: rolls ×0.5 to ×3 luck each full pan, counted as ×1.33 on your total luck.`
     :`${tk.n}: ${tk.fx} (not counted in the stats, it depends on what you pan)`;
   const pe=EN.pan.find(e=>e.n===S.panEn),se=EN.shovel.find(e=>e.n===S.shEn);
   $("enNote").textContent=[tkTxt,pe?`${pe.n}: `+[...Object.entries(pe.m).map(([k,v])=>`${v}× pan ${k.toLowerCase()}`),...Object.entries(pe.a).map(([k,v])=>`${v>0?"+":"−"}${Math.abs(v)}${["Shake Speed","Size Boost","Modifier Boost","Sell Boost"].includes(k)?"%":""} ${k.toLowerCase()}`)].join(", ")+".":"",se?`${se.n}: ${se.d}`:""].filter(Boolean).join(" ")}
