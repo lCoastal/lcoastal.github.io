@@ -4,7 +4,7 @@
 .tm{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--tc,var(--accent));border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
 .tm .lab{color:var(--muted)}
 .tm b{font-family:var(--f-display);font-size:1.15rem}
-.tm .cd{font-family:var(--f-mono);font-size:1.9rem;line-height:1.1}
+.tm .cd{font-family:var(--f-mono);font-size:1.9rem;line-height:1.1;font-variant-numeric:tabular-nums}
 .tm .st{font-size:13px;font-weight:600}
 .tm .st.open{color:var(--accent)}
 .tm .st.shut{color:var(--muted)}
