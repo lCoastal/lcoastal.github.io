@@ -152,3 +152,11 @@ table.out th.bkc{text-align:center}
 .ucw .v{font-family:var(--mono,monospace);text-align:right;color:var(--muted)}
 .ucw .v.on{color:var(--fg)}
 .ucw .hint{grid-column:1/-1;margin:2px 0 0}
+
+/* upgrade path */
+.upi.pth{grid-template-columns:1.6em minmax(0,1fr) 4.4em 5.8em auto}
+.upnum{font-family:var(--f-mono);font-size:13px;color:var(--muted);align-self:start;padding-top:1px}
+.upb{display:flex;gap:6px;justify-content:flex-end}
+.btn.ghost{background:transparent}
+.uptot{display:grid;grid-template-columns:minmax(0,1fr) 4.4em 5.8em auto;gap:4px 10px;padding:9px 2px 2px;font-size:13px;font-weight:600;border-top:1px solid var(--line)}
+@media (max-width:420px){.upi:not(.pth)>.upb{grid-column:1/-1;justify-self:start}.upi.pth{grid-template-columns:1.4em minmax(0,1fr) auto}.upi.pth .upn{grid-row:1/3}.upi.pth .upm,.upi.pth .upp{grid-column:3}.upi.pth>.upb{grid-column:2/-1;justify-self:start}}

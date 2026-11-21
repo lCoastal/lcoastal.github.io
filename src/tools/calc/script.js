@@ -351,7 +351,7 @@ function upCandidates(){
   Object.values(bestMut).forEach(c=>add(c));
   // potions and limited consumables you don't have on yet. Halloween and Christmas treats only show with "Include event gear".
   ((P.x2||{}).potions||[]).forEach(po=>{if((base.pots||[]).includes(po.n))return;const st=clone(base);st.pots=[...(base.pots||[]),po.n];
-    const m=/\$/.test(po.cost||"")?uMoney(po.cost):0;add({kind:"Potion",name:po.n,where:[po.fx,po.where].filter(Boolean).join(" · "),money:m,other:m?"":po.cost||"",pans:0,limited:false,state:st,apply:()=>{S.pots=[...(S.pots||[]),po.n]}})});
+    const m=/\$/.test(po.cost||"")?uMoney(po.cost):0;add({kind:"Potion",name:po.n,where:[po.fx,po.where].filter(Boolean).join(" · "),money:m,other:m?"":String(po.cost||"").replace(/Meteor Shards/i,"shards"),pans:0,limited:false,state:st,apply:()=>{S.pots=[...(S.pots||[]),po.n]}})});
   const CEV={"Candy Corn":1,"Ghost Gummy":1,"Gingerbread Cookie":1};
   CONS.forEach(c=>{if((base.cons||[]).includes(c.n))return;const st=clone(base);st.cons=[...(base.cons||[]),c.n];
     add({kind:"Consumable",name:c.n,where:c.fx,money:0,pans:0,limited:!!CEV[c.n],state:st,apply:()=>{S.cons=[...(S.cons||[]),c.n]}})});
@@ -395,28 +395,46 @@ function upCandidates(){
 function renderUp(){
   const on=S.showUp!==false;$("showUp").checked=on;$("upBody").hidden=!on;
   $("upGoal").innerHTML=[...UGOALS.map(([n])=>n),"Custom"].map(n=>`<button type="button" class="chip" data-ug="${esc(n)}" aria-pressed="${(S.upGoal||"Luck")===n}">${esc(n)}</button>`).join("");renderUcw();
-  $("upSort").innerHTML=(`<button type="button" class="chip" data-uev="1" aria-pressed="${!!S.upEvent}" title="Event and limited-time gear you can't just go and get">Include event gear</button>`);
+  $("upSort").innerHTML=[["list","Top 10"],["path","Upgrade path"]].map(([v,n])=>`<button type="button" class="chip" data-um="${v}" aria-pressed="${(S.upMode||"list")===v}">${n}</button>`).join("")+(`<button type="button" class="chip" data-uev="1" aria-pressed="${!!S.upEvent}" title="Event and limited-time gear you can't just go and get">Include event gear</button>`);
   if(!on){$("upList").innerHTML="";$("upHint").textContent="";return}
   renderUpList()}
-function renderUpList(){
-  const list=upCandidates().slice(0,10);
-  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality.`;
-  if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
-  $("upList").innerHTML=list.map((c,i)=>{
-    const gains=Object.entries(c.d).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3)
+// Upgrade path: take the biggest gain, apply it, then pick again from there. Skipped steps are left out
+// and the path is worked out again without them.
+const upKey=c=>c.kind+"|"+c.name;
+function upPath(n){const real=S,skip=new Set(S.upSkip||[]),steps=[];let cur=clone(real);
+  try{for(let i=0;i<n;i++){S=cur;const c=upCandidates().find(x=>!skip.has(upKey(x)));if(!c)break;c.apply();cur=clone(S);steps.push(Object.assign(c,{after:cur}))}}
+  finally{S=real}
+  return steps}
+const upRow=(c,i,btns)=>{const gains=Object.entries(c.d).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).slice(0,3)
       .map(([s,v])=>`<span class="${v<0?"neg":"gain"}">${esc(s)} <b>${fv2(s,v)}</b></span>`).join("");
     const money=c.money?uMoneyTxt(c.money):c.other||(c.limited?"event":"");
     const grind=c.pans?uPansTxt(c.pans):"";
     const meta=c.kind+(c.replaces?" (instead of "+c.replaces+")":"")+(c.where?" · "+c.where:"")+(c.recipe?" · "+c.recipe:"")+(c.unknown?" · some materials aren't panned":"");
-    return `<div class="upi"><span class="upn"><b>${esc(c.name)}</b><span class="uph" title="${esc(meta)}">${esc(meta)}</span><span class="upg">${gains}</span></span>
-      <span class="upm">${esc(money)}</span><span class="upp">${esc(grind)}</span>
-      <button type="button" class="btn sm" data-uptry="${i}">Try it</button></div>`}).join("");
+    return `<div class="upi${btns.length>1?" pth":""}">${btns.length>1?`<span class="upnum">${i+1}</span>`:""}<span class="upn"><b>${esc(c.name)}</b><span class="uph" title="${esc(meta)}">${esc(meta)}</span><span class="upg">${gains}</span></span>
+      <span class="upm">${esc(money)}</span><span class="upp">${esc(grind)}</span><span class="upb">${btns.join("")}</span></div>`};
+function renderPath(){const steps=upPath(8);const sk=(S.upSkip||[]).length;
+  $("upHint").innerHTML=`Each step is picked after the ones above it are done. Equipment is shown at 6★ and 100% quality.`+(sk?` <button type="button" class="rst" data-upunskip="1">Bring back ${sk} skipped</button>`:"");
+  if(!steps.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';UPLAST=[];return}
+  const tm=steps.reduce((a,c)=>a+(c.money||0),0),tp=steps.reduce((a,c)=>a+(c.pans||0),0);
+  $("upList").innerHTML=steps.map((c,i)=>upRow(c,i,[`<button type="button" class="btn sm" data-upto="${i}" title="Applies steps 1 to ${i+1}">${i?"Do 1–"+(i+1):"Do it"}</button>`,`<button type="button" class="btn sm ghost" data-upskip="${i}" title="Leave this out and work the path out again">Skip</button>`])).join("")
+    +`<div class="uptot"><span>Whole path</span><span class="upm">${tm?esc(uMoneyTxt(tm)):""}</span><span class="upp">${tp?esc(uPansTxt(tp)):""}</span><span></span></div>`;
+  UPLAST=steps}
+function renderUpList(){
+  if(S.upMode==="path")return renderPath();
+  const list=upCandidates().slice(0,10);
+  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality.`;
+  if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
+  $("upList").innerHTML=list.map((c,i)=>upRow(c,i,[`<button type="button" class="btn sm" data-uptry="${i}">Try it</button>`])).join("");
   UPLAST=list}
 const fv2=(s,v)=>(v<0?"−":"+")+(PCT.has(s)?fmt(Math.abs(v),1)+"%":fmt(Math.abs(v),Math.abs(v)<10?1:0));
 let UPLAST=[],UPUNDO=null;
 $("showUp").addEventListener("change",()=>{S.showUp=$("showUp").checked;save();renderUp()});
 document.addEventListener("click",e=>{
   const g=e.target.closest("[data-ug]");if(g){S.upGoal=g.dataset.ug;save();renderUp();return}
+  const um=e.target.closest("[data-um]");if(um){S.upMode=um.dataset.um;save();renderUp();return}
+  const sk=e.target.closest("[data-upskip]");if(sk){const c=UPLAST[+sk.dataset.upskip];if(c){S.upSkip=[...(S.upSkip||[]),upKey(c)];save();renderUpList()}return}
+  if(e.target.closest("[data-upunskip]")){S.upSkip=[];save();renderUpList();return}
+  const ut=e.target.closest("[data-upto]");if(ut){const c=UPLAST[+ut.dataset.upto];if(!c)return;UPUNDO=clone(S);const keep={upMode:S.upMode,upSkip:S.upSkip,upGoal:S.upGoal,upW:S.upW,upEvent:S.upEvent};Object.assign(S,clone(c.after),keep);save();all();toastUp(+ut.dataset.upto?`Did steps 1–${+ut.dataset.upto+1}`:`Did ${c.name}`);return}
   const ev=e.target.closest("[data-uev]");if(ev){S.upEvent=!S.upEvent;save();renderUp();return}
   const t=e.target.closest("[data-uptry]");if(t){const c=UPLAST[+t.dataset.uptry];if(!c)return;
     UPUNDO=clone(S);c.apply();save();all();toastUp(`Tried ${c.name}`);return}
