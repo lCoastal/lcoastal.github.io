@@ -95,4 +95,10 @@ function renderDiff(){const el=$("diff");if(!el)return;const L=S.b.map((b,i)=>({
   const row=(lab,vals)=>{const same=vals.every(v=>v===vals[0]);return `<tr class="${same?"same":""}"><td>${lab}</td>${vals.map((v,j)=>`<td class="${j&&v!==vals[0]?"dif":""}">${esc(v||"—")}</td>`).join("")}</tr>`};
   el.innerHTML=`<h3 class="dh">What's different</h3><p class="hint">Highlighted where a build differs from the first one. Rows that match everywhere are faded.</p><div class="tw"><table class="dt"><tr><th></th>${L.map(x=>`<th style="color:${COLS[x.i%COLS.length]}">${esc(x.b.n)}</th>`).join("")}</tr>${keys.map(k=>row(k,L.map(x=>x.b.snap[k]))).join("")}${MO.map(r=>row("Museum "+r,L.map(x=>(x.b.snap.mus||{})[r]||""))).join("")}</table></div>`}
 window.ptRefresh=()=>{loadBList();render()};
+$("csvB").onclick=async()=>{const R=rows();const out=[];if(R&&R.list.length){out.push(["Mineral",R.m.n],["Zone",S.zone||"best zone for each build"],["Luck cap",S.useCap?"each build's best":"none"],[]);
+    out.push(["Build","Luck","Capacity","Zone","Luck cap","Chance per pan","Pans on average","Pans per hour","Hours on average"]);
+    R.list.forEach(x=>out.push([x.b.n,x.L,x.C,x.z,x.cap==null?"none":x.cap,x.pp,isFinite(x.pans)?Math.round(x.pans*10)/10:"",x.pph||"",x.hours!=null?Math.round(x.hours*100)/100:""]))}
+  else{out.push(["Build","Luck","Capacity"]);S.b.forEach(b=>out.push([b.n,b.luck,b.cap]))}
+  const L=S.b.filter(b=>b.snap);if(L.length>1){out.push([],["What's different"],["",...L.map(b=>b.n)]);["Pan","Shovel","Trinket","Necklace","Charm","Rings"].forEach(k=>out.push([k,...L.map(b=>b.snap[k]||"")]));["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"].forEach(r=>out.push(["Museum "+r,...L.map(b=>(b.snap.mus||{})[r]||"")]))}
+  if(await ptDownloadCSV((R&&R.m?R.m.n+" ":"")+"build comparison",out))ptToast("Download started")};
 renderBuilds();render();loadBList();

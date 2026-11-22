@@ -70,13 +70,15 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
     ${L.goal==="luck"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}
     <table class="bt"><tr><th></th><th>Best build</th><th>Now</th></tr>${rows.join("")}</table>${mus}
     ${cw.ptWhyHTML?cw.ptWhyHTML(R):""}
-    <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button></div>`}
+    <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
 function sheetText(){const L=LAST;let txt=L.cw.ptBuildTextOf(L.R.st);
   if(L.goal==="min"){const n=L.info.per(L.R.tot.Luck,L.R.tot.Capacity);txt=txt.replace(/^(Title:[^\n]*\n)/,`$1Subtitle: Best build for ${L.info.m.n} in ${L.zone}: about ${oneInT(n.p)}${n.cap?`, with a luck cap of ${fmt(n.cap,0)}`:""}\n`)}
   return txt}
 document.addEventListener("click",async e=>{if(!LAST)return;
   if(e.target.closest("#toSheet")){try{window.parent.ptCallTool("builds","ptAddBuildText",sheetText());ptToast("Saved to Build Sheets")}catch(err){ptToast("Couldn't reach Build Sheets")}return}
   if(e.target.closest("#share")){const url=await ptCopyShare(sheetText());ptToast(url?"Share link copied":"Couldn't copy, your browser blocked it");return}
+  if(e.target.closest("#csv")){const L=LAST;const head=L.goal==="min"?(()=>{const n=L.info.per(L.R.tot.Luck,L.R.tot.Capacity);return [["Goal",`${L.info.m.n} in ${L.zone}`],["Odds per pan",oneInT(n.p)],["Luck cap",n.cap||"none"],[]]})():[["Goal",L.goal==="luck"?"Luck only":"Rare finds per pan"],[]];
+    if(await ptDownloadCSV(L.goal==="min"?`Best build for ${L.info.m.n}`:"Best build",L.cw.ptFinderRows(L.R,head)))ptToast("Download started");return}
   if(e.target.closest("#use")){LAST.cw.ptUseBuild(LAST.R.st,LAST.R.museum);ptToast("Loaded into the Stat Calculator");return}});
 // ---- what I own: one list of everything, with tick-all per group ----
 const OWNG=[["Pans",(P.gear.pans||[]).map(x=>x.name)],["Shovels",(P.gear.shovels||[]).map(x=>x.name)],["Trinkets",((P.x2||{}).trinkets||[]).map(t=>t.n)],

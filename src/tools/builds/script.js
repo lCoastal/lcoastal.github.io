@@ -825,6 +825,21 @@ window.ptOpenFeatured=id=>{const f=FEATURED.find(x=>x.id===id);if(!f){viewMode="
 window.ptBuildsList=()=>B.map(b=>({id:b.id,name:plainC(b.name)||"Untitled build",kind:"mine"})).concat(FEATURED.map(f=>({id:"feat:"+f.id,name:f.t,kind:"feat"})));
 window.ptCalcStateAny=id=>{id=String(id||"");if(id.startsWith("feat:")){const f=FEATURED.find(x=>x.id===id.slice(5));return f?calcState(fromText(f.txt,blankBuild()).b):null}const b=B.find(x=>x.id===id);return b?calcState(b):null};
 window.ptCalcState=id=>{const b=B.find(x=>x.id===id)||getB();return calcState(b)};
+// a build as spreadsheet rows: every museum slot, piece of gear and note, plus luck and capacity with your boosts
+async function sheetRows(b0){const b=withAny(b0);const P_=v=>plainC(String(v||""));const R=[["Build",P_(b.name)],["Subtitle",P_(b.subtitle)],["Author",b.author||""],[]];
+  R.push(["Section","Slot","Item","Mutation / modifier","Note"]);
+  ORDER.forEach(r=>(b.museum[r]||[]).forEach((s,i)=>{if(covered(b.museum[r],i))return;const items=s.m.length?(s.pick>1?`pick ${Math.min(s.pick,s.m.length)}: `:"")+s.m.join(s.join===">"?" > ":" or "):"Any";
+    const mods=s.m.length?s.m.map((n,j)=>uAt(s,j)||b.mod||"").filter(Boolean).filter((x,j,a)=>a.indexOf(x)===j).join(" / "):(b.mod||"");R.push(["Museum",`${r} ${i+1}`,items,mods,s.mark||""])}));
+  const eq=(lab,e)=>{if(e&&e.name)R.push(["Equipment",lab,e.name,e.mut||"",e.note||""])};eq("Charm",b.charm);eq("Necklace",b.neck);
+  (b.rings||[]).forEach(x=>{if(x.name)R.push(["Equipment","Ring",(x.count?String(x.count).replace("×","")+"× ":"")+x.name,x.mut||"",x.note||""])});
+  if(b.runes)R.push(["Runes","",b.runes,"",""]);
+  if(b.pan&&b.pan.name)R.push(["Pan","",b.pan.name,b.pan.enchant||"",[b.pan.trinket?"Trinket: "+b.pan.trinket:"",b.pan.note||""].filter(Boolean).join(" · ")]);
+  if(b.shovel&&b.shovel.name)R.push(["Shovel","",b.shovel.name,b.shovel.enchant||"",b.shovel.note||""]);
+  (b.extras||[]).forEach(x=>{if(x.name)R.push(["Extra",x.label||"",x.name,"",x.note||""])});
+  String(b.notes||"").split("\n").map(P_).filter(x=>x.trim()).forEach(n=>R.push(["Note","",n.replace(/^-\s*/,""),"",""]));
+  try{const cw=await window.parent.ptCalcWin();const t=cw.ptTotalsWithGear(calcState(b0));R.push([],["Stats, with your Stat Calculator boosts"]);["Luck","Capacity","Shake Strength","Shake Speed","Dig Strength","Dig Speed","Size Boost","Modifier Boost","Sell Boost"].forEach(k=>R.push([k,Math.round(t[k]*100)/100]))}catch(e){}
+  return R}
+document.getElementById("bCsv").onclick=async()=>{const b=SHARED?SHARED.b:getB();if(!b)return;document.getElementById("sMenu").open=false;if(await ptDownloadCSV((plainC(b.name)||"Build")+" - Prospecting Build",await sheetRows(b)))toast("Download started")};
 document.getElementById("bCalc").onclick=()=>{try{window.parent.ptSendCalc(calcState(getB()))}catch(e){toast("Couldn't reach the Stat Calculator")}};
 function renderAll(){renderSelect();renderEditor();renderSheet();renderMTot();histBtns()}
 renderAll();persist();

@@ -967,6 +967,15 @@ async function bfEngine(c,scoreTot,onProg){
   if(b.meteor||b.weather)as.push("Event: "+[b.meteor&&"Meteor Shower",b.weather&&"weather"].filter(Boolean).join(" + "));
   as.push("Luck and capacity worked out with the formulas in How It Works, which are estimates fitted on testing");
   return {st:best.st,sc:best.sc,before,beforeSc,base,tot:tot(best.st),museum:!!c.museum,why,assume:as}}
+// finder results as spreadsheet rows (shared with the Best Build tool)
+window.ptFinderRows=(R,extra)=>{const it=v=>v&&v.n?v.n+(v.m&&v.m!=="None"?` (${v.m})`:""):"";const st=R.st,b=R.base||S;const out=[...(extra||[])];
+  out.push(["Luck",Math.round(R.tot.Luck),"now",Math.round(R.before.Luck)],["Capacity",Math.round(R.tot.Capacity),"now",Math.round(R.before.Capacity)],[],["Part","Best build","Now"]);
+  out.push(["Pan",[st.pan,st.panEn].filter(Boolean).join(" · "),[b.pan,b.panEn].filter(Boolean).join(" · ")],["Shovel",[st.shovel,st.shEn].filter(Boolean).join(" · "),[b.shovel,b.shEn].filter(Boolean).join(" · ")],["Trinket",st.trinket||"",b.trinket||""]);
+  SLOTDEF.forEach(([k,l])=>out.push([l,it(st.slots[k]),it(b.slots&&b.slots[k])]));
+  if(R.museum){out.push([],["Museum","Mineral","Modifier"]);MORDER.forEach(r=>((st.museumBoard||{})[r]||[]).forEach((x,i)=>{if(x&&x.m)out.push([`${r} ${i+1}`,x.m,x.u||""])}))}
+  if(R.why&&R.why.length){out.push([],["Why","Picked","Best alternative","% worse if swapped"]);R.why.forEach(w=>out.push([w.part,w.pick,w.alt+(w.note?` (${w.note})`:""),Math.round(-w.pct*10)/10]))}
+  if(R.assume){out.push([],["Assumes"]);R.assume.forEach(a=>out.push([a]))}
+  return out};
 // "why" and "assumptions" as HTML, shared by the finder here and the Best Build tool
 window.ptWhyHTML=R=>{if(!R||!R.why)return "";const f=v=>v>-0.05?"about the same":fmt(-v,-v<10?1:0)+"% worse";
   return `<details class="bfwhy" open><summary><b>Why this build</b></summary><table class="bfwt"><tr><th></th><th>Picked</th><th>Best alternative</th><th>If you swapped it</th></tr>${R.why.map(w=>`<tr><td>${esc(w.part)}</td><td>${esc(w.pick)}</td><td>${esc(w.alt)}${w.note?` <span class="hint">(${esc(w.note)})</span>`:""}</td><td class="${w.pct>-1?"near":""}">${f(w.pct)}</td></tr>`).join("")}</table>
@@ -999,11 +1008,11 @@ function showBf(){const R=BF_LAST;if(!R){$("bfOut").innerHTML="";return}const st
   $("bfOut").innerHTML=`<div class="bfsum"><div><span class="lab">Luck</span><b>${fmt(t.Luck,0)}</b> <span class="hint">was ${fmt(R.before.Luck,0)}</span></div><div><span class="lab">Capacity</span><b>${fmt(t.Capacity,0)}</b> <span class="hint">was ${fmt(R.before.Capacity,0)}</span></div><div><span class="lab">${R.goal==="luck"?"Luck":"Rare finds per pan"}</span><b class="${g>0.0005?"pos":""}">${g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found"}</b></div></div>
     ${R.goal==="luck"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck (0.565 × luck ÷ capacity).</p>`}
     <table class="bft"><tr><th></th><th>Best build</th><th>Now</th></tr>${rows.join("")}</table>${mus}
-    ${window.ptWhyHTML(R)}<div class="bfa"><button type="button" class="btn" id="bfUse">Use this build</button><button type="button" class="btn" id="bfCopy">Copy for Build Sheets</button></div>`}
+    ${window.ptWhyHTML(R)}<div class="bfa"><button type="button" class="btn" id="bfUse">Use this build</button><button type="button" class="btn" id="bfCopy">Copy for Build Sheets</button><button type="button" class="btn" id="bfCsv">Download as spreadsheet</button></div>`}
 $("showBf").addEventListener("change",()=>{S.showBf=$("showBf").checked;save();renderBf()});
 $("bfRun").addEventListener("click",runBf);
 document.head.insertAdjacentHTML("beforeend",`<style>${window.ptWhyCSS}</style>`);
-document.addEventListener("click",e=>{const o=e.target.closest("[data-opentool]");if(o){try{window.parent.ptOpenTool(o.dataset.opentool)}catch(err){}}});
+document.addEventListener("click",async e=>{if(e.target.closest("#bfCsv")&&BF_LAST){if(await ptDownloadCSV("Best build",window.ptFinderRows(Object.assign({base:S},BF_LAST),[["Goal",BF_LAST.goal==="luck"?"Luck only":"Rare finds per pan"],[]])))ptToast("Download started");return}const o=e.target.closest("[data-opentool]");if(o){try{window.parent.ptOpenTool(o.dataset.opentool)}catch(err){}}});
 $("bfMore").addEventListener("click",()=>{try{window.parent.ptOpenTool("bestbuild")}catch(e){}});
 ["tools","trinket","museum","owned","perfect"].forEach(k=>$("bf_"+k).addEventListener("change",()=>{bfCfg()[k]=$("bf_"+k).checked;save()}));
 document.addEventListener("click",e=>{const g=e.target.closest("[data-bfg]");if(g){bfCfg().goal=g.dataset.bfg;save();renderBf();return}
