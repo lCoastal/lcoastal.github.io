@@ -84,8 +84,12 @@ function covered(sl,i){for(let j=0;j<i;j++){if(covered(sl,j))continue;if(j+spanO
 function gainOf(name){const d=BY[name.toLowerCase()];return d?d[3]:[]}
 // a mineral can have its own modifier: s.u[name] (written "Diamond (Perfect)"); otherwise the build's modifier
 const modOf=(s,n,main)=>(s&&s.u&&s.u[n])||main;
+// the same mineral can be listed twice with different modifiers ("Key of Life (Entombed) or Key of Life (Perfect)"):
+// then s.uo holds each option's own modifier by position ("" = the build's), and wins over s.u
+const uAt=(s,i)=>s&&s.uo&&i<s.uo.length?(s.uo[i]||""):((s&&s.u&&s.u[s.m[i]])||"");
+const modAt=(s,i,main)=>uAt(s,i)||main;
 function museumTotals(b0,ov){const b=withAny(b0);const t=Object.fromEntries(STATS.map(s=>[s,0]));
-  ORDER.forEach(r=>{const sl=b.museum[r];sl.forEach((s,i)=>{if(covered(sl,i))return;const k=s.m.length>1&&s.pick>1?Math.min(s.pick,s.m.length):1;let names=s.m.slice(0,k);if(ov&&ov.r===r&&ov.i===i)names=[ov.name,...names.slice(1)];names.forEach(n=>{if(!n)return;gainOf(n).forEach(([st,v])=>t[st]+=v);const md=MODSTATS[modOf(s,n,b.mod)];if(md)md[0].forEach(st=>t[st]+=MULT[r]*md[1])})})});return t}
+  ORDER.forEach(r=>{const sl=b.museum[r];sl.forEach((s,i)=>{if(covered(sl,i))return;const k=s.m.length>1&&s.pick>1?Math.min(s.pick,s.m.length):1;let names=s.m.slice(0,k);if(ov&&ov.r===r&&ov.i===i)names=[ov.name,...names.slice(1)];names.forEach((n,j)=>{if(!n)return;gainOf(n).forEach(([st,v])=>t[st]+=v);const md=MODSTATS[ov&&ov.r===r&&ov.i===i&&j===0?modOf(s,n,b.mod):modAt(s,j,b.mod)];if(md)md[0].forEach(st=>t[st]+=MULT[r]*md[1])})})});return t}
 const gainsHTML=g=>g.map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fx(v)}</em></span>`).join("");
 function slotHTML(s){
   if(!s.m.length)return"";
@@ -121,9 +125,9 @@ function slotCard(s,span,ed,r,mod){const da=ed?` data-ed="${ed}"`:"";
   if(!s.m.length)return `<div class="sl empty"${da}${span>1?` style="grid-column:span ${span}"`:""}>Any mineral</div>`;
   const multi=s.m.length>1;const pick=multi&&s.pick>1?Math.min(s.pick,s.m.length):1;
   const how=!multi?"":pick>1?`Pick ${pick} of these ${s.m.length}`:s.join===">"?"Best first, then the next":"Any one of these";
-  const ovr=n=>s.u&&s.u[n]?`<span class="ovm" title="This one uses a different modifier" style="color:${MC(s.u[n])};border-color:${MC(s.u[n])}">${s.u[n]==="None"?"No modifier":esc(s.u[n])}</span>`:"";
-  const ops=s.m.map((n,i)=>{if(n==="Any"){const am=s.u&&s.u.Any;return `<div class="op anyop"><span class="ph anyi" style="color:${RC(r)};border-color:${RC(r)}">ANY</span><span class="nm">Any ${esc(String(r||"").toLowerCase())} mineral${ovr("Any")}</span><span class="gs"><span>only the modifier counts</span></span></div>`}const d=BY[n.toLowerCase()];const nm=d?d[0]:n;
-    return `<div class="op">${imgTag(d?picOf("Mineral",nm):"")}<span class="nm"${d?` data-mineral="${esc(nm)}"`:""}>${multi&&s.join===">"&&pick===1?`<span class="rk">${i+1}</span>`:""}${esc(nm)}${ovr(n)}</span><span class="gs">${gainSpans(d)}</span>${d?`<span class="kgl">Max boost at ${d[2]} kg</span>`:""}</div>`}).join("");
+  const ovr=i=>{const o=uAt(s,i);return o?`<span class="ovm" title="This one uses a different modifier" style="color:${MC(o)};border-color:${MC(o)}">${o==="None"?"No modifier":esc(o)}</span>`:""};
+  const ops=s.m.map((n,i)=>{if(n==="Any"){const am=s.u&&s.u.Any;return `<div class="op anyop"><span class="ph anyi" style="color:${RC(r)};border-color:${RC(r)}">ANY</span><span class="nm">Any ${esc(String(r||"").toLowerCase())} mineral${ovr(i)}</span><span class="gs"><span>only the modifier counts</span></span></div>`}const d=BY[n.toLowerCase()];const nm=d?d[0]:n;
+    return `<div class="op">${imgTag(d?picOf("Mineral",nm):"")}<span class="nm"${d?` data-mineral="${esc(nm)}"`:""}>${multi&&s.join===">"&&pick===1?`<span class="rk">${i+1}</span>`:""}${esc(nm)}${ovr(i)}</span><span class="gs">${gainSpans(d)}</span>${d?`<span class="kgl">Max boost at ${d[2]} kg</span>`:""}</div>`}).join("");
   return `<div class="sl"${da}${span>1?` style="grid-column:span ${span}"`:""}>${how?`<span class="how">${how}</span>`:""}${span>1?`<div class="opsg" style="--cols:${Math.min(span,s.m.length)}">${ops}</div>`:ops}${s.mark?`<span class="mark">${esc(s.mark)}</span>`:""}</div>`}
 function modTag(m){if(!m||m==="None"||m==="Any")return `<span class="modtag" style="color:#c7d0d9">Any modifier</span>`;const st=(MODSTATS[m]||[[]])[0];return `<span class="modtag" style="color:${MC(m)}">${esc(m)}</span>${st.length?`<span class="k">boosts ${st.join(", ")}</span>`:""}`}
 function gearCard(label,kind,e,extra,rs,count){
@@ -239,8 +243,8 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   if(b.author)h+=`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`;
   return colourStats(h+`</div>`)}
 function slotText(s,r,mod){if(!s.m.length)return '<span class="dim">any mineral</span>';
-  const one=n=>{const om=s.u&&s.u[n];if(n==="Any")return `<b>any ${esc(String(r||"").toLowerCase())} mineral</b>${om?` <span style="color:${MC(om)}">${om==="None"?"with no modifier":"with "+esc(om)}</span>`:""} <span class="gv">(only the modifier counts)</span>`;const d=BY[n.toLowerCase()];const nm=d?d[0]:n;const u=d?picOf("Mineral",nm):"";const g=d?d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", "):"";return `${u?`<img src="${u}" alt="">`:""}<span${d?` data-mineral="${esc(nm)}"`:""}><b>${esc(nm)}</b></span>${om?` <span style="color:${MC(om)}">${om==="None"?"with no modifier":"with "+esc(om)}</span>`:""}${d?` <span class="gv">(${g}, needs ${d[2]} kg)</span>`:""}`};
-  let t;if(s.m.length===1)t=one(s.m[0]);
+  const one=(n,i)=>{const om=uAt(s,i);if(n==="Any")return `<b>any ${esc(String(r||"").toLowerCase())} mineral</b>${om?` <span style="color:${MC(om)}">${om==="None"?"with no modifier":"with "+esc(om)}</span>`:""} <span class="gv">(only the modifier counts)</span>`;const d=BY[n.toLowerCase()];const nm=d?d[0]:n;const u=d?picOf("Mineral",nm):"";const g=d?d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", "):"";return `${u?`<img src="${u}" alt="">`:""}<span${d?` data-mineral="${esc(nm)}"`:""}><b>${esc(nm)}</b></span>${om?` <span style="color:${MC(om)}">${om==="None"?"with no modifier":"with "+esc(om)}</span>`:""}${d?` <span class="gv">(${g}, needs ${d[2]} kg)</span>`:""}`};
+  let t;if(s.m.length===1)t=one(s.m[0],0);
   else if(s.pick>1)t=`pick ${Math.min(s.pick,s.m.length)}: ${s.m.map(one).join(", ")}`;
   else if(s.join===">")t=s.m.map(one).join(" → if you don't have it, ");
   else t=s.m.map(one).join(" <span class=\"dim\">or</span> ");
@@ -285,7 +289,7 @@ function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("
 // Equipment: Name (Mutation) // note. Rings start with "- " and an optional count like "5×".
 const TXT_SEC=["Museum","Equipment","Pan & shovel"];
 const eqTxt=e=>`${e.name||""}${e.mut?` (${e.mut})`:""}${e.note?` // ${e.note}`:""}`.trim();
-function slotTxt(s){if(!s.m.length)return "-";const M=s.m.map(n=>n+(s.u&&s.u[n]?` (${s.u[n]})`:""));let t=M.length===1?M[0]:s.pick>1?`pick ${Math.min(s.pick,M.length)}: ${M.join(", ")}`:M.join(s.join===">"?" > ":" or ");return t+(s.mark?` [${s.mark}]`:"")}
+function slotTxt(s){if(!s.m.length)return "-";const M=s.m.map((n,i)=>{const o=uAt(s,i);return n+(o?` (${o})`:"")});let t=M.length===1?M[0]:s.pick>1?`pick ${Math.min(s.pick,M.length)}: ${M.join(", ")}`:M.join(s.join===">"?" > ":" or ");return t+(s.mark?` [${s.mark}]`:"")}
 function toText(b){const L=[];const AN=k=>anL(b,k).forEach(x=>L.push("-- "+x));const has=k=>anL(b,k).length>0;
   L.push("Title: "+(b.name||""));if(b.subtitle)L.push("Subtitle: "+b.subtitle);if(b.warning)L.push("Warning: "+b.warning);if(b.author)L.push("Author: "+b.author);
   const notes=String(b.notes||"").split("\n").map(x=>x.trim()).filter(Boolean);if(notes.length){L.push("Notes:");notes.forEach(n=>L.push("- "+n))}
@@ -310,10 +314,12 @@ function parseEq(t){const e={name:"",mut:"",note:""};let s=String(t);const ni=s.
 function parseSlot(t){const s={m:[],pick:1,join:"|",mark:"",span:1};t=String(t).trim();const mk=t.match(/\[([^\]]*)\]\s*$/);if(mk){s.mark=mk[1].trim();t=t.slice(0,mk.index).trim()}
   if(!t||t==="-")return s;const pk=t.match(/^pick\s*(\d+)\s*:\s*(.*)$/i);
   // "Diamond (Perfect)": that mineral's own modifier
-  const one=v=>{v=String(v).trim();const m=v.match(/\(([^)]*)\)\s*$/);const k=m?ciKey(MODS,m[1]):null;const n=minN(k?v.slice(0,m.index):v);if(k&&n){(s.u=s.u||{})[n]=k}return n};
+  const uo=[];const one=v=>{v=String(v).trim();const m=v.match(/\(([^)]*)\)\s*$/);const k=m?ciKey(MODS,m[1]):null;const n=minN(k?v.slice(0,m.index):v);if(n){uo.push(k||"");if(k&&!(s.u&&s.u[n]))(s.u=s.u||{})[n]=k}return n};
   if(pk){s.m=pk[2].split(",").map(one).filter(Boolean);s.pick=Math.max(1,Math.min(+pk[1],s.m.length||1))}
   else if(t.includes(">")){s.m=t.split(">").map(one).filter(Boolean);s.join=">"}
   else s.m=t.split(/\s+or\s+/i).map(one).filter(Boolean);
+  // a mineral listed more than once keeps each modifier by position
+  if(new Set(s.m).size<s.m.length&&uo.some(Boolean))s.uo=uo.slice(0,s.m.length);
   s.multi=s.m.length>1;return s}
 function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pic;b.rings=[];b.anotes={};const bad=[];let ctx=null,area=null,lastRing=null;const notes=[];const R={};
   String(txt).split("\n").forEach((raw,ln)=>{const line=raw.trim();if(!line)return;let m;
@@ -453,7 +459,7 @@ function renderEditor(){
       const multi=!!s.multi||s.m.length>1;const hw=s.pick>1?"pick"+s.pick:s.join===">"?"best":"any";
       h+=`<div class="se" data-part="slot-${r}-${i}"${sp>1?` style="grid-column:span ${sp}"`:""}><div class="seh"><span>Slot ${i+1}${sp>1?`–${i+sp}`:""}</span><label class="mtg" title="Let this slot list more than one mineral"><input type="checkbox" data-act="multi" data-r="${r}" data-i="${i}"${multi?" checked":""}> Multiple</label></div>
       ${multi&&s.m.length>1?`<label class="mhow"><span>How to choose</span><select class="inp" data-act="how" data-r="${r}" data-i="${i}"><option value="any"${hw==="any"?" selected":""}>Any one of these</option><option value="best"${hw==="best"?" selected":""}>Best first, then the next</option>${Array.from({length:Math.min(s.m.length,SLOTS[r]-i)-1},(_,k)=>k+2).map(n=>`<option value="pick${n}"${hw==="pick"+n?" selected":""}>Pick ${n} of these (takes ${n} slots)</option>`).join("")}</select></label>`:""}
-      ${s.m.length?`<div class="mlist">${s.m.map((n,k)=>{const nm=mname(n);const u=BY[n.toLowerCase()]?picOf("Mineral",nm):"";return `<div class="mrow${k===0?" counted":""}" data-mineral="${esc(nm)}" title="${k===0?"Counted in the museum total":"Alternative, not counted in the total"}">${u?`<img src="${u}" alt="">`:n==="Any"?`<span class="np anyi" style="color:${RC(r)};border-color:${RC(r)}">ANY</span>`:`<span class="np"></span>`}<span class="mt"><b>${esc(nm)}</b><span class="cg">${gainsHTML(gainOf(n))}</span></span><select class="inp mu" data-act="mu" data-r="${r}" data-i="${i}" data-n="${esc(n)}" aria-label="Modifier for ${esc(nm)}" title="Its modifier: the build's one, or a different one for just this mineral"><option value="">${esc(b.mod&&b.mod!=="Any"?b.mod:"Any")} (build's)</option>${Object.keys(MODS).filter(x=>x!=="Any"&&x!==b.mod).map(x=>`<option value="${esc(x)}"${s.u&&s.u[n]===x?" selected":""}>${esc(x==="None"?"No modifier":x)}</option>`).join("")}</select><button type="button" class="rmx" aria-label="Remove ${esc(n)}" data-act="rm" data-r="${r}" data-i="${i}" data-k="${k}">×</button></div>`}).join("")}</div>`:""}
+      ${s.m.length?`<div class="mlist">${s.m.map((n,k)=>{const nm=mname(n);const u=BY[n.toLowerCase()]?picOf("Mineral",nm):"";return `<div class="mrow${k===0?" counted":""}" data-mineral="${esc(nm)}" title="${k===0?"Counted in the museum total":"Alternative, not counted in the total"}">${u?`<img src="${u}" alt="">`:n==="Any"?`<span class="np anyi" style="color:${RC(r)};border-color:${RC(r)}">ANY</span>`:`<span class="np"></span>`}<span class="mt"><b>${esc(nm)}</b><span class="cg">${gainsHTML(gainOf(n))}</span></span><select class="inp mu" data-act="mu" data-r="${r}" data-i="${i}" data-k="${k}" data-n="${esc(n)}" aria-label="Modifier for ${esc(nm)}" title="Its modifier: the build's one, or a different one for just this mineral"><option value="">${esc(b.mod&&b.mod!=="Any"?b.mod:"Any")} (build's)</option>${Object.keys(MODS).filter(x=>x!=="Any"&&x!==b.mod).map(x=>`<option value="${esc(x)}"${uAt(s,k)===x?" selected":""}>${esc(x==="None"?"No modifier":x)}</option>`).join("")}</select><button type="button" class="rmx" aria-label="Remove ${esc(n)}" data-act="rm" data-r="${r}" data-i="${i}" data-k="${k}">×</button></div>`}).join("")}</div>`:""}
       <div class="sugg"><input class="inp addm" placeholder="${multi?"Search · click to tick or untick":s.m.length?"Search to change it":"Search "+r.toLowerCase()+" minerals"}" data-act="add" data-r="${r}" data-i="${i}" id="add-${r}-${i}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="sb-${r}-${i}"><div class="sbox" id="sb-${r}-${i}" role="listbox" hidden></div></div>
       </div>`;
     });
@@ -533,9 +539,9 @@ ed.addEventListener("change",e=>{const t=e.target,b=getB();
   else if(t.dataset.act==="mark"){b.museum[t.dataset.r][+t.dataset.i].mark=t.value;touch()}
   else if(t.dataset.act==="span"){b.museum[t.dataset.r][+t.dataset.i].span=+t.value||1;touch();renderEditor()}
   else if(t.id==="f-emptyAny"){b.emptyAny=t.checked;touch()}
-  else if(t.dataset.act==="mu"){const s2=b.museum[t.dataset.r][+t.dataset.i];s2.u=Object.assign({},s2.u);if(t.value)s2.u[t.dataset.n]=t.value;else delete s2.u[t.dataset.n];touch()}
+  else if(t.dataset.act==="mu"){const s2=b.museum[t.dataset.r][+t.dataset.i];if(s2.uo){s2.uo=s2.uo.slice();s2.uo[+t.dataset.k]=t.value||""}else{s2.u=Object.assign({},s2.u);if(t.value)s2.u[t.dataset.n]=t.value;else delete s2.u[t.dataset.n]}touch()}
   else if(t.id==="f-mod"){b.modEq=eqMods(b);touch();renderEditor()}
-  else if(t.dataset.act==="multi"){const s2=b.museum[t.dataset.r][+t.dataset.i];s2.multi=t.checked;if(!t.checked&&s2.m.length>1){s2.m=[s2.m[0]];s2.pick=1;s2.join="|";s2.span=1}touch();renderEditor();const n=document.getElementById(`add-${t.dataset.r}-${t.dataset.i}`);if(n){quiet=true;n.focus();quiet=false;openSugg(n)}}
+  else if(t.dataset.act==="multi"){const s2=b.museum[t.dataset.r][+t.dataset.i];s2.multi=t.checked;if(!t.checked&&s2.m.length>1){if(s2.uo){const o=s2.uo[0];delete s2.uo;if(o){s2.u=Object.assign({},s2.u,{[s2.m[0]]:o})}}s2.m=[s2.m[0]];s2.pick=1;s2.join="|";s2.span=1}touch();renderEditor();const n=document.getElementById(`add-${t.dataset.r}-${t.dataset.i}`);if(n){quiet=true;n.focus();quiet=false;openSugg(n)}}
   else if(t.dataset.act==="how"){const r2=t.dataset.r,i2=+t.dataset.i,s2=b.museum[r2][i2];const v=t.value;s2.pick=/^pick/.test(v)?+v.slice(4):1;s2.join=v==="best"?">":"|";s2.span=Math.max(1,Math.min(s2.pick,SLOTS[r2]-i2));touch();renderEditor()}
   else if(t.id==="f-split6"){b.split6=t.checked;if(!Array.isArray(b.rings6))b.rings6=[];if(b.split6&&!b.rings6.some(x=>x.name))b.rings6=b.rings.map(x=>Object.assign({},x,{count:(String(x.count).split("/")[1]||x.count||"").trim()}));if(b.split6)b.rings=b.rings.map(x=>Object.assign({},x,{count:String(x.count).split("/")[0].trim()}));
     else b.rings=b.rings.map(x=>{const m=b.rings6.find(y=>y.name&&y.name===x.name);return m&&m.count&&m.count!==x.count&&!String(x.count).includes("/")?Object.assign({},x,{count:x.count+"/"+m.count}):x});
@@ -588,8 +594,8 @@ function addMineral(t,pickName){const v=(pickName||t.value).trim();if(!v)return;
   const other=name==="Any"?-1:b.museum[t.dataset.r].findIndex((x,k)=>k!==+t.dataset.i&&x.m.some(y=>y.toLowerCase()===name.toLowerCase()));
   if(other>=0){toast(`${name} is already in ${t.dataset.r} slot ${other+1}. Each mineral can only go in one slot.`);return}
   const at=s.m.findIndex(x=>x.toLowerCase()===name.toLowerCase());
-  if(s.multi){if(at>=0)s.m.splice(at,1);else s.m.push(name);s.pick=Math.min(s.pick||1,Math.max(1,s.m.length));if((s.span||1)>1)s.span=Math.max(1,s.pick)}
-  else{if(at>=0&&s.m.length===1)return;s.m=[name];s.pick=1}
+  if(s.multi){if(at>=0){s.m.splice(at,1);if(s.uo){s.uo=s.uo.slice();s.uo.splice(at,1)}}else{s.m.push(name);if(s.uo)s.uo=s.uo.concat([""])}s.pick=Math.min(s.pick||1,Math.max(1,s.m.length));if((s.span||1)>1)s.span=Math.max(1,s.pick)}
+  else{if(at>=0&&s.m.length===1)return;s.m=[name];s.pick=1;delete s.uo}
   // keep the list open, so more can be ticked (or the choice changed)
   const keep=t.id;touch();renderEditor();const n=document.getElementById(keep);if(n){quiet=true;n.focus();quiet=false;openSugg(n)}}
 // backup minerals: a small picker with pictures, notes per mineral
@@ -604,7 +610,7 @@ ed.addEventListener("focusout",e=>{if(e.target.id==="xIn")setTimeout(()=>{const 
 ed.addEventListener("keydown",e=>{if(e.target.id==="xIn"&&e.key==="Enter"){e.preventDefault();const l=xList(e.target.value);if(l[0])xAdd(l[0][0])}if(e.target.id==="xIn"&&e.key==="Escape"){const bx=document.getElementById("xBox");if(bx)bx.hidden=true}});
 ed.addEventListener("click",e=>{const o=e.target.closest(".xopt");if(o){e.stopPropagation();xAdd(o.dataset.xn);return}const r=e.target.closest("[data-act=xrm]");if(r){e.stopPropagation();const b=getB();b.extra.splice(+r.dataset.k,1);touch();renderAll()}},true);
 ed.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;const b=getB(),a=t.dataset.act;
-  if(a==="rm"){const s=b.museum[t.dataset.r][+t.dataset.i];s.m.splice(+t.dataset.k,1);s.pick=Math.min(s.pick,Math.max(1,s.m.length));if((s.span||1)>1)s.span=Math.max(1,s.pick)}
+  if(a==="rm"){const s=b.museum[t.dataset.r][+t.dataset.i];if(s.uo){s.uo=s.uo.slice();s.uo.splice(+t.dataset.k,1)}s.m.splice(+t.dataset.k,1);s.pick=Math.min(s.pick,Math.max(1,s.m.length));if((s.span||1)>1)s.span=Math.max(1,s.pick)}
   else if(a==="addring")b.rings.push({count:"",mut:"",name:"",note:""});
   else if(a==="rmring")b.rings.splice(+t.dataset.i,1);
   else if(a==="addring6"){if(!Array.isArray(b.rings6))b.rings6=[];b.rings6.push({count:"",mut:"",name:"",note:""})}
@@ -804,7 +810,7 @@ function calcState(b0){const b=withAny(b0);
   let total=0;(b.rings||[]).forEach(x=>{if(!x.name)return;const n=Math.max(1,parseInt(x.count)||1);total+=n;for(let i=0;i<n&&k<8;i++)slots["r"+(k++)]=eq(x)});
   const board={};const u=b.mod&&b.mod!=="Any"?b.mod:"None";
   ORDER.forEach(r=>{const sl=b.museum[r]||[];board[r]=Array.from({length:SLOTS[r]},()=>({m:null,u:"None"}));
-    sl.forEach((s,i)=>{if(covered(sl,i))return;const k2=s.m.length>1&&s.pick>1?Math.min(s.pick,s.m.length):1;s.m.slice(0,k2).forEach((n,j)=>{if(n&&board[r][i+j]){const o=s.u&&s.u[n];board[r][i+j]={m:n,u:o?(o==="Any"?"None":o):u}}})})});
+    sl.forEach((s,i)=>{if(covered(sl,i))return;const k2=s.m.length>1&&s.pick>1?Math.min(s.pick,s.m.length):1;s.m.slice(0,k2).forEach((n,j)=>{if(n&&board[r][i+j]){const o=uAt(s,j);board[r][i+j]={m:n,u:o?(o==="Any"?"None":o):u}}})})});
   return {extraRings:Math.max(0,total-8),from:plainC(b.name),pan:(b.pan.name||"").trim(),panEn:(b.pan.enchant||"").trim(),trinket:(b.pan.trinket||"").trim(),shovel:(b.shovel.name||"").trim(),shEn:(b.shovel.enchant||"").trim(),slots,museumBoard:board}}
 window.ptCalcState=id=>{const b=B.find(x=>x.id===id)||getB();return calcState(b)};
 document.getElementById("bCalc").onclick=()=>{try{window.parent.ptSendCalc(calcState(getB()))}catch(e){toast("Couldn't reach the Stat Calculator")}};
