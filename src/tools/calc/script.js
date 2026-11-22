@@ -933,12 +933,51 @@ async function bfEngine(c,scoreTot,onProg){
     }
     if(!best||cur>best.sc+1e-12)best={sc:cur,st};
   }
-  return {st:best.st,sc:best.sc,before,beforeSc,base,tot:tot(best.st),museum:!!c.museum}}
+  // why this build: for each part, the best thing you could put there instead and how much worse it is
+  const fin=best.st,sc=best.sc,why=[];const pct=v=>(Math.exp(v-sc)-1)*100;const lab=(p,e)=>p+(e?" · "+e:"");
+  if(c.tools){
+    {let bb=null;for(const p of pans){if(p.name===fin.pan)continue;for(const e of ["",...EN.pan.map(x=>x.n)]){const v=score(Object.assign({},fin,{pan:p.name,panEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Pan",pick:lab(fin.pan,fin.panEn),alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const e of ["",...EN.pan.map(x=>x.n)]){if(e===fin.panEn)continue;const v=score(Object.assign({},fin,{panEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Pan enchant",pick:fin.panEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const p of shovels){if(p.name===fin.shovel)continue;for(const e of shEns){const v=score(Object.assign({},fin,{shovel:p.name,shEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Shovel",pick:lab(fin.shovel,fin.shEn),alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const e of shEns){if(e===fin.shEn)continue;const v=score(Object.assign({},fin,{shEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Shovel enchant",pick:fin.shEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}}
+  if(c.trinket){let bb=null;for(const n of ["",...TRN]){if(n===fin.trinket)continue;const v=score(Object.assign({},fin,{trinket:n}));if(!bb||v>bb.v)bb={v,t:n||"no trinket"}}if(bb)why.push({part:"Trinket",pick:fin.trinket||"no trinket",alt:bb.t,pct:pct(bb.v)})}
+  const seen=new Set();
+  for(const [k,l,slot] of SLOTDEF){const v0=fin.slots[k];if(!v0||!v0.n)continue;const key=slot+"|"+v0.n+"|"+v0.m;if(seen.has(key))continue;seen.add(key);
+    const cnt=SLOTDEF.filter(([kk,,sl])=>sl===slot&&fin.slots[kk]&&fin.slots[kk].n===v0.n&&fin.slots[kk].m===v0.m).length;
+    const others=Object.entries(fin.slots).filter(([kk])=>kk!==k).map(([,v])=>v&&v.n);let bi=null,bm=null;
+    for(const n of POOL[slot]){if(n===v0.n||(BF_UNIQ.has(n)&&others.includes(n)))continue;for(const m of muts){fin.slots[k]={n,l:"6",m,q:100};const v=score(fin);if(!bi||v>bi.v)bi={v,t:n+(m!=="None"?` (${m})`:"")}}}
+    for(const m of muts){if(m===v0.m)continue;fin.slots[k]=Object.assign({},v0,{m});const v=score(fin);if(!bm||v>bm.v)bm={v,t:m}}
+    fin.slots[k]=v0;const nm=(slot==="Ring"&&cnt>1?cnt+"× ":"")+v0.n+(v0.m&&v0.m!=="None"?` (${v0.m})`:"");
+    if(bi)why.push({part:slot==="Ring"?"Ring":l,pick:nm,alt:bi.t,pct:pct(bi.v),note:cnt>1?"for one of them":""});
+    if(bm)why.push({part:"Mutation",pick:`${v0.m||"None"} on ${v0.n}`,alt:bm.t,pct:pct(bm.v),note:cnt>1?"on one of them":""})}
+  // what every build here was compared under
+  const as=[];const b=fin.b||{},n=fin.n||{};
+  as.push("Every new piece at 6★ with a 100% roll; pieces you already had keep theirs");
+  if(b.night)as.push("It's night, so Night Luck counts (Dullahan's Curse)");else as.push("It's day: Night Luck doesn't count");
+  if(sunOn(fin))as.push("Sun Blessing fully charged: it fills in sunlight or from Luminant Totems");
+  if(rhyOn(fin)&&STREAK[fin.shEn])as.push(`${fin.shEn} at a full perfect-dig streak`);
+  if(noPerf)as.push("No perfect digs: autopan, which only gets your full luck with Mastered");
+  if(fin.trinket==="Nomad's Compass")as.push("Nomad's Compass fully stacked (×1.9 luck)");
+  if(fin.trinket==="Senet Die")as.push("Senet Die at its average roll (×1.33 luck)");
+  if(TRROLL[fin.trinket])as.push(`${fin.trinket} at its ${fin.trkMax?"max":"average"} roll`);
+  if(+n.mastery>0)as.push(`Location mastery +${n.mastery}× luck`);
+  const rn=(fin.runes||[]).length?fin.runes:[b.purity&&"Purity",b.vet&&"Veteran",b.sun&&"Abyssal or Sunblessed",b.solo&&"Solitude"].filter(Boolean);if(rn.length)as.push("Runes: "+rn.join(", "));
+  if((fin.pots||[]).length)as.push("Potions: "+fin.pots.join(", "));if((fin.cons||[]).length)as.push("Consumables: "+fin.cons.join(", "));
+  if(b.luckTotem||b.strTotem||b.lumTotem||+n.friendTotem>=0)as.push("Totems as set under Boosts");
+  if(b.meteor||b.weather)as.push("Event: "+[b.meteor&&"Meteor Shower",b.weather&&"weather"].filter(Boolean).join(" + "));
+  as.push("Luck and capacity worked out with the formulas in How It Works, which are estimates fitted on testing");
+  return {st:best.st,sc:best.sc,before,beforeSc,base,tot:tot(best.st),museum:!!c.museum,why,assume:as}}
+// "why" and "assumptions" as HTML, shared by the finder here and the Best Build tool
+window.ptWhyHTML=R=>{if(!R||!R.why)return "";const f=v=>v>-0.05?"about the same":fmt(-v,-v<10?1:0)+"% worse";
+  return `<details class="bfwhy" open><summary><b>Why this build</b></summary><table class="bfwt"><tr><th></th><th>Picked</th><th>Best alternative</th><th>If you swapped it</th></tr>${R.why.map(w=>`<tr><td>${esc(w.part)}</td><td>${esc(w.pick)}</td><td>${esc(w.alt)}${w.note?` <span class="hint">(${esc(w.note)})</span>`:""}</td><td class="${w.pct>-1?"near":""}">${f(w.pct)}</td></tr>`).join("")}</table>
+  <p class="hint">Anything marked "about the same" or under 1% is a near tie: use whichever you have.</p></details>
+  <details class="bfwhy"><summary><b>What this assumes</b></summary><ul class="bfas">${R.assume.map(a=>`<li>${esc(a)}</li>`).join("")}</ul><p class="hint">How it's worked out: <button type="button" class="lnk" data-opentool="mechanics">How It Works</button> · <button type="button" class="lnk" data-opentool="formulas">Formulas</button></p></details>`};
+window.ptWhyCSS=`.bfwhy{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}.bfwhy summary{cursor:pointer}.bfwt{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.bfwt th{text-align:left;font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}.bfwt td{padding:5px 6px;border-bottom:1px dashed var(--line);vertical-align:top}.bfwt td:first-child{color:var(--muted);white-space:nowrap}.bfwt td:last-child{white-space:nowrap;font-family:var(--f-mono)}.bfwt td.near{color:var(--warn,#9a5b00)}.bfas{margin:6px 0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}`;
 async function runBf(){const c=bfCfg();if(!c.muts.length){ptToast("Pick at least one mutation");return}
   const btn=$("bfRun");btn.disabled=true;const prog=$("bfProg");const goal=c.goal;
   const sf=goal==="luck"?t=>Math.log(Math.max(1e-9,t.Luck)):t=>Math.log(Math.max(1e-9,t.Luck))+.565*Math.log(Math.max(1e-9,t.Capacity));
   const R=await bfEngine(Object.assign({},c,{useful:goal==="luck"?["Luck"]:["Luck","Capacity"]}),sf,(i,n)=>prog.textContent=`Searching… ${i+1} of ${n}`);
-  btn.disabled=false;prog.textContent="";BF_LAST={st:R.st,goal,before:R.before,beforeSc:R.beforeSc,sc:R.sc,tot:R.tot,museum:c.museum};showBf()}
+  btn.disabled=false;prog.textContent="";BF_LAST={st:R.st,goal,before:R.before,beforeSc:R.beforeSc,sc:R.sc,tot:R.tot,museum:c.museum,why:R.why,assume:R.assume};showBf()}
 // for the Best Build tool and other tools
 window.ptFindBuild=(c,sf,onProg)=>bfEngine(c,sf,onProg);
 window.ptBuildTextOf=st=>{const keep=S;S=Object.assign(clone(keep),st);window.S=S;try{return buildSheetText()}finally{S=keep;window.S=keep}};
@@ -960,9 +999,11 @@ function showBf(){const R=BF_LAST;if(!R){$("bfOut").innerHTML="";return}const st
   $("bfOut").innerHTML=`<div class="bfsum"><div><span class="lab">Luck</span><b>${fmt(t.Luck,0)}</b> <span class="hint">was ${fmt(R.before.Luck,0)}</span></div><div><span class="lab">Capacity</span><b>${fmt(t.Capacity,0)}</b> <span class="hint">was ${fmt(R.before.Capacity,0)}</span></div><div><span class="lab">${R.goal==="luck"?"Luck":"Rare finds per pan"}</span><b class="${g>0.0005?"pos":""}">${g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found"}</b></div></div>
     ${R.goal==="luck"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck (0.565 × luck ÷ capacity).</p>`}
     <table class="bft"><tr><th></th><th>Best build</th><th>Now</th></tr>${rows.join("")}</table>${mus}
-    <div class="bfa"><button type="button" class="btn" id="bfUse">Use this build</button><button type="button" class="btn" id="bfCopy">Copy for Build Sheets</button></div>`}
+    ${window.ptWhyHTML(R)}<div class="bfa"><button type="button" class="btn" id="bfUse">Use this build</button><button type="button" class="btn" id="bfCopy">Copy for Build Sheets</button></div>`}
 $("showBf").addEventListener("change",()=>{S.showBf=$("showBf").checked;save();renderBf()});
 $("bfRun").addEventListener("click",runBf);
+document.head.insertAdjacentHTML("beforeend",`<style>${window.ptWhyCSS}</style>`);
+document.addEventListener("click",e=>{const o=e.target.closest("[data-opentool]");if(o){try{window.parent.ptOpenTool(o.dataset.opentool)}catch(err){}}});
 $("bfMore").addEventListener("click",()=>{try{window.parent.ptOpenTool("bestbuild")}catch(e){}});
 ["tools","trinket","museum","owned","perfect"].forEach(k=>$("bf_"+k).addEventListener("change",()=>{bfCfg()[k]=$("bf_"+k).checked;save()}));
 document.addEventListener("click",e=>{const g=e.target.closest("[data-bfg]");if(g){bfCfg().goal=g.dataset.bfg;save();renderBf();return}

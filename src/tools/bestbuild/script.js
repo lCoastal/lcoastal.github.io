@@ -69,6 +69,7 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
   $("res").innerHTML=`<div class="sum">${head}<div><span class="lab">Luck</span><b>${fmt(t.Luck,0)}</b><span class="hint">now ${fmt(R.before.Luck,0)}</span></div><div><span class="lab">Capacity</span><b>${fmt(t.Capacity,0)}</b><span class="hint">now ${fmt(R.before.Capacity,0)}</span></div></div>
     ${L.goal==="luck"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}
     <table class="bt"><tr><th></th><th>Best build</th><th>Now</th></tr>${rows.join("")}</table>${mus}
+    ${cw.ptWhyHTML?cw.ptWhyHTML(R):""}
     <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button></div>`}
 function sheetText(){const L=LAST;let txt=L.cw.ptBuildTextOf(L.R.st);
   if(L.goal==="min"){const n=L.info.per(L.R.tot.Luck,L.R.tot.Capacity);txt=txt.replace(/^(Title:[^\n]*\n)/,`$1Subtitle: Best build for ${L.info.m.n} in ${L.zone}: about ${oneInT(n.p)}${n.cap?`, with a luck cap of ${fmt(n.cap,0)}`:""}\n`)}
@@ -93,3 +94,5 @@ window.ptStoreChanged=()=>{if(!$("ownBox").open)return;drawOwn()};
 $("ownBox").addEventListener("toggle",()=>{if($("ownBox").open)drawOwn()});
 drawOwn();
 drawForm();
+(async()=>{try{const cw=await window.parent.ptCalcWin();if(cw&&cw.ptWhyCSS)document.head.insertAdjacentHTML("beforeend",`<style>${cw.ptWhyCSS}</style>`)}catch(e){}})();
+document.addEventListener("click",e=>{const o=e.target.closest("[data-opentool]");if(o){try{window.parent.ptOpenTool(o.dataset.opentool)}catch(err){}}});
