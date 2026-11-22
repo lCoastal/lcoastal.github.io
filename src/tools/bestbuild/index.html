@@ -15,6 +15,27 @@
     <h1>Best Build</h1>
     <p class="lede">Pick what you're after and what you can get. It tries every piece and mutation, every pan, shovel, enchant and trinket and a museum, and gives you the best build as a finished build sheet.</p>
   </header>
+  <div class="tabs" role="tablist" aria-label="Best Build"><button type="button" role="tab" data-tab="find" id="tab-find">Find a build</button><button type="button" role="tab" data-tab="as" id="tab-as">Assumptions</button></div>
+  <div id="pane-as" role="tabpanel" aria-labelledby="tab-as" hidden>
+    <section class="card">
+      <h2>What can you keep up?</h2>
+      <p class="hint">Untick anything you can't do, and every build is worked out without it. These apply to every search here.</p>
+      <div class="asl">
+        <label class="ck"><input type="checkbox" id="perfect"> <span><b>I can do perfect digs</b><small>Off: streak enchants are skipped, and anything but Mastered counts as autopan at about two thirds of your luck</small></span></label>
+        <label class="ck"><input type="checkbox" id="streak"> <span><b>I can hold a full perfect-dig streak</b><small>Non Euclidean up to 2× capacity, Rhythmic up to 1.3× luck. Off: they count as nothing</small></span></label>
+        <label class="ck"><input type="checkbox" id="sun"> <span><b>I can keep Sun Blessing fully charged</b><small>It fills in sunlight or from Luminant Totems. Needs both the Pharaoh's Pan and Shovel</small></span></label>
+        <label class="ck"><input type="checkbox" id="nomad"> <span><b>I can keep Nomad's Compass fully stacked</b><small>×1.9 luck once stacked. Off: it counts as nothing</small></span></label>
+        <label class="ck"><input type="checkbox" id="night"> <span><b>It's night</b><small>Counts Night Luck, like Dullahan's Curse</small></span></label>
+        <label class="ck"><input type="checkbox" id="trkMax"> <span><b>Count Mass Reactor and Beach Umbrella at their best roll</b><small>Off: their average roll</small></span></label>
+      </div>
+      <div class="row">
+        <label class="fld"><span class="lab">Location mastery</span><select id="mastery"><option value="">As in the Stat Calculator</option><option value="0">None</option><option value="0.05">+0.05×</option><option value="0.1">+0.10×</option><option value="0.15">+0.15×</option><option value="0.2">+0.20×</option><option value="0.25">+0.25× (mastered)</option></select></label>
+        <label class="fld"><span class="lab">Events</span><select id="events"><option value="">As in the Stat Calculator</option><option value="none">None</option><option value="meteor">Meteor Shower (×2)</option><option value="weather">Weather (×1.5)</option><option value="both">Both (×3)</option></select></label>
+      </div>
+      <p class="hint">Potions, totems, runes and the rest of your boosts come from the Stat Calculator. <button type="button" class="lnk" id="openCalc2">Open the Stat Calculator</button></p>
+    </section>
+  </div>
+  <div id="pane-find" role="tabpanel" aria-labelledby="tab-find">
 
   <section class="card">
     <h2>1. What are you after?</h2>
@@ -30,7 +51,7 @@
   <section class="card">
     <h2>2. What can you use?</h2>
     <div class="iso"><span class="lab">Mutations you can get</span><span id="muts" class="chips"></span></div>
-    <div class="iso"><label class="ck"><input type="checkbox" id="perfect"> I can do perfect digs</label><label class="ck"><input type="checkbox" id="night"> It's night</label><label class="ck"><input type="checkbox" id="owned"> Only items I own</label></div>
+    <div class="iso"><label class="ck"><input type="checkbox" id="owned"> Only items I own</label><span class="hint" id="asSum"></span></div>
     <div class="iso"><span class="lab">Also change</span><label class="ck"><input type="checkbox" id="tools"> Pan and shovel</label><label class="ck"><input type="checkbox" id="trinket"> Trinket</label><label class="ck"><input type="checkbox" id="museum"> Museum</label></div>
     <details class="own" id="ownBox"><summary><b>What I own</b> <span class="hint" id="ownCount"></span></summary>
       <p class="hint">Tick what you have, so "Only items I own" can stick to it. It's shared with every other tool that has owned ticks.</p>
@@ -45,6 +66,7 @@
     <h2>Your best build</h2>
     <div id="res"></div>
   </section>
+  </div>
   <p class="foot">Uses the same luck model as Luck Odds and Best Luck Cap, which is still an estimate. Made by @__coastal</p>
 </div>
 <script data-file="script.js"></script>

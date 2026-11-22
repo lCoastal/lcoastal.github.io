@@ -37,3 +37,15 @@ h2{font:700 1.05rem var(--f-display);margin:0}
 .og{margin:8px 0 12px}
 .ogh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px}
 .oit{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:4px 12px;font-size:13.5px}
+
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:8px 14px;font:600 14px var(--f-body);color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+#pane-find,#pane-as{display:flex;flex-direction:column;gap:14px}
+#pane-find[hidden],#pane-as[hidden]{display:none}
+.asl{display:flex;flex-direction:column;gap:10px}
+.asl .ck{align-items:flex-start}
+.asl .ck input{margin-top:3px}
+.asl .ck span{display:flex;flex-direction:column;gap:2px}
+.asl small{color:var(--muted);font-size:12.5px}
+.ck input:disabled+span{opacity:.5}

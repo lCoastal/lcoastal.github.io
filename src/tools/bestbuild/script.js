@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id);
 const MUTN=["None","Silver","Gold","Diamond","Granite","Overclocked","Festive","Sunforged","Prismatic"];
-let S={goal:"min",min:"",zone:"",useCap:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,night:false,owned:false,tools:true,trinket:true,museum:true};
+let S={tab:"find",goal:"min",min:"",zone:"",useCap:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-bestbuild")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("pt-bestbuild",JSON.stringify(S))}catch(e){}};
 const GOALS=[["min","A mineral"],["rare","Rare finds per pan"],["luck","Luck only"]];
@@ -27,14 +27,21 @@ function drawForm(){
   $("goalTxt").innerHTML=S.goal==="min"?"The best odds per pan for one mineral in one zone, with a luck cap if that helps.":S.goal==="rare"?"Best odds per pan at the rarest minerals: <b>luck × capacity<sup>0.565</sup></b>. Capacity gives more minerals per pan but fades, while luck keeps paying off for the rarest ones.":"Highest total luck. Capacity doesn't count.";
   $("minRow").hidden=S.goal!=="min";
   $("muts").innerHTML=MUTN.map(m=>`<button type="button" class="chip" data-m="${m}" aria-pressed="${S.muts.includes(m)}">${m}</button>`).join("");
-  ["perfect","night","owned","tools","trinket","museum","useCap"].forEach(k=>$(k).checked=!!S[k]);
+  ["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap"].forEach(k=>$(k).checked=!!S[k]);$("streak").disabled=!S.perfect;
+  $("mastery").value=S.mastery;$("events").value=S.events;
+  document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));$("pane-find").hidden=S.tab!=="find";$("pane-as").hidden=S.tab!=="as";
+  const off=[!S.perfect&&"no perfect digs",S.perfect&&!S.streak&&"no full streak",!S.sun&&"no Sun Blessing",!S.nomad&&"Nomad not stacked",S.night?"night":"day"].filter(Boolean);
+  $("asSum").innerHTML=`Assuming: ${esc(off.join(", "))} · <button type="button" class="lnk" data-tab="as">change</button>`;
   const m=minObj();$("mq").value=S.min;const zs=m?zonesOf(m):[];
   if(m&&!zs.includes(S.zone)){S.zone=zs.slice().sort((a,b)=>(effFn(b,m)||(()=>0))(1000)-(effFn(a,m)||(()=>0))(1000))[0]||""}
   $("zone").innerHTML=zs.length?zs.map(z=>`<option${z===S.zone?" selected":""}>${esc(z)}</option>`).join(""):'<option value="">Pick a mineral first</option>'}
 makeAC({inp:$("mq"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),icon:()=>{const m=minObj();return m&&m.ic},pick:x=>{S.min=x.n;S.zone="";save();drawForm()}});
 document.addEventListener("click",e=>{const g=e.target.closest("[data-g]");if(g){S.goal=g.dataset.g;save();drawForm();return}
   const m=e.target.closest("[data-m]");if(m){const n=m.dataset.m;S.muts=S.muts.includes(n)?S.muts.filter(x=>x!==n):S.muts.concat([n]);save();drawForm();return}});
-["perfect","night","owned","tools","trinket","museum","useCap"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save()}));
+["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();drawForm()}));
+["mastery","events"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).value;save()}));
+document.addEventListener("click",e=>{const t=e.target.closest("[data-tab]");if(t){S.tab=t.dataset.tab;save();drawForm();window.scrollTo(0,0)}});
+$("openCalc2").onclick=()=>{try{window.parent.ptOpenTool("calc")}catch(e){}};
 $("zone").addEventListener("change",()=>{S.zone=$("zone").value;save()});
 $("openCalc").onclick=()=>{try{window.parent.ptOpenTool?window.parent.ptOpenTool("calc"):window.parent.location.hash="calc"}catch(e){}};
 // ---- search ----
@@ -53,7 +60,8 @@ $("run").onclick=async()=>{if(!S.muts.length){ptToast("Pick at least one mutatio
   let cw=null;try{cw=await window.parent.ptCalcWin()}catch(e){}
   if(!cw||!cw.ptFindBuild){btn.disabled=false;$("prog").textContent="";ptToast("Couldn't load the Stat Calculator");return}
   const useful=S.goal==="luck"?["Luck"]:["Luck","Capacity"];
-  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,night:S.night,useful},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
+  const ev=S.events?{meteor:S.events==="meteor"||S.events==="both",weather:S.events==="weather"||S.events==="both"}:null;
+  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
   btn.disabled=false;$("prog").textContent="";LAST={R,goal:S.goal,info,cw,zone:S.zone,perfect:S.perfect};showRes()};
 function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCard").hidden=false;const {R,cw}=L;const st=R.st,t=R.tot,b=R.base;
   const g=Math.exp(R.sc-R.beforeSc)-1;const gTxt=g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found";

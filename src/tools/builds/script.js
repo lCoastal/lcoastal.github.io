@@ -57,7 +57,7 @@ const modGroup=L=>L.map(m=>`<span class="modtag" style="color:${MC(m)}">${esc(m)
 // ---------- storage ----------
 // featured builds: ready-made sheets anyone can open, copy or compare. Add more by adding to this list.
 const FEATURED=[];
-const FEATURE_ASK=`<div class="fask"><b>Want your build featured here?</b><span>Ping <b>@__coastal</b> on Discord with your build (a share link is easiest) and it can be added for everyone.</span></div>`;
+const FEATURE_ASK=`<div class="fask"><b>Want your build featured here?</b><span>DM <b>@__coastal</b> on Discord with your build (a share link is easiest) and it can be added for everyone.</span></div>`;
 let B=[],cur=null,armDel=false;let SHARED=null;
 try{const x=JSON.parse(localStorage.getItem("pbs-builds")||"[]");if(Array.isArray(x))B=x.filter(b=>b&&b.id&&b.museum);}catch(e){}
 try{cur=localStorage.getItem("pbs-current")}catch(e){}

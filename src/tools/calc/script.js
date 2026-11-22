@@ -101,7 +101,7 @@ function compute(S0){const S=S0||window.S;
   (S.cons||[]).forEach(cn=>{const c=CONS.find(x=>x.n===cn);if(c)Object.entries(c.p).forEach(([k,v])=>pile[k]+=v)});
   if(b.cookie)STATS.forEach(s=>{if(!["Toughness","Inventory Size"].includes(s))pile[s]+=1});
   // luck trinkets
-  if(S.trinket==="Nomad's Compass")luckMult*=1.9;  // always stacked: 6 deposits × +15%, multiplies total luck
+  if(S.trinket==="Nomad's Compass"&&!S.nomadOff)luckMult*=1.9;  // stacked: 6 deposits × +15%, multiplies total luck (nomadOff: not stacked, counts as nothing)
   if(S.trinket==="Senet Die")luckMult*=1.33;         // x0.5–x3 per full pan, counted as ×1.33
   let trk=null;if(TRROLL[S.trinket]){const cap=(base.Capacity+flat.Capacity)*(1+pile.Capacity),mb=(base["Modifier Boost"]+flat["Modifier Boost"])*(1+pile["Modifier Boost"]);
     trk=trkLuck(S.trinket,cap,mb,!!S.trkMax);if(S.trkFix!=null)trk.luck=S.trkFix;base.Luck+=trk.luck}
@@ -895,7 +895,11 @@ function renderBf(){const c=bfCfg();const on=S.showBf===true;$("showBf").checked
 async function bfEngine(c,scoreTot,onProg){
   const ok=n=>!c.owned||own(n);
   const EN=(P.ench||{pan:[],shovel:[]});const noPerf=c.perfect===false;
-  const base=clone(S);base.only=null;if(c.night!=null)base.b=Object.assign({},base.b,{night:!!c.night});if(noPerf)base.rhy=false;
+  const base=clone(S);base.only=null;if(c.night!=null)base.b=Object.assign({},base.b,{night:!!c.night});if(noPerf||c.streak===false)base.rhy=false;
+  // conditions you can (or can't) keep up, from the Best Build tool's Assumptions tab
+  if(c.sun===false)base.noSun=true;if(c.sun===true)delete base.noSun;if(c.nomad===false)base.nomadOff=true;if(c.nomad===true)delete base.nomadOff;
+  if(c.trkMax!=null)base.trkMax=!!c.trkMax;if(c.mastery!=null)base.n=Object.assign({},base.n,{mastery:+c.mastery||0});
+  if(c.events)base.b=Object.assign({},base.b,{meteor:!!c.events.meteor,weather:!!c.events.weather});
   // can't do perfect digs: streak enchants never build up, and digging without Mastered means autopan at about two thirds of your luck
   const tot=st=>{const t=compute(st).tot;if(noPerf&&st.shEn!=="Mastered")t.Luck*=2/3;return t};
   const score=st=>scoreTot(tot(st),st);
@@ -957,7 +961,9 @@ async function bfEngine(c,scoreTot,onProg){
   if(sunOn(fin))as.push("Sun Blessing fully charged: it fills in sunlight or from Luminant Totems");
   if(rhyOn(fin)&&STREAK[fin.shEn])as.push(`${fin.shEn} at a full perfect-dig streak`);
   if(noPerf)as.push("No perfect digs: autopan, which only gets your full luck with Mastered");
-  if(fin.trinket==="Nomad's Compass")as.push("Nomad's Compass fully stacked (×1.9 luck)");
+  if(fin.trinket==="Nomad's Compass")as.push(fin.nomadOff?"Nomad's Compass not stacked (no luck from it)":"Nomad's Compass fully stacked (×1.9 luck)");
+  if(fin.noSun&&sunGear(fin).length)as.push("Sun Blessing not counted (you said you can't keep it charged)");
+  if(!noPerf&&fin.rhy===false)as.push("Streak enchants not counted (you said you can't hold a perfect-dig streak)");
   if(fin.trinket==="Senet Die")as.push("Senet Die at its average roll (×1.33 luck)");
   if(TRROLL[fin.trinket])as.push(`${fin.trinket} at its ${fin.trkMax?"max":"average"} roll`);
   if(+n.mastery>0)as.push(`Location mastery +${n.mastery}× luck`);
