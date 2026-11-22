@@ -156,9 +156,21 @@ function joinSecs(b,S,edit){const o=secOrder(b);let n=0;
     return edit?`<div class="dsec" data-sec="${k}"><div class="dbar"><span class="dgrip" draggable="true" title="Drag to move this section" aria-hidden="true">⠿</span><button type="button" class="dmv" data-mv="-1" data-sec="${k}" aria-label="Move ${SECN[k]} up"${i===0?" disabled":""}>▲</button><button type="button" class="dmv" data-mv="1" data-sec="${k}" aria-label="Move ${SECN[k]} down"${i===o.filter(x=>S[x]).length-1?" disabled":""}>▼</button></div>${html}</div>`:html}).join("")}
 // a line starting with a colour word in capitals (RED, GREEN…), [red] or a #hex code is shown in that colour
 const LCOL={red:"#ff5a5a",orange:"#ff9d3c",yellow:"#ffd84a",gold:"#ffcc33",green:"#6ee06a",lime:"#b6f24a",cyan:"#4ad8e0",blue:"#5aa8ff",purple:"#b880ee",pink:"#ff7ad6",white:"#ffffff",gray:"#97a3b0",grey:"#97a3b0"};
-const LCRE=new RegExp("^(?:("+Object.keys(LCOL).map(k=>k.toUpperCase()).join("|")+")\\b[:\\s-]*|\\[("+Object.keys(LCOL).join("|")+")\\][:\\s]*|(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})\\b[:\\s]*)","i");
-function escC(t){t=String(t??"");const m=t.match(LCRE);if(!m)return esc(t);if(m[1]&&m[1]!==m[1].toUpperCase())return esc(t);
-  const c=m[3]||LCOL[(m[1]||m[2]).toLowerCase()];return `<span style="color:${c}">${esc(t.slice(m[0].length))}</span>`}
+// line styles, written in capitals at the start of a line and combinable: "RED BIG BOLD Don't sell this"
+// (or in brackets, any case: "[red][big] …"). A #hex code sets any colour.
+const LSTY={BOLD:"font-weight:800",ITALIC:"font-style:italic",UNDERLINE:"text-decoration:underline",STRIKE:"text-decoration:line-through",
+  BIG:"font-size:1.25em",HUGE:"font-size:1.6em;line-height:1.25",SMALL:"font-size:.85em",CAPS:"text-transform:uppercase;letter-spacing:.04em",
+  GLOW:"text-shadow:0 0 8px currentColor",OUTLINE:"display:inline-block;border:1.5px solid currentColor;border-radius:6px;padding:1px 7px",
+  HIGHLIGHT:"",FADED:"opacity:.6"};
+const LTOK=[...Object.keys(LCOL),...Object.keys(LSTY).map(x=>x.toLowerCase())];
+const LCRE1=new RegExp("^(?:("+LTOK.map(x=>x.toUpperCase()).join("|")+")\\b|\\[("+LTOK.join("|")+")\\]|(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})\\b)[:\\s-]*","i");
+function escC(t){t=String(t??"");let col="",st=[],hi=false,m,n=0;
+  while(n++<8&&(m=t.match(LCRE1))){if(m[1]&&m[1]!==m[1].toUpperCase())break;const w=(m[1]||m[2]||"").toLowerCase();
+    if(m[3])col=m[3];else if(LCOL[w])col=LCOL[w];else if(w==="highlight")hi=true;else st.push(LSTY[w.toUpperCase()]);t=t.slice(m[0].length)}
+  if(!col&&!st.length&&!hi)return esc(t);
+  // highlight: a soft background in the line's colour (plain hex + alpha, so saved images get it too)
+  if(hi){const c=/^#[0-9a-f]{3}$/i.test(col)?"#"+[...col.slice(1)].map(x=>x+x).join(""):(col||"#ffd84a");st.push(`background:${c}33;border-radius:5px;padding:1px 6px;box-decoration-break:clone;-webkit-box-decoration-break:clone`)}
+  return `<span style="${col?`color:${col};`:""}${st.join(";")}">${esc(t)}</span>`}
 const addChip=(on,part,t)=>on?`<button type="button" class="edadd" data-ed="${part}">+ ${t}</button>`:"";
 function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const b=withAny(tidy(b0));
   const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
@@ -302,7 +314,7 @@ function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach
   if(viewMode!=="edit"){el.innerHTML=sheetHTML(getB(),true);return}
   // edit as text: the text box stays put while you type; only the sheet beside it is redrawn
   const ta=document.getElementById("txIn");
-  if(!ta){el.innerHTML=`<div class="txed"><div class="txl"><div class="txbar"><button type="button" class="btn sm" id="txCopy">Copy</button><button type="button" class="btn sm" id="txPaste" title="Make a new build from text you've copied">Paste as new build</button><span class="txmsg" id="txMsg" aria-live="polite"></span></div><textarea id="txIn" spellcheck="false" aria-label="The build as text"></textarea><p class="txhelp">Change any line and the sheet follows. Museum slots are split with <code>|</code>; list choices with <code>or</code>, <code>&gt;</code> (best first) or <code>pick 2: A, B</code>; <code>Any</code> keeps just the modifier, <code>-</code> leaves it empty. Equipment: <code>Name (Mutation) // note</code>. Rings: <code>- 5× Sun's Gift (Sunforged)</code>.</p></div><div class="txr" id="txR"></div></div>`;document.getElementById("txIn").value=toText(getB())}
+  if(!ta){el.innerHTML=`<div class="txed"><div class="txl"><div class="txbar"><button type="button" class="btn sm" id="txCopy">Copy</button><button type="button" class="btn sm" id="txPaste" title="Make a new build from text you've copied">Paste as new build</button><span class="txmsg" id="txMsg" aria-live="polite"></span></div><textarea id="txIn" spellcheck="false" aria-label="The build as text"></textarea><p class="txhelp">Change any line and the sheet follows. Museum slots are split with <code>|</code>; list choices with <code>or</code>, <code>&gt;</code> (best first) or <code>pick 2: A, B</code>; <code>Any</code> keeps just the modifier, <code>-</code> leaves it empty. Equipment: <code>Name (Mutation) // note</code>. Rings: <code>- 5× Sun's Gift (Sunforged)</code>. Style a note by starting it with capitals: <code>RED BIG BOLD</code>, <code>OUTLINE</code>, <code>HIGHLIGHT</code>, <code>GLOW</code>, <code>ITALIC</code>…</p></div><div class="txr" id="txR"></div></div>`;document.getElementById("txIn").value=toText(getB())}
   else if(document.activeElement!==ta)ta.value=toText(getB());
   document.getElementById("txR").innerHTML=sheetHTML(getB(),false)}
 let txT=null;
@@ -346,7 +358,7 @@ function renderEditor(){
   <label class="field"><span>Title</span><input class="inp" autocomplete="off" id="f-name" value="${esc(b.name)}" placeholder="e.g. ${esc(randomName())}"></label>
   <div class="row"><label class="field"><span>Subtitle</span><input class="inp" autocomplete="off" id="f-subtitle" maxlength="120" value="${esc(b.subtitle)}" placeholder="e.g. ${esc(SUB_EX[Math.floor(Math.random()*SUB_EX.length)])}"></label>
   <label class="field"><span>Warning (shown in red)</span><input class="inp" autocomplete="off" id="f-warning" maxlength="200" value="${esc(b.warning)}" placeholder="e.g. Needs modification for Fungal Marsh"></label></div>
-  <label class="field"><span>Notes, one bullet per line <small style="font-weight:400;color:var(--muted)">start a line with RED, GREEN, BLUE, YELLOW, PURPLE… (or #ff8800) to colour it</small></span><textarea class="inp" id="f-notes" maxlength="1500" placeholder="This is a one-tap build.&#10;Use with Luck, Strength and Luminant totems.">${esc(b.notes)}</textarea></label>
+  <label class="field"><span>Notes, one bullet per line <small style="font-weight:400;color:var(--muted)">start a line with words in capitals to style it, and mix them: RED, GREEN, BLUE… (or #ff8800), BIG, HUGE, SMALL, BOLD, ITALIC, UNDERLINE, STRIKE, OUTLINE, HIGHLIGHT, GLOW, CAPS, FADED. E.g. RED BIG BOLD Don't sell this</small></span><textarea class="inp" id="f-notes" maxlength="1500" placeholder="This is a one-tap build.&#10;Use with Luck, Strength and Luminant totems.">${esc(b.notes)}</textarea></label>
   <label class="field"><span>Author / credit</span><input class="inp" autocomplete="off" id="f-author" maxlength="60" value="${esc(b.author)}" placeholder="e.g. YourName (@handle)"></label>
   <div class="field"><span>Picture <small style="font-weight:400;color:var(--muted)">shown top left, cropped to a square</small></span><div class="picrow">${b.pic?`<img class="picprev" src="${b.pic}" alt="">`:`<span class="picprev none">No picture</span>`}<label class="btn sm" for="f-pic">${b.pic?"Change":"Upload image"}</label><input type="file" id="f-pic" accept="image/*" hidden>${b.pic?`<button type="button" class="btn sm" data-act="rmpic">Remove</button>`:""}</div></div></section>`;
   h+=`<section class="card"><h2>Museum</h2>
