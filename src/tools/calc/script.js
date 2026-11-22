@@ -23,7 +23,7 @@ function buildSlots(){
     <button type="button" class="pick it" data-pick="${k}" aria-haspopup="listbox" aria-label="${l}"></button>
     <select data-lvl="${k}" aria-label="${l} stars"><option value="0">0★</option><option value="5">5★</option><option value="6">6★</option></select>
     <select data-mut="${k}" data-ptmut aria-label="${l} mutation">${MUTS.map(m=>`<option value="${m[0]}">${mutLabel(m)}</option>`).join("")}</select>
-    <input type="number" min="0" max="100" data-q="${k}" value="${v.q??100}" aria-label="${l} quality %" title="Quality %"></div>`}).join("");
+    <span class="qw"><button type="button" class="qbtn" data-qopen="${k}" title="Quality: where the roll lands (100% = best). Click to change"${(v.q??100)!==100||v.l==="5"||v.l==="0"?" hidden":""}>100%</button><input type="number" min="0" max="100" data-q="${k}" value="${v.q??100}" aria-label="${l} quality %" title="Quality %"${(v.q??100)!==100||v.l==="5"||v.l==="0"?"":" hidden"}></span></div>`}).join("");
   SLOTDEF.forEach(([k,,slot])=>{const v=S.slots[k]||{};document.querySelector(`[data-lvl="${k}"]`).value=v.l==="5"||v.l==="0"?v.l:"6";document.querySelector(`[data-mut="${k}"]`).value=v.m||"None"})}
 function fillTools(){}
 // museum sources: the planner's current board plus every saved loadout
@@ -187,7 +187,7 @@ function brkSources(B){const L=[];const sunB=sunOn(B);const lab=k=>{if(BLAB[k])r
   if(B.b&&B.b.weather)L.push({key:"group:events",label:"Weather event",cut:t=>{t.b=Object.assign({},t.b,{weather:false})}});
   return L}
 // how much detail: 0 just stats, 1 semi (flat × multiplier = total), 2 full breakdown. Old saves: "show breakdown" off = 0
-const brkLvl=()=>S.brkLevel!=null?+S.brkLevel:(S.showBrk===false?0:2);
+const brkLvl=()=>S.brkLevel!=null?+S.brkLevel:0;
 const LVLN=["Just stats","Semi","Full breakdown"];
 // multiplier lines: small museum bonuses (a Common display's +0.005×) need more than 2 decimals; trailing zeros are dropped
 const mxf=v=>v>=100?fmt(v,2):String(+v.toFixed(4));
@@ -440,7 +440,7 @@ function upCandidates(){
   keep.sort((a,b)=>b.gain-a.gain);
   return keep}
 function renderUp(){
-  const on=S.showUp!==false;$("showUp").checked=on;$("upBody").hidden=!on;
+  const on=S.showUp===true;$("showUp").checked=on;$("upBody").hidden=!on;
   $("upGoal").innerHTML=[...UGOALS.map(([n])=>n),"Custom"].map(n=>`<button type="button" class="chip" data-ug="${esc(n)}" aria-pressed="${(S.upGoal||"Luck")===n}">${esc(n)}</button>`).join("");renderUcw();
   $("upCat").innerHTML=(S.upMode==="path"?[]:UCAT).map(([v,n])=>`<button type="button" class="chip" data-ucat="${v}" aria-pressed="${(S.upCat||"all")===v}">${n}</button>`).join("");$("upCat").parentElement.hidden=S.upMode==="path";
   $("upSort").innerHTML=[["list","Top 10"],["path","Upgrade path"]].map(([v,n])=>`<button type="button" class="chip" data-um="${v}" aria-pressed="${(S.upMode||"list")===v}">${n}</button>`).join("")+(`<button type="button" class="chip" data-uev="1" aria-pressed="${!!S.upEvent}" title="Event and limited-time gear you can't just go and get">Include event gear</button>`);
@@ -1009,6 +1009,9 @@ async function runBf(){const c=bfCfg();if(!c.muts.length){ptToast("Pick at least
   const R=await bfEngine(Object.assign({},c,{useful:goal==="luck"?["Luck"]:["Luck","Capacity"]}),sf,(i,n)=>prog.textContent=`Searching… ${i+1} of ${n}`);
   btn.disabled=false;prog.textContent="";BF_LAST={st:R.st,goal,before:R.before,beforeSc:R.beforeSc,sc:R.sc,tot:R.tot,museum:c.museum,why:R.why,assume:R.assume};showBf()}
 // for the Best Build tool and other tools
+// quality boxes stay tucked away at a 100% roll; click to change, or pick 5★ to see them
+document.addEventListener("click",e=>{const q=e.target.closest("[data-qopen]");if(!q)return;const inp=document.querySelector(`[data-q="${q.dataset.qopen}"]`);q.hidden=true;if(inp){inp.hidden=false;inp.focus();inp.select()}});
+document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.lvl)return;const k=t.dataset.lvl,inp=document.querySelector(`[data-q="${k}"]`),qb=document.querySelector(`[data-qopen="${k}"]`);if(!inp||!qb)return;const show=t.value!=="6"||+inp.value!==100;inp.hidden=!show;qb.hidden=show});
 window.ptFindBuild=(c,sf,onProg)=>bfEngine(c,sf,onProg);
 window.ptBuildTextOf=st=>{const keep=S;S=Object.assign(clone(keep),st);window.S=S;try{return buildSheetText()}finally{S=keep;window.S=keep}};
 window.ptUseBuild=(st,museum)=>{Object.assign(S,{pan:st.pan,panEn:st.panEn,shovel:st.shovel,shEn:st.shEn,trinket:st.trinket,slots:clone(st.slots)});if(museum){S.mus="custom";S.museumBoard=clone(st.museumBoard)}if(st.b&&"night" in st.b)S.b.night=st.b.night;if(st.rhy===false)S.rhy=false;save();all()};
@@ -1041,8 +1044,8 @@ document.addEventListener("click",e=>{const g=e.target.closest("[data-bfg]");if(
   if(e.target.closest("#bfUse")&&BF_LAST){window.ptUseBuild(BF_LAST.st,BF_LAST.museum);ptToast("Build loaded into the calculator");BF_LAST=null;showBf();return}
   if(e.target.closest("#bfCopy")&&BF_LAST){const keep=S;S=Object.assign(clone(keep),BF_LAST.st);window.S=S;let txt="";try{txt=buildSheetText()}finally{S=keep;window.S=keep}
     (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>ptToast("Copied, paste it into Build Sheets → Edit as text"),()=>ptToast("Couldn't copy, your browser blocked it"))}});
-$("shMenu").addEventListener("click",e=>{if(e.target.closest(".smi"))setTimeout(()=>$("shMenu").open=false,0)});
-document.addEventListener("click",e=>{const m=$("shMenu");if(m.open&&!e.target.closest("#shMenu"))m.open=false});
+["shMenu","bsMenu"].forEach(id=>$(id).addEventListener("click",e=>{if(e.target.closest(".smi"))setTimeout(()=>$(id).open=false,0)}));
+document.addEventListener("click",e=>{["shMenu","bsMenu"].forEach(id=>{const m=$(id);if(m.open&&!e.target.closest("#"+id))m.open=false})});
 $("shareB").addEventListener("click",async()=>{const url=await ptCopyShare(buildSheetText());ptToast(url?"Share link copied: it opens this build as a build sheet":"Couldn't copy, your browser blocked it")});
 renderBf();
 all();

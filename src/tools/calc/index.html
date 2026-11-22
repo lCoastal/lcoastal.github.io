@@ -13,7 +13,7 @@
 <div class="wrap">
   <header>
     <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h1>Stat Calculator</h1>
-      <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" id="resetAll">Reset everything</button><button type="button" class="btn" id="toBuild">Send to Build Sheets</button><button type="button" class="btn" id="toBuildTxt" title="Copies this build as text you can paste into Build Sheets (Edit as text, Paste as new build) or share">Copy for Build Sheets</button><button type="button" class="btn" id="fromBuild">Load a build sheet…</button></span></div>
+      <span style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><details class="smenu pt-noacts" id="bsMenu"><summary class="btn">Build Sheets <span aria-hidden="true">▾</span></summary><div class="smpop" role="menu"><button type="button" class="smi" id="fromBuild" role="menuitem">Load a build sheet…<small>Fill the calculator from one of your build sheets</small></button><button type="button" class="smi" id="toBuild" role="menuitem">Send to Build Sheets<small>Save this setup as a new build sheet</small></button><button type="button" class="smi" id="toBuildTxt" role="menuitem">Copy for Build Sheets<small>As text to paste into Edit as text, or to share</small></button></div></details><button type="button" class="btn" id="resetAll">Reset everything</button></span></div>
     <p class="lede">Pick your pan, shovel, jewelry, museum and boosts to see your stat panel.<br>Uses the wiki's formula: (gear + flat bonuses) × (1 + every boost added together), with events multiplying luck at the end.</p>
   </header>
   <div class="split">
@@ -29,7 +29,7 @@
         <details class="hintd"><summary>How stars, quality and mutations work</summary><p class="hint">Stars set the stat range (0★ uses the same range as 5★), quality is where the roll lands inside it (0% worst, 100% best), and the mutation multiplies the result on top.<br>This is a planner, so quality is spread evenly over every stat. In game a 50% item isn't always 50% on each stat: it could be 100% luck and 0% sell boost, which still averages out to 50%.</p></details>
         <div id="slots"></div></section>
       <section class="card"><h2>Museum <button type="button" class="rst" data-reset="museum">Reset</button></h2>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end"><label class="fld" style="flex:1;min-width:220px"><span class="lab">Museum boosts from</span><select id="mus"></select></label><button type="button" class="btn" id="musCopy">Edit a copy here</button></div>
+        <div class="addrow"><span class="lab">From</span><select id="mus" aria-label="Museum boosts from"></select><button type="button" class="lnk" id="musCopy">Edit a copy here</button></div>
         <p class="hint" id="musTxt"></p><div id="musEd"></div></section>
       <section class="card"><h2>Boosts <button type="button" class="rst" data-reset="boosts">Reset</button></h2>
         <details class="prog" id="progBox"><summary><span class="ph"><b>Your progress</b><span class="hint" id="progSum"></span></span><span class="pedit">Edit</span></summary>

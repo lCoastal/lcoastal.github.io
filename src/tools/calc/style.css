@@ -211,3 +211,8 @@ table.out th.bkc{text-align:center}
 .smi{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:8px 10px;border:0;border-radius:8px;background:none;color:var(--fg);font:600 13.5px var(--f-body);cursor:pointer}
 .smi:hover,.smi:focus-visible{background:var(--sunk)}
 .smi small{font-weight:400;font-size:12px;color:var(--muted)}
+
+.qw{display:flex;justify-content:flex-end}
+.qw input{width:100%}
+.qbtn{border:1px dashed var(--line);background:none;border-radius:6px;padding:5px 6px;font:12px var(--f-mono);color:var(--muted);cursor:pointer;width:100%;text-align:right}
+.qbtn:hover{border-color:var(--accent);color:var(--fg)}
