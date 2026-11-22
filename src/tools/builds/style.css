@@ -405,3 +405,10 @@ textarea.inp{min-height:90px;resize:vertical}
 .tutbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
 .tutbar b{font-size:14px}.tutbar span{flex:1;min-width:220px;font-size:12.5px;color:var(--muted)}
 #tutIn{width:100%;box-sizing:border-box;min-height:min(70vh,720px);resize:vertical;font:13px/1.55 var(--f-mono,ui-monospace,monospace);background:var(--sunk,var(--panel));color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:12px;white-space:pre;overflow:auto}
+
+/* a line with its own colour keeps it, even on stat names the sheet would otherwise colour */
+.lc span{color:inherit!important}
+
+/* text boxes grow with their text, so the page scrolls as one (no box-inside-a-page scrolling) */
+.txl{position:static!important}
+#txIn,#tutIn{min-height:240px!important;overflow:hidden!important;resize:none!important}
