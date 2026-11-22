@@ -805,6 +805,7 @@ document.addEventListener("focusout",e=>{if(e.target===SGI)setTimeout(()=>{if(do
 window.addEventListener("scroll",e=>{if(!SGI||!SGX||SGX.contains(e.target))return;const rc=SGI.getBoundingClientRect();SGX.style.top=(rc.bottom+scrollY+4)+"px";SGX.style.left=Math.max(8,Math.min(rc.left+scrollX,window.innerWidth-SGX.offsetWidth-8+scrollX))+"px"},true);
 window.ptSetRunes=names=>{const b=getB();b.runeSlots=Array.from({length:5},(_,i)=>(names||[])[i]||"");syncRunes(b);touch();renderEditor();toast(`Added ${names.length} rune${names.length===1?"":"s"} to “${b.name||"this build"}”`)};
 window.ptAddBuild=src=>{const nb=Object.assign(blankBuild(randomName()),JSON.parse(JSON.stringify(src)),{id:uid(),updated:Date.now()});if(!nb.name)nb.name=randomName();B.push(nb);cur=nb.id;armDel=false;persist();renderAll();toast(`Added “${nb.name}” from the Stat Calculator`)};
+window.ptAddBuildText=txt=>{const {b}=fromText(String(txt||""),blankBuild());window.ptAddBuild(b)};
 window.ptListBuilds=()=>B.map(b=>({id:b.id,name:plainC(b.name)||"Untitled build"}));
 function calcState(b0){const b=withAny(b0);
   const slots={};const eq=e=>e&&e.name?{n:e.name.trim(),m:e.mut||"None",l:/5★/.test(e.note||"")?"5":/0★/.test(e.note||"")?"0":"6",q:(()=>{const m=String(e.note||"").match(/(\d+)%\s*quality/);return m?+m[1]:100})()}:{};

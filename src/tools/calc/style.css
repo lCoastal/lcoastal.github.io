@@ -182,3 +182,5 @@ table.out th.bkc{text-align:center}
 .bfh{margin:14px 0 6px;font:700 12px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .bfmus{display:flex;flex-direction:column;gap:4px;font-size:13.5px}
 .bfmus .lab{display:inline-block;min-width:84px}
+
+.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}

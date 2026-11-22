@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Best Build</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Best Build</h1>
+    <p class="lede">Pick what you're after and what you can get. It tries every piece and mutation, every pan, shovel, enchant and trinket and a museum, and gives you the best build as a finished build sheet.</p>
+  </header>
+
+  <section class="card">
+    <h2>1. What are you after?</h2>
+    <div class="chips" id="goal" role="group" aria-label="Goal"></div>
+    <p class="hint" id="goalTxt"></p>
+    <div class="row" id="minRow">
+      <div class="fld grow"><span class="lab">Mineral</span><input type="search" id="mq" placeholder="Search a mineral" autocomplete="off" aria-label="Mineral"></div>
+      <label class="fld"><span class="lab">Zone</span><select id="zone" aria-label="Zone"></select></label>
+      <label class="ck" title="A luck cap only helps minerals that aren't the rarest in their zone: more luck pushes them out. Counts a cap as 56% of its number, like Best Luck Cap."><input type="checkbox" id="useCap"> Allow a luck cap</label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2. What can you use?</h2>
+    <div class="iso"><span class="lab">Mutations you can get</span><span id="muts" class="chips"></span></div>
+    <div class="iso"><label class="ck"><input type="checkbox" id="perfect"> I can do perfect digs</label><label class="ck"><input type="checkbox" id="night"> It's night</label><label class="ck"><input type="checkbox" id="owned"> Only items I own</label></div>
+    <div class="iso"><span class="lab">Also change</span><label class="ck"><input type="checkbox" id="tools"> Pan and shovel</label><label class="ck"><input type="checkbox" id="trinket"> Trinket</label><label class="ck"><input type="checkbox" id="museum"> Museum</label></div>
+    <p class="hint">Your boosts (potions, totems, runes, mastery, events) come from the Stat Calculator, so every build is compared with the same ones. <button type="button" class="lnk" id="openCalc">Open the Stat Calculator</button></p>
+    <div class="acts"><button type="button" class="btn pri" id="run">Find the best build</button><span class="hint" id="prog" aria-live="polite"></span></div>
+  </section>
+
+  <section class="card" id="resCard" hidden>
+    <h2>Your best build</h2>
+    <div id="res"></div>
+  </section>
+  <p class="foot">Uses the same luck model as Luck Odds and Best Luck Cap, which is still an estimate. Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>

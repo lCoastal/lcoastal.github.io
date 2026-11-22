@@ -1,5 +1,6 @@
 const LIST = [
   { id: "builds", name: "Build Sheets", desc: "Write full builds in the guide layout" },
+  { id: "bestbuild", name: "Best Build", desc: "Pick a mineral or goal, get the best build as a build sheet" },
   { id: "planner", name: "Museum Planner", desc: "Pick minerals and mutations, see totals" },
   { id: "boosts", name: "Museum Boosts", desc: "Every mineral's boost and max weight" },
   { id: "minerals", name: "Minerals", desc: "Value, drop rates, recipes and museum boost" },

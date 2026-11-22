@@ -131,6 +131,28 @@ window.ptGetTotals = () =>
     f.addEventListener("load", () => setTimeout(go, 0), { once: true });
   });
 window.ptCallTool = (id, fn, ...a) => callTool(id, fn, ...a);
+// the Stat Calculator's window, loaded in the background if needed (the Best Build tool runs its search there)
+window.ptCalcWin = () =>
+  new Promise((res) => {
+    const had = !!frames.calc;
+    const f = frameFor("calc");
+    if (!had) f.hidden = true;
+    const go = () => {
+      try {
+        res(f.contentWindow);
+      } catch (e) {
+        res(null);
+      }
+    };
+    try {
+      if (f.contentWindow && f.contentWindow.ptFindBuild) {
+        go();
+        return;
+      }
+    } catch (e) {}
+    f.addEventListener("load", () => setTimeout(go, 0), { once: true });
+  });
+window.ptOpenTool = (id) => show(id);
 // stats breakdown for a Build Sheets build, worked out by the Stat Calculator (loaded in the background if needed)
 window.ptBuildStats = (st) =>
   new Promise((res) => {
