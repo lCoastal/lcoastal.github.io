@@ -167,3 +167,18 @@ table.out th.bkc{text-align:center}
 .spread .sp1 small{color:var(--muted);font-size:12px}
 .spread .sp1 b{font-family:var(--f-mono);font-size:1.25rem;font-variant-numeric:tabular-nums}
 .spread .sp1.ok small.now{color:var(--accent)}
+
+.bfa{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.bfsum{display:flex;gap:18px;flex-wrap:wrap;margin:10px 0 4px}
+.bfsum>div{display:flex;flex-direction:column;gap:2px}
+.bfsum b{font:700 18px var(--f-mono)}
+.bfsum b.pos{color:var(--accent)}
+.bft{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
+.bft th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}
+.bft td{padding:5px 8px;border-bottom:1px dashed var(--line)}
+.bft td:first-child{color:var(--muted);white-space:nowrap;width:1%}
+.bft tr.chg td:nth-child(2){color:var(--accent);font-weight:600}
+.bft td.was{color:var(--muted);text-decoration:line-through}
+.bfh{margin:14px 0 6px;font:700 12px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.bfmus{display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.bfmus .lab{display:inline-block;min-width:84px}

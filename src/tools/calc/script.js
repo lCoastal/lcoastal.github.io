@@ -68,6 +68,8 @@ function compute(S0){const S=S0||window.S;
   // Embalmer's Salt: +0.25% sell value per item panned, up to +100%. Counted as maxed out, added like gear.
   if(S.trinket==="Embalmer's Salt")base["Sell Boost"]+=100;
   SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
+  // at night, pieces with Night Luck (Dullahan's Curse) add it to their luck, scaled by stars, roll and mutation like any stat
+  if(S.b.night)SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const s=x.st.find(s=>s[0]==="Night Luck");if(!s)return;const mu=MUT[v.m||"None"]||MUTS[0];base.Luck+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});
   const flat=Object.fromEntries(STATS.map(s=>[s,0]));flat.Luck=Math.max(0,+S.n.flatLuck||0);
   // permanent quest luck (flat points): Lighthouse +3, Ancient +5, Spirits +50, Dredge Master +3 a quest, login Experience +5 a point
   flat.Luck+=(S.b.lighthouse?3:0)+(S.b.ancient?5:0)+(S.b.spirits?50:0)+3*Math.max(0,+S.n.dredge||0)+5*Math.max(0,+S.n.xp||0)+(TOMB[+S.n.tomb||0]||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
@@ -874,4 +876,78 @@ const musSig=()=>{try{return ["mp-board","mp-loadouts"].map(k=>localStorage.getI
 let lastMus=musSig();
 window.addEventListener("focus",()=>{const sg=musSig();if(sg===lastMus)return;lastMus=sg;fillMus();render()});
 window.ptRefresh=()=>{fillMus();render()};window.ptYouChanged=renderSpread;
+// ---- Build finder: searches gear, mutations, tools, trinket and museum for the best build for a goal ----
+// "Rare finds per pan" scores luck × capacity^0.565: for a mineral that's the rarest in its zone, odds per mineral go up in step
+// with luck and a pan holds 0.678 × capacity^0.565 minerals (the capacity graph in How It Works). Everything you've set under
+// Boosts stays as it is, so every build is compared with the same boosts.
+const BF_UNIQ=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"]);
+const BF_GOALS=[["rare","Rare finds per pan"],["luck","Luck only"]];
+const BF_SKIPMUS=new Set(["Key of Life"]);
+function bfCfg(){S.bf=Object.assign({goal:"rare",muts:MUTS.map(m=>m[0]).filter(m=>m!=="Festive"),tools:true,trinket:true,museum:true,owned:false},S.bf||{});return S.bf}
+function bfScore(st,goal){const t=compute(st).tot;const L=Math.max(1e-9,t.Luck),C=Math.max(1e-9,t.Capacity);return goal==="luck"?Math.log(L):Math.log(L)+.565*Math.log(C)}
+function renderBf(){const c=bfCfg();const on=S.showBf===true;$("showBf").checked=on;$("bfBody").hidden=!on;if(!on)return;
+  $("bfGoal").innerHTML=BF_GOALS.map(([k,l])=>`<button type="button" class="chip" data-bfg="${k}" aria-pressed="${c.goal===k}">${l}</button>`).join("");
+  $("bfMuts").innerHTML=MUTS.map(m=>`<button type="button" class="chip" data-bfm="${esc(m[0])}" aria-pressed="${c.muts.includes(m[0])}">${esc(m[0])}</button>`).join("");
+  ["tools","trinket","museum","owned"].forEach(k=>$("bf_"+k).checked=!!c[k]);
+  $("bfGoalTxt").innerHTML=c.goal==="luck"?"Highest total luck. Capacity doesn't count.":"Best odds per pan at the rarest minerals: <b>luck × capacity<sup>0.565</sup></b>. Capacity gives more minerals per pan but fades (see the capacity graph in How It Works), while luck keeps paying off for the rarest ones."}
+async function runBf(){const c=bfCfg();if(!c.muts.length){ptToast("Pick at least one mutation");return}
+  const btn=$("bfRun");btn.disabled=true;const prog=$("bfProg");const goal=c.goal;
+  const ok=n=>!c.owned||own(n);
+  const EN=(P.ench||{pan:[],shovel:[]});
+  const pans=G.pans.filter(x=>ok(x.name)||x.name===S.pan),shovels=G.shovels.filter(x=>ok(x.name)||x.name===S.shovel);
+  const TRN=((P.x2||{}).trinkets||[]).map(t=>t.n).filter(n=>ok(n)||n===S.trinket);
+  const POOL={};["Necklace","Charm","Ring"].forEach(sl=>POOL[sl]=EQ.filter(x=>x.slot===sl&&EQB[x.n]&&ok(x.n)).map(x=>x.n));
+  const muts=MUTS.filter(m=>c.muts.includes(m[0])).map(m=>m[0]);
+  const useful=goal==="luck"?["Luck"]:["Luck","Capacity"];
+  const MC={};MORDER.forEach(r=>MC[r]=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.some(([k])=>useful.includes(k))).map(m=>m.n).concat(["Any"]));
+  const MODN=Object.keys(MODS).filter(u=>u==="None"||MODS[u][1].some(k=>useful.includes(k)));
+  const start=clone(S);start.only=null;if(c.museum){start.museumBoard=clone(musBoard(S)||{});start.mus="custom"}
+  // pieces you already wear keep their stars and roll; anything new is counted at 6★ and a 100% roll
+  SLOTDEF.forEach(([k])=>{const v=start.slots[k];if(v&&v.n&&!muts.includes(v.m||"None"))v.m=muts[muts.length-1]});
+  const before=compute(S).tot,beforeSc=bfScore(S,goal);
+  let rs=12345;const rnd=()=>{rs=(rs*1103515245+12345)%2147483648;return rs/2147483648};
+  let best=null;const RESTARTS=6;
+  for(let rep=0;rep<RESTARTS;rep++){prog.textContent=`Searching… ${rep+1} of ${RESTARTS}`;await new Promise(r=>setTimeout(r,20));
+    const st=clone(start);
+    if(rep>0){SLOTDEF.forEach(([k,,slot])=>{const pool=POOL[slot];if(!pool.length)return;let n,tries=0;do{n=pool[Math.floor(rnd()*pool.length)]}while(BF_UNIQ.has(n)&&tries++<50&&Object.entries(st.slots).some(([kk,v])=>kk!==k&&v&&v.n===n));st.slots[k]={n,l:"6",m:muts[Math.floor(rnd()*muts.length)],q:100}})}
+    let cur=bfScore(st,goal),changed=true,it=0;
+    while(changed&&it++<25){changed=false;
+      const tryPut=(apply)=>{const v=bfScore(st,goal);if(v>cur+1e-12){cur=v;changed=true;return true}apply();return false};
+      if(c.tools){
+        {let bb=null;for(const p of pans)for(const e of ["",...EN.pan.map(x=>x.n)]){const t=Object.assign({},st,{pan:p.name,panEn:e});const v=bfScore(t,goal);if(!bb||v>bb.v)bb={v,p:p.name,e}}if(bb&&bb.v>cur+1e-12){st.pan=bb.p;st.panEn=bb.e;cur=bb.v;changed=true}}
+        {let bb=null;for(const p of shovels)for(const e of ["",...EN.shovel.map(x=>x.n)]){const t=Object.assign({},st,{shovel:p.name,shEn:e});const v=bfScore(t,goal);if(!bb||v>bb.v)bb={v,p:p.name,e}}if(bb&&bb.v>cur+1e-12){st.shovel=bb.p;st.shEn=bb.e;cur=bb.v;changed=true}}
+        {let bb=null;for(const p of pans)for(const q of shovels){const t=Object.assign({},st,{pan:p.name,shovel:q.name});const v=bfScore(t,goal);if(!bb||v>bb.v)bb={v,p:p.name,s:q.name}}if(bb&&bb.v>cur+1e-12){st.pan=bb.p;st.shovel=bb.s;cur=bb.v;changed=true}}}
+      if(c.trinket){let bb=null;for(const n of ["",...TRN]){const v=bfScore(Object.assign({},st,{trinket:n}),goal);if(!bb||v>bb.v)bb={v,n}}if(bb&&bb.v>cur+1e-12){st.trinket=bb.n;cur=bb.v;changed=true}}
+      for(const [k,,slot] of SLOTDEF){let bb=null;const others=Object.entries(st.slots).filter(([kk])=>kk!==k).map(([,v])=>v&&v.n);const keep=st.slots[k];
+        for(const n of POOL[slot]){if(BF_UNIQ.has(n)&&others.includes(n))continue;for(const m of muts){const same=keep&&keep.n===n;st.slots[k]=same?Object.assign({},keep,{m}):{n,l:"6",m,q:100};const v=bfScore(st,goal);if(!bb||v>bb.v)bb={v,slot:st.slots[k]}}}
+        st.slots[k]=keep;if(bb&&bb.v>cur+1e-12){st.slots[k]=bb.slot;cur=bb.v;changed=true}}
+      if(c.museum){const brd=st.museumBoard;for(const r of MORDER){brd[r]=(brd[r]||[]).slice(0,MSLOTS[r]);for(let i=0;i<MSLOTS[r];i++){const keep=brd[r][i];const used=new Set(Object.values(brd).flat().filter(x=>x&&x.m&&x.m!=="Any").map(x=>x.m));let bb=null;
+        for(const m of MC[r]){if(m!=="Any"&&used.has(m)&&!(keep&&keep.m===m))continue;for(const u of MODN){brd[r][i]={m,u};const v=bfScore(st,goal);if(!bb||v>bb.v)bb={v,m,u}}}
+        brd[r][i]=keep;if(bb&&bb.v>cur+1e-12){brd[r][i]={m:bb.m,u:bb.u};cur=bb.v;changed=true}}}}
+    }
+    if(!best||cur>best.sc+1e-12)best={sc:cur,st};
+  }
+  btn.disabled=false;prog.textContent="";BF_LAST={st:best.st,goal,before,beforeSc,museum:c.museum};showBf()}
+let BF_LAST=null;
+function showBf(){const R=BF_LAST;if(!R){$("bfOut").innerHTML="";return}const st=R.st,t=compute(st).tot;
+  const g=Math.exp(bfScore(st,R.goal)-R.beforeSc)-1;const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";
+  const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"—"}</td><td class="was">${now===was?"":(was||"—")}</td></tr>`;
+  const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":` · ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
+  const rows=[row("Pan",esc(st.pan)+(st.panEn?` · ${esc(st.panEn)}`:""),esc(S.pan)+(S.panEn?` · ${esc(S.panEn)}`:"")),row("Shovel",esc(st.shovel)+(st.shEn?` · ${esc(st.shEn)}`:""),esc(S.shovel)+(S.shEn?` · ${esc(S.shEn)}`:"")),row("Trinket",esc(st.trinket||""),esc(S.trinket||""))]
+    .concat(SLOTDEF.map(([k,l])=>row(l,it(st.slots[k]),it(S.slots[k]))));
+  let mus="";if(R.museum){const b=st.museumBoard||{};mus=`<h3 class="bfh">Museum</h3><div class="bfmus">${MORDER.map(r=>`<div><span class="lab" style="color:${rc(r)}">${r}</span> ${(b[r]||[]).filter(Boolean).map(x=>`${esc(x.m)}${x.u&&x.u!=="None"?` <span class="hint">(${esc(x.u)})</span>`:""}`).join(", ")||"—"}</div>`).join("")}</div>`}
+  const capL=.565*t.Luck/Math.max(1,t.Capacity);
+  $("bfOut").innerHTML=`<div class="bfsum"><div><span class="lab">Luck</span><b>${fmt(t.Luck,0)}</b> <span class="hint">was ${fmt(R.before.Luck,0)}</span></div><div><span class="lab">Capacity</span><b>${fmt(t.Capacity,0)}</b> <span class="hint">was ${fmt(R.before.Capacity,0)}</span></div><div><span class="lab">${R.goal==="luck"?"Luck":"Rare finds per pan"}</span><b class="${g>0.0005?"pos":""}">${g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found"}</b></div></div>
+    ${R.goal==="luck"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck (0.565 × luck ÷ capacity).</p>`}
+    <table class="bft"><tr><th></th><th>Best build</th><th>Now</th></tr>${rows.join("")}</table>${mus}
+    <div class="bfa"><button type="button" class="btn" id="bfUse">Use this build</button><button type="button" class="btn" id="bfCopy">Copy for Build Sheets</button></div>`}
+$("showBf").addEventListener("change",()=>{S.showBf=$("showBf").checked;save();renderBf()});
+$("bfRun").addEventListener("click",runBf);
+["tools","trinket","museum","owned"].forEach(k=>$("bf_"+k).addEventListener("change",()=>{bfCfg()[k]=$("bf_"+k).checked;save()}));
+document.addEventListener("click",e=>{const g=e.target.closest("[data-bfg]");if(g){bfCfg().goal=g.dataset.bfg;save();renderBf();return}
+  const m=e.target.closest("[data-bfm]");if(m){const c=bfCfg(),n=m.dataset.bfm;c.muts=c.muts.includes(n)?c.muts.filter(x=>x!==n):c.muts.concat([n]);c.muts=MUTS.map(x=>x[0]).filter(x=>c.muts.includes(x));save();renderBf();return}
+  if(e.target.closest("#bfUse")&&BF_LAST){const st=BF_LAST.st;Object.assign(S,{pan:st.pan,panEn:st.panEn,shovel:st.shovel,shEn:st.shEn,trinket:st.trinket,slots:clone(st.slots)});if(BF_LAST.museum){S.mus="custom";S.museumBoard=clone(st.museumBoard)}save();all();ptToast("Build loaded into the calculator");BF_LAST=null;showBf();return}
+  if(e.target.closest("#bfCopy")&&BF_LAST){const keep=S;S=Object.assign(clone(keep),BF_LAST.st);window.S=S;let txt="";try{txt=buildSheetText()}finally{S=keep;window.S=keep}
+    (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>ptToast("Copied, paste it into Build Sheets → Edit as text"),()=>ptToast("Couldn't copy, your browser blocked it"))}});
+renderBf();
 all();
