@@ -28,14 +28,27 @@ const oneTxt=p=>{if(!(p>0))return "—";const n=1/p;return "~1 in "+(n<10?fmt(n,
 const pansTxt=x=>!isFinite(x)?"—":x<1?"under 1":fmt(x,x<10?1:0);
 const hrs=(pans,pph)=>{if(!(pph>0)||!isFinite(pans))return "";const h=pans/pph;return h*60<1?"under 1 min":h<1?fmt(h*60,0)+" min":h<48?fmt(h,1)+" h":fmt(h/24,1)+" days"};
 // ---- builds ----
+// build sheets (yours and the featured ones) can be loaded into a build: their gear is put through the Stat Calculator with your boosts
+let BLIST=[];
+const srcOpts=sel=>{const g=(k,l)=>{const it=BLIST.filter(x=>x.kind===k);return it.length?`<optgroup label="${l}">${it.map(x=>`<option value="${esc(x.id)}"${x.id===sel?" selected":""}>${esc(x.name)}</option>`).join("")}</optgroup>`:""};return g("mine","Your builds")+g("feat","Featured")};
+async function loadBList(){try{const bw=await window.parent.ptBuildsWin();BLIST=bw&&bw.ptBuildsList?bw.ptBuildsList():[]}catch(e){BLIST=[]}renderBuilds()}
+// a short summary of a build's gear, to show what differs between builds
+function snapOf(st,name){const it=v=>v&&v.n?v.n+(v.m&&v.m!=="None"?` (${v.m})`:""):"";const rc={};Object.keys(st.slots||{}).filter(k=>/^r\d/.test(k)).forEach(k=>{const t=it(st.slots[k]);if(t)rc[t]=(rc[t]||0)+1});
+  const rings=Object.entries(rc).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([t,n])=>(n>1?n+"× ":"")+t).join(", ");
+  const mus={};Object.entries(st.museumBoard||{}).forEach(([r,arr])=>{mus[r]=(arr||[]).filter(x=>x&&x.m).map(x=>x.m+(x.u&&x.u!=="None"?` (${x.u})`:"")).join(", ")});
+  return {name,Pan:[st.pan,st.panEn].filter(Boolean).join(" · "),Shovel:[st.shovel,st.shEn].filter(Boolean).join(" · "),Trinket:st.trinket||"",Necklace:it(st.slots&&st.slots.neck),Charm:it(st.slots&&st.slots.charm),Rings:rings,mus}}
 function renderBuilds(){$("blds").innerHTML=S.b.map((b,i)=>`<div class="bld" style="--bc:${COLS[i%COLS.length]}">
   <div class="bh"><input type="text" class="inp" data-bf="n" data-i="${i}" value="${esc(b.n)}" aria-label="Build name">${S.b.length>1?`<button type="button" class="x" data-rm="${i}" aria-label="Remove ${esc(b.n)}" title="Remove this build">×</button>`:""}</div>
   <div class="row2"><label class="fld"><span class="lab">Luck</span><input type="number" min="1" data-bf="luck" data-i="${i}" value="${esc(b.luck)}"></label><label class="fld"><span class="lab">Capacity</span><input type="number" min="1" data-bf="cap" data-i="${i}" value="${esc(b.cap)}"></label></div>
   <label class="fld"><span class="lab" title="Optional. Bigger pans usually take longer, so this is what makes the time column fair">Pans per hour (optional)</span><input type="number" min="0" data-bf="pph" data-i="${i}" value="${esc(b.pph)}" placeholder="Leave empty for pans only"></label>
-  <button type="button" class="btn sm" data-calc="${i}">Use my Stat Calculator stats</button></div>`).join("");
+  <div class="srcrow"><select class="inp" data-src="${i}" aria-label="Load a build sheet into ${esc(b.n)}"><option value="">Load a build sheet…</option>${srcOpts(b.src)}</select><button type="button" class="btn sm" data-calc="${i}">Use my Stat Calculator stats</button></div>${b.snap?`<span class="hint">Luck and capacity worked out from ${esc(b.snap.name)} with your boosts</span>`:""}</div>`).join("");
   $("addB").disabled=S.b.length>=8}
 $("addB").onclick=()=>{if(S.b.length>=8)return;const last=S.b[S.b.length-1]||{luck:1000,cap:100};S.b.push({n:"Build "+(S.b.length+1),luck:last.luck,cap:last.cap,pph:""});save();renderBuilds();render()};
-document.addEventListener("input",e=>{const t=e.target;if(t.dataset.bf==null)return;S.b[+t.dataset.i][t.dataset.bf]=t.value;save();render()});
+document.addEventListener("change",async e=>{const t=e.target;if(t.dataset.src==null)return;const i=+t.dataset.src,id=t.value;if(!id)return;
+  let st=null,tot=null;try{const bw=await window.parent.ptBuildsWin();st=bw.ptCalcStateAny(id);const cw=await window.parent.ptCalcWin();tot=cw.ptTotalsWithGear(st)}catch(err){}
+  if(!st||!tot){ptToast("Couldn't load that build");return}const nm=(BLIST.find(x=>x.id===id)||{}).name||"Build";
+  const b=S.b[i];b.src=id;b.n=nm;b.luck=Math.round(tot.Luck);b.cap=Math.round(tot.Capacity);b.snap=snapOf(st,nm);save();renderBuilds();render()});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.bf==null)return;if(t.dataset.bf!=="n"&&S.b[+t.dataset.i].snap){delete S.b[+t.dataset.i].snap;delete S.b[+t.dataset.i].src}S.b[+t.dataset.i][t.dataset.bf]=t.value;save();render()});
 document.addEventListener("click",async e=>{const r=e.target.closest("[data-rm]");if(r){S.b.splice(+r.dataset.rm,1);save();renderBuilds();render();return}
   const c=e.target.closest("[data-calc]");if(c){let t=null;try{t=await window.parent.ptGetTotals()}catch(err){}if(!t||!(t.Luck>0)){ptToast("Couldn't read the Stat Calculator. Open it once and set up your gear.");return}
     const b=S.b[+c.dataset.calc];b.luck=Math.round(t.Luck);if(t.Capacity>0)b.cap=Math.round(t.Capacity);save();renderBuilds();render()}});
@@ -51,7 +64,7 @@ function rows(){const m=curMin();if(!m)return null;const zs=zonesOf(m);if(!zs.le
     let best=null;cand.forEach(z=>{const r=bestEff(z,m,L);if(!best||r.eff>best.eff)best={...r,z}});
     const pp=1-Math.pow(1-best.eff,panItems(C));const pans=pp>0?1/pp:Infinity;return {i,b,L,C,pph,z:best.z,cap:best.cap,eff:best.eff,pp,pans,hours:pph>0?pans/pph:null}});
   return {m,zs,list}}
-function render(){$("useCap").checked=!!S.useCap;const R=rows();const m=R&&R.m;
+function render(){renderDiff();$("useCap").checked=!!S.useCap;const R=rows();const m=R&&R.m;
   $("zone").innerHTML=`<option value="">Best zone for each build</option>`+(R?R.zs.map(z=>`<option value="${esc(z)}"${z===S.zone?" selected":""}>${esc(z)}</option>`).join(""):"");
   if(!m){$("sum").innerHTML="";$("tbl").innerHTML='<p class="hint">Pick a mineral to compare your builds.</p>';return}
   if(!R.list.length){$("sum").innerHTML="";$("tbl").innerHTML='<p class="hint">There are no drop rates for this mineral, so it can\'t be compared.</p>';return}
@@ -76,5 +89,10 @@ $("toImg").onclick=()=>{const R=rows();if(!R||!R.list.length){ptToast("Pick a mi
   const rows2=L.map(x=>{const r=x[key]/best[key];return {cells:[{t:x.b.n,b:true,dot:COLS[x.i%COLS.length],sub:`${fmt(x.L,0)} luck · ${fmt(x.C,0)} capacity${x.cap!=null?" · cap "+fmt(x.cap,0):""}`},...(oneZ?[]:[{t:x.z,wrap:true,fs:13}]),{t:oneTxt(x.pp),mono:true},{t:pansTxt(x.pans),mono:true}].concat(anyT?[{t:x.hours!=null?hrs(x.pans,x.pph):"—",mono:true}]:[]).concat([x===best?{t:"Best",b:true,col:"#3cc2a8"}:{t:isFinite(r)?fmt(r,r<10?2:1)+"×":"—",mono:true,col:"#98a2ad"}])}});
   ptSaveImg(R.m.n+" build comparison",()=>ptTableImage({title:R.m.n,tic:R.m.ic,tcol:HX[R.m.r],sub:[R.m.r,oneZ?L[0].z:"best zone for each build",S.useCap?"best luck cap":"own luck",`${L.length} builds`],sections:[{cols,rows:rows2}],note:"Estimates only: modifiers, Size Boost, enchants, events and weather aren't counted."}))};
 window.ptOpenFor=(kind,name)=>{if(kind==="mineral"){S.min=name;S.zone="";save();render()}};
-window.ptRefresh=()=>render();
-renderBuilds();render();
+// what's different between the loaded build sheets, highlighted against the first one
+function renderDiff(){const el=$("diff");if(!el)return;const L=S.b.map((b,i)=>({b,i})).filter(x=>x.b.snap);if(L.length<2){el.innerHTML="";return}
+  const keys=["Pan","Shovel","Trinket","Necklace","Charm","Rings"];const MO=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
+  const row=(lab,vals)=>{const same=vals.every(v=>v===vals[0]);return `<tr class="${same?"same":""}"><td>${lab}</td>${vals.map((v,j)=>`<td class="${j&&v!==vals[0]?"dif":""}">${esc(v||"—")}</td>`).join("")}</tr>`};
+  el.innerHTML=`<h3 class="dh">What's different</h3><p class="hint">Highlighted where a build differs from the first one. Rows that match everywhere are faded.</p><div class="tw"><table class="dt"><tr><th></th>${L.map(x=>`<th style="color:${COLS[x.i%COLS.length]}">${esc(x.b.n)}</th>`).join("")}</tr>${keys.map(k=>row(k,L.map(x=>x.b.snap[k]))).join("")}${MO.map(r=>row("Museum "+r,L.map(x=>(x.b.snap.mus||{})[r]||""))).join("")}</table></div>`}
+window.ptRefresh=()=>{loadBList();render()};
+renderBuilds();render();loadBList();

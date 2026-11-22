@@ -153,6 +153,27 @@ window.ptCalcWin = () =>
     f.addEventListener("load", () => setTimeout(go, 0), { once: true });
   });
 window.ptOpenTool = (id) => show(id);
+// Build Sheets' window, loaded in the background if needed
+window.ptBuildsWin = () =>
+  new Promise((res) => {
+    const had = !!frames.builds;
+    const f = frameFor("builds");
+    if (!had) f.hidden = true;
+    const go = () => {
+      try {
+        res(f.contentWindow);
+      } catch (e) {
+        res(null);
+      }
+    };
+    try {
+      if (f.contentWindow && f.contentWindow.ptBuildsList) {
+        go();
+        return;
+      }
+    } catch (e) {}
+    f.addEventListener("load", () => setTimeout(go, 0), { once: true });
+  });
 // stats breakdown for a Build Sheets build, worked out by the Stat Calculator (loaded in the background if needed)
 window.ptBuildStats = (st) =>
   new Promise((res) => {

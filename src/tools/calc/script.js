@@ -943,6 +943,8 @@ async function runBf(){const c=bfCfg();if(!c.muts.length){ptToast("Pick at least
 window.ptFindBuild=(c,sf,onProg)=>bfEngine(c,sf,onProg);
 window.ptBuildTextOf=st=>{const keep=S;S=Object.assign(clone(keep),st);window.S=S;try{return buildSheetText()}finally{S=keep;window.S=keep}};
 window.ptUseBuild=(st,museum)=>{Object.assign(S,{pan:st.pan,panEn:st.panEn,shovel:st.shovel,shEn:st.shEn,trinket:st.trinket,slots:clone(st.slots)});if(museum){S.mus="custom";S.museumBoard=clone(st.museumBoard)}if(st.b&&"night" in st.b)S.b.night=st.b.night;if(st.rhy===false)S.rhy=false;save();all()};
+// a build's gear with your own boosts (for comparing builds fairly)
+window.ptTotalsWithGear=g=>{const st=Object.assign(clone(S),{pan:g.pan||"",panEn:g.panEn||"",shovel:g.shovel||"",shEn:g.shEn||"",trinket:g.trinket||"",slots:clone(g.slots||{}),mus:"custom",museumBoard:clone(g.museumBoard||{}),only:null});return compute(st).tot};
 window.ptSlotDefs=()=>SLOTDEF.map(([k,l,slot])=>[k,l,slot]);
 window.ptCalcSnapshot=()=>clone(S);
 window.ptMusRows=()=>MORDER.map(r=>[r,MSLOTS[r]]);

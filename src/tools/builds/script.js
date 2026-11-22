@@ -810,6 +810,8 @@ window.ptSetRunes=names=>{const b=getB();b.runeSlots=Array.from({length:5},(_,i)
 window.ptAddBuild=src=>{const nb=Object.assign(blankBuild(randomName()),JSON.parse(JSON.stringify(src)),{id:uid(),updated:Date.now()});if(!nb.name)nb.name=randomName();B.push(nb);cur=nb.id;armDel=false;persist();renderAll();toast(`Added “${nb.name}” from the Stat Calculator`)};
 window.ptAddBuildText=txt=>{const {b}=fromText(String(txt||""),blankBuild());window.ptAddBuild(b)};
 window.ptListBuilds=()=>B.map(b=>({id:b.id,name:plainC(b.name)||"Untitled build"}));
+// "Non Euclidean or Rhythmic" / "Abyssal/Sunblessed": the first one is what gets counted
+const first=v=>String(v||"").split(/\s+or\s+|\s*\/\s*|\s*>\s*/i)[0].trim();
 function calcState(b0){const b=withAny(b0);
   const slots={};const eq=e=>e&&e.name?{n:e.name.trim(),m:e.mut||"None",l:/5★/.test(e.note||"")?"5":/0★/.test(e.note||"")?"0":"6",q:(()=>{const m=String(e.note||"").match(/(\d+)%\s*quality/);return m?+m[1]:100})()}:{};
   slots.neck=eq(b.neck);slots.charm=eq(b.charm);let k=0;
@@ -817,7 +819,9 @@ function calcState(b0){const b=withAny(b0);
   const board={};const u=b.mod&&b.mod!=="Any"?b.mod:"None";
   ORDER.forEach(r=>{const sl=b.museum[r]||[];board[r]=Array.from({length:SLOTS[r]},()=>({m:null,u:"None"}));
     sl.forEach((s,i)=>{if(covered(sl,i))return;const k2=s.m.length>1&&s.pick>1?Math.min(s.pick,s.m.length):1;s.m.slice(0,k2).forEach((n,j)=>{if(n&&board[r][i+j]){const o=uAt(s,j);board[r][i+j]={m:n,u:o?(o==="Any"?"None":o):u}}})})});
-  return {extraRings:Math.max(0,total-8),from:plainC(b.name),pan:(b.pan.name||"").trim(),panEn:(b.pan.enchant||"").trim(),trinket:(b.pan.trinket||"").trim(),shovel:(b.shovel.name||"").trim(),shEn:(b.shovel.enchant||"").trim(),slots,museumBoard:board}}
+  return {extraRings:Math.max(0,total-8),from:plainC(b.name),pan:(b.pan.name||"").trim(),panEn:first(b.pan.enchant),trinket:first(b.pan.trinket),shovel:(b.shovel.name||"").trim(),shEn:first(b.shovel.enchant),slots,museumBoard:board}}
+window.ptBuildsList=()=>B.map(b=>({id:b.id,name:plainC(b.name)||"Untitled build",kind:"mine"})).concat(FEATURED.map(f=>({id:"feat:"+f.id,name:f.t,kind:"feat"})));
+window.ptCalcStateAny=id=>{id=String(id||"");if(id.startsWith("feat:")){const f=FEATURED.find(x=>x.id===id.slice(5));return f?calcState(fromText(f.txt,blankBuild()).b):null}const b=B.find(x=>x.id===id);return b?calcState(b):null};
 window.ptCalcState=id=>{const b=B.find(x=>x.id===id)||getB();return calcState(b)};
 document.getElementById("bCalc").onclick=()=>{try{window.parent.ptSendCalc(calcState(getB()))}catch(e){toast("Couldn't reach the Stat Calculator")}};
 function renderAll(){renderSelect();renderEditor();renderSheet();renderMTot();histBtns()}
