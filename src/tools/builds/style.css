@@ -337,3 +337,11 @@ textarea.inp{min-height:90px;resize:vertical}
 .sopt .si.anyi{width:28px;height:28px;border:1px dashed #56616c;border-radius:8px}
 .op.anyop .ph.anyi{width:34px;height:34px;border:1px dashed #56616c;border-radius:8px}
 .op.anyop .gs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;color:#97a3b0;font-size:12px}
+
+/* museum slot: one mineral, or tick several */
+.seh .mtg{display:inline-flex;align-items:center;gap:5px;margin-left:auto;font-size:12px;font-weight:600;color:var(--fg);text-transform:none;letter-spacing:0;cursor:pointer}
+.seh{display:flex;align-items:center;gap:8px}
+.mhow{display:flex;align-items:center;gap:8px;margin:4px 0 6px;font-size:12.5px;color:var(--muted)}
+.mhow select{flex:1;min-width:0}
+.sopt.on{background:color-mix(in srgb,var(--acc,#3cc2a8) 14%,transparent);box-shadow:inset 3px 0 0 var(--acc,#3cc2a8)}
+.sopt.on .kgs{color:var(--acc,#3cc2a8);font-weight:700}

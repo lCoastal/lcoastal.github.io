@@ -265,9 +265,11 @@ function renderEditor(){
     h+=`<div class="rar" style="--rc:${RC(r)}"><div class="rarh"><i></i><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slotgrid">`;
     sl.forEach((s,i)=>{if(covered(sl,i))return;const sp=Math.min(Math.max(1,s.span||1),sl.length-i);const maxSpan=SLOTS[r]-i;
       const how=s.m.length>1?(s.pick>1?`Pick ${Math.min(s.pick,s.m.length)}`:s.join===">"?"Best first":"Any one"):"";
-      h+=`<div class="se" data-part="slot-${r}-${i}"${sp>1?` style="grid-column:span ${sp}"`:""}><div class="seh"><span>Slot ${i+1}${sp>1?`–${i+sp}`:""}</span>${how?`<em>${how}</em>`:""}${s.mark?`<em class="mk">${esc(s.mark)}</em>`:""}</div>
+      const multi=!!s.multi||s.m.length>1;const hw=s.pick>1?"pick"+s.pick:s.join===">"?"best":"any";
+      h+=`<div class="se" data-part="slot-${r}-${i}"${sp>1?` style="grid-column:span ${sp}"`:""}><div class="seh"><span>Slot ${i+1}${sp>1?`–${i+sp}`:""}</span><label class="mtg" title="Let this slot list more than one mineral"><input type="checkbox" data-act="multi" data-r="${r}" data-i="${i}"${multi?" checked":""}> Multiple</label></div>
+      ${multi&&s.m.length>1?`<label class="mhow"><span>How to choose</span><select class="inp" data-act="how" data-r="${r}" data-i="${i}"><option value="any"${hw==="any"?" selected":""}>Any one of these</option><option value="best"${hw==="best"?" selected":""}>Best first, then the next</option>${Array.from({length:s.m.length-1},(_,k)=>k+2).map(n=>`<option value="pick${n}"${hw==="pick"+n?" selected":""}>Pick ${n} of these</option>`).join("")}</select></label>`:""}
       ${s.m.length?`<div class="mlist">${s.m.map((n,k)=>{const nm=mname(n);const u=BY[n.toLowerCase()]?picOf("Mineral",nm):"";return `<div class="mrow${k===0?" counted":""}" data-mineral="${esc(nm)}" title="${k===0?"Counted in the museum total":"Alternative, not counted in the total"}">${u?`<img src="${u}" alt="">`:`<span class="np"></span>`}<span class="mt"><b>${esc(nm)}</b><span class="cg">${gainsHTML(gainOf(n))}</span></span><button type="button" class="rmx" aria-label="Remove ${esc(n)}" data-act="rm" data-r="${r}" data-i="${i}" data-k="${k}">×</button></div>`}).join("")}</div>`:""}
-      <div class="sugg"><input class="inp addm" placeholder="${s.m.length?"+ Add another choice":"+ Add "+(/^[AEIOU]/.test(r)?"an ":"a ")+r.toLowerCase()+" mineral"}" data-act="add" data-r="${r}" data-i="${i}" id="add-${r}-${i}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="sb-${r}-${i}"><div class="sbox" id="sb-${r}-${i}" role="listbox" hidden></div></div>
+      <div class="sugg"><input class="inp addm" placeholder="${multi?"Search · click to tick or untick":s.m.length?"Search to change it":"Search "+r.toLowerCase()+" minerals"}" data-act="add" data-r="${r}" data-i="${i}" id="add-${r}-${i}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="sb-${r}-${i}"><div class="sbox" id="sb-${r}-${i}" role="listbox" hidden></div></div>
       </div>`;
     });
     h+=`</div></div>`;
@@ -345,6 +347,8 @@ ed.addEventListener("change",e=>{const t=e.target,b=getB();
   else if(t.dataset.act==="mark"){b.museum[t.dataset.r][+t.dataset.i].mark=t.value;touch()}
   else if(t.dataset.act==="span"){b.museum[t.dataset.r][+t.dataset.i].span=+t.value||1;touch();renderEditor()}
   else if(t.id==="f-emptyAny"){b.emptyAny=t.checked;touch()}
+  else if(t.dataset.act==="multi"){const s2=b.museum[t.dataset.r][+t.dataset.i];s2.multi=t.checked;if(!t.checked&&s2.m.length>1){s2.m=[s2.m[0]];s2.pick=1;s2.join="|"}touch();renderEditor();const n=document.getElementById(`add-${t.dataset.r}-${t.dataset.i}`);if(n){quiet=true;n.focus();quiet=false;openSugg(n)}}
+  else if(t.dataset.act==="how"){const s2=b.museum[t.dataset.r][+t.dataset.i];const v=t.value;s2.pick=/^pick/.test(v)?+v.slice(4):1;s2.join=v==="best"?">":"|";touch();renderEditor()}
   else if(t.id==="f-split6"){b.split6=t.checked;if(!Array.isArray(b.rings6))b.rings6=[];if(b.split6&&!b.rings6.some(x=>x.name))b.rings6=b.rings.map(x=>Object.assign({},x,{count:(String(x.count).split("/")[1]||x.count||"").trim()}));if(b.split6)b.rings=b.rings.map(x=>Object.assign({},x,{count:String(x.count).split("/")[0].trim()}));
     else b.rings=b.rings.map(x=>{const m=b.rings6.find(y=>y.name&&y.name===x.name);return m&&m.count&&m.count!==x.count&&!String(x.count).includes("/")?Object.assign({},x,{count:x.count+"/"+m.count}):x});
     touch();renderEditor()}});
@@ -361,7 +365,7 @@ function openSugg(inp){
   if(!q||"any".includes(q))list=[["Any",r,0,[]],...list];delete usedAt.any;
   const box=sbox(inp);
   if(!list.length){box.innerHTML=`<div class="spv">No ${r.toLowerCase()} mineral matches “${esc(inp.value)}”.</div>`;box.hidden=false;inp.setAttribute("aria-expanded","true");SG={inp,items:[],hot:-1};return}
-  box.innerHTML=`<div class="slist">${list.map((d,k)=>{const lc=d[0].toLowerCase();const here=inSlot.includes(lc);const other=usedAt[lc];const dis=here||!!other;const u=picOf("Mineral",d[0]);if(d[0]==="Any")return `<button type="button" class="sopt" role="option" id="so-${r}-${i}-${k}" data-name="Any"${here?' aria-disabled="true"':""}><span class="si anyi">✦</span><b>Any ${r.toLowerCase()} mineral</b><span class="kgs"></span><span class="g">${here?"<span>Already in this slot</span>":`<span>Only the modifier counts${b.mod&&b.mod!=="Any"?": "+esc(b.mod):""}</span>`}</span></button>`;return `<button type="button" class="sopt${dis?" taken":""}" role="option" data-mineral="${esc(d[0])}" id="so-${r}-${i}-${k}" data-name="${esc(d[0])}"${dis?' aria-disabled="true"':""}>${u?`<img class="si" src="${u}" alt="">`:'<span class="si"></span>'}<b>${esc(d[0])}</b><span class="kgs">${d[2]} kg for max</span><span class="g">${here?"<span>Already in this slot</span>":other?`<span>Already in slot ${other}</span>`:gainsHTML(d[3])}</span></button>`}).join("")}</div><div class="spv" id="spv-${r}-${i}" hidden></div>`;
+  box.innerHTML=`<div class="slist">${list.map((d,k)=>{const lc=d[0].toLowerCase();const here=inSlot.includes(lc);const other=usedAt[lc];const dis=!here&&!!other;const u=picOf("Mineral",d[0]);if(d[0]==="Any")return `<button type="button" class="sopt${here?" on":""}" role="option" id="so-${r}-${i}-${k}" data-name="Any" aria-selected="${here}"><span class="si anyi">✦</span><b>Any ${r.toLowerCase()} mineral</b><span class="kgs">${here?"✓":""}</span><span class="g">${false?"":`<span>Only the modifier counts${b.mod&&b.mod!=="Any"?": "+esc(b.mod):""}</span>`}</span></button>`;return `<button type="button" class="sopt${dis?" taken":""}${here?" on":""}" role="option" data-mineral="${esc(d[0])}" id="so-${r}-${i}-${k}" data-name="${esc(d[0])}" aria-selected="${here}"${dis?' aria-disabled="true"':""}>${u?`<img class="si" src="${u}" alt="">`:'<span class="si"></span>'}<b>${esc(d[0])}</b><span class="kgs">${here?"✓ ":""}${d[2]} kg for max</span><span class="g">${other&&!here?`<span>Already in slot ${other}</span>`:gainsHTML(d[3])}</span></button>`}).join("")}</div><div class="spv" id="spv-${r}-${i}" hidden></div>`;
   box.hidden=false;inp.setAttribute("aria-expanded","true");
   // wider than a slot; keep it on screen
   box.style.left="0px";{const rc=box.getBoundingClientRect(),over=rc.right-(document.documentElement.clientWidth-8);if(over>0)box.style.left=(-Math.min(over,rc.left-8))+"px"}
@@ -395,8 +399,11 @@ function addMineral(t,pickName){const v=(pickName||t.value).trim();if(!v)return;
   if(d&&d[1]!==t.dataset.r){toast(`${name} is ${d[1]}, not ${t.dataset.r}`);return}
   const other=name==="Any"?-1:b.museum[t.dataset.r].findIndex((x,k)=>k!==+t.dataset.i&&x.m.some(y=>y.toLowerCase()===name.toLowerCase()));
   if(other>=0){toast(`${name} is already in ${t.dataset.r} slot ${other+1}. Each mineral can only go in one slot.`);return}
-  if(!s.m.some(x=>x.toLowerCase()===name.toLowerCase()))s.m.push(name);
-  const keep=t.id;touch();renderEditor();const n=document.getElementById(keep);if(n){quiet=true;n.focus();quiet=false}}
+  const at=s.m.findIndex(x=>x.toLowerCase()===name.toLowerCase());
+  if(s.multi){if(at>=0)s.m.splice(at,1);else s.m.push(name);s.pick=Math.min(s.pick||1,Math.max(1,s.m.length))}
+  else{if(at>=0&&s.m.length===1)return;s.m=[name];s.pick=1}
+  // keep the list open, so more can be ticked (or the choice changed)
+  const keep=t.id;touch();renderEditor();const n=document.getElementById(keep);if(n){quiet=true;n.focus();quiet=false;openSugg(n)}}
 // backup minerals: a small picker with pictures, notes per mineral
 function xList(q){q=q.trim().toLowerCase();const have=new Set((getB().extra||[]).map(x=>String(x.n).toLowerCase()));const RO=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
   return D.filter(d=>!have.has(d[0].toLowerCase())&&(!q||d[0].toLowerCase().includes(q))).sort((a,b)=>(q?(b[0].toLowerCase().startsWith(q)-a[0].toLowerCase().startsWith(q)):0)||RO.indexOf(a[1])-RO.indexOf(b[1])||a[0].localeCompare(b[0])).slice(0,8)}
