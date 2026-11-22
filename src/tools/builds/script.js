@@ -56,7 +56,13 @@ try{cur=localStorage.getItem("pbs-current")}catch(e){}
 if(!B.length){const b=blankBuild(PAGE_NAME);B.push(b);}
 if(!B.find(b=>b.id===cur))cur=B[0].id;
 const getB=()=>B.find(b=>b.id===cur);
-let saveT;function persist(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem("pbs-builds",JSON.stringify(B));localStorage.setItem("pbs-current",cur)}catch(e){}},250)}
+// undo / redo: one history per build, a snapshot after each change (quick typing counts as one step)
+const HIST={};let histT=null,histMute=false;
+function histCommit(){const b=getB();if(!b)return;const j=JSON.stringify(b);const h=HIST[b.id]||(HIST[b.id]={l:[],i:-1});if(h.l[h.i]===j)return;h.l=h.l.slice(0,h.i+1);h.l.push(j);if(h.l.length>200)h.l.shift();h.i=h.l.length-1;histBtns()}
+function histBtns(){const h=HIST[cur]||{l:[],i:0};const u=document.getElementById("bUndo"),r=document.getElementById("bRedo");if(u)u.disabled=!(h.i>0);if(r)r.disabled=!(h.i<h.l.length-1)}
+function histGo(d){clearTimeout(histT);histCommit();const h=HIST[cur];if(!h)return;const n=h.i+d;if(n<0||n>=h.l.length)return;h.i=n;const b=JSON.parse(h.l[n]);const k=B.findIndex(x=>x.id===cur);B[k]=b;
+  histMute=true;persist();histMute=false;const ta=document.getElementById("txIn");if(ta)ta.value=toText(b);renderAll();histBtns();toast(d<0?"Undone":"Redone")}
+let saveT;function persist(){if(!histMute){clearTimeout(histT);histT=setTimeout(histCommit,450)}clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem("pbs-builds",JSON.stringify(B));localStorage.setItem("pbs-current",cur)}catch(e){}},250)}
 
 // ---------- sheet rendering ----------
 function codesHTML(codes){return codes?`<span class="code">${[...codes].map(c=>`<span style="color:${CCOL[c]||"#fff"}">${esc(c)}</span>`).join("")}</span>`:""}
@@ -332,16 +338,33 @@ function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach
 // formatting helper under the text box: every style and colour drawn in its own look; hover explains, click adds it to the current line
 const FDESC={BOLD:"Heavy, thick text",ITALIC:"Slanted text",UNDERLINE:"A line under the text",STRIKE:"Crossed out, e.g. old advice",BIG:"Bigger text",HUGE:"Much bigger text, for headings",SMALL:"Smaller text, for fine print",CAPS:"Turns the line into capitals",GLOW:"A glow around the text",OUTLINE:"A rounded box around the line",HIGHLIGHT:"A soft background behind the line, in its colour (yellow if no colour is set)",FADED:"Dimmed, for optional tips"};
 const FSYN=[["- line","A note line, under Notes:"],["-- note","A note under the line above it: a heading, rarity row or item. Right under a ring, it goes on that ring; right under Rings:, it's for all the rings"],["// note","A note on one item, at the end of its line"],["A | B | C","Museum slots in a rarity row, left to right"],["A or B","Any one of these in that slot"],["A > B","Best first, then the next"],["pick 2: A, B, C","Put two of these in"],["Any","Any mineral: only the modifier counts"],["-","Leave the slot empty"],["[note]","A short label on a museum slot"],["Name (Mutation)","Equipment with a mutation, e.g. Sun's Gift (Sunforged)"],["- 5× Name","A ring and how many of it"],["#ff8800","Any colour by hex code, at the start of a line"],["[red] [big]","Brackets work in any case"]];
-function fmtHelp(){const chip=(w,desc)=>`<button type="button" class="fchip" data-ins="${w} " title="${esc(desc)} · click to add it to this line">${escC(w+" "+(w.length>2?w[0]+w.slice(1).toLowerCase():w))}</button>`;
-  return `<div class="fmt"><div class="fmth"><b>Formatting</b><span>Write these in capitals at the start of a line, and mix them: <code>RED BIG BOLD …</code>. Hover for what they do, click to add one to the line you're on.</span></div>
+function fmtHelp(){const chip=(w,desc)=>`<button type="button" class="fchip" data-ins="${w} " title="${esc(desc)} · click to add it to this line, or take it off if it's already there">${escC(w+" "+(w.length>2?w[0]+w.slice(1).toLowerCase():w))}</button>`;
+  return `<div class="fmt"><div class="fmth"><b>Formatting</b><span>Write these in capitals at the start of a line, and mix them: <code>RED BIG BOLD …</code>. Put the cursor on a line: the ones it already has light up. Click one to add it, click a lit one to take it off. Hover for what they do.</span></div>
   <div class="fgrp"><small>Styles</small>${Object.keys(FDESC).map(w=>chip(w,FDESC[w])).join("")}</div>
   <div class="fgrp"><small>Colours</small>${Object.keys(LCOL).filter(k=>k!=="grey").map(k=>chip(k.toUpperCase(),"Colours the line "+k)).join("")}</div>
   <details class="fsyn"><summary>Build text cheat sheet</summary><dl>${FSYN.map(([a,b])=>`<dt><code>${esc(a)}</code></dt><dd>${esc(b)}</dd>`).join("")}</dl></details></div>`}
-// put a style word at the start of the caret's line (after "- ", "-- " or "Key: ")
+// formatting chips follow the line the cursor is on: words already on it are lit; clicking toggles one on or off
+// (a colour replaces the line's colour). Edits go through the browser's own text editing, so Ctrl+Z in the box undoes them.
+const TXPRE=/^(--?\s*|[A-Za-z &()0-9]+:\s*(?:.*\/\/\s*)?)/;
+function txLine(ta){const v=ta.value,p=ta.selectionStart??0;const ls=v.lastIndexOf("\n",p-1)+1;let le=v.indexOf("\n",p);if(le<0)le=v.length;const line=v.slice(ls,le);
+  const pre=(line.match(TXPRE)||[""])[0];const toks=[];let at=pre.length,m,n=0;
+  while(n++<8&&(m=line.slice(at).match(LCRE1))&&(!m[1]||m[1]===m[1].toUpperCase())){toks.push({w:(m[1]||m[2]||m[3]||"").toUpperCase(),s:ls+at,e:ls+at+m[0].length});at+=m[0].length}
+  return {start:ls+pre.length,toks,p}}
+const isCol=w=>!!LCOL[w.toLowerCase()]||/^#/.test(w);
+function txChips(){const ta=document.getElementById("txIn");if(!ta)return;const on=document.activeElement===ta?new Set(txLine(ta).toks.map(t=>t.w)):new Set();
+  document.querySelectorAll(".fchip").forEach(c=>{const w=c.dataset.ins.trim();const x=on.has(w);c.classList.toggle("on",x);c.setAttribute("aria-pressed",String(x))})}
+function txEdit(ta,a,b,text){ta.focus();ta.setSelectionRange(a,b);const ok=text?document.execCommand("insertText",false,text):document.execCommand("delete");
+  if(!ok){ta.setRangeText(text,a,b,"end");ta.dispatchEvent(new Event("input",{bubbles:true}))}}
+document.addEventListener("mousedown",e=>{if(e.target.closest(".fchip"))e.preventDefault()}); // keep the cursor in the text box
 document.addEventListener("click",e=>{const c=e.target.closest(".fchip");if(!c)return;const ta=document.getElementById("txIn");if(!ta)return;
-  const v=ta.value,p=ta.selectionStart??v.length;const ls=v.lastIndexOf("\n",p-1)+1;const line=v.slice(ls,(v.indexOf("\n",p)+1||v.length+1)-1);
-  const pre=(line.match(/^(--?\s*|[A-Za-z &()0-9]+:\s*(?:.*\/\/\s*)?)/)||[""])[0];let at=ls+pre.length;{let m,n=0;while(n++<8&&(m=v.slice(at).match(LCRE1))&&(!m[1]||m[1]===m[1].toUpperCase()))at+=m[0].length}const w=c.dataset.ins;
-  ta.value=v.slice(0,at)+w+v.slice(at);ta.focus();ta.selectionStart=ta.selectionEnd=p+w.length;ta.dispatchEvent(new Event("input",{bubbles:true}))});
+  const w=c.dataset.ins.trim();const L=txLine(ta);const have=L.toks.find(t=>t.w===w);let p=L.p;
+  if(have){txEdit(ta,have.s,have.e,"");if(p>have.s)p=Math.max(have.s,p-(have.e-have.s))}
+  else{const col=isCol(w)?L.toks.find(t=>isCol(t.w)):null;
+    if(col){txEdit(ta,col.s,col.e,w+" ");if(p>col.s)p+=(w.length+1)-(col.e-col.s)}
+    else{const at=L.toks.length?L.toks[L.toks.length-1].e:L.start;txEdit(ta,at,at,w+" ");if(p>=at)p+=w.length+1}}
+  ta.setSelectionRange(p,p);txChips()});
+["selectionchange"].forEach(ev=>document.addEventListener(ev,()=>{if(document.activeElement&&document.activeElement.id==="txIn")txChips()}));
+document.addEventListener("focusout",e=>{if(e.target.id==="txIn")setTimeout(txChips,0)});
 let txT=null;
 document.addEventListener("input",e=>{if(e.target.id!=="txIn")return;clearTimeout(txT);txT=setTimeout(()=>{const cur0=getB();const {b,bad}=fromText(e.target.value,cur0);b.updated=Date.now();const i=B.findIndex(x=>x.id===cur0.id);B[i]=b;persist();renderSelect();renderSheet();renderEditor();
   document.getElementById("txMsg").textContent=bad.length?`Couldn't read line${bad.length>1?"s":""} ${bad.slice(0,6).join(", ")}${bad.length>6?"…":""}`:"Saved"},200)});
@@ -742,5 +765,12 @@ function calcState(b0){const b=withAny(b0);
   return {extraRings:Math.max(0,total-8),from:b.name,pan:(b.pan.name||"").trim(),panEn:(b.pan.enchant||"").trim(),trinket:(b.pan.trinket||"").trim(),shovel:(b.shovel.name||"").trim(),shEn:(b.shovel.enchant||"").trim(),slots,museumBoard:board}}
 window.ptCalcState=id=>{const b=B.find(x=>x.id===id)||getB();return calcState(b)};
 document.getElementById("bCalc").onclick=()=>{try{window.parent.ptSendCalc(calcState(getB()))}catch(e){toast("Couldn't reach the Stat Calculator")}};
-function renderAll(){renderSelect();renderEditor();renderSheet();renderMTot()}
+function renderAll(){renderSelect();renderEditor();renderSheet();renderMTot();histBtns()}
 renderAll();persist();
+
+// Ctrl+Z / Ctrl+Y (or Ctrl+Shift+Z) undo and redo the build; inside a text box the box's own undo runs instead
+document.getElementById("bUndo").onclick=()=>histGo(-1);document.getElementById("bRedo").onclick=()=>histGo(1);
+document.addEventListener("keydown",e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey)return;const k=e.key.toLowerCase();if(k!=="z"&&k!=="y")return;
+  const t=e.target;if(t&&(t.tagName==="TEXTAREA"||(t.tagName==="INPUT"&&!["checkbox","radio","button"].includes(t.type))||t.isContentEditable))return;
+  e.preventDefault();histGo(k==="y"||e.shiftKey?1:-1)});
+histCommit();
