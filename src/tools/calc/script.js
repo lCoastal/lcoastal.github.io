@@ -495,7 +495,14 @@ document.addEventListener("click",e=>{
 function toastUp(msg){let d=document.querySelector(".uptoast");if(!d){d=document.createElement("div");d.className="uptoast";document.body.appendChild(d)}
   d.innerHTML=`${esc(msg)} <button type="button" class="btn sm" data-upundo="1">Undo</button>`;d.hidden=false;clearTimeout(toastUp.t);toastUp.t=setTimeout(()=>{d.hidden=true},6000)}
 
-function render(){
+// stats spread: the four "Your stats" numbers this build gives, in the same rounding Settings uses
+function spreadVals(){const t=compute(S).tot;return {luck:String(Math.round(t.Luck||0)),cap:String(Math.round(t.Capacity||0)),sb:String(Math.round((t["Size Boost"]||0)*10)/10),mb:String(Math.round(t["Modifier Boost"]||0))}}
+function renderSpread(){const v=spreadVals();let y={};try{y=window.parent.ptYou.get()||{}}catch(e){}
+  const F=[["luck","Luck",""],["cap","Pan capacity",""],["sb","Size Boost %","%"],["mb","Modifier Boost %","%"]];
+  $("spread").innerHTML=F.map(([k,n])=>{const same=String(y[k]??"")===v[k];return `<div class="sp1${same?" ok":""}"><small>${n}</small><b>${fmt(+v[k],k==="sb"?1:0)}</b><small class="now">${same?"Matches Your stats":y[k]?"Your stats: "+esc(fmt(+y[k],k==="sb"?1:0)):"Not set in Your stats"}</small></div>`}).join("")}
+
+document.addEventListener("click",e=>{if(!e.target.closest("#spSet"))return;try{window.parent.ptYou.set(spreadVals(),window)}catch(e){}renderSpread();toast("Your stats updated")});
+function render(){renderSpread();
   renderIso();renderParts();renderUp();
   const r=compute(effState());
   const f=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
@@ -832,5 +839,5 @@ window.onStoreChange=()=>{if(S.owned)all()};
 const musSig=()=>{try{return ["mp-board","mp-loadouts"].map(k=>localStorage.getItem(k)||"").join("|")}catch(e){return ""}};
 let lastMus=musSig();
 window.addEventListener("focus",()=>{const sg=musSig();if(sg===lastMus)return;lastMus=sg;fillMus();render()});
-window.ptRefresh=()=>{fillMus();render()};
+window.ptRefresh=()=>{fillMus();render()};window.ptYouChanged=renderSpread;
 all();
