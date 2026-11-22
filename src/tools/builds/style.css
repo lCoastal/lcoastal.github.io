@@ -391,3 +391,17 @@ textarea.inp{min-height:90px;resize:vertical}
 
 .fchip.on{border-color:var(--acc,#3cc2a8);background:color-mix(in srgb,var(--acc,#3cc2a8) 18%,#1b2128);box-shadow:inset 0 0 0 1px var(--acc,#3cc2a8)}
 .fchip.on::after{content:" ✓";color:var(--acc,#3cc2a8);font-size:11px}
+
+/* museum slots and gear cards: shorter cards sit in the middle of a taller row */
+.sheet .sl{justify-content:center}
+.sheet .gc{align-items:center}
+
+/* a slot that takes several squares spreads its options across them */
+.sheet .opsg{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:8px 14px}
+.sheet .opsg .op+.op{border-top:0;padding-top:0}
+@media (max-width:640px){.sheet .opsg{grid-template-columns:1fr}.sheet .opsg .op+.op{padding-top:6px;border-top:1px dashed var(--line)}}
+
+/* tutorial tab */
+.tutbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.tutbar b{font-size:14px}.tutbar span{flex:1;min-width:220px;font-size:12.5px;color:var(--muted)}
+#tutIn{width:100%;box-sizing:border-box;min-height:min(70vh,720px);resize:vertical;font:13px/1.55 var(--f-mono,ui-monospace,monospace);background:var(--sunk,var(--panel));color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:12px;white-space:pre;overflow:auto}

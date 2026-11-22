@@ -73,7 +73,9 @@ const MULT={Common:.005,Uncommon:.0075,Rare:.0125,Epic:.02,Legendary:.03,Mythic:
 const MODSTATS={Perfect:[["Luck","Capacity","Size Boost"],1],Treasured:[["Luck"],2],Entombed:[["Luck"],2],Lunar:[["Dig Speed","Shake Speed","Walk Speed"],1],Voidtorn:[["Luck","Capacity"],1],Mutated:[["Luck","Dig Strength","Modifier Boost"],1],Cosmic:[["Capacity","Shake Strength"],1],Electrified:[["Dig Speed","Shake Speed"],1],Iridescent:[["Luck"],1],Irradiated:[["Modifier Boost"],1],Crystalline:[["Size Boost"],1],Scorching:[["Dig Strength"],1],Glowing:[["Shake Speed"],1],Pure:[["Dig Speed"],1],Shiny:[["Shake Strength"],1]};
 const r4=v=>Math.round(v*1000)/1000;
 const fx=v=>(v<0?"−":"+")+r4(Math.abs(v))+"×";
-function covered(sl,i){for(let j=0;j<i;j++){if(j+Math.max(1,sl[j].span||1)>i)return true}return false}
+// squares a slot takes: its span, or its "pick N" (older builds saved pick without span)
+const spanOf=s=>Math.max(1,s.span||1,(s.m||[]).length>1&&s.pick>1?s.pick:1);
+function covered(sl,i){for(let j=0;j<i;j++){if(covered(sl,j))continue;if(j+spanOf(sl[j])>i)return true}return false}
 function gainOf(name){const d=BY[name.toLowerCase()];return d?d[3]:[]}
 function museumTotals(b0,ov){const b=withAny(b0);const t=Object.fromEntries(STATS.map(s=>[s,0]));const md=MODSTATS[b.mod];
   ORDER.forEach(r=>{const sl=b.museum[r];sl.forEach((s,i)=>{if(covered(sl,i))return;const k=s.m.length>1&&s.pick>1?Math.min(s.pick,s.m.length):1;let names=s.m.slice(0,k);if(ov&&ov.r===r&&ov.i===i)names=[ov.name,...names.slice(1)];names.forEach(n=>{if(!n)return;gainOf(n).forEach(([st,v])=>t[st]+=v);if(md)md[0].forEach(st=>t[st]+=MULT[r]*md[1])})})});return t}
@@ -88,7 +90,9 @@ function slotHTML(s){
 function modLabel(m){if(!m||m==="None")return"";if(m==="Any")return"Any";return `<span style="color:${MC(m)}">${esc(m)}</span> ${codesHTML(MODS[m])}`}
 function eqName(e){return (e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:"")+esc(e.name)}
 const STATN={L:"Luck",C:"Capacity",W:"Size Boost",D:"Dig Strength",S:"Dig Speed",$:"Sell Boost",K:"Walk Speed",M:"Modifier Boost",A:"Shake Strength",P:"Shake Speed"};
-let viewMode="table";try{const v=localStorage.getItem("pbs-view");if(v==="text"||v==="table"||v==="edit")viewMode=v}catch(e){}
+let viewMode="table";try{const v=localStorage.getItem("pbs-view");if(v==="text"||v==="table"||v==="edit"||v==="tut")viewMode=v}catch(e){}
+// the Tutorial tab: a built-in build that shows every feature; never saved into your builds
+const TUT_TEXT="Title: HUGE Tutorial\nSubtitle: PURPLE BOLD Every Build Sheets feature in one build. Make a copy to try things out.\nWarning: The warning line shows in red, for anything people must not miss\nAuthor: @__coastal\nNotes:\n- HUGE CAPS huge and caps makes text big and capitalized\n- can also add plain text\n- BIG big text\n- SMALL small text for the fine print\n- BOLD bold text\n- ITALIC italic text\n- UNDERLINE underlined text\n- STRIKE crossed out text\n- FADED faded text for optional tips\n- CAPS caps turns everything into capitals\n- OUTLINE outline puts a box around the line\n- HIGHLIGHT highlight gives the line a soft background\n- GLOW glow makes the text shine\n- RED red\n- ORANGE orange\n- YELLOW yellow\n- GOLD gold\n- GREEN green\n- LIME lime\n- CYAN cyan\n- BLUE blue\n- PURPLE purple\n- PINK pink\n- WHITE white\n- GRAY gray\n- #ff8800 any hex colour works too\n- [cyan] [italic] brackets work too, in any case\n- RED BIG BOLD mix them: red, big and bold\n- BLUE GLOW OUTLINE blue, glowing and outlined\n- GREEN HIGHLIGHT ITALIC green, highlighted and italic\n- PINK CAPS UNDERLINE pink capitals, underlined\n- STRIKE FADED old advice, crossed out and faded\n\nMuseum\n-- ITALIC A line starting with two dashes is a note under whatever is above it, like this one under the Museum heading\nModifier: Treasured\nFallbacks: Entombed, Perfect, Voidtorn\nEmpty slots: Any\n-- YELLOW Treasured first, then the fallbacks in order. Empty slots count as Any, so the modifier still counts there\nExotic: Key of Life [must have]\n-- GOLD BOLD One mineral in a slot. The [must have] at the end is a short label\nMythic: Flarebloom > Inferlume > Pink Diamond | Inferlume or Prismara or Chrysoberyl\n-- Slot 1 lists the best first, then the next (>). Slot 2 takes any one of them (or)\nLegendary: pick 2: Diamond, Catseye, Fire Opal | Any\n-- \"pick 2: \u2026\" means pick 2 of these. It takes up 2 slots and lists every option\nEpic: Emerald | Scarab Amber [tomb only] | Golden Pearl\nRare: pick 3: Peridot, Jade, Amber, Azuralite, Glacial Quartz, Gloomberry\n-- pick 3 of 6 fills the whole row\nUncommon: Any | Any | -\nCommon: Any | - | -\n-- FADED Any means any mineral, only the modifier counts. A dash leaves the slot empty, which shows as Any here because of the Empty slots: Any line\nBackup: Agate, Painite, Fire Opal\n-- Backup minerals, in case one above is hard to get\n\nEquipment\n-- CYAN Notes under the Equipment heading go here\nCharm: Lunar Mask (Sunforged) // fallback: Crown\n-- A mutation goes in brackets after the name. Two slashes add a note on the same line\nNecklace: Guardian Pendant (Sunforged) // RED BOLD keep it 6\u2605\nRings (8 slots):\n-- Right under the Rings heading: a note for all of them\n- 1\u00d7 Ring of Champions (Sunforged) // only one can be worn\n- 1\u00d7 Ring of Ra (Sunforged)\n-- GREEN Right under a ring: the note goes on that ring's card\n- 1\u00d7 Ring of the Stars (Sunforged)\n- 5\u00d7 Sun's Gift (Sunforged) // GREEN best luck ring\nRings (6 slots):\n-- With 6 ring slots, drop Champions and Stars. The sheet gets an 8 / 6 switch\n- 1\u00d7 Ring of Ra (Sunforged)\n- 5\u00d7 Sun's Gift (Sunforged)\nRunes: Abyssal/Sunblessed, Veteran, Any rune, Any rune, Any rune\n-- A slash means either one: Abyssal at night, Sunblessed in the sun\nExtra: Totem = Luck Totem // stack 2 for an hour\nExtra: Potion = Supreme Luck Potion\nExtra: Consumable = Luck Booster // HIGHLIGHT during Admin Abuse\n-- Extra rows are for anything else: totems, potions, consumables\n\nPan & shovel\n-- PURPLE Drag sections by their handle to reorder them, or use the arrows\nPan: Pharaoh's Pan; enchant Devouring; trinket Nomad's Compass // needs both Pharaoh pieces for Sun Blessing\n-- Notes on the pan go inside its card\nShovel: Starcrusher; enchant Rhythmic // keep a perfect-dig streak\n\nSection order: notes, museum, equip, tools";
 // ---------- the sheet: pictures, names and readable layout ----------
 const RHX={Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
 const cvar=(pre,name,hex)=>`var(--${pre}-${String(name).toLowerCase().replace(/[^a-z0-9]+/g,"")},${hex})`;
@@ -109,10 +113,10 @@ const gainSpans=d=>d?d[3].map(([s,v])=>`<span style="color:${SC2(s)}">${s} ${fx(
 function slotCard(s,span,ed,r,mod){const da=ed?` data-ed="${ed}"`:"";
   if(!s.m.length)return `<div class="sl empty"${da}${span>1?` style="grid-column:span ${span}"`:""}>Any mineral</div>`;
   const multi=s.m.length>1;const pick=multi&&s.pick>1?Math.min(s.pick,s.m.length):1;
-  const how=!multi?"":pick>1?`Pick ${pick} of these`:s.join===">"?"Best first, then the next":"Any one of these";
+  const how=!multi?"":pick>1?`Pick ${pick} of these ${s.m.length}`:s.join===">"?"Best first, then the next":"Any one of these";
   const ops=s.m.map((n,i)=>{if(n==="Any")return `<div class="op anyop"><span class="ph anyi">✦</span><span class="nm">Any ${esc(String(r||"").toLowerCase())} mineral</span><span class="gs">${mod&&mod!=="Any"?`<span>only the modifier counts:</span> ${modTag(mod)}`:"<span>only the modifier counts</span>"}</span></div>`;const d=BY[n.toLowerCase()];const nm=d?d[0]:n;
     return `<div class="op">${imgTag(d?picOf("Mineral",nm):"")}<span class="nm"${d?` data-mineral="${esc(nm)}"`:""}>${multi&&s.join===">"&&pick===1?`<span class="rk">${i+1}</span>`:""}${esc(nm)}</span><span class="gs">${gainSpans(d)}</span>${d?`<span class="kgl">Max boost at ${d[2]} kg</span>`:""}</div>`}).join("");
-  return `<div class="sl"${da}${span>1?` style="grid-column:span ${span}"`:""}>${how?`<span class="how">${how}</span>`:""}${ops}${s.mark?`<span class="mark">${esc(s.mark)}</span>`:""}</div>`}
+  return `<div class="sl"${da}${span>1?` style="grid-column:span ${span}"`:""}>${how?`<span class="how">${how}</span>`:""}${span>1?`<div class="opsg" style="--cols:${Math.min(span,s.m.length)}">${ops}</div>`:ops}${s.mark?`<span class="mark">${esc(s.mark)}</span>`:""}</div>`}
 function modTag(m){if(!m||m==="None"||m==="Any")return `<span class="modtag" style="color:#c7d0d9">Any modifier</span>`;const st=(MODSTATS[m]||[[]])[0];return `<span class="modtag" style="color:${MC(m)}">${esc(m)}</span>${st.length?`<span class="k">boosts ${st.join(", ")}</span>`:""}`}
 function gearCard(label,kind,e,extra,rs,count){
   const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";
@@ -195,7 +199,7 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   SX.notes=h;h="";
   // museum
   h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3>${an(b,"museum")}<div class="modline"${edA(edit,"mod")}><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${fbs(b).length?`<span class="k">· if you can't, use</span>${fbs(b).map(modTag).join(`<span class="k">then</span>`)}`:""}</div>${an(b,"mod")}`;
-  ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(Math.max(1,sl[i].span||1),sl.length-i);cells+=slotCard(sl[i],sp,edit?`slot-${r}-${i}`:"",r,b.mod)}
+  ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(spanOf(sl[i]),sl.length-i);cells+=slotCard(sl[i],sp,edit?`slot-${r}-${i}`:"",r,b.mod)}
     h+=`<div class="rrow" style="--rc:${RC(r)}"><div class="rlab"><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slots">${cells}</div></div>${an(b,"r:"+r)}`});
   const t=museumTotals(b);const tl=STATS.filter(s=>Math.abs(t[s])>1e-9);
   if(tl.length)h+=`<div class="tot">${tl.map(s=>`<span style="border-color:${SC2(s)}55"><span style="color:${SC2(s)}">${s}</span><em style="color:${t[s]<0?"#ef7a66":"#e8ecf0"}">${fx(t[s])}</em></span>`).join("")}</div><span class="em" style="font-size:12px">Museum total with the first choice in each slot at full weight, including the modifier.</span>`;
@@ -277,7 +281,7 @@ function toText(b){const L=[];const AN=k=>anL(b,k).forEach(x=>L.push("-- "+x));c
   L.push("Title: "+(b.name||""));if(b.subtitle)L.push("Subtitle: "+b.subtitle);if(b.warning)L.push("Warning: "+b.warning);if(b.author)L.push("Author: "+b.author);
   const notes=String(b.notes||"").split("\n").map(x=>x.trim()).filter(Boolean);if(notes.length){L.push("Notes:");notes.forEach(n=>L.push("- "+n))}
   L.push("","Museum");AN("museum");L.push("Modifier: "+(b.mod||"Any"));if(fbs(b).length)L.push("Fallbacks: "+fbs(b).join(", "));if(b.emptyAny)L.push("Empty slots: Any");AN("mod");
-  ORDER.forEach(r=>{const sl=b.museum[r]||[];L.push(`${r}: `+sl.map((s,i)=>covered(sl,i)?"~":slotTxt(s)).join(" | "));AN("r:"+r)});
+  ORDER.forEach(r=>{const sl=b.museum[r]||[];L.push(`${r}: `+sl.map((s,i)=>covered(sl,i)?null:slotTxt(s)).filter(x=>x!==null).join(" | "));AN("r:"+r)});
   const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length||has("backup"))L.push("Backup: "+XS.map(x=>x.n).join(", "));AN("backup");
   L.push("","Equipment");AN("equip");if(b.charm.name||b.charm.note||has("charm"))L.push("Charm: "+eqTxt(b.charm));AN("charm");if(b.neck.name||b.neck.note||has("neck"))L.push("Necklace: "+eqTxt(b.neck));AN("neck");
   const rl=(head,list,k)=>{const xs=(list||[]).filter(x=>x.name||x.note);if(!xs.length&&!has(k))return;L.push(head);AN(k);
@@ -315,7 +319,12 @@ function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pi
     else if(k==="modifier"){b.mod=ciKey(MODS,v)||"Any"}
     else if(k==="fallbacks"||k==="fallback")setFbs(b,v.split(",").map(x=>ciKey(MODS,x)).filter(x=>x&&x!=="Any"&&x!=="None"));
     else if(k==="empty slots")b.emptyAny=/any/i.test(v);
-    else if(ciKey(SLOTS,k)){const r=ciKey(SLOTS,k);const parts=v.split("|");const out=[];for(let i=0;i<SLOTS[r];i++){const p=(parts[i]??"-").trim();if(p==="~"&&out.length){out[out.length-1].span=(out[out.length-1].span||1)+1;out.push({m:[],pick:1,join:"|",mark:"",span:1});continue}out.push(parseSlot(p))}R[r]=out}
+    else if(ciKey(SLOTS,k)){const r=ciKey(SLOTS,k);const parts=v.split("|").map(x=>x.trim());const out=[];let pi=0;
+      // slots fill left to right; "pick N" takes N squares, "~" merges into the slot before
+      while(out.length<SLOTS[r]){const p=parts[pi++]??"-";
+        if(p==="~"&&out.length){const own=out.findLastIndex(x=>!x._cov);out[own].span=(out[own].span||1)+1;out.push({m:[],pick:1,join:"|",mark:"",span:1,_cov:1});continue}
+        const sl=parseSlot(p);const n=Math.max(1,Math.min(sl.pick||1,SLOTS[r]-out.length));sl.span=n;out.push(sl);for(let k2=1;k2<n;k2++)out.push({m:[],pick:1,join:"|",mark:"",span:1,_cov:1})}
+      out.forEach(x=>delete x._cov);R[r]=out}
     else if(k==="backup")b.extra=v.split(",").map(x=>x.trim()).filter(Boolean).map(n=>{const d=BY[n.toLowerCase()];const nm=d?d[0]:n;const o=(old.extra||[]).find(x=>x.n.toLowerCase()===nm.toLowerCase());return {n:nm,note:o?o.note:""}});
     else if(k==="charm")b.charm=parseEq(v);else if(k==="necklace")b.neck=parseEq(v);
     else if(k==="rings"||k==="rings (8 slots)")ctx="r8";else if(k==="rings (6 slots)"){ctx="r6";b.split6=true}
@@ -329,6 +338,8 @@ function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pi
   return {b,bad}}
 let viewRings="8";try{const v=localStorage.getItem("pbs-rings");if(v==="6"||v==="8")viewRings=v}catch(e){}
 function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.view===viewMode)));const el=document.getElementById("sheet");
+  if(viewMode==="tut"){const tb=fromText(TUT_TEXT,blankBuild()).b;const vm=viewMode;viewMode="table";const sh=sheetHTML(tb,false);viewMode=vm;
+    el.innerHTML=`<div class="tutbar"><b>Tutorial</b><span>Every feature in one build: on the left as text, on the right as the sheet it makes. Nothing here changes your builds.</span><button type="button" class="btn sm primary" id="tutCopy">Make a copy to edit</button><button type="button" class="btn sm" id="tutTxt">Copy the text</button></div><div class="txed"><div class="txl"><textarea id="tutIn" readonly spellcheck="false" aria-label="The tutorial build as text">${esc(TUT_TEXT)}</textarea>${fmtHelp()}</div><div class="txr">${sh}</div></div>`;return}
   if(viewMode!=="edit"){el.innerHTML=sheetHTML(getB(),true);return}
   // edit as text: the text box stays put while you type; only the sheet beside it is redrawn
   const ta=document.getElementById("txIn");
@@ -369,6 +380,8 @@ let txT=null;
 document.addEventListener("input",e=>{if(e.target.id!=="txIn")return;clearTimeout(txT);txT=setTimeout(()=>{const cur0=getB();const {b,bad}=fromText(e.target.value,cur0);b.updated=Date.now();const i=B.findIndex(x=>x.id===cur0.id);B[i]=b;persist();renderSelect();renderSheet();renderEditor();
   document.getElementById("txMsg").textContent=bad.length?`Couldn't read line${bad.length>1?"s":""} ${bad.slice(0,6).join(", ")}${bad.length>6?"…":""}`:"Saved"},200)});
 document.addEventListener("click",async e=>{
+  if(e.target.closest("#tutCopy")){const {b}=fromText(TUT_TEXT,blankBuild());b.name="Tutorial (copy)";B.push(b);cur=b.id;persist();viewMode="edit";try{localStorage.setItem("pbs-view",viewMode)}catch(err){}renderAll();toast("Tutorial copied into your builds. Edit away");return}
+  if(e.target.closest("#tutTxt")){try{await navigator.clipboard.writeText(TUT_TEXT);toast("Tutorial text copied")}catch(err){const t=document.getElementById("tutIn");t.focus();t.select();toast("Press Ctrl+C to copy")}return}
   if(e.target.closest("#txCopy")){const v=document.getElementById("txIn").value;try{await navigator.clipboard.writeText(v);toast("Build copied as text")}catch(err){const ta=document.getElementById("txIn");ta.focus();ta.select();toast("Press Ctrl+C to copy")}}
   if(e.target.closest("#txPaste")){let t="";try{t=await navigator.clipboard.readText()}catch(err){}
     if(!t||!/title\s*:/i.test(t)){toast("Copy a build's text first (it starts with Title:)");return}
@@ -420,11 +433,11 @@ function renderEditor(){
   const mname=n=>BY[n.toLowerCase()]?BY[n.toLowerCase()][0]:n;
   ORDER.forEach(r=>{const sl=b.museum[r];
     h+=`<div class="rar" style="--rc:${RC(r)}"><div class="rarh"><i></i><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slotgrid">`;
-    sl.forEach((s,i)=>{if(covered(sl,i))return;const sp=Math.min(Math.max(1,s.span||1),sl.length-i);const maxSpan=SLOTS[r]-i;
+    sl.forEach((s,i)=>{if(covered(sl,i))return;const sp=Math.min(spanOf(s),sl.length-i);const maxSpan=SLOTS[r]-i;
       const how=s.m.length>1?(s.pick>1?`Pick ${Math.min(s.pick,s.m.length)}`:s.join===">"?"Best first":"Any one"):"";
       const multi=!!s.multi||s.m.length>1;const hw=s.pick>1?"pick"+s.pick:s.join===">"?"best":"any";
       h+=`<div class="se" data-part="slot-${r}-${i}"${sp>1?` style="grid-column:span ${sp}"`:""}><div class="seh"><span>Slot ${i+1}${sp>1?`–${i+sp}`:""}</span><label class="mtg" title="Let this slot list more than one mineral"><input type="checkbox" data-act="multi" data-r="${r}" data-i="${i}"${multi?" checked":""}> Multiple</label></div>
-      ${multi&&s.m.length>1?`<label class="mhow"><span>How to choose</span><select class="inp" data-act="how" data-r="${r}" data-i="${i}"><option value="any"${hw==="any"?" selected":""}>Any one of these</option><option value="best"${hw==="best"?" selected":""}>Best first, then the next</option>${Array.from({length:s.m.length-1},(_,k)=>k+2).map(n=>`<option value="pick${n}"${hw==="pick"+n?" selected":""}>Pick ${n} of these</option>`).join("")}</select></label>`:""}
+      ${multi&&s.m.length>1?`<label class="mhow"><span>How to choose</span><select class="inp" data-act="how" data-r="${r}" data-i="${i}"><option value="any"${hw==="any"?" selected":""}>Any one of these</option><option value="best"${hw==="best"?" selected":""}>Best first, then the next</option>${Array.from({length:Math.min(s.m.length,SLOTS[r]-i)-1},(_,k)=>k+2).map(n=>`<option value="pick${n}"${hw==="pick"+n?" selected":""}>Pick ${n} of these (takes ${n} slots)</option>`).join("")}</select></label>`:""}
       ${s.m.length?`<div class="mlist">${s.m.map((n,k)=>{const nm=mname(n);const u=BY[n.toLowerCase()]?picOf("Mineral",nm):"";return `<div class="mrow${k===0?" counted":""}" data-mineral="${esc(nm)}" title="${k===0?"Counted in the museum total":"Alternative, not counted in the total"}">${u?`<img src="${u}" alt="">`:`<span class="np"></span>`}<span class="mt"><b>${esc(nm)}</b><span class="cg">${gainsHTML(gainOf(n))}</span></span><button type="button" class="rmx" aria-label="Remove ${esc(n)}" data-act="rm" data-r="${r}" data-i="${i}" data-k="${k}">×</button></div>`}).join("")}</div>`:""}
       <div class="sugg"><input class="inp addm" placeholder="${multi?"Search · click to tick or untick":s.m.length?"Search to change it":"Search "+r.toLowerCase()+" minerals"}" data-act="add" data-r="${r}" data-i="${i}" id="add-${r}-${i}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="sb-${r}-${i}"><div class="sbox" id="sb-${r}-${i}" role="listbox" hidden></div></div>
       </div>`;
@@ -504,8 +517,8 @@ ed.addEventListener("change",e=>{const t=e.target,b=getB();
   else if(t.dataset.act==="mark"){b.museum[t.dataset.r][+t.dataset.i].mark=t.value;touch()}
   else if(t.dataset.act==="span"){b.museum[t.dataset.r][+t.dataset.i].span=+t.value||1;touch();renderEditor()}
   else if(t.id==="f-emptyAny"){b.emptyAny=t.checked;touch()}
-  else if(t.dataset.act==="multi"){const s2=b.museum[t.dataset.r][+t.dataset.i];s2.multi=t.checked;if(!t.checked&&s2.m.length>1){s2.m=[s2.m[0]];s2.pick=1;s2.join="|"}touch();renderEditor();const n=document.getElementById(`add-${t.dataset.r}-${t.dataset.i}`);if(n){quiet=true;n.focus();quiet=false;openSugg(n)}}
-  else if(t.dataset.act==="how"){const s2=b.museum[t.dataset.r][+t.dataset.i];const v=t.value;s2.pick=/^pick/.test(v)?+v.slice(4):1;s2.join=v==="best"?">":"|";touch();renderEditor()}
+  else if(t.dataset.act==="multi"){const s2=b.museum[t.dataset.r][+t.dataset.i];s2.multi=t.checked;if(!t.checked&&s2.m.length>1){s2.m=[s2.m[0]];s2.pick=1;s2.join="|";s2.span=1}touch();renderEditor();const n=document.getElementById(`add-${t.dataset.r}-${t.dataset.i}`);if(n){quiet=true;n.focus();quiet=false;openSugg(n)}}
+  else if(t.dataset.act==="how"){const r2=t.dataset.r,i2=+t.dataset.i,s2=b.museum[r2][i2];const v=t.value;s2.pick=/^pick/.test(v)?+v.slice(4):1;s2.join=v==="best"?">":"|";s2.span=Math.max(1,Math.min(s2.pick,SLOTS[r2]-i2));touch();renderEditor()}
   else if(t.id==="f-split6"){b.split6=t.checked;if(!Array.isArray(b.rings6))b.rings6=[];if(b.split6&&!b.rings6.some(x=>x.name))b.rings6=b.rings.map(x=>Object.assign({},x,{count:(String(x.count).split("/")[1]||x.count||"").trim()}));if(b.split6)b.rings=b.rings.map(x=>Object.assign({},x,{count:String(x.count).split("/")[0].trim()}));
     else b.rings=b.rings.map(x=>{const m=b.rings6.find(y=>y.name&&y.name===x.name);return m&&m.count&&m.count!==x.count&&!String(x.count).includes("/")?Object.assign({},x,{count:x.count+"/"+m.count}):x});
     touch();renderEditor()}});
@@ -557,7 +570,7 @@ function addMineral(t,pickName){const v=(pickName||t.value).trim();if(!v)return;
   const other=name==="Any"?-1:b.museum[t.dataset.r].findIndex((x,k)=>k!==+t.dataset.i&&x.m.some(y=>y.toLowerCase()===name.toLowerCase()));
   if(other>=0){toast(`${name} is already in ${t.dataset.r} slot ${other+1}. Each mineral can only go in one slot.`);return}
   const at=s.m.findIndex(x=>x.toLowerCase()===name.toLowerCase());
-  if(s.multi){if(at>=0)s.m.splice(at,1);else s.m.push(name);s.pick=Math.min(s.pick||1,Math.max(1,s.m.length))}
+  if(s.multi){if(at>=0)s.m.splice(at,1);else s.m.push(name);s.pick=Math.min(s.pick||1,Math.max(1,s.m.length));if((s.span||1)>1)s.span=Math.max(1,s.pick)}
   else{if(at>=0&&s.m.length===1)return;s.m=[name];s.pick=1}
   // keep the list open, so more can be ticked (or the choice changed)
   const keep=t.id;touch();renderEditor();const n=document.getElementById(keep);if(n){quiet=true;n.focus();quiet=false;openSugg(n)}}
@@ -573,7 +586,7 @@ ed.addEventListener("focusout",e=>{if(e.target.id==="xIn")setTimeout(()=>{const 
 ed.addEventListener("keydown",e=>{if(e.target.id==="xIn"&&e.key==="Enter"){e.preventDefault();const l=xList(e.target.value);if(l[0])xAdd(l[0][0])}if(e.target.id==="xIn"&&e.key==="Escape"){const bx=document.getElementById("xBox");if(bx)bx.hidden=true}});
 ed.addEventListener("click",e=>{const o=e.target.closest(".xopt");if(o){e.stopPropagation();xAdd(o.dataset.xn);return}const r=e.target.closest("[data-act=xrm]");if(r){e.stopPropagation();const b=getB();b.extra.splice(+r.dataset.k,1);touch();renderAll()}},true);
 ed.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;const b=getB(),a=t.dataset.act;
-  if(a==="rm"){const s=b.museum[t.dataset.r][+t.dataset.i];s.m.splice(+t.dataset.k,1);s.pick=Math.min(s.pick,Math.max(1,s.m.length));}
+  if(a==="rm"){const s=b.museum[t.dataset.r][+t.dataset.i];s.m.splice(+t.dataset.k,1);s.pick=Math.min(s.pick,Math.max(1,s.m.length));if((s.span||1)>1)s.span=Math.max(1,s.pick)}
   else if(a==="addring")b.rings.push({count:"",mut:"",name:"",note:""});
   else if(a==="rmring")b.rings.splice(+t.dataset.i,1);
   else if(a==="addring6"){if(!Array.isArray(b.rings6))b.rings6=[];b.rings6.push({count:"",mut:"",name:"",note:""})}
