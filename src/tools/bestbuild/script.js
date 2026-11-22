@@ -77,4 +77,19 @@ document.addEventListener("click",async e=>{if(!LAST)return;
   if(e.target.closest("#toSheet")){try{window.parent.ptCallTool("builds","ptAddBuildText",sheetText());ptToast("Saved to Build Sheets")}catch(err){ptToast("Couldn't reach Build Sheets")}return}
   if(e.target.closest("#share")){const url=await ptCopyShare(sheetText());ptToast(url?"Share link copied":"Couldn't copy, your browser blocked it");return}
   if(e.target.closest("#use")){LAST.cw.ptUseBuild(LAST.R.st,LAST.R.museum);ptToast("Loaded into the Stat Calculator");return}});
+// ---- what I own: one list of everything, with tick-all per group ----
+const OWNG=[["Pans",(P.gear.pans||[]).map(x=>x.name)],["Shovels",(P.gear.shovels||[]).map(x=>x.name)],["Trinkets",((P.x2||{}).trinkets||[]).map(t=>t.n)],
+  ["Necklaces",P.equip.filter(e=>e.slot==="Necklace").map(e=>e.n)],["Charms",P.equip.filter(e=>e.slot==="Charm").map(e=>e.n)],["Rings",P.equip.filter(e=>e.slot==="Ring").map(e=>e.n)]];
+const isOwn=n=>!!(Store.get(n)||{}).own;const setOwn=(n,v)=>{if(isOwn(n)!==!!v)Store.toggle(n,"own")};
+function drawOwn(){const q=$("ownQ").value.trim().toLowerCase();let tot=0,have=0;
+  $("ownList").innerHTML=OWNG.map(([g,list])=>{const shown=list.filter(n=>!q||n.toLowerCase().includes(q));tot+=list.length;have+=list.filter(isOwn).length;if(!shown.length)return "";
+    return `<div class="og"><div class="ogh"><b>${g}</b><span class="hint">${list.filter(isOwn).length} of ${list.length}</span><button type="button" class="btn sm" data-oall="${g}">Tick all</button><button type="button" class="btn sm" data-onone="${g}">Untick all</button></div><div class="oit">${shown.map(n=>`<label class="ck"><input type="checkbox" data-own="${esc(n)}"${isOwn(n)?" checked":""}> ${esc(n)}</label>`).join("")}</div></div>`}).join("")||'<p class="hint">Nothing matches.</p>';
+  $("ownCount").textContent=`${have} of ${tot} ticked`}
+$("ownQ").addEventListener("input",drawOwn);
+$("ownList").addEventListener("change",e=>{const t=e.target.closest("[data-own]");if(t){setOwn(t.dataset.own,t.checked);drawOwn()}});
+$("ownList").addEventListener("click",e=>{const a=e.target.closest("[data-oall],[data-onone]");if(!a)return;const g=a.dataset.oall||a.dataset.onone,on=!!a.dataset.oall;const q=$("ownQ").value.trim().toLowerCase();
+  (OWNG.find(x=>x[0]===g)||[,[]])[1].filter(n=>!q||n.toLowerCase().includes(q)).forEach(n=>setOwn(n,on));drawOwn()});
+window.ptStoreChanged=()=>{if(!$("ownBox").open)return;drawOwn()};
+$("ownBox").addEventListener("toggle",()=>{if($("ownBox").open)drawOwn()});
+drawOwn();
 drawForm();

@@ -32,6 +32,11 @@
     <div class="iso"><span class="lab">Mutations you can get</span><span id="muts" class="chips"></span></div>
     <div class="iso"><label class="ck"><input type="checkbox" id="perfect"> I can do perfect digs</label><label class="ck"><input type="checkbox" id="night"> It's night</label><label class="ck"><input type="checkbox" id="owned"> Only items I own</label></div>
     <div class="iso"><span class="lab">Also change</span><label class="ck"><input type="checkbox" id="tools"> Pan and shovel</label><label class="ck"><input type="checkbox" id="trinket"> Trinket</label><label class="ck"><input type="checkbox" id="museum"> Museum</label></div>
+    <details class="own" id="ownBox"><summary><b>What I own</b> <span class="hint" id="ownCount"></span></summary>
+      <p class="hint">Tick what you have, so "Only items I own" can stick to it. It's shared with every other tool that has owned ticks.</p>
+      <input type="search" id="ownQ" placeholder="Search your gear" aria-label="Search your gear" autocomplete="off">
+      <div id="ownList"></div>
+    </details>
     <p class="hint">Your boosts (potions, totems, runes, mastery, events) come from the Stat Calculator, so every build is compared with the same ones. <button type="button" class="lnk" id="openCalc">Open the Stat Calculator</button></p>
     <div class="acts"><button type="button" class="btn pri" id="run">Find the best build</button><span class="hint" id="prog" aria-live="polite"></span></div>
   </section>
