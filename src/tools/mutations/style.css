@@ -54,3 +54,7 @@ table.t .nm{font-weight:600;font-size:14px;white-space:nowrap}
 #cats td.nm{grid-column:1/-1;font-weight:600;display:flex;align-items:center;gap:6px;min-width:0}
 #cats td:nth-child(3){justify-self:end;text-align:right}
 }
+.heat th.cust{text-align:center;white-space:nowrap;border-left:2px solid var(--accent)}
+.heat th.cust label{display:inline-flex;align-items:center;gap:6px;font:inherit;color:inherit}
+.heat th.cust input{width:58px;padding:3px 6px;font:12px var(--f-mono);text-align:center;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg)}
+.heat td.cust{border-left:2px solid var(--accent);font-weight:700}

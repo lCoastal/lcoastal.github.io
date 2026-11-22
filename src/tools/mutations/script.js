@@ -15,7 +15,18 @@ window.ptOpenTab=t=>setTab(t);
 // gear mutations
 $("mcards").innerHTML=X.muts.map(m=>`<div class="mc" style="--mc:${MC[m.n]||"var(--accent)"}"><b>${esc(m.n)}</b><span class="x">×${m.x}</span><small>${Object.entries(m.a).map(([k,v])=>`+${v}${PCTS.has(k)?"%":""} ${esc(k)}`).join(", ")||"all stats"}${m.ev?` · ${esc(m.ev)}`:""}</small></div>`).join("");
 const order=["Prismatic","Overclocked","Granite","Diamond","Gold","Silver","None"];
-$("chance").innerHTML=`<tr><th>Catalysts</th>${Array.from({length:15},(_,i)=>`<th style="text-align:center">${i+1}</th>`).join("")}</tr>`+order.filter(k=>X.chances[k]).map(k=>`<tr><td class="nm" style="color:${MC[k]||"var(--muted)"}">${k==="None"?"No mutation":k}</td>${X.chances[k].map(v=>{const p=parseFloat(v);return `<td class="h" style="--p:${Math.min(60,p*1.6).toFixed(0)}%">${esc(v)}</td>`}).join("")}</tr>`).join("");
+// the table above follows one rule: each catalyst has a 25% chance to roll a mutation (Silver 50, Gold 20, Diamond 9,
+// Granite 4.5, Overclocked 4.5, Prismatic 2 out of 90) and you keep the best one rolled. That gives the custom column.
+const CW=[["Silver",50],["Gold",20],["Diamond",9],["Granite",4.5],["Overclocked",4.5],["Prismatic",2]];
+function chanceAt(n){const q=.25,out={};let F=0,prev=Math.pow(1-q,n);out.None=prev*100;CW.forEach(([k,w])=>{F+=w/90;const cur=Math.pow(1-q+q*F,n);out[k]=(cur-prev)*100;prev=cur});return out}
+const pf=p=>p>=99.95?"100%":p<0.005?"0%":p<1?(+p.toFixed(2))+"%":p<10?(+p.toFixed(1))+"%":Math.round(p)+"%";
+let CUSTN=20;try{CUSTN=Math.max(1,Math.min(999,parseInt(localStorage.getItem("pmu-catn"))||20))}catch(e){}
+function chanceTable(){const c=chanceAt(CUSTN);
+  $("chance").innerHTML=`<tr><th>Catalysts</th>${Array.from({length:15},(_,i)=>`<th style="text-align:center">${i+1}</th>`).join("")}<th class="cust"><label>Custom <input type="number" id="custN" min="1" max="999" step="1" value="${CUSTN}" aria-label="Number of catalysts"></label></th></tr>`+order.filter(k=>X.chances[k]).map(k=>`<tr><td class="nm" style="color:${MC[k]||"var(--muted)"}">${k==="None"?"No mutation":k}</td>${X.chances[k].map(v=>{const p=parseFloat(v);return `<td class="h" style="--p:${Math.min(60,p*1.6).toFixed(0)}%">${esc(v)}</td>`}).join("")}<td class="h cust" data-k="${k}" style="--p:${Math.min(60,c[k]*1.6).toFixed(0)}%">${pf(c[k])}</td></tr>`).join("")}
+function custUpd(){const c=chanceAt(CUSTN);document.querySelectorAll("#chance td.cust").forEach(td=>{const v=c[td.dataset.k];td.textContent=pf(v);td.style.setProperty("--p",Math.min(60,v*1.6).toFixed(0)+"%")})}
+chanceTable();
+$("chance").addEventListener("input",e=>{if(e.target.id!=="custN")return;const v=parseInt(e.target.value);if(!(v>=1))return;CUSTN=Math.min(999,v);try{localStorage.setItem("pmu-catn",String(CUSTN))}catch(x){}custUpd()});
+$("chance").addEventListener("change",e=>{if(e.target.id==="custN")e.target.value=CUSTN});
 // catalyst list: search + slot, item rarity, catalyst, catalyst rarity filters; kept per browser
 const RORD=["Common","Uncommon","Rare","Epic","Legendary","Mythic","Exotic","Ascended"],RDK={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6",Ascended:"#ffd36b"};
 const EQ=Object.fromEntries(P.equip.map(x=>[x.n,x]));
@@ -85,12 +96,10 @@ document.addEventListener("click",e=>{const o=e.target.closest("[data-ofmt]");if
 // ---- save each tab as an image ----
 const MUTHEX={...MC,None:"#98a2ad"};
 const chipsOf=e=>{const out=[];Object.entries(e.m).forEach(([k,v])=>out.push({t:`${v}× Pan ${k}`,col:"#e6e9ec"}));Object.entries(e.a).forEach(([k,v])=>out.push({t:`${v>0?"+":"−"}${Math.abs(v)}${PCTS.has(k)?"%":""} ${k}`,col:v>0?statHex(k):"#ef7a66"}));return out};
-$("imgMut").onclick=()=>ptSaveImg("Gear mutations",()=>ptTableImage({title:"Gear mutations",sub:["Multiplies every stat on the item","odds per roll at the Mutation Forge, no event"],
+$("imgMut").onclick=()=>ptSaveImg("Gear mutations",()=>ptTableImage({title:"Gear mutations",sub:["Multiplies every stat on the item","one mutation per item, kept when you reforge or merge"],
   sections:[{h:"What each mutation does",cols:[{h:"Mutation",w:.22},{h:"Stats",w:.1,al:"c"},{h:"Extra bonus",w:.48},{h:"Note",w:.2}],
-    rows:X.muts.map(m=>({cells:[{t:m.n,b:true,col:MC[m.n]||"#e6e9ec",dot:MC[m.n]||"#3cc2a8"},{t:"×"+m.x,mono:true,al:"r"},Object.keys(m.a).length?{chips:Object.entries(m.a).map(([k,v])=>({t:`+${v}${PCTS.has(k)?"%":""} ${k}`,col:statHex(k)}))}:{t:"All stats",col:"#98a2ad"},{t:m.ev||"",col:"#98a2ad",wrap:true}]}))},
-   {h:"Chance per roll by number of catalysts",cols:[{h:"Catalysts",w:.16}].concat(Array.from({length:15},(_,i)=>({h:String(i+1),w:.84/15,al:"c"}))),
-    rows:order.filter(k=>X.chances[k]).map(k=>({cells:[{t:k==="None"?"No mutation":k,b:true,fs:14,col:MUTHEX[k]||"#98a2ad"}].concat(X.chances[k].map(v=>{const p=parseFloat(v);return {t:v,mono:true,fs:11.5,bg:`rgba(60,194,168,${Math.min(.6,p*1.6/100).toFixed(3)})`}}))}))}],
-  note:"Odds with no event running. A Prismatic Catalyst applies Prismatic directly."}));
+    rows:X.muts.map(m=>({cells:[{t:m.n,b:true,col:MC[m.n]||"#e6e9ec",dot:MC[m.n]||"#3cc2a8"},{t:"×"+m.x,mono:true,al:"r"},Object.keys(m.a).length?{chips:Object.entries(m.a).map(([k,v])=>({t:`+${v}${PCTS.has(k)?"%":""} ${k}`,col:statHex(k)}))}:{t:"All stats",col:"#98a2ad"},{t:m.ev||"",col:"#98a2ad",wrap:true}]}))}],
+  note:"A Prismatic Catalyst applies Prismatic directly, and a Festive Catalyst applies Festive."}));
 $("imgPan").onclick=()=>{const {p,base,only,rows,bestLuck}=panRows();if(!rows.length){ptToast("Nothing to save, every enchant is hidden");return}
   const cols=base?[{h:"Enchant",w:.14},{h:"Effect",w:.29},{h:"Pan Luck",w:.09,al:"r"},{h:"Pan Capacity",w:.11,al:"r"},{h:"Aurorite",w:.08,al:"r"},{h:"Aetherite",w:.08,al:"r"},{h:"Aetherium",w:.09,al:"r"},{h:"Book",w:.12}]
     :[{h:"Enchant",w:.16},{h:"Effect",w:.4},{h:"Aurorite",w:.1,al:"r"},{h:"Aetherite",w:.1,al:"r"},{h:"Aetherium",w:.1,al:"r"},{h:"Book",w:.14}];
