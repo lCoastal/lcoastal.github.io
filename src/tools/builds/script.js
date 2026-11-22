@@ -82,7 +82,7 @@ function slotHTML(s){
 function modLabel(m){if(!m||m==="None")return"";if(m==="Any")return"Any";return `<span style="color:${MC(m)}">${esc(m)}</span> ${codesHTML(MODS[m])}`}
 function eqName(e){return (e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:"")+esc(e.name)}
 const STATN={L:"Luck",C:"Capacity",W:"Size Boost",D:"Dig Strength",S:"Dig Speed",$:"Sell Boost",K:"Walk Speed",M:"Modifier Boost",A:"Shake Strength",P:"Shake Speed"};
-let viewMode="table";try{const v=localStorage.getItem("pbs-view");if(v==="text"||v==="table")viewMode=v}catch(e){}
+let viewMode="table";try{const v=localStorage.getItem("pbs-view");if(v==="text"||v==="table"||v==="edit")viewMode=v}catch(e){}
 // ---------- the sheet: pictures, names and readable layout ----------
 const RHX={Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
 const cvar=(pre,name,hex)=>`var(--${pre}-${String(name).toLowerCase().replace(/[^a-z0-9]+/g,"")},${hex})`;
@@ -242,8 +242,77 @@ function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("
   if(tl.length)h+=`<section><h2><span class="n">3</span>Pan &amp; shovel</h2><ul>${tl.map(x=>`<li${edit?` data-ed="${/^Pan:/.test(x)?"pan":/^Shovel:/.test(x)?"shovel":(x.match(/data-ed="(\w+)"/)||[])[1]}"`:""}>${x}</li>`).join("")}</ul></section>`;
   SX.tools=h;h=h0+joinSecs(b,SX,edit);
   h+=`</div>${b.author?`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`:""}</div>`;return colourStats(h)}
+// ---------- the build as plain text: shown in "Edit as text", read back on every change ----------
+// One line per thing. Museum slots are split with " | "; a slot lists choices with " or ", " > " (best first) or "pick 2: A, B".
+// Equipment: Name (Mutation) // note. Rings start with "- " and an optional count like "5×".
+const TXT_SEC=["Museum","Equipment","Pan & shovel"];
+const eqTxt=e=>`${e.name||""}${e.mut?` (${e.mut})`:""}${e.note?` // ${e.note}`:""}`.trim();
+function slotTxt(s){if(!s.m.length)return "-";let t=s.m.length===1?s.m[0]:s.pick>1?`pick ${Math.min(s.pick,s.m.length)}: ${s.m.join(", ")}`:s.m.join(s.join===">"?" > ":" or ");return t+(s.mark?` [${s.mark}]`:"")}
+function toText(b){const L=[];
+  L.push("Title: "+(b.name||""));if(b.subtitle)L.push("Subtitle: "+b.subtitle);if(b.warning)L.push("Warning: "+b.warning);if(b.author)L.push("Author: "+b.author);
+  const notes=String(b.notes||"").split("\n").map(x=>x.trim()).filter(Boolean);if(notes.length){L.push("Notes:");notes.forEach(n=>L.push("- "+n))}
+  L.push("","Museum","Modifier: "+(b.mod||"Any"));if(fbs(b).length)L.push("Fallbacks: "+fbs(b).join(", "));if(b.emptyAny)L.push("Empty slots: Any");
+  ORDER.forEach(r=>{const sl=b.museum[r]||[];L.push(`${r}: `+sl.map((s,i)=>covered(sl,i)?"~":slotTxt(s)).join(" | "))});
+  const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length)L.push("Backup: "+XS.map(x=>x.n).join(", "));
+  L.push("","Equipment");if(b.charm.name||b.charm.note)L.push("Charm: "+eqTxt(b.charm));if(b.neck.name||b.neck.note)L.push("Necklace: "+eqTxt(b.neck));
+  const rl=(head,list)=>{const xs=(list||[]).filter(x=>x.name||x.note);if(!xs.length)return;L.push(head);xs.forEach(x=>L.push("- "+(x.count?String(x.count).trim()+" ":"")+eqTxt(x)))};
+  if(b.split6){rl("Rings (8 slots):",b.rings);rl("Rings (6 slots):",b.rings6)}else rl("Rings:",b.rings);
+  if(b.runes)L.push("Runes: "+b.runes);
+  (b.extras||[]).filter(x=>x.label||x.name).forEach(x=>L.push(`Extra: ${x.label||"Other"} = `+eqTxt(x)));
+  L.push("","Pan & shovel");
+  if(b.pan.name||b.pan.enchant||b.pan.trinket)L.push("Pan: "+[b.pan.name||"",b.pan.enchant?"enchant "+b.pan.enchant:"",b.pan.trinket?"trinket "+b.pan.trinket:""].filter(Boolean).join("; ")+(b.pan.note?" // "+b.pan.note:""));
+  if(b.shovel.name||b.shovel.enchant)L.push("Shovel: "+[b.shovel.name||"",b.shovel.enchant?"enchant "+b.shovel.enchant:""].filter(Boolean).join("; ")+(b.shovel.note?" // "+b.shovel.note:""));
+  if(Array.isArray(b.order))L.push("","Section order: "+secOrder(b).join(", "));
+  return L.join("\n")}
+const ciKey=(obj,v)=>Object.keys(obj).find(k=>k.toLowerCase()===String(v).trim().toLowerCase());
+const minN=v=>{v=String(v).trim();if(/^any$/i.test(v))return "Any";const d=BY[v.toLowerCase()];return d?d[0]:v};
+function parseEq(t){const e={name:"",mut:"",note:""};let s=String(t);const ni=s.indexOf("//");if(ni>=0){e.note=s.slice(ni+2).trim();s=s.slice(0,ni)}
+  const m=s.match(/\(([^)]*)\)\s*$/);if(m){const k=ciKey(EQMUT,m[1]);if(k){e.mut=k;s=s.slice(0,m.index)}}e.name=s.trim();return e}
+function parseSlot(t){const s={m:[],pick:1,join:"|",mark:"",span:1};t=String(t).trim();const mk=t.match(/\[([^\]]*)\]\s*$/);if(mk){s.mark=mk[1].trim();t=t.slice(0,mk.index).trim()}
+  if(!t||t==="-")return s;const pk=t.match(/^pick\s*(\d+)\s*:\s*(.*)$/i);
+  if(pk){s.m=pk[2].split(",").map(minN).filter(Boolean);s.pick=Math.max(1,Math.min(+pk[1],s.m.length||1))}
+  else if(t.includes(">")){s.m=t.split(">").map(minN).filter(Boolean);s.join=">"}
+  else s.m=t.split(/\s+or\s+/i).map(minN).filter(Boolean);
+  s.multi=s.m.length>1;return s}
+function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pic;b.rings=[];const bad=[];let ctx=null;const notes=[];const R={};
+  String(txt).split("\n").forEach((raw,ln)=>{const line=raw.trim();if(!line)return;let m;
+    if(TXT_SEC.some(x=>x.toLowerCase()===line.toLowerCase())){ctx=null;return}
+    if(/^-\s*/.test(line)&&ctx){const v=line.replace(/^-\s*/,"");if(ctx==="notes")notes.push(v);else{const c=v.match(/^(\d+(?:\/\d+)?\s*[×x]?)\s+(.*)$/i);const e=parseEq(c?c[2]:v);e.count=c?c[1].replace(/\s+/g,"").replace(/x$/i,"×"):"";(ctx==="r6"?(b.rings6=b.rings6||[]):b.rings).push(e)}return}
+    if(!(m=line.match(/^([^:]+?):\s*(.*)$/))){bad.push(ln+1);return}
+    const k=m[1].trim().toLowerCase(),v=m[2].trim();ctx=null;
+    if(k==="title")b.name=v;else if(k==="subtitle")b.subtitle=v;else if(k==="warning")b.warning=v;else if(k==="author")b.author=v;
+    else if(k==="notes"){ctx="notes";if(v)notes.push(v)}
+    else if(k==="modifier"){b.mod=ciKey(MODS,v)||"Any"}
+    else if(k==="fallbacks"||k==="fallback")setFbs(b,v.split(",").map(x=>ciKey(MODS,x)).filter(x=>x&&x!=="Any"&&x!=="None"));
+    else if(k==="empty slots")b.emptyAny=/any/i.test(v);
+    else if(ciKey(SLOTS,k)){const r=ciKey(SLOTS,k);const parts=v.split("|");const out=[];for(let i=0;i<SLOTS[r];i++){const p=(parts[i]??"-").trim();if(p==="~"&&out.length){out[out.length-1].span=(out[out.length-1].span||1)+1;out.push({m:[],pick:1,join:"|",mark:"",span:1});continue}out.push(parseSlot(p))}R[r]=out}
+    else if(k==="backup")b.extra=v.split(",").map(x=>x.trim()).filter(Boolean).map(n=>{const d=BY[n.toLowerCase()];const nm=d?d[0]:n;const o=(old.extra||[]).find(x=>x.n.toLowerCase()===nm.toLowerCase());return {n:nm,note:o?o.note:""}});
+    else if(k==="charm")b.charm=parseEq(v);else if(k==="necklace")b.neck=parseEq(v);
+    else if(k==="rings"||k==="rings (8 slots)")ctx="r8";else if(k==="rings (6 slots)"){ctx="r6";b.split6=true}
+    else if(k==="runes"){b.runes=v;b.runeSlots=undefined;rslots(b)}
+    else if(k==="extra"){const i=v.indexOf("=");const e=parseEq(i>=0?v.slice(i+1):v);e.label=i>=0?v.slice(0,i).trim():"";b.extras.push(e)}
+    else if(k==="pan"||k==="shovel"){let s=v,note="";const ni=s.indexOf("//");if(ni>=0){note=s.slice(ni+2).trim();s=s.slice(0,ni)}const ps=s.split(";").map(x=>x.trim());const o={name:"",enchant:"",note};if(k==="pan")o.trinket="";
+      ps.forEach((p,i)=>{const em=p.match(/^enchant\s+(.*)$/i),tm=p.match(/^trinket\s+(.*)$/i);if(em)o.enchant=em[1];else if(tm&&k==="pan")o.trinket=tm[1];else if(i===0)o.name=p});b[k]=o}
+    else if(k==="section order"){b.order=v.split(",").map(x=>x.trim().toLowerCase()).filter(x=>SECS.includes(x))}
+    else bad.push(ln+1)});
+  ORDER.forEach(r=>{if(R[r])b.museum[r]=R[r]});b.notes=notes.join("\n");if(!b.rings.length)b.rings=[{count:"",mut:"",name:"",note:""}];if(!b.split6)b.rings6=[];
+  return {b,bad}}
 let viewRings="8";try{const v=localStorage.getItem("pbs-rings");if(v==="6"||v==="8")viewRings=v}catch(e){}
-function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.view===viewMode)));document.getElementById("sheet").innerHTML=sheetHTML(getB(),true)}
+function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.view===viewMode)));const el=document.getElementById("sheet");
+  if(viewMode!=="edit"){el.innerHTML=sheetHTML(getB(),true);return}
+  // edit as text: the text box stays put while you type; only the sheet beside it is redrawn
+  const ta=document.getElementById("txIn");
+  if(!ta){el.innerHTML=`<div class="txed"><div class="txl"><div class="txbar"><button type="button" class="btn sm" id="txCopy">Copy</button><button type="button" class="btn sm" id="txPaste" title="Make a new build from text you've copied">Paste as new build</button><span class="txmsg" id="txMsg" aria-live="polite"></span></div><textarea id="txIn" spellcheck="false" aria-label="The build as text"></textarea><p class="txhelp">Change any line and the sheet follows. Museum slots are split with <code>|</code>; list choices with <code>or</code>, <code>&gt;</code> (best first) or <code>pick 2: A, B</code>; <code>Any</code> keeps just the modifier, <code>-</code> leaves it empty. Equipment: <code>Name (Mutation) // note</code>. Rings: <code>- 5× Sun's Gift (Sunforged)</code>.</p></div><div class="txr" id="txR"></div></div>`;document.getElementById("txIn").value=toText(getB())}
+  else if(document.activeElement!==ta)ta.value=toText(getB());
+  document.getElementById("txR").innerHTML=sheetHTML(getB(),false)}
+let txT=null;
+document.addEventListener("input",e=>{if(e.target.id!=="txIn")return;clearTimeout(txT);txT=setTimeout(()=>{const cur0=getB();const {b,bad}=fromText(e.target.value,cur0);b.updated=Date.now();const i=B.findIndex(x=>x.id===cur0.id);B[i]=b;persist();renderSelect();renderSheet();renderEditor();
+  document.getElementById("txMsg").textContent=bad.length?`Couldn't read line${bad.length>1?"s":""} ${bad.slice(0,6).join(", ")}${bad.length>6?"…":""}`:"Saved"},200)});
+document.addEventListener("click",async e=>{
+  if(e.target.closest("#txCopy")){const v=document.getElementById("txIn").value;try{await navigator.clipboard.writeText(v);toast("Build copied as text")}catch(err){const ta=document.getElementById("txIn");ta.focus();ta.select();toast("Press Ctrl+C to copy")}}
+  if(e.target.closest("#txPaste")){let t="";try{t=await navigator.clipboard.readText()}catch(err){}
+    if(!t||!/title\s*:/i.test(t)){toast("Copy a build's text first (it starts with Title:)");return}
+    const nb=blankBuild();const {b}=fromText(t,nb);B.push(b);cur=b.id;persist();const ta=document.getElementById("txIn");if(ta)ta.value=toText(b);renderAll();toast("Pasted as a new build")}});
 document.querySelector(".vtoggle").addEventListener("click",e=>{const t=e.target.closest("[data-view]");if(!t)return;viewMode=t.dataset.view;try{localStorage.setItem("pbs-view",viewMode)}catch(err){}renderSheet()});
 // moving sections: drag the grip, or the arrows (keyboard and touch)
 function moveSec(k,to){const b=getB();const o=secOrder(b).filter(x=>x!==k);o.splice(Math.max(0,Math.min(to,o.length)),0,k);b.order=o;touch()}
