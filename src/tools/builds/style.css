@@ -416,3 +416,9 @@ textarea.inp{min-height:90px;resize:vertical}
 /* a mineral with its own modifier */
 .sheet .ovm{display:inline-block;margin-left:6px;padding:0 6px;border:1px solid;border-radius:999px;font-size:11px;font-weight:700;line-height:16px;vertical-align:1px}
 .mrow .mu{max-width:130px;padding:3px 6px;font-size:12px;margin-left:auto}
+
+/* "ANY" in the rarity's colour where a mineral's picture would be */
+.anyi{font-weight:800;font-size:10.5px;line-height:1;letter-spacing:.06em;text-transform:uppercase;border:1.5px dashed currentColor;border-radius:8px;display:inline-grid;place-items:center;box-sizing:border-box}
+.op.anyop .ph.anyi{width:34px;height:34px;font-size:10.5px}
+.sopt .si.anyi{width:28px;height:28px;font-size:9px}
+.mrow .np.anyi{width:28px;height:28px;font-size:9px;flex:none}
