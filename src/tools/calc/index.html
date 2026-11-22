@@ -26,51 +26,34 @@
           <label class="fld sub"><span class="lab">Shovel enchant</span><select id="shEn"></select></label><label class="ck" id="rhyWrap" hidden title="Streak enchants build up with each perfect dig in a row"><input type="checkbox" id="rhy"> <span id="rhyTxt">Full perfect-dig streak</span></label></div></div><p class="hint" id="enNote"></p></section>
       <section class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h2>Jewelry <button type="button" class="rst" data-reset="jewelry">Reset</button></h2>
         <span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="seg" role="group" aria-label="Set every slot's stars"><button type="button" data-all="0">No ★</button><button type="button" data-all="5">All 5★</button><button type="button" data-all="6">All 6★</button></span><select id="allMut" data-ptmut aria-label="Set every slot's mutation"><option value="">Set all mutations…</option></select></span></div>
-        <p class="hint">Stars set the stat range (0★ uses the same range as 5★), quality is where the roll lands inside it (0% worst, 100% best), and the mutation multiplies the result on top.<br>This is a planner, so quality is spread evenly over every stat. In game a 50% item isn't always 50% on each stat: it could be 100% luck and 0% sell boost, which still averages out to 50%.</p>
+        <details class="hintd"><summary>How stars, quality and mutations work</summary><p class="hint">Stars set the stat range (0★ uses the same range as 5★), quality is where the roll lands inside it (0% worst, 100% best), and the mutation multiplies the result on top.<br>This is a planner, so quality is spread evenly over every stat. In game a 50% item isn't always 50% on each stat: it could be 100% luck and 0% sell boost, which still averages out to 50%.</p></details>
         <div id="slots"></div></section>
       <section class="card"><h2>Museum <button type="button" class="rst" data-reset="museum">Reset</button></h2>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end"><label class="fld" style="flex:1;min-width:220px"><span class="lab">Museum boosts from</span><select id="mus"></select></label><button type="button" class="btn" id="musCopy">Edit a copy here</button></div>
         <p class="hint" id="musTxt"></p><div id="musEd"></div></section>
       <section class="card"><h2>Boosts <button type="button" class="rst" data-reset="boosts">Reset</button></h2>
-        <div class="rowc">
-          <label class="ck"><input type="checkbox" data-b="luckTotem"> Luck Totem</label>
-          <label class="ck"><input type="checkbox" data-b="strTotem"> Strength Totem</label>
-          <label class="ck"><input type="checkbox" data-b="lumTotem"> Luminant Totem</label>
-          <label class="ck"><input type="checkbox" data-b="cookie"> XP Cookie</label>
-          <label class="ck"><input type="checkbox" data-b="sun"> Sunblessed / Abyssal rune</label>
-          <label class="ck"><input type="checkbox" data-b="solo"> Solitude rune</label>
-          <label class="ck"><input type="checkbox" data-b="purity"> Purity rune (+1× luck, no modifiers)</label>
-          <label class="ck"><input type="checkbox" data-b="vet"> Veteran rune (+0.25× luck in a fully mastered region)</label>
-          <label class="ck"><input type="checkbox" data-b="daily"> Daily login luck (2× luck)</label>
-          <label class="ck"><input type="checkbox" data-b="dailyStr"> Daily login strength (2× dig strength)</label>
-          <label class="ck"><input type="checkbox" data-b="empower"> Empowering sluice (1.4× luck and capacity)</label>
-          <label class="ck"><input type="checkbox" data-b="egg"> Easter Sluice, Egg Hunter (1.5× luck, capacity, modifier boost, walk speed)</label></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="lab">Other runes</span><span id="runeList" class="rowc"></span><button type="button" class="btn" id="runePage">Pick on the Runes page</button></div>
-        <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="lab">Potions</span><select id="potAdd" aria-label="Add a potion"><option value="">Add a potion…</option></select><button type="button" class="btn" id="potMoney" title="Adds every potion you can buy with money, except the Traveling Merchant's ones">Add all money potions</button><button type="button" class="btn" id="potClear">Clear</button><button type="button" class="btn" id="potShow" aria-pressed="true" aria-controls="potList" title="Only hides the list. Active potions still count in your stats.">Hide potions</button></div><div id="potList" class="rowc"></div><span class="hint" id="potHid" hidden></span></div>
-        <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="lab">Limited consumables</span><select id="consAdd" aria-label="Add a limited consumable"><option value="">Add a consumable…</option></select><button type="button" class="btn" id="consClear">Clear</button></div><div id="consList" class="rowc"></div></div>
-        <div class="rowc">
-          <label class="num">Friendship Totem, players nearby <input type="number" min="-1" max="19" data-n="friendTotem" aria-describedby="ftH"></label>
-          <label class="num">Friends online <input type="number" min="0" max="5" data-n="friends"></label>
-          <label class="num">Location mastery <select data-n="mastery"><option value="0">None</option><option value="0.05">+0.05×</option><option value="0.1">+0.10×</option><option value="0.15">+0.15×</option><option value="0.2">+0.20×</option><option value="0.25">+0.25×</option></select></label></div>
-        <p class="hint" id="ftH">Friendship Totem: −1 = no totem, 0 = just you (+0.4×), each extra player adds +0.2×.</p>
-        <div class="rowc">
-          <label class="num">Other flat luck (potions, etc.) <input type="number" min="0" data-n="flatLuck"></label></div>
-        <div class="rowc"><span class="lab">Permanent buffs</span>
-          <label class="ck" title="Sunset Beach: Restoring the Lighthouse quest"><input type="checkbox" data-b="lighthouse"> Lighthouse Blessing (+3 luck)</label>
-          <label class="ck" title="The figure behind the waterfall in Crystal Caverns"><input type="checkbox" data-b="ancient"> Ancient Blessing (+5 luck)</label>
-          <label class="ck" title="Deeproot Spring: Spirits of the Grotto quest"><input type="checkbox" data-b="spirits"> Blessing of the Spirits (+50 luck)</label>
-          <label class="num" title="Pharaoh's Tomb mastery: flat luck, plus extra tomb time (not counted here)">Tomb Mastery <select data-n="tomb"><option value="0">None</option><option value="1">1 (+50 luck)</option><option value="2">2 (+100)</option><option value="3">3 (+200)</option><option value="4">4 (+350)</option><option value="5">5 (+500)</option></select></label>
-          <label class="num" title="+3 luck for each Dredge Master quest you've done">Dredge Master quests <input type="number" min="0" data-n="dredge"></label>
-          <label class="num" title="Daily login: 1 point on day 5 and 2 on day 10 of each 10-day cycle, +5 luck each">Login Experience points <input type="number" min="0" data-n="xp"></label>
-          <label class="ck" title="Permanent: the Trader at Rubble Creek gives +10% each for Special Orders 2 and 3"><input type="checkbox" data-b="trader"> Trader's Recommendation (+20% Sell Boost)</label>
-          <label class="num">Flat dig strength <input type="number" min="0" data-n="flatDig"></label></div>
-        <div class="rowc"><span class="lab">Events</span>
-          <label class="ck"><input type="checkbox" data-b="meteor"> Meteor shower ×2 luck</label>
-          <label class="ck"><input type="checkbox" data-b="weather"> Weather event ×1.5 luck</label>
-          <label class="ck" title="Counts Night Luck on your gear, like Dullahan's Curse"><input type="checkbox" data-b="night"> Night (counts Night Luck)</label></div></section>
+        <details class="prog" id="progBox"><summary><span class="ph"><b>Your progress</b><span class="hint" id="progSum"></span></span><span class="pedit">Edit</span></summary>
+          <p class="hint">Permanent luck from quests and masteries. Set it once: resetting boosts keeps it.</p>
+          <div class="progg">
+            <label class="ck" title="Permanent: the Trader at Rubble Creek gives +10% each for Special Orders 2 and 3"><input type="checkbox" data-b="trader"> Trader's Recommendation (+20% Sell Boost)</label>
+            <label class="ck" title="Sunset Beach: Restoring the Lighthouse quest"><input type="checkbox" data-b="lighthouse"> Lighthouse Blessing (+3 luck)</label>
+            <label class="ck" title="The figure behind the waterfall in Crystal Caverns"><input type="checkbox" data-b="ancient"> Ancient Blessing (+5 luck)</label>
+            <label class="ck" title="Deeproot Spring: Spirits of the Grotto quest"><input type="checkbox" data-b="spirits"> Blessing of the Spirits (+50 luck)</label>
+            <label class="num" title="+3 luck for each Dredge Master quest you've done">Dredge Master quests done <input type="number" min="0" data-n="dredge"></label>
+            <label class="num" title="Daily login: 1 point on day 5 and 2 on day 10 of each 10-day cycle, +5 luck each">Login Experience points <input type="number" min="0" data-n="xp"></label>
+            <label class="num" title="Pharaoh's Tomb mastery: flat luck, plus extra tomb time (not counted here)">Tomb Mastery <select data-n="tomb"><option value="0">None</option><option value="1">1 (+50 luck)</option><option value="2">2 (+100)</option><option value="3">3 (+200)</option><option value="4">4 (+350)</option><option value="5">5 (+500)</option></select></label>
+            <label class="num" title="The zone you pan in: its mastery level">Location mastery <select data-n="mastery"><option value="0">None</option><option value="0.05">+0.05×</option><option value="0.1">+0.10×</option><option value="0.15">+0.15×</option><option value="0.2">+0.20×</option><option value="0.25">+0.25× (mastered)</option></select></label>
+          </div>
+        </details>
+        <div class="addrow"><span class="lab">Boosts</span><select id="bAdd" aria-label="Add a boost"></select><button type="button" class="btn" id="bClear">Clear</button></div>
+        <div id="bList" class="chips2"></div>
+        <div class="addrow"><span class="lab">Potions</span><select id="potAdd" aria-label="Add a potion"><option value="">Add a potion…</option></select><button type="button" class="btn" id="potClear">Clear</button></div>
+        <details id="potBox" class="potbox"><summary id="potSum"></summary><div id="potList" class="chips2"></div></details>
+        <div class="addrow"><span class="lab">Other runes</span><span id="runeList" class="chips2"></span><button type="button" class="lnk" id="runePage">Pick on the Runes page</button></div>
+      </section>
     </div>
     <div class="res" style="display:flex;flex-direction:column;gap:14px">
-      <section class="card" aria-live="polite"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">Your stats</h2><input id="bName" class="bname" type="text" maxlength="40" placeholder="Name this build" aria-label="Build name" autocomplete="off"><button type="button" class="btn" id="cpStats">Copy my stats</button><button type="button" class="btn" id="shareB" title="Copies a link that opens this build as a build sheet">Share link</button><button type="button" class="btn" id="toImg">Save as image</button></div>
+      <section class="card" aria-live="polite"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">Your stats</h2><input id="bName" class="bname" type="text" maxlength="40" placeholder="Name this build" aria-label="Build name" autocomplete="off"><details class="smenu pt-noacts" id="shMenu"><summary class="btn">Share <span aria-hidden="true">▾</span></summary><div class="smpop" role="menu"><button type="button" class="smi" id="shareB" role="menuitem">Share link<small>A link that opens this build as a build sheet</small></button><button type="button" class="smi" id="cpStats" role="menuitem">Copy my stats<small>Your stat panel as text, for Discord</small></button><button type="button" class="smi" id="toImg" role="menuitem">Save as image<small>Your stat panel as a picture</small></button></div></details></div>
         <div class="iso"><span class="lab">Counting</span><span id="isoChips" class="isoc"></span></div><p class="hint" id="isoNote" hidden></p><div id="out"></div></section>
       <section class="card"><div class="bkh"><h2>What to upgrade next</h2><label class="ck bkt"><input type="checkbox" id="showUp"> Show suggestions</label></div>
         <div id="upBody">

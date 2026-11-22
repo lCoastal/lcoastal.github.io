@@ -184,3 +184,30 @@ table.out th.bkc{text-align:center}
 .bfmus .lab{display:inline-block;min-width:84px}
 
 .lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
+
+/* boosts: progress panel, add-a-boost dropdowns and chips */
+.prog{border:1px solid var(--line);border-radius:10px;background:var(--sunk);padding:0}
+.prog summary{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;cursor:pointer;list-style:none}
+.prog summary::-webkit-details-marker{display:none}
+.prog .ph{display:flex;flex-direction:column;gap:2px;min-width:0}
+.prog .pedit{color:var(--accent);font-weight:600;font-size:13px;flex:none}
+.prog[open] .pedit{display:none}
+.prog>p,.prog .progg{margin:0 12px 10px}
+.progg{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.addrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.addrow select{flex:1 1 220px;max-width:420px;min-width:0}
+.chips2{display:flex;flex-wrap:wrap;gap:6px}
+.bchip{display:inline-flex;align-items:center;gap:6px;padding:3px 6px 3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--sunk);font-size:13px}
+.bchip input{width:56px;padding:2px 4px;font:12px var(--f-mono)}
+.bchip button{border:0;background:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;padding:0 2px}
+.potbox summary{cursor:pointer;font-size:13px;color:var(--muted);margin:2px 0 6px}
+.hintd summary{cursor:pointer;font-size:12.5px;color:var(--muted)}
+.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
+/* share menu in the stats header */
+.smenu{position:relative}
+.smenu>summary{list-style:none;cursor:pointer}
+.smenu>summary::-webkit-details-marker{display:none}
+.smpop{position:absolute;right:0;top:calc(100% + 4px);z-index:30;min-width:240px;display:flex;flex-direction:column;padding:6px;border:1px solid var(--line);border-radius:10px;background:var(--panel);box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.smi{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:8px 10px;border:0;border-radius:8px;background:none;color:var(--fg);font:600 13.5px var(--f-body);cursor:pointer}
+.smi:hover,.smi:focus-visible{background:var(--sunk)}
+.smi small{font-weight:400;font-size:12px;color:var(--muted)}

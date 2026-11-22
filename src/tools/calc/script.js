@@ -116,7 +116,7 @@ function strip(st,g){const t=clone(st);
   if(g==="tools"){t.pan="";t.shovel="";t.panEn="";t.shEn="";t.trinket="";t.trkMax=false}
   else if(g==="jewelry"){t.slots={}}
   else if(g==="museum"){t.mus="none"}
-  else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};PERM.forEach(k=>keep[k]=t.b[k]);t.b=keep;t.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:t.n.dredge,xp:t.n.xp,tomb:t.n.tomb};t.pots=[];t.runes=[];t.cons=[]}
+  else if(g==="boosts"){const keep={meteor:t.b.meteor,weather:t.b.weather};PERM.forEach(k=>keep[k]=t.b[k]);t.b=keep;t.n={friendTotem:-1,friends:0,mastery:t.n.mastery||0,flatLuck:0,flatDig:0,dredge:t.n.dredge,xp:t.n.xp,tomb:t.n.tomb};t.pots=[];t.runes=[];t.cons=[]}
   else if(g==="events"){t.b=Object.assign({},t.b,{meteor:false,weather:false})}
   return t}
 // S.only: null = count everything, otherwise a single part key like "slot:r0", "slot:r0,r1" (same item in several slots) or "group:museum"
@@ -287,7 +287,7 @@ document.addEventListener("click",e=>{const c=e.target.closest("[data-iso]");if(
   const r=e.target.closest("[data-reset]");if(r){if(!r.classList.contains("arm")){r.classList.add("arm");r.textContent="Sure?";setTimeout(()=>{r.classList.remove("arm");r.textContent="Reset"},2500);return}resetGroup(r.dataset.reset);return}});
 document.addEventListener("keydown",e=>{const p=e.target.closest&&e.target.closest("[data-only]");if(p&&(e.key==="Enter"||e.key===" ")){e.preventDefault();p.click()}});
 function resetGroup(g){if(g==="tools"){S.pan="";S.shovel="";S.panEn="";S.shEn=""}else if(g==="jewelry"){S.slots={}}else if(g==="museum"){S.mus="none";S.museumBoard=null}
-  else if(g==="boosts"){const kb={};PERM.forEach(k=>{if(k in S.b)kb[k]=S.b[k]});S.b=kb;S.n={friendTotem:-1,friends:0,mastery:0,flatLuck:0,flatDig:0,dredge:S.n.dredge,xp:S.n.xp,tomb:S.n.tomb};S.pots=[];S.runes=[];S.cons=[]}S.only=null;save();all()}
+  else if(g==="boosts"){const kb={};PERM.forEach(k=>{if(k in S.b)kb[k]=S.b[k]});S.b=kb;S.n={friendTotem:-1,friends:0,mastery:S.n.mastery||0,flatLuck:0,flatDig:0,dredge:S.n.dredge,xp:S.n.xp,tomb:S.n.tomb};S.pots=[];S.runes=[];S.cons=[]}S.only=null;save();all()}
 $("resetAll").onclick=()=>{const b=$("resetAll");if(!b.classList.contains("arm")){b.classList.add("arm");b.textContent="Reset everything?";setTimeout(()=>{b.classList.remove("arm");b.textContent="Reset everything"},2500);return}
   ["tools","jewelry","museum","boosts"].forEach(g=>resetGroup(g));S.isoOff=[];S.only=null;S.owned=false;b.classList.remove("arm");b.textContent="Reset everything";save();all()};
 // ---- what to upgrade next ----------------------------------------------------
@@ -504,7 +504,7 @@ function renderSpread(){const v=spreadVals();let y={};try{y=window.parent.ptYou.
   $("spread").innerHTML=F.map(([k,n])=>{const same=String(y[k]??"")===v[k];return `<div class="sp1${same?" ok":""}"><small>${n}</small><b>${fmt(+v[k],k==="sb"?1:0)}</b><small class="now">${same?"Matches Your stats":y[k]?"Your stats: "+esc(fmt(+y[k],k==="sb"?1:0)):"Not set in Your stats"}</small></div>`}).join("")}
 
 document.addEventListener("click",e=>{if(!e.target.closest("#spSet"))return;try{window.parent.ptYou.set(spreadVals(),window)}catch(e){}renderSpread();toast("Your stats updated")});
-function render(){renderSpread();
+function render(){renderSpread();if(typeof fillProg==="function"&&$("progSum"))fillProg();
   renderIso();renderParts();renderUp();
   const r=compute(effState());
   const f=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
@@ -827,33 +827,48 @@ window.ptLoadState=st=>{const missed=[];
 
   const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=(st.from?`Loaded “${st.from}” from Build Sheets`:"Loaded from Build Sheets")+(missed.length?`. Couldn't match ${missed.join(", ")}, so ${missed.length===1?"it was":"they were"} left empty.`:"")+(st.extraRings?`. The build lists ${st.extraRings} more ring${st.extraRings===1?"":"s"} than the 8 slots, so only the first 8 were used.`:"");Object.assign(t.style,{position:"fixed",left:"50%",bottom:"20px",transform:"translateX(-50%)",background:"var(--fg)",color:"var(--bg)",padding:"8px 14px",borderRadius:"8px",zIndex:60,fontSize:"13.5px"});document.body.appendChild(t);setTimeout(()=>t.remove(),missed.length||st.extraRings?6000:2400)};
 function fillPots(){const PO=((P.x2||{}).potions||[]);S.pots=(S.pots||[]).filter(n=>PO.some(p=>p.n===n));
-  $("potAdd").innerHTML=`<option value="">Add a potion…</option>`+PO.filter(p=>!S.pots.includes(p.n)).map(p=>`<option value="${esc(p.n)}">${esc(p.n)} · ${esc(p.fx)}</option>`).join("");
-  // show / hide the list of active potions (visual only: they still count in the stats)
-  let hid=false;try{hid=localStorage.getItem("pc-hidepots")==="1"}catch(e){}
-  $("potShow").textContent=hid?"Show potions":"Hide potions";$("potShow").setAttribute("aria-pressed",String(!hid));$("potList").hidden=hid;
-  $("potHid").hidden=!hid;$("potHid").textContent=S.pots.length?`${S.pots.length} potion${S.pots.length===1?"":"s"} active, still counted in your stats.`:"No potions active.";
-  $("potList").innerHTML=S.pots.map(n=>`<span class="chip" style="cursor:default">${esc(n)} <button type="button" data-rmpot="${esc(n)}" aria-label="Remove ${esc(n)}" style="border:0;background:none;cursor:pointer;color:var(--muted);font-size:14px;padding:0 0 0 4px">×</button></span>`).join("")||'<span class="hint">No potions active.</span>'}
+  const mp=moneyPots().filter(p=>!S.pots.includes(p.n)).length;
+  $("potAdd").innerHTML=`<option value="">Add a potion…</option>${mp?`<option value="__money">＋ Every money potion (${mp})</option>`:""}`+PO.filter(p=>!S.pots.includes(p.n)).map(p=>`<option value="${esc(p.n)}">${esc(p.n)} · ${esc(p.fx)}</option>`).join("");
+  $("potSum").textContent=S.pots.length?`${S.pots.length} potion${S.pots.length===1?"":"s"} active (click to ${$("potBox").open?"hide":"show"})`:"No potions active";$("potBox").hidden=!S.pots.length;
+  $("potList").innerHTML=S.pots.map(n=>`<span class="bchip">${esc(n)}<button type="button" data-rmpot="${esc(n)}" aria-label="Remove ${esc(n)}">×</button></span>`).join("")}
 function toast(t){document.querySelectorAll(".ctoast").forEach(x=>x.remove());const d=document.createElement("div");d.className="ctoast";d.setAttribute("role","status");d.textContent=t;d.style.cssText="position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40";document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 // every potion bought with money, except the Traveling Merchant's (he isn't always around)
 const moneyPots=()=>((P.x2||{}).potions||[]).filter(p=>/\$/.test(p.cost)&&!/travel/i.test(p.where||""));
-$("potMoney").onclick=()=>{const add=moneyPots().map(p=>p.n).filter(n=>!(S.pots||[]).includes(n));S.pots=[...(S.pots||[]),...add];save();fillPots();render();toast(add.length?`Added ${add.length} money potion${add.length===1?"":"s"}`:"All money potions are already on")};
-$("potShow").onclick=()=>{let hid=false;try{hid=localStorage.getItem("pc-hidepots")==="1"}catch(e){}try{localStorage.setItem("pc-hidepots",hid?"0":"1")}catch(e){}fillPots()};
+$("potBox").addEventListener("toggle",fillPots);
 $("potClear").onclick=()=>{if(!(S.pots||[]).length)return;S.pots=[];save();fillPots();render();toast("Potions cleared")};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-rmpot]");if(!b)return;S.pots=(S.pots||[]).filter(n=>n!==b.dataset.rmpot);save();fillPots();render()});
-function fillCons(){S.cons=(S.cons||[]).filter(n=>CONS.some(c=>c.n===n));
-  $("consAdd").innerHTML=`<option value="">Add a consumable…</option>`+CONS.filter(c=>!S.cons.includes(c.n)).map(c=>`<option value="${esc(c.n)}">${esc(c.n)} · ${esc(c.fx)}</option>`).join("");
-  $("consList").innerHTML=S.cons.map(n=>`<span class="chip" style="cursor:default">${esc(n)} <button type="button" data-rmcons="${esc(n)}" aria-label="Remove ${esc(n)}" style="border:0;background:none;cursor:pointer;color:var(--muted);font-size:14px;padding:0 0 0 4px">×</button></span>`).join("")||'<span class="hint">None active.</span>'}
-$("consClear").onclick=()=>{if(!(S.cons||[]).length)return;S.cons=[];save();fillCons();render();toast("Consumables cleared")};
-document.addEventListener("click",e=>{const b=e.target.closest("[data-rmcons]");if(!b)return;S.cons=(S.cons||[]).filter(n=>n!==b.dataset.rmcons);save();fillCons();render()});
+// boosts you turn on for a while: one dropdown to add them, chips to see and remove them (numbers stay editable on the chip)
+const BOOSTS=[["Totems",[["b","luckTotem","Luck Totem (+1× luck)"],["b","strTotem","Strength Totem (+1× strength)"],["b","lumTotem","Luminant Totem (+0.5× capacity, +50% speed)"],["n","friendTotem","Friendship Totem",0,"players nearby"]]],
+  ["Daily and sluices",[["b","daily","Daily login luck (2× luck)"],["b","dailyStr","Daily login strength (2× dig strength)"],["b","empower","Empowering sluice (1.4× luck and capacity)"],["b","egg","Easter Sluice, Egg Hunter (1.5×)"],["b","cookie","XP Cookie"]]],
+  ["Runes",[["b","sun","Sunblessed / Abyssal rune (+0.2× luck)"],["b","solo","Solitude rune (+0.2× luck)"],["b","purity","Purity rune (+1× luck, no modifiers)"],["b","vet","Veteran rune (+0.25× luck when mastered)"]]],
+  ["Events and time",[["b","meteor","Meteor Shower (×2 luck)"],["b","weather","Weather event (×1.5 luck)"],["b","night","Night (counts Night Luck)"]]],
+  ["Limited consumables",CONS.map(c=>["c",c.n,`${c.n} · ${c.fx}`])],
+  ["Other",[["n","friends","Friends online",1,"online"],["n","flatLuck","Other flat luck",100,"luck"],["n","flatDig","Flat dig strength",10,"strength"]]]];
+const bOn=([k,key])=>k==="b"?!!S.b[key]:k==="c"?(S.cons||[]).includes(key):key==="friendTotem"?(+S.n.friendTotem>=0):(+S.n[key]>0);
+function fillBoosts(){S.cons=(S.cons||[]).filter(n=>CONS.some(c=>c.n===n));
+  $("bAdd").innerHTML=`<option value="">Add a boost…</option>`+BOOSTS.map(([g,l])=>{const off=l.filter(x=>!bOn(x));return off.length?`<optgroup label="${esc(g)}">${off.map(x=>`<option value="${x[0]}:${esc(x[1])}">${esc(x[2])}</option>`).join("")}</optgroup>`:""}).join("");
+  const on=BOOSTS.flatMap(([,l])=>l.filter(bOn));
+  $("bList").innerHTML=on.map(x=>{const lab=x[0]==="c"?x[1]:x[2].replace(/\s*\(.*$/,"");return `<span class="bchip">${esc(lab)}${x[0]==="n"?`<input type="number" min="${x[1]==="friendTotem"?0:0}" data-n="${x[1]}" value="${esc(S.n[x[1]])}" aria-label="${esc(x[2])}" title="${esc(x[4])}">`:""}<button type="button" data-rmb="${x[0]}:${esc(x[1])}" aria-label="Remove ${esc(lab)}">×</button></span>`}).join("")||'<span class="hint">None on. Add totems, daily boosts, runes, events and more from the list.</span>';
+  fillProg()}
+function fillProg(){const b=S.b,n=S.n;const P_=[b.trader!==false&&"Trader",b.lighthouse&&"Lighthouse",b.ancient&&"Ancient",b.spirits&&"Spirits",+n.dredge>0&&`${n.dredge} Dredge quests`,+n.xp>0&&`${n.xp} Experience`,+n.tomb>0&&`Tomb Mastery ${n.tomb}`,+n.mastery>0&&`Mastery +${n.mastery}×`].filter(Boolean);
+  $("progSum").textContent=P_.length?P_.join(" · "):"Nothing set yet: quest luck, Dredge quests, Experience, masteries"}
+document.addEventListener("change",e=>{if(e.target.id!=="bAdd"||!e.target.value)return;const [k,...r]=e.target.value.split(":");const key=r.join(":");const x=BOOSTS.flatMap(([,l])=>l).find(y=>y[0]===k&&y[1]===key);
+  if(k==="b")S.b[key]=true;else if(k==="c")S.cons=[...(S.cons||[]),key];else if(x)S.n[key]=x[3];if(key==="sun"||key==="solo"||key==="purity"||key==="vet")syncRuneFlags();save();all()});
+document.addEventListener("click",e=>{const r=e.target.closest("[data-rmb]");if(!r)return;const [k,...rr]=r.dataset.rmb.split(":");const key=rr.join(":");
+  if(k==="b")S.b[key]=false;else if(k==="c")S.cons=(S.cons||[]).filter(n=>n!==key);else S.n[key]=key==="friendTotem"?-1:0;if(["sun","solo","purity","vet"].includes(key))syncRuneFlags();save();all()});
+$("bClear").onclick=()=>{BOOSTS.flatMap(([,l])=>l).forEach(x=>{if(x[0]==="b")S.b[x[1]]=false;else if(x[0]==="n")S.n[x[1]]=x[1]==="friendTotem"?-1:0});S.cons=[];save();all();toast("Boosts cleared")};
+// rune ticks here keep the rune list (shared with the Runes page) in step
+function syncRuneFlags(){const R=new Set(S.runes||[]);const set=(n,on)=>on?R.add(n):R.delete(n);set("Solitude",!!S.b.solo);set("Purity",!!S.b.purity);set("Veteran",!!S.b.vet);if(!S.b.sun){R.delete("Sunblessed");R.delete("Abyssal")}else if(!R.has("Sunblessed")&&!R.has("Abyssal"))R.add("Sunblessed");S.runes=[...R]}
+function fillCons(){fillBoosts()}
 function fillRhy(){const k=STREAK[S.shEn];$("rhyWrap").hidden=!k;$("rhy").checked=S.rhy!==false;if(k)$("rhyTxt").textContent=`Full perfect-dig streak (+${k[1]}× ${k[0].toLowerCase()})`}
-function fillRunes(){const RU=(S.runes||[]).filter(n=>!["Sunblessed","Abyssal","Solitude","Purity","Veteran"].includes(n));$("runeList").innerHTML=RU.map(n=>`<span class="chip" style="cursor:default">${esc(n)}</span>`).join("")||'<span class="hint">None</span>'}
+function fillRunes(){const RU=(S.runes||[]).filter(n=>!["Sunblessed","Abyssal","Solitude","Purity","Veteran"].includes(n));$("runeList").innerHTML=RU.map(n=>`<span class="bchip" style="padding-right:10px">${esc(n)}</span>`).join("")||'<span class="hint">None</span>'}
 window.ptSetRunes=list=>{S.runes=list||[];S.b.sun=S.runes.includes("Sunblessed")||S.runes.includes("Abyssal");S.b.solo=S.runes.includes("Solitude");S.b.purity=S.runes.includes("Purity");S.b.vet=S.runes.includes("Veteran");save();all()};
 $("runePage").onclick=()=>{try{window.parent.ptCallTool("runes","ptOpenItem","")}catch(e){}};
 function all(){fillEnch();fillPots();fillCons();fillRhy();fillRunes();$("allMut").innerHTML=`<option value="">Set all mutations…</option>`+MUTS.map(m=>`<option value="${m[0]}">${m[0]==="None"?"No mutation":m[0]}</option>`).join("");fillTools();buildSlots();paintPicks();fillMus();musEditor();
   document.querySelectorAll("[data-b]").forEach(i=>i.checked=i.dataset.b==="trader"?S.b.trader!==false:!!S.b[i.dataset.b]);document.querySelectorAll("[data-n]").forEach(i=>i.value=S.n[i.dataset.n]??0);$("ownedOnly").checked=!!S.owned;render()}
 document.addEventListener("change",e=>{const t=e.target;
-  if(t.id==="potAdd"){if(t.value){S.pots=[...(S.pots||[]),t.value];fillPots()}else return}
-  else if(t.id==="consAdd"){if(t.value){S.cons=[...(S.cons||[]),t.value];fillCons()}else return}
+  if(t.id==="potAdd"){if(t.value==="__money"){const add=moneyPots().map(p=>p.n).filter(n=>!(S.pots||[]).includes(n));S.pots=[...(S.pots||[]),...add];fillPots();toast(`Added ${add.length} money potion${add.length===1?"":"s"}`)}else if(t.value){S.pots=[...(S.pots||[]),t.value];fillPots()}else return}
+  else if(t.id==="bAdd"){return}
   else if(t.id==="rhy"){S.rhy=t.checked}
   else if(t.dataset.mm){const [r,i]=t.dataset.mm.split("|");S.museumBoard[r][+i].m=t.value||null}
   else if(t.dataset.mu){const [r,i]=t.dataset.mu.split("|");S.museumBoard[r][+i].u=t.value}
@@ -1026,6 +1041,8 @@ document.addEventListener("click",e=>{const g=e.target.closest("[data-bfg]");if(
   if(e.target.closest("#bfUse")&&BF_LAST){window.ptUseBuild(BF_LAST.st,BF_LAST.museum);ptToast("Build loaded into the calculator");BF_LAST=null;showBf();return}
   if(e.target.closest("#bfCopy")&&BF_LAST){const keep=S;S=Object.assign(clone(keep),BF_LAST.st);window.S=S;let txt="";try{txt=buildSheetText()}finally{S=keep;window.S=keep}
     (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>ptToast("Copied, paste it into Build Sheets → Edit as text"),()=>ptToast("Couldn't copy, your browser blocked it"))}});
+$("shMenu").addEventListener("click",e=>{if(e.target.closest(".smi"))setTimeout(()=>$("shMenu").open=false,0)});
+document.addEventListener("click",e=>{const m=$("shMenu");if(m.open&&!e.target.closest("#shMenu"))m.open=false});
 $("shareB").addEventListener("click",async()=>{const url=await ptCopyShare(buildSheetText());ptToast(url?"Share link copied: it opens this build as a build sheet":"Couldn't copy, your browser blocked it")});
 renderBf();
 all();
