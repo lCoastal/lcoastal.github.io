@@ -949,5 +949,6 @@ document.addEventListener("click",e=>{const g=e.target.closest("[data-bfg]");if(
   if(e.target.closest("#bfUse")&&BF_LAST){const st=BF_LAST.st;Object.assign(S,{pan:st.pan,panEn:st.panEn,shovel:st.shovel,shEn:st.shEn,trinket:st.trinket,slots:clone(st.slots)});if(BF_LAST.museum){S.mus="custom";S.museumBoard=clone(st.museumBoard)}save();all();ptToast("Build loaded into the calculator");BF_LAST=null;showBf();return}
   if(e.target.closest("#bfCopy")&&BF_LAST){const keep=S;S=Object.assign(clone(keep),BF_LAST.st);window.S=S;let txt="";try{txt=buildSheetText()}finally{S=keep;window.S=keep}
     (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>ptToast("Copied, paste it into Build Sheets → Edit as text"),()=>ptToast("Couldn't copy, your browser blocked it"))}});
+$("shareB").addEventListener("click",async()=>{const url=await ptCopyShare(buildSheetText());ptToast(url?"Share link copied: it opens this build as a build sheet":"Couldn't copy, your browser blocked it")});
 renderBf();
 all();

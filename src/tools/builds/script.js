@@ -55,7 +55,7 @@ const sameBoost=m=>{const a=MODSTATS[m];if(!a)return [];return Object.keys(MODST
 // several equally good modifiers: names joined with "or", what they boost listed once
 const modGroup=L=>L.map(m=>`<span class="modtag" style="color:${MC(m)}">${esc(m)}</span>`).join(`<span class="k">or</span>`)+(()=>{const st=[...new Set(L.flatMap(m=>(MODSTATS[m]||[[]])[0]))];return st.length?`<span class="k">boosts ${st.join(", ")}</span>`:""})();
 // ---------- storage ----------
-let B=[],cur=null,armDel=false;
+let B=[],cur=null,armDel=false;let SHARED=null;
 try{const x=JSON.parse(localStorage.getItem("pbs-builds")||"[]");if(Array.isArray(x))B=x.filter(b=>b&&b.id&&b.museum);}catch(e){}
 try{cur=localStorage.getItem("pbs-current")}catch(e){}
 if(!B.length){const b=blankBuild(PAGE_NAME);B.push(b);}
@@ -355,6 +355,8 @@ function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pi
   return {b,bad}}
 let viewRings="8";try{const v=localStorage.getItem("pbs-rings");if(v==="6"||v==="8")viewRings=v}catch(e){}
 function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.view===viewMode)));const el=document.getElementById("sheet");
+  if(SHARED){const vm=viewMode;viewMode="table";const sh=sheetHTML(SHARED.b,false);viewMode=vm;
+    el.innerHTML=`<div class="shbar" role="region" aria-label="Shared build"><div><b>Someone shared this build with you</b><span>It isn't saved yet. Copy it to keep it and change it, or load it straight into the Stat Calculator.</span></div><div class="shbtns"><button type="button" class="btn sm primary" id="shCopy">Copy to my builds</button><button type="button" class="btn sm" id="shCalc">Open in Stat Calculator</button><button type="button" class="btn sm" id="shX">Close</button></div></div>${sh}`;return}
   if(viewMode==="tut"){const tb=fromText(TUT_TEXT,blankBuild()).b;const vm=viewMode;viewMode="table";const sh=sheetHTML(tb,false);viewMode=vm;
     el.innerHTML=`<div class="tutbar"><b>Tutorial</b><span>A small example build. The left is what you'd write in Edit as text, the right is the sheet it makes. Nothing here changes your builds.</span><button type="button" class="btn sm primary" id="tutCopy">Make a copy to edit</button><button type="button" class="btn sm" id="tutTxt">Copy the text</button></div><div class="txed"><div class="txl"><textarea id="tutIn" readonly spellcheck="false" aria-label="The tutorial build as text">${esc(TUT_TEXT)}</textarea><details class="tutfmt"><summary>All colours, styles and text rules</summary>${fmtHelp()}</details></div><div class="txr">${sh}</div></div>`;fitTA(document.getElementById("tutIn"));return}
   if(viewMode!=="edit"){el.innerHTML=sheetHTML(getB(),true);return}
@@ -816,6 +818,17 @@ window.ptCalcState=id=>{const b=B.find(x=>x.id===id)||getB();return calcState(b)
 document.getElementById("bCalc").onclick=()=>{try{window.parent.ptSendCalc(calcState(getB()))}catch(e){toast("Couldn't reach the Stat Calculator")}};
 function renderAll(){renderSelect();renderEditor();renderSheet();renderMTot();histBtns()}
 renderAll();persist();
+// a share link (?b=…): show that build read-only on top, until it's copied or closed
+function dropShareParam(){try{const L=window.parent.location;if(/[?&]b=/.test(L.search))window.parent.history.replaceState(null,"",L.pathname+L.hash)}catch(e){}}
+function endShared(){SHARED=null;dropShareParam();renderSheet()}
+(async()=>{let q="";try{q=new URLSearchParams(window.parent.location.search).get("b")||""}catch(e){}if(!q)return;
+  try{const txt=await ptUnpackText(q);const {b}=fromText(txt,blankBuild());SHARED={b,txt};renderSheet();window.scrollTo(0,0)}catch(e){toast("That share link looks broken");dropShareParam()}})();
+document.getElementById("bShare").onclick=async()=>{const b=getB();if(!b)return;const url=await ptCopyShare(toText(b));if(!url){toast("Couldn't copy, your browser blocked it");return}toast(url.length>1900?"Link copied (long, but it works)":"Share link copied")};
+document.addEventListener("click",e=>{if(!SHARED)return;
+  if(e.target.closest("#shCopy")){const nb=Object.assign(JSON.parse(JSON.stringify(SHARED.b)),{id:uid(),updated:Date.now()});B.push(nb);cur=nb.id;SHARED=null;dropShareParam();persist();renderAll();toast("Copied to your builds");return}
+  if(e.target.closest("#shCalc")){try{window.parent.ptSendCalc(calcState(SHARED.b))}catch(err){toast("Couldn't reach the Stat Calculator")}return}
+  if(e.target.closest("#shX")){endShared();return}
+  if(e.target.closest("#buildSel,#bNew,#bDup,.vtoggle [data-view]"))endShared()});
 
 // Ctrl+Z / Ctrl+Y (or Ctrl+Shift+Z) undo and redo the build; inside a text box the box's own undo runs instead
 document.getElementById("bUndo").onclick=()=>histGo(-1);document.getElementById("bRedo").onclick=()=>histGo(1);
