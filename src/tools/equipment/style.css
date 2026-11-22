@@ -7,7 +7,7 @@
 .frow input[type=search]{flex:1;min-width:180px}
 .chip.r[aria-pressed="true"]{background:var(--rc);border-color:var(--rc)}
 .count{font-size:13px;color:var(--muted)}
-.grp{background:var(--panel);border:1px solid var(--rc);border-left-width:5px;border-radius:8px;overflow:hidden}
+.grp{background:var(--panel);border:1px solid var(--rc);border-left-width:5px;border-radius:8px;overflow:hidden;overflow-x:auto}
 .gh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 12px;border-bottom:1px solid var(--rc);background:var(--sunk)}
 .gh b{font-family:var(--f-display);font-size:1.05rem;color:var(--rc)}
 .grp.neutral .gh b{color:var(--fg)}
@@ -122,3 +122,6 @@ table.mst tr.hl td{background:color-mix(in srgb,var(--accent) 16%,transparent)}
 table.eq td{vertical-align:baseline;padding-top:9px}
 table.eq td.ic{vertical-align:top;padding-top:6px}
 .rec span{align-items:baseline}.rec span img{align-self:center}
+
+/* with three or four star/mutation columns the table gets a minimum width and scrolls sideways instead of squeezing the recipe */
+@media (min-width:761px){table.eq.one{min-width:900px}table.eq.two{min-width:940px}table.eq.many{min-width:1040px}}
