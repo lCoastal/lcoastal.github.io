@@ -164,6 +164,9 @@ const LSTY={BOLD:"font-weight:800",ITALIC:"font-style:italic",UNDERLINE:"text-de
   HIGHLIGHT:"",FADED:"opacity:.6"};
 const LTOK=[...Object.keys(LCOL),...Object.keys(LSTY).map(x=>x.toLowerCase())];
 const LCRE1=new RegExp("^(?:("+LTOK.map(x=>x.toUpperCase()).join("|")+")\\b|\\[("+LTOK.join("|")+")\\]|(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})\\b)[:\\s-]*","i");
+// notes under any area (written as "-- note" lines in Edit as text): b.anotes[key] = "line\nline"
+const anL=(b,k)=>String((b.anotes||{})[k]||"").split("\n").map(x=>x.trim()).filter(Boolean);
+const an=(b,k)=>{const L=anL(b,k);return L.length?`<div class="anote${/^r:/.test(k)?" rn":""}">${L.map(l=>`<div>${escC(l)}</div>`).join("")}</div>`:""};
 function escC(t){t=String(t??"");let col="",st=[],hi=false,m,n=0;
   while(n++<8&&(m=t.match(LCRE1))){if(m[1]&&m[1]!==m[1].toUpperCase())break;const w=(m[1]||m[2]||"").toLowerCase();
     if(m[3])col=m[3];else if(LCOL[w])col=LCOL[w];else if(w==="highlight")hi=true;else st.push(LSTY[w.toUpperCase()]);t=t.slice(m[0].length)}
@@ -182,33 +185,34 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   if(notes.length)h+=`<div class="tips"${edA(edit,"info")}><h3>Read this first</h3><ul>${notes.map(n=>`<li><span>${escC(n)}</span></li>`).join("")}</ul></div>`;
   SX.notes=h;h="";
   // museum
-  h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3><div class="modline"${edA(edit,"mod")}><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${fbs(b).length?`<span class="k">· if you can't, use</span>${fbs(b).map(modTag).join(`<span class="k">then</span>`)}`:""}</div>`;
+  h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3>${an(b,"museum")}<div class="modline"${edA(edit,"mod")}><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${fbs(b).length?`<span class="k">· if you can't, use</span>${fbs(b).map(modTag).join(`<span class="k">then</span>`)}`:""}</div>${an(b,"mod")}`;
   ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(Math.max(1,sl[i].span||1),sl.length-i);cells+=slotCard(sl[i],sp,edit?`slot-${r}-${i}`:"",r,b.mod)}
-    h+=`<div class="rrow" style="--rc:${RC(r)}"><div class="rlab"><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slots">${cells}</div></div>`});
+    h+=`<div class="rrow" style="--rc:${RC(r)}"><div class="rlab"><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slots">${cells}</div></div>${an(b,"r:"+r)}`});
   const t=museumTotals(b);const tl=STATS.filter(s=>Math.abs(t[s])>1e-9);
   if(tl.length)h+=`<div class="tot">${tl.map(s=>`<span style="border-color:${SC2(s)}55"><span style="color:${SC2(s)}">${s}</span><em style="color:${t[s]<0?"#ef7a66":"#e8ecf0"}">${fx(t[s])}</em></span>`).join("")}</div><span class="em" style="font-size:12px">Museum total with the first choice in each slot at full weight, including the modifier.</span>`;
   const XS=(b.extra||[]).filter(x=>x&&x.n);if(!XS.length)h+=addChip(edit,"extra","Add backup minerals");if(XS.length)h+=`<div class="xtra"${edA(edit,"extra")}><h4>Backup minerals <span>if one is hard to get</span></h4><div class="xl">${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];const u=d?picOf("Mineral",d[0]):"";return `<div class="xc" style="--rc:${d?RHX[d[1]]:"#56616c"}">${u?`<img src="${u}" alt="">`:""}<span><b style="color:var(--rc)">${esc(d?d[0]:x.n)}</b>${d?`<span class="gs">${gainSpans(d)}</span><small class="kgl">Max boost at ${d[2]} kg</small>`:""}${x.note?`<small class="xnote">${esc(x.note)}</small>`:""}</span></div>`}).join("")}</div></div>`;
-  h+=`</div>`;SX.museum=h;h="";
+  h+=an(b,"backup");h+=`</div>`;SX.museum=h;h="";
   // gear
   const cards=[];
   const tag=(h0,part)=>edit?h0.replace('<div class="gc"',`<div class="gc" data-ed="${part}"`):h0;
   const ph=(part,t,ico)=>edit?`<div class="gc edgh" data-ed="${part}"><span class="ph">${ico}</span><div class="gt"><small>${t}</small><b>+ Add ${t.toLowerCase()}</b></div></div>`:"";
-  if(b.charm.name||b.charm.note)cards.push(tag(gearCard({t:"Charm",ico:"🔗"},"Equipment",b.charm),"charm"));else if(edit)cards.push(ph("charm","Charm","🔗"));
-  if(b.neck.name||b.neck.note)cards.push(tag(gearCard({t:"Necklace",ico:"📿"},"Equipment",b.neck),"neck"));else if(edit)cards.push(ph("neck","Necklace","📿"));
-  h+=`<div class="blk"><h3><span class="n">2</span>Equipment</h3>`;
+  if(b.charm.name||b.charm.note)cards.push(tag(gearCard({t:"Charm",ico:"🔗"},"Equipment",b.charm,an(b,"charm")),"charm"));else if(edit)cards.push(ph("charm","Charm","🔗"));
+  if(b.neck.name||b.neck.note)cards.push(tag(gearCard({t:"Necklace",ico:"📿"},"Equipment",b.neck,an(b,"neck")),"neck"));else if(edit)cards.push(ph("neck","Necklace","📿"));
+  h+=`<div class="blk"><h3><span class="n">2</span>Equipment</h3>${an(b,"equip")}`;
   h+=cards.length?`<div class="gear">${cards.join("")}</div>`:"";
-  {const rg=ringGrids(b);h+=rg?(edit?`<div data-ed="rings">${rg}</div>`:rg):addChip(edit,"rings","Add rings")}
+  {const rg=ringGrids(b);h+=rg?(edit?`<div data-ed="rings">${rg}</div>`:rg):addChip(edit,"rings","Add rings");h+=an(b,"rings")+an(b,"rings6")}
   if(!b.runes)h+=addChip(edit,"runes","Add runes");if(b.runes){const rs=b.runes.split(",").map(x=>x.trim()).filter(Boolean);h+=`<h3 style="margin:6px 0 0;font:700 11px/1 inherit;letter-spacing:.12em;text-transform:uppercase;color:#97a3b0">Runes</h3><div class="runes"${edA(edit,"runes")}>${rs.map(x=>{const parts=x.split("/").map(y=>y.trim());return `<span>${parts.map(p=>{const real=findItem("Rune",p);const u=real?picOf("Rune",real):"";return (u?`<img src="${u}" alt="">`:"")+esc(p)}).join(' <i class="alt">or</i> ')}</span>`}).join("")}</div>`}
+  h+=an(b,"runes");
   // extra rows go last, after the rings and runes (same order as the text view)
   const xc=b.extras.filter(x=>x.label||x.name).map(x=>tag(gearCard({t:x.label||"Other",ico:"✦"},"Equipment",x),"extras"));
   if(xc.length)h+=`<div class="gear" style="margin-top:8px">${xc.join("")}</div>`;
-  h+=addChip(edit,"extras",xc.length?"Add another row":"Add a row (totems, potions, anything else)");
+  h+=an(b,"extras");h+=addChip(edit,"extras",xc.length?"Add another row":"Add a row (totems, potions, anything else)");
   h+=`</div>`;SX.equip=h;h="";
   // pan + shovel
   const tc=[];
-  if(!(b.pan.name||b.pan.enchant||b.pan.trinket)){if(edit)tc.push(ph("pan","Pan","🥘"))}else tc.push(tag(gearCard({t:"Pan",ico:"🥘"},"Pan",b.pan,`${b.pan.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.pan.enchant)}</span>`:""}${b.pan.trinket?`<span class="ex"><i>Trinket</i> ${esc(b.pan.trinket)}</span>`:""}`),"pan"));
-  if(b.shovel.name||b.shovel.enchant)tc.push(tag(gearCard({t:"Shovel",ico:"⛏"},"Shovel",b.shovel,b.shovel.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.shovel.enchant)}</span>`:""),"shovel"));else if(edit)tc.push(ph("shovel","Shovel","⛏"));
-  if(tc.length)h+=`<div class="blk"><h3><span class="n">3</span>Pan &amp; shovel</h3><div class="gear">${tc.join("")}</div></div>`;
+  if(!(b.pan.name||b.pan.enchant||b.pan.trinket)){if(edit)tc.push(ph("pan","Pan","🥘"))}else tc.push(tag(gearCard({t:"Pan",ico:"🥘"},"Pan",b.pan,`${b.pan.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.pan.enchant)}</span>`:""}${b.pan.trinket?`<span class="ex"><i>Trinket</i> ${esc(b.pan.trinket)}</span>`:""}${an(b,"pan")}`),"pan"));
+  if(b.shovel.name||b.shovel.enchant)tc.push(tag(gearCard({t:"Shovel",ico:"⛏"},"Shovel",b.shovel,(b.shovel.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.shovel.enchant)}</span>`:"")+an(b,"shovel")),"shovel"));else if(edit)tc.push(ph("shovel","Shovel","⛏"));
+  if(tc.length)h+=`<div class="blk"><h3><span class="n">3</span>Pan &amp; shovel</h3>${an(b,"tools")}<div class="gear">${tc.join("")}</div></div>`;
   SX.tools=h;h=h0+joinSecs(b,SX,edit);
   if(b.author)h+=`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`;
   return colourStats(h+`</div>`)}
@@ -229,29 +233,29 @@ function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("
   const SX={};const h0=h;h="";
   if(notes.length)h+=`<section class="tsm"${edA(edit,"info")}><h2>Read this first</h2><ul>${notes.map(n=>`<li>${escC(n)}</li>`).join("")}</ul></section>`;
   SX.notes=h;h="";
-  h+=`<section><h2><span class="n">1</span>Museum</h2><p${edA(edit,"mod")}>Use ${modT(b.mod)} modifier on every mineral${fbs(b).length?`; if you can't get it, use ${fbs(b).map(modT).join(", then ")}`:""}. Put these in each rarity:</p><ul>`;
+  h+=`<section><h2><span class="n">1</span>Museum</h2>${an(b,"museum")}<p${edA(edit,"mod")}>Use ${modT(b.mod)} modifier on every mineral${fbs(b).length?`; if you can't get it, use ${fbs(b).map(modT).join(", then ")}`:""}. Put these in each rarity:</p>${an(b,"mod")}<ul>`;
   ORDER.forEach(r=>{const sl=b.museum[r];const items=sl.map((s,i)=>covered(sl,i)?null:[s,i]).filter(Boolean);
-    h+=`<li><span class="r" style="color:${RC(r)}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(([s,i])=>`<li${edA(edit,`slot-${r}-${i}`)}>${slotText(s,r,b.mod)}</li>`).join("")}</ol></li>`});
+    h+=`<li><span class="r" style="color:${RC(r)}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(([s,i])=>`<li${edA(edit,`slot-${r}-${i}`)}>${slotText(s,r,b.mod)}</li>`).join("")}</ol>${an(b,"r:"+r)}</li>`});
   h+=`</ul>`;
   {const XS=(b.extra||[]).filter(x=>x&&x.n);if(!XS.length)h+=addChip(edit,"extra","Add backup minerals");if(XS.length)h+=`<p${edA(edit,"extra")}>Backup minerals, if one is hard to get:</p><ul${edA(edit,"extra")}>${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];return `<li><b${d?` style="color:${RC(d[1])}"`:""}>${esc(d?d[0]:x.n)}</b>${d?` <span class="dim">(${d[1]})</span> ${d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", ")}, max boost at ${d[2]} kg`:""}${x.note?` · ${esc(x.note)}`:""}</li>`}).join("")}</ul>`}
-  h+=`</section>`;SX.museum=h;h="";
+  h+=an(b,"backup");h+=`</section>`;SX.museum=h;h="";
   const nm=(kind,e)=>{const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";return (u?`<img src="${u}" alt="">`:"")+(e.mut?`<span style="color:${EC(e.mut)}">${esc(e.mut)}</span> `:"")+`<b>${esc(e.name)}</b>`};
   const nt=n=>n?` <span class="dim">· ${escC(n)}</span>`:"";const eq=[];const ad=(part,t)=>edit?{h:`<span class="edadd in">+ ${t}</span>`,p:part}:null;
-  if(b.charm.name||b.charm.note)eq.push({h:`Charm: ${nm("Equipment",b.charm)}${nt(b.charm.note)}`,p:"charm"});else eq.push(ad("charm","Add a charm"));
-  if(b.neck.name||b.neck.note)eq.push({h:`Necklace: ${nm("Equipment",b.neck)}${nt(b.neck.note)}`,p:"neck"});else eq.push(ad("neck","Add a necklace"));
-  const rings=(list,label,rs)=>{const xs=list.filter(x=>x.name||x.note);if(xs.length)eq.push({h:`${label}:<ul>${xs.map(x=>`<li>${x.count?`<b>${esc(x.count)}</b> `:""}${nm("Equipment",x)}${nt(x.note)}</li>`).join("")}</ul>`,rs,p:"rings"});return xs.length};
+  if(b.charm.name||b.charm.note)eq.push({h:`Charm: ${nm("Equipment",b.charm)}${nt(b.charm.note)}${an(b,"charm")}`,p:"charm"});else eq.push(ad("charm","Add a charm"));
+  if(b.neck.name||b.neck.note)eq.push({h:`Necklace: ${nm("Equipment",b.neck)}${nt(b.neck.note)}${an(b,"neck")}`,p:"neck"});else eq.push(ad("neck","Add a necklace"));
+  const rings=(list,label,rs)=>{const xs=list.filter(x=>x.name||x.note);if(xs.length)eq.push({h:`${label}:<ul>${xs.map(x=>`<li>${x.count?`<b>${esc(x.count)}</b> `:""}${nm("Equipment",x)}${nt(x.note)}</li>`).join("")}</ul>${an(b,rs==="6"?"rings6":"rings")}`,rs,p:"rings"});return xs.length};
   let nr=0;if(b.split6){nr+=rings(b.rings,"Rings (8 ring slots)","8");nr+=rings(b.rings6||[],"Rings (6 ring slots)","6")}else nr+=rings(b.rings,"Rings","");if(!nr)eq.push(ad("rings","Add rings"));
-  if(b.runes)eq.push({h:`Runes: <b>${esc(b.runes)}</b>`,p:"runes"});else eq.push(ad("runes","Add runes"));
-  b.extras.filter(x=>x.label||x.name).forEach(x=>eq.push({h:`${esc(x.label||"Other")}: ${nm("Equipment",x)}${nt(x.note)}`,p:"extras"}));eq.push(ad("extras","Add a row (totems, potions, anything else)"));
+  if(b.runes)eq.push({h:`Runes: <b>${esc(b.runes)}</b>${an(b,"runes")}`,p:"runes"});else eq.push(ad("runes","Add runes"));
+  b.extras.filter(x=>x.label||x.name).forEach(x=>eq.push({h:`${esc(x.label||"Other")}: ${nm("Equipment",x)}${nt(x.note)}`,p:"extras"}));{const xi=eq.filter(x=>x&&x.p==="extras");if(xi.length)xi[xi.length-1].h+=an(b,"extras")}eq.push(ad("extras","Add a row (totems, potions, anything else)"));
   const EQ=eq.filter(Boolean);
-  h+=`<section><h2><span class="n">2</span>Equipment</h2>${EQ.length?`<ul>${EQ.map(x=>`<li${x.rs?` data-rs="${x.rs}"`:""}${edA(edit,x.p)}>${x.h}</li>`).join("")}</ul>`:'<p class="dim">No equipment yet.</p>'}</section>`;
+  h+=`<section><h2><span class="n">2</span>Equipment</h2>${an(b,"equip")}${EQ.length?`<ul>${EQ.map(x=>`<li${x.rs?` data-rs="${x.rs}"`:""}${edA(edit,x.p)}>${x.h}</li>`).join("")}</ul>`:'<p class="dim">No equipment yet.</p>'}</section>`;
   SX.equip=h;h="";
   const tl=[];
   if(!(b.pan.name||b.pan.enchant)&&edit)tl.push(`<span class="edadd in" data-ed="pan">+ Add a pan</span>`);
   if(!(b.shovel.name||b.shovel.enchant)&&edit)tl.push(`<span class="edadd in" data-ed="shovel">+ Add a shovel</span>`);
-  if(b.pan.name||b.pan.enchant)tl.push(`Pan: ${nm("Pan",b.pan)}${b.pan.enchant?` with the <b>${esc(b.pan.enchant)}</b> enchant`:""}${b.pan.trinket?` and the <b>${esc(b.pan.trinket)}</b> trinket`:""}${nt(b.pan.note)}`);
-  if(b.shovel.name||b.shovel.enchant)tl.push(`Shovel: ${nm("Shovel",b.shovel)}${b.shovel.enchant?` with the <b>${esc(b.shovel.enchant)}</b> enchant`:""}${nt(b.shovel.note)}`);
-  if(tl.length)h+=`<section><h2><span class="n">3</span>Pan &amp; shovel</h2><ul>${tl.map(x=>`<li${edit?` data-ed="${/^Pan:/.test(x)?"pan":/^Shovel:/.test(x)?"shovel":(x.match(/data-ed="(\w+)"/)||[])[1]}"`:""}>${x}</li>`).join("")}</ul></section>`;
+  if(b.pan.name||b.pan.enchant)tl.push(`Pan: ${nm("Pan",b.pan)}${b.pan.enchant?` with the <b>${esc(b.pan.enchant)}</b> enchant`:""}${b.pan.trinket?` and the <b>${esc(b.pan.trinket)}</b> trinket`:""}${nt(b.pan.note)}${an(b,"pan")}`);
+  if(b.shovel.name||b.shovel.enchant)tl.push(`Shovel: ${nm("Shovel",b.shovel)}${b.shovel.enchant?` with the <b>${esc(b.shovel.enchant)}</b> enchant`:""}${nt(b.shovel.note)}${an(b,"shovel")}`);
+  if(tl.length)h+=`<section><h2><span class="n">3</span>Pan &amp; shovel</h2>${an(b,"tools")}<ul>${tl.map(x=>`<li${edit?` data-ed="${/^Pan:/.test(x)?"pan":/^Shovel:/.test(x)?"shovel":(x.match(/data-ed="(\w+)"/)||[])[1]}"`:""}>${x}</li>`).join("")}</ul></section>`;
   SX.tools=h;h=h0+joinSecs(b,SX,edit);
   h+=`</div>${b.author?`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`:""}</div>`;return colourStats(h)}
 // ---------- the build as plain text: shown in "Edit as text", read back on every change ----------
@@ -260,20 +264,20 @@ function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("
 const TXT_SEC=["Museum","Equipment","Pan & shovel"];
 const eqTxt=e=>`${e.name||""}${e.mut?` (${e.mut})`:""}${e.note?` // ${e.note}`:""}`.trim();
 function slotTxt(s){if(!s.m.length)return "-";let t=s.m.length===1?s.m[0]:s.pick>1?`pick ${Math.min(s.pick,s.m.length)}: ${s.m.join(", ")}`:s.m.join(s.join===">"?" > ":" or ");return t+(s.mark?` [${s.mark}]`:"")}
-function toText(b){const L=[];
+function toText(b){const L=[];const AN=k=>anL(b,k).forEach(x=>L.push("-- "+x));const has=k=>anL(b,k).length>0;
   L.push("Title: "+(b.name||""));if(b.subtitle)L.push("Subtitle: "+b.subtitle);if(b.warning)L.push("Warning: "+b.warning);if(b.author)L.push("Author: "+b.author);
   const notes=String(b.notes||"").split("\n").map(x=>x.trim()).filter(Boolean);if(notes.length){L.push("Notes:");notes.forEach(n=>L.push("- "+n))}
-  L.push("","Museum","Modifier: "+(b.mod||"Any"));if(fbs(b).length)L.push("Fallbacks: "+fbs(b).join(", "));if(b.emptyAny)L.push("Empty slots: Any");
-  ORDER.forEach(r=>{const sl=b.museum[r]||[];L.push(`${r}: `+sl.map((s,i)=>covered(sl,i)?"~":slotTxt(s)).join(" | "))});
-  const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length)L.push("Backup: "+XS.map(x=>x.n).join(", "));
-  L.push("","Equipment");if(b.charm.name||b.charm.note)L.push("Charm: "+eqTxt(b.charm));if(b.neck.name||b.neck.note)L.push("Necklace: "+eqTxt(b.neck));
-  const rl=(head,list)=>{const xs=(list||[]).filter(x=>x.name||x.note);if(!xs.length)return;L.push(head);xs.forEach(x=>L.push("- "+(x.count?String(x.count).trim()+" ":"")+eqTxt(x)))};
-  if(b.split6){rl("Rings (8 slots):",b.rings);rl("Rings (6 slots):",b.rings6)}else rl("Rings:",b.rings);
-  if(b.runes)L.push("Runes: "+b.runes);
-  (b.extras||[]).filter(x=>x.label||x.name).forEach(x=>L.push(`Extra: ${x.label||"Other"} = `+eqTxt(x)));
-  L.push("","Pan & shovel");
-  if(b.pan.name||b.pan.enchant||b.pan.trinket)L.push("Pan: "+[b.pan.name||"",b.pan.enchant?"enchant "+b.pan.enchant:"",b.pan.trinket?"trinket "+b.pan.trinket:""].filter(Boolean).join("; ")+(b.pan.note?" // "+b.pan.note:""));
-  if(b.shovel.name||b.shovel.enchant)L.push("Shovel: "+[b.shovel.name||"",b.shovel.enchant?"enchant "+b.shovel.enchant:""].filter(Boolean).join("; ")+(b.shovel.note?" // "+b.shovel.note:""));
+  L.push("","Museum");AN("museum");L.push("Modifier: "+(b.mod||"Any"));if(fbs(b).length)L.push("Fallbacks: "+fbs(b).join(", "));if(b.emptyAny)L.push("Empty slots: Any");AN("mod");
+  ORDER.forEach(r=>{const sl=b.museum[r]||[];L.push(`${r}: `+sl.map((s,i)=>covered(sl,i)?"~":slotTxt(s)).join(" | "));AN("r:"+r)});
+  const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length||has("backup"))L.push("Backup: "+XS.map(x=>x.n).join(", "));AN("backup");
+  L.push("","Equipment");AN("equip");if(b.charm.name||b.charm.note||has("charm"))L.push("Charm: "+eqTxt(b.charm));AN("charm");if(b.neck.name||b.neck.note||has("neck"))L.push("Necklace: "+eqTxt(b.neck));AN("neck");
+  const rl=(head,list,k)=>{const xs=(list||[]).filter(x=>x.name||x.note);if(!xs.length&&!has(k))return;L.push(head);xs.forEach(x=>L.push("- "+(x.count?String(x.count).trim()+" ":"")+eqTxt(x)));AN(k)};
+  if(b.split6){rl("Rings (8 slots):",b.rings,"rings");rl("Rings (6 slots):",b.rings6,"rings6")}else rl("Rings:",b.rings,"rings");
+  if(b.runes||has("runes"))L.push("Runes: "+(b.runes||""));AN("runes");
+  (b.extras||[]).filter(x=>x.label||x.name).forEach(x=>L.push(`Extra: ${x.label||"Other"} = `+eqTxt(x)));AN("extras");
+  L.push("","Pan & shovel");AN("tools");
+  if(b.pan.name||b.pan.enchant||b.pan.trinket||has("pan"))L.push("Pan: "+[b.pan.name||"",b.pan.enchant?"enchant "+b.pan.enchant:"",b.pan.trinket?"trinket "+b.pan.trinket:""].filter(Boolean).join("; ")+(b.pan.note?" // "+b.pan.note:""));AN("pan");
+  if(b.shovel.name||b.shovel.enchant||has("shovel"))L.push("Shovel: "+[b.shovel.name||"",b.shovel.enchant?"enchant "+b.shovel.enchant:""].filter(Boolean).join("; ")+(b.shovel.note?" // "+b.shovel.note:""));AN("shovel");
   if(Array.isArray(b.order))L.push("","Section order: "+secOrder(b).join(", "));
   return L.join("\n")}
 const ciKey=(obj,v)=>Object.keys(obj).find(k=>k.toLowerCase()===String(v).trim().toLowerCase());
@@ -286,12 +290,15 @@ function parseSlot(t){const s={m:[],pick:1,join:"|",mark:"",span:1};t=String(t).
   else if(t.includes(">")){s.m=t.split(">").map(minN).filter(Boolean);s.join=">"}
   else s.m=t.split(/\s+or\s+/i).map(minN).filter(Boolean);
   s.multi=s.m.length>1;return s}
-function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pic;b.rings=[];const bad=[];let ctx=null;const notes=[];const R={};
+function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pic;b.rings=[];b.anotes={};const bad=[];let ctx=null,area=null;const notes=[];const R={};
   String(txt).split("\n").forEach((raw,ln)=>{const line=raw.trim();if(!line)return;let m;
-    if(TXT_SEC.some(x=>x.toLowerCase()===line.toLowerCase())){ctx=null;return}
+    if(TXT_SEC.some(x=>x.toLowerCase()===line.toLowerCase())){ctx=null;area={museum:"museum",equipment:"equip","pan & shovel":"tools"}[line.toLowerCase()];return}
+    // "-- note": a note under the area just above
+    if(/^--/.test(line)){const v=line.replace(/^--\s*/,"");if(!area){bad.push(ln+1);return}b.anotes[area]=(b.anotes[area]?b.anotes[area]+"\n":"")+v;return}
     if(/^-\s*/.test(line)&&ctx){const v=line.replace(/^-\s*/,"");if(ctx==="notes")notes.push(v);else{const c=v.match(/^(\d+(?:\/\d+)?\s*[×x]?)\s+(.*)$/i);const e=parseEq(c?c[2]:v);e.count=c?c[1].replace(/\s+/g,"").replace(/x$/i,"×"):"";(ctx==="r6"?(b.rings6=b.rings6||[]):b.rings).push(e)}return}
     if(!(m=line.match(/^([^:]+?):\s*(.*)$/))){bad.push(ln+1);return}
     const k=m[1].trim().toLowerCase(),v=m[2].trim();ctx=null;
+    area=["modifier","fallbacks","fallback","empty slots"].includes(k)?"mod":ciKey(SLOTS,k)?"r:"+ciKey(SLOTS,k):k==="necklace"?"neck":k==="extra"?"extras":k==="rings"||k==="rings (8 slots)"?"rings":k==="rings (6 slots)"?"rings6":["backup","charm","runes","pan","shovel"].includes(k)?k:null;
     if(k==="title")b.name=v;else if(k==="subtitle")b.subtitle=v;else if(k==="warning")b.warning=v;else if(k==="author")b.author=v;
     else if(k==="notes"){ctx="notes";if(v)notes.push(v)}
     else if(k==="modifier"){b.mod=ciKey(MODS,v)||"Any"}
@@ -314,7 +321,7 @@ function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach
   if(viewMode!=="edit"){el.innerHTML=sheetHTML(getB(),true);return}
   // edit as text: the text box stays put while you type; only the sheet beside it is redrawn
   const ta=document.getElementById("txIn");
-  if(!ta){el.innerHTML=`<div class="txed"><div class="txl"><div class="txbar"><button type="button" class="btn sm" id="txCopy">Copy</button><button type="button" class="btn sm" id="txPaste" title="Make a new build from text you've copied">Paste as new build</button><span class="txmsg" id="txMsg" aria-live="polite"></span></div><textarea id="txIn" spellcheck="false" aria-label="The build as text"></textarea><p class="txhelp">Change any line and the sheet follows. Museum slots are split with <code>|</code>; list choices with <code>or</code>, <code>&gt;</code> (best first) or <code>pick 2: A, B</code>; <code>Any</code> keeps just the modifier, <code>-</code> leaves it empty. Equipment: <code>Name (Mutation) // note</code>. Rings: <code>- 5× Sun's Gift (Sunforged)</code>. Style a note by starting it with capitals: <code>RED BIG BOLD</code>, <code>OUTLINE</code>, <code>HIGHLIGHT</code>, <code>GLOW</code>, <code>ITALIC</code>…</p></div><div class="txr" id="txR"></div></div>`;document.getElementById("txIn").value=toText(getB())}
+  if(!ta){el.innerHTML=`<div class="txed"><div class="txl"><div class="txbar"><button type="button" class="btn sm" id="txCopy">Copy</button><button type="button" class="btn sm" id="txPaste" title="Make a new build from text you've copied">Paste as new build</button><span class="txmsg" id="txMsg" aria-live="polite"></span></div><textarea id="txIn" spellcheck="false" aria-label="The build as text"></textarea><p class="txhelp">Change any line and the sheet follows. Museum slots are split with <code>|</code>; list choices with <code>or</code>, <code>&gt;</code> (best first) or <code>pick 2: A, B</code>; <code>Any</code> keeps just the modifier, <code>-</code> leaves it empty. Equipment: <code>Name (Mutation) // note</code>. Rings: <code>- 5× Sun's Gift (Sunforged)</code>. Put <code>-- your note</code> under any heading, rarity row or item to add notes there. Style a note by starting it with capitals: <code>RED BIG BOLD</code>, <code>OUTLINE</code>, <code>HIGHLIGHT</code>, <code>GLOW</code>, <code>ITALIC</code>…</p></div><div class="txr" id="txR"></div></div>`;document.getElementById("txIn").value=toText(getB())}
   else if(document.activeElement!==ta)ta.value=toText(getB());
   document.getElementById("txR").innerHTML=sheetHTML(getB(),false)}
 let txT=null;
