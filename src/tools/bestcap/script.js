@@ -18,6 +18,8 @@ let ENCH_ON=true;try{ENCH_ON=localStorage.getItem("pt-ench")!=="0"}catch(e){}
 const enchTag=r=>ENCH_ON&&ENCH_BY[r]?` <span class="ench" title="Best shovel enchant for ${r} minerals">${ENCH_BY[r]}</span>`:"";
 
 const LTD=/The Void|Haunted Creek|North Pole|Seashell Beach/;
+// Sunscorched Desert zones and the Pharaoh's Tomb inside it; you can leave them out if you can't get there yet
+const DESERT=/^(Sandstone Stream|Mystic Floodplains|Lifespring Oasis|Tomb Vein I{1,3})$/;
 const $=id=>document.getElementById(id);
 const ORD=["Ascended","Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
 let S={q:"",sort:"rar",hideR:[],luck:null};
@@ -28,7 +30,7 @@ if(!(+S.luck>0)){try{S.luck=+JSON.parse(localStorage.getItem("po-s")||"{}").luck
 const youGet=()=>{try{return window.parent.ptYou.get()}catch(e){return {}}};const youSet=p=>{try{window.parent.ptYou.set(p)}catch(e){}};
 const youPull=keys=>{const y=youGet();keys.forEach(k=>{if(y[k]!==undefined&&y[k]!==null&&y[k]!=="")S[k]=y[k]});};
 youPull(["luck"]);
-const save=()=>{try{localStorage.setItem("pt-bestcap",JSON.stringify({sort:S.sort,hideR:S.hideR,luck:S.luck,bestOnly:!!S.bestOnly}))}catch(e){}youSet({luck:S.luck})};
+const save=()=>{try{localStorage.setItem("pt-bestcap",JSON.stringify({sort:S.sort,hideR:S.hideR,luck:S.luck,bestOnly:!!S.bestOnly,desert:S.desert!==false}))}catch(e){}youSet({luck:S.luck})};
 // the cap settings you can pick in game; no cap means you pan at your own luck
 const CAPS=[1,5,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000];
 // same drop model as Luck Odds: location -> every mineral's listed share there
@@ -86,7 +88,7 @@ function render(){
   // a search matching any mineral name looks for minerals only; otherwise it's a zone search, which shows every drop there
   const exactQ=!!q&&ROWS.some(x=>x.m.n.toLowerCase()===q),nameHit=n=>exactQ?n.toLowerCase()===q:n.toLowerCase().includes(q);
   const minQ=!!q&&ROWS.some(x=>x.m.n.toLowerCase().includes(q)),zoneQ=!!q&&!minQ,best=S.bestOnly&&!zoneQ;
-  const by=new Map();ROWS.filter(x=>!S.hideR.includes(x.m.r)).forEach(x=>{if(!by.has(x.m))by.set(x.m,[]);by.get(x.m).push(x)});
+  const by=new Map();ROWS.filter(x=>!S.hideR.includes(x.m.r)&&(S.desert!==false||!DESERT.test(baseLoc(x.loc)))).forEach(x=>{if(!by.has(x.m))by.set(x.m,[]);by.get(x.m).push(x)});
   by.forEach((list,m)=>{let zs=list.map(r=>({r,b:bestFor(r)})).sort((x,y)=>y.b.eff-x.b.eff);
     // best zone only: skip limited-time zones unless the mineral only drops there
     // Abyssal Depth is a normal always-open zone; only The Void and event islands count as limited
@@ -98,16 +100,17 @@ function render(){
   let mins=[...by.keys()];
   mins.sort(S.sort==="az"?(a,b)=>a.n.localeCompare(b.n):(a,b)=>ORD.indexOf(a.r)-ORD.indexOf(b.r)||a.n.localeCompare(b.n));
   const rows=[...by.values()].flat();const zones=new Set(rows.map(z=>z.r.loc));
-  VIEW_BEST=best;$("count").textContent=rows.length?(best?`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"}, each in its best zone`:`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"} across ${fmt(zones.size,0)} zones`):"";
+  VIEW_BEST=best;$("count").textContent=rows.length?(best?`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"}, each in its best zone`:`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"} across ${fmt(zones.size,0)} zones`):"";if(rows.length&&S.desert===false)$("count").textContent+=" · desert and Pharaoh's Tomb left out";
   VIEW={mins,by};
   const shown=mins.slice(0,LIMIT);
   $("rows").innerHTML=rows.length?shown.map(m=>{const zs=by.get(m);
     return zs.map(({r,b},i)=>`<tr class="${i?"":"first"}"><td class="mcell">${i?"":`<span class="mn mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<span><b>${esc(m.n)}</b><br><span class="rr" style="--rc:${rc(m.r)}">${m.r}</span>${enchTag(m.r)}</span></span>`}</td><td class="zcell" data-l="Zone"><span class="lk" data-location="${esc(baseLoc(r.loc))}">${esc(r.loc)}</span>${LTD.test(r.loc)?' <span class="ltd">limited time</span>':""}</td><td data-l="Best luck cap">${b.cap==null?`<span class="cap none">No cap</span>`:`<span class="cap">${fmt(b.cap,0)}</span>`}</td><td class="bl" data-l="Best luck">${peakCell(r)}</td><td class="num" data-l="Chance per mineral">${oneInT(b.eff)}</td><td data-l="Compared to your luck">${gain(b,r)}</td></tr>`).join("")}).join("")
-    :`<tr><td colspan="6" class="hint">Nothing matches. Try another search or turn a rarity back on.</td></tr>`;
+    :`<tr><td colspan="6" class="hint">${S.desert===false?"Nothing matches outside the desert. Tick “Count the desert” to see desert and Pharaoh's Tomb zones too.":"Nothing matches. Try another search or turn a rarity back on."}</td></tr>`;
   $("more").innerHTML=mins.length>LIMIT?`<button type="button" class="btn" id="moreBtn">Show ${fmt(Math.min(60,mins.length-LIMIT),0)} more minerals</button>`:"";
 }
 $("q").value=S.q;$("luck").value=S.luck;$("bestOnly").checked=!!S.bestOnly;
 $("bestOnly").addEventListener("change",()=>{S.bestOnly=$("bestOnly").checked;save();render()});
+$("desertOn").checked=S.desert!==false;$("desertOn").addEventListener("change",()=>{S.desert=$("desertOn").checked;save();render()});
 $("enchOn").checked=ENCH_ON;$("enchOn").addEventListener("change",()=>{ENCH_ON=$("enchOn").checked;try{localStorage.setItem("pt-ench",ENCH_ON?"1":"0")}catch(e){}render()});
 
 $("luck").addEventListener("input",()=>{const v=+$("luck").value;if(v>0){S.luck=v;save();render()}});
@@ -150,7 +153,7 @@ async function capImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-ser
   const title=imgName();
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(fit(title,W-PAD*2-mw-20),PAD,PAD+30);
   const shownR=ORD.filter(r=>!S.hideR.includes(r)&&ROWS.some(x=>x.m.r===r));
-  const sub=[`Your luck ${fmt(L,0)}`,`${fmt(VIEW.mins.length,0)} mineral${VIEW.mins.length===1?"":"s"}`];if(VIEW_BEST&&S.q.trim())sub.push("best zone only");if(S.hideR.length)sub.push(shownR.join(", ")||"no rarities");
+  const sub=[`Your luck ${fmt(L,0)}`,`${fmt(VIEW.mins.length,0)} mineral${VIEW.mins.length===1?"":"s"}`];if(VIEW_BEST&&S.q.trim())sub.push("best zone only");if(S.hideR.length)sub.push(shownR.join(", ")||"no rarities");if(S.desert===false)sub.push("no desert");
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(" · "),W-PAD*2),PAD,PAD+58);
   const cols=[["Mineral",0],["Zone",250],["Best luck cap",520],["Best luck",670],["Chance per mineral",850],["Compared to your luck",1030]];const X=v=>PAD+12+v;
   let y=HEAD;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach(([t,x])=>c.fillText(t.toUpperCase(),X(x),y+20));
