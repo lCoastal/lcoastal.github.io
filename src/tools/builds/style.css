@@ -345,3 +345,16 @@ textarea.inp{min-height:90px;resize:vertical}
 .mhow select{flex:1;min-width:0}
 .sopt.on{background:color-mix(in srgb,var(--acc,#3cc2a8) 14%,transparent);box-shadow:inset 3px 0 0 var(--acc,#3cc2a8)}
 .sopt.on .kgs{color:var(--acc,#3cc2a8);font-weight:700}
+
+/* reordering sections on the sheet */
+.dsec{position:relative;border-radius:12px}
+.dbar{position:absolute;top:6px;right:6px;display:flex;gap:2px;z-index:3;opacity:.35;transition:opacity .12s}
+.dsec:hover>.dbar,.dbar:focus-within{opacity:1}
+.dgrip{cursor:grab;padding:2px 6px;border-radius:6px;color:#97a3b0;font-size:15px;line-height:1.2;user-select:none}
+.dgrip:active{cursor:grabbing}
+.dmv{border:0;background:transparent;color:#97a3b0;font-size:11px;padding:3px 5px;border-radius:6px;cursor:pointer}
+.dmv:hover:not(:disabled),.dgrip:hover{background:rgba(255,255,255,.08);color:#e8ecf0}
+.dmv:disabled{opacity:.3;cursor:default}
+.dsec.dragging{opacity:.45}
+.dsec.dropb{box-shadow:0 -3px 0 var(--acc,#3cc2a8)}
+.dsec.dropa{box-shadow:0 3px 0 var(--acc,#3cc2a8)}

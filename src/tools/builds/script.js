@@ -113,7 +113,7 @@ function gearCard(label,kind,e,extra,rs,count){
   const alts=String(e.name||"").split("|").map(x=>x.trim()).filter(Boolean);
   const main=alts[0]||"—";const altT=alts.slice(1);
   const mut=e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:"";
-  return `<div class="gc"${rs?` data-rs="${rs}"`:""}>${u?`<img src="${u}" alt="">`:`<span class="ph">${label.ico||""}</span>`}<div class="gt"><small>${esc(label.t)}</small><b>${mut}${esc(main)}${count?`<span class="cnt">${esc(count)}</span>`:""}</b>${altT.length?`<span class="alt">or ${altT.map(esc).join(" or ")}</span>`:""}${extra||""}${e.note?`<span class="nt">${esc(e.note)}</span>`:""}</div></div>`}
+  return `<div class="gc"${rs?` data-rs="${rs}"`:""}>${u?`<img src="${u}" alt="">`:`<span class="ph">${label.ico||""}</span>`}<div class="gt"><small>${esc(label.t)}</small><b>${mut}${esc(main)}${count?`<span class="cnt">${esc(count)}</span>`:""}</b>${altT.length?`<span class="alt">or ${altT.map(esc).join(" or ")}</span>`:""}${extra||""}${e.note?`<span class="nt">${escC(e.note)}</span>`:""}</div></div>`}
 function quickChip(t,kind,name){const real=name?findItem(kind,name):null;const u=real?picOf(kind,real):"";return `<div class="qc">${u?`<img src="${u}" alt="">`:`<span class="ph"></span>`}<span><small>${t}</small><b>${esc(String(name).split("|")[0].trim())}</b></span></div>`}
 // rings: always 8 slots; each ring is shown as many times as its count; with 6 ring slots, slots 7 and 8 are locked
 const has6=b=>!!b.split6||(b.rings||[]).some(x=>String(x.count||"").includes("/"));
@@ -127,7 +127,7 @@ function ringGrid(b,v,rs){const got=ringSlots(b,v);let h=`<div class="rings8"${r
     if(i>=v){h+=`<div class="rs lock"><span class="lk">🔒</span><small>Slot ${i+1}</small><span class="lt">Locked</span></div>`;continue}
     const g=got[i];if(!g){h+=`<div class="rs empty"><small>Slot ${i+1}</small><span class="lt">Any ring</span></div>`;continue}
     const e=g.x;const real=findItem("Equipment",e.name);const u=real?picOf("Equipment",real):"";const alts=String(e.name).split("|").map(t=>t.trim()).filter(Boolean);
-    h+=`<div class="rs">${u?`<img src="${u}" alt="">`:`<span class="ph">💍</span>`}<small>Slot ${i+1}</small><b>${e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:""}${esc(alts[0]||"")}</b>${g.first&&e.note?`<span class="lt">${esc(e.note)}</span>`:""}</div>`}
+    h+=`<div class="rs">${u?`<img src="${u}" alt="">`:`<span class="ph">💍</span>`}<small>Slot ${i+1}</small><b>${e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:""}${esc(alts[0]||"")}</b>${g.first&&e.note?`<span class="lt">${escC(e.note)}</span>`:""}</div>`}
   return h+`</div>`}
 function ringGrids(b){if(!(b.rings||[]).some(x=>x.name)&&!(b.rings6||[]).some(x=>x.name))return "";
   return `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:6px"><h3 style="margin:0;font:700 11px/1 inherit;letter-spacing:.12em;text-transform:uppercase;color:#97a3b0">Rings</h3>${has6(b)?`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`:""}</div>`+(has6(b)?ringGrid(b,8,"8")+ringGrid(b,6,"6"):ringGrid(b,8,""))}
@@ -148,14 +148,27 @@ const tidy=o=>{if(typeof o==="string")return tidyT(o);if(Array.isArray(o))return
 // edit=true only for the page's own preview: parts get data-ed (click to edit) and empty parts get "+ Add" chips.
 // Saved images and downloads call these without it, so none of that ends up in them.
 const edA=(on,part)=>on?` data-ed="${part}"`:"";
+// section order (dragged on the sheet); numbers follow the order
+const SECS=["notes","museum","equip","tools"];const SECN={notes:"Read this first",museum:"Museum",equip:"Equipment",tools:"Pan & shovel"};
+const secOrder=b=>{const o=(Array.isArray(b.order)?b.order:[]).filter(k=>SECS.includes(k));SECS.forEach(k=>{if(!o.includes(k))o.push(k)});return o};
+function joinSecs(b,S,edit){const o=secOrder(b);let n=0;
+  return o.filter(k=>S[k]).map((k,i)=>{const html=S[k].replace(/<span class="n">\d<\/span>/,()=>`<span class="n">${++n}</span>`);
+    return edit?`<div class="dsec" data-sec="${k}"><div class="dbar"><span class="dgrip" draggable="true" title="Drag to move this section" aria-hidden="true">⠿</span><button type="button" class="dmv" data-mv="-1" data-sec="${k}" aria-label="Move ${SECN[k]} up"${i===0?" disabled":""}>▲</button><button type="button" class="dmv" data-mv="1" data-sec="${k}" aria-label="Move ${SECN[k]} down"${i===o.filter(x=>S[x]).length-1?" disabled":""}>▼</button></div>${html}</div>`:html}).join("")}
+// a line starting with a colour word in capitals (RED, GREEN…), [red] or a #hex code is shown in that colour
+const LCOL={red:"#ff5a5a",orange:"#ff9d3c",yellow:"#ffd84a",gold:"#ffcc33",green:"#6ee06a",lime:"#b6f24a",cyan:"#4ad8e0",blue:"#5aa8ff",purple:"#b880ee",pink:"#ff7ad6",white:"#ffffff",gray:"#97a3b0",grey:"#97a3b0"};
+const LCRE=new RegExp("^(?:("+Object.keys(LCOL).map(k=>k.toUpperCase()).join("|")+")\\b[:\\s-]*|\\[("+Object.keys(LCOL).join("|")+")\\][:\\s]*|(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})\\b[:\\s]*)","i");
+function escC(t){t=String(t??"");const m=t.match(LCRE);if(!m)return esc(t);if(m[1]&&m[1]!==m[1].toUpperCase())return esc(t);
+  const c=m[3]||LCOL[(m[1]||m[2]).toLowerCase()];return `<span style="color:${c}">${esc(t.slice(m[0].length))}</span>`}
 const addChip=(on,part,t)=>on?`<button type="button" class="edadd" data-ed="${part}">+ ${t}</button>`:"";
 function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const b=withAny(tidy(b0));
   const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
-  let h=`<div class="sheet" data-rings="${has6(b)?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
+  let h=`<div class="sheet" data-rings="${has6(b)?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${escC(b.subtitle)}</p>`:""}</div></div>`;
   if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
   if(!notes.length&&!b.warning)h+=addChip(edit,"info",b.subtitle?"Add a warning or notes":"Add a subtitle, warning or notes");
   const q=[];if(b.pan.name)q.push(quickChip("Pan","Pan",b.pan.name));if(b.shovel.name)q.push(quickChip("Shovel","Shovel",b.shovel.name));if(b.charm.name)q.push(quickChip("Charm","Equipment",b.charm.name));if(b.neck.name)q.push(quickChip("Necklace","Equipment",b.neck.name));
-  if(notes.length)h+=`<div class="tips"${edA(edit,"info")}><h3>Read this first</h3><ul>${notes.map(n=>`<li><span>${esc(n)}</span></li>`).join("")}</ul></div>`;
+  const SX={};const h0=h;h="";
+  if(notes.length)h+=`<div class="tips"${edA(edit,"info")}><h3>Read this first</h3><ul>${notes.map(n=>`<li><span>${escC(n)}</span></li>`).join("")}</ul></div>`;
+  SX.notes=h;h="";
   // museum
   h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3><div class="modline"${edA(edit,"mod")}><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${fbs(b).length?`<span class="k">· if you can't, use</span>${fbs(b).map(modTag).join(`<span class="k">then</span>`)}`:""}</div>`;
   ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(Math.max(1,sl[i].span||1),sl.length-i);cells+=slotCard(sl[i],sp,edit?`slot-${r}-${i}`:"",r,b.mod)}
@@ -163,7 +176,7 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   const t=museumTotals(b);const tl=STATS.filter(s=>Math.abs(t[s])>1e-9);
   if(tl.length)h+=`<div class="tot">${tl.map(s=>`<span style="border-color:${SC2(s)}55"><span style="color:${SC2(s)}">${s}</span><em style="color:${t[s]<0?"#ef7a66":"#e8ecf0"}">${fx(t[s])}</em></span>`).join("")}</div><span class="em" style="font-size:12px">Museum total with the first choice in each slot at full weight, including the modifier.</span>`;
   const XS=(b.extra||[]).filter(x=>x&&x.n);if(!XS.length)h+=addChip(edit,"extra","Add backup minerals");if(XS.length)h+=`<div class="xtra"${edA(edit,"extra")}><h4>Backup minerals <span>if one is hard to get</span></h4><div class="xl">${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];const u=d?picOf("Mineral",d[0]):"";return `<div class="xc" style="--rc:${d?RHX[d[1]]:"#56616c"}">${u?`<img src="${u}" alt="">`:""}<span><b style="color:var(--rc)">${esc(d?d[0]:x.n)}</b>${d?`<span class="gs">${gainSpans(d)}</span><small class="kgl">Max boost at ${d[2]} kg</small>`:""}${x.note?`<small class="xnote">${esc(x.note)}</small>`:""}</span></div>`}).join("")}</div></div>`;
-  h+=`</div>`;
+  h+=`</div>`;SX.museum=h;h="";
   // gear
   const cards=[];
   const tag=(h0,part)=>edit?h0.replace('<div class="gc"',`<div class="gc" data-ed="${part}"`):h0;
@@ -178,12 +191,13 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   const xc=b.extras.filter(x=>x.label||x.name).map(x=>tag(gearCard({t:x.label||"Other",ico:"✦"},"Equipment",x),"extras"));
   if(xc.length)h+=`<div class="gear" style="margin-top:8px">${xc.join("")}</div>`;
   h+=addChip(edit,"extras",xc.length?"Add another row":"Add a row (totems, potions, anything else)");
-  h+=`</div>`;
+  h+=`</div>`;SX.equip=h;h="";
   // pan + shovel
   const tc=[];
   if(!(b.pan.name||b.pan.enchant||b.pan.trinket)){if(edit)tc.push(ph("pan","Pan","🥘"))}else tc.push(tag(gearCard({t:"Pan",ico:"🥘"},"Pan",b.pan,`${b.pan.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.pan.enchant)}</span>`:""}${b.pan.trinket?`<span class="ex"><i>Trinket</i> ${esc(b.pan.trinket)}</span>`:""}`),"pan"));
   if(b.shovel.name||b.shovel.enchant)tc.push(tag(gearCard({t:"Shovel",ico:"⛏"},"Shovel",b.shovel,b.shovel.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.shovel.enchant)}</span>`:""),"shovel"));else if(edit)tc.push(ph("shovel","Shovel","⛏"));
   if(tc.length)h+=`<div class="blk"><h3><span class="n">3</span>Pan &amp; shovel</h3><div class="gear">${tc.join("")}</div></div>`;
+  SX.tools=h;h=h0+joinSecs(b,SX,edit);
   if(b.author)h+=`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`;
   return colourStats(h+`</div>`)}
 function slotText(s,r,mod){if(!s.m.length)return '<span class="dim">any mineral</span>';
@@ -195,20 +209,22 @@ function slotText(s,r,mod){if(!s.m.length)return '<span class="dim">any mineral<
   return t+(s.mark?` <span class="mark">${esc(s.mark)}</span>`:"")}
 function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
   const modT=m=>!m||m==="None"||m==="Any"?"<b>any</b>":`<b style="color:${MC(m)}">${esc(m)}</b>`;
-  let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
+  let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${escC(b.subtitle)}</p>`:""}</div></div>`;
   if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
   if(!notes.length&&!b.warning)h+=addChip(edit,"info",b.subtitle?"Add a warning or notes":"Add a subtitle, warning or notes");
   if(b.split6)h+=`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`;
   h+=`<div class="tx">`;
-  if(notes.length)h+=`<section class="tsm"${edA(edit,"info")}><h2>Read this first</h2><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>`;
+  const SX={};const h0=h;h="";
+  if(notes.length)h+=`<section class="tsm"${edA(edit,"info")}><h2>Read this first</h2><ul>${notes.map(n=>`<li>${escC(n)}</li>`).join("")}</ul></section>`;
+  SX.notes=h;h="";
   h+=`<section><h2><span class="n">1</span>Museum</h2><p${edA(edit,"mod")}>Use ${modT(b.mod)} modifier on every mineral${fbs(b).length?`; if you can't get it, use ${fbs(b).map(modT).join(", then ")}`:""}. Put these in each rarity:</p><ul>`;
   ORDER.forEach(r=>{const sl=b.museum[r];const items=sl.map((s,i)=>covered(sl,i)?null:[s,i]).filter(Boolean);
     h+=`<li><span class="r" style="color:${RC(r)}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(([s,i])=>`<li${edA(edit,`slot-${r}-${i}`)}>${slotText(s,r,b.mod)}</li>`).join("")}</ol></li>`});
   h+=`</ul>`;
   {const XS=(b.extra||[]).filter(x=>x&&x.n);if(!XS.length)h+=addChip(edit,"extra","Add backup minerals");if(XS.length)h+=`<p${edA(edit,"extra")}>Backup minerals, if one is hard to get:</p><ul${edA(edit,"extra")}>${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];return `<li><b${d?` style="color:${RC(d[1])}"`:""}>${esc(d?d[0]:x.n)}</b>${d?` <span class="dim">(${d[1]})</span> ${d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", ")}, max boost at ${d[2]} kg`:""}${x.note?` · ${esc(x.note)}`:""}</li>`}).join("")}</ul>`}
-  h+=`</section>`;
+  h+=`</section>`;SX.museum=h;h="";
   const nm=(kind,e)=>{const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";return (u?`<img src="${u}" alt="">`:"")+(e.mut?`<span style="color:${EC(e.mut)}">${esc(e.mut)}</span> `:"")+`<b>${esc(e.name)}</b>`};
-  const nt=n=>n?` <span class="dim">· ${esc(n)}</span>`:"";const eq=[];const ad=(part,t)=>edit?{h:`<span class="edadd in">+ ${t}</span>`,p:part}:null;
+  const nt=n=>n?` <span class="dim">· ${escC(n)}</span>`:"";const eq=[];const ad=(part,t)=>edit?{h:`<span class="edadd in">+ ${t}</span>`,p:part}:null;
   if(b.charm.name||b.charm.note)eq.push({h:`Charm: ${nm("Equipment",b.charm)}${nt(b.charm.note)}`,p:"charm"});else eq.push(ad("charm","Add a charm"));
   if(b.neck.name||b.neck.note)eq.push({h:`Necklace: ${nm("Equipment",b.neck)}${nt(b.neck.note)}`,p:"neck"});else eq.push(ad("neck","Add a necklace"));
   const rings=(list,label,rs)=>{const xs=list.filter(x=>x.name||x.note);if(xs.length)eq.push({h:`${label}:<ul>${xs.map(x=>`<li>${x.count?`<b>${esc(x.count)}</b> `:""}${nm("Equipment",x)}${nt(x.note)}</li>`).join("")}</ul>`,rs,p:"rings"});return xs.length};
@@ -217,16 +233,28 @@ function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("
   b.extras.filter(x=>x.label||x.name).forEach(x=>eq.push({h:`${esc(x.label||"Other")}: ${nm("Equipment",x)}${nt(x.note)}`,p:"extras"}));eq.push(ad("extras","Add a row (totems, potions, anything else)"));
   const EQ=eq.filter(Boolean);
   h+=`<section><h2><span class="n">2</span>Equipment</h2>${EQ.length?`<ul>${EQ.map(x=>`<li${x.rs?` data-rs="${x.rs}"`:""}${edA(edit,x.p)}>${x.h}</li>`).join("")}</ul>`:'<p class="dim">No equipment yet.</p>'}</section>`;
+  SX.equip=h;h="";
   const tl=[];
   if(!(b.pan.name||b.pan.enchant)&&edit)tl.push(`<span class="edadd in" data-ed="pan">+ Add a pan</span>`);
   if(!(b.shovel.name||b.shovel.enchant)&&edit)tl.push(`<span class="edadd in" data-ed="shovel">+ Add a shovel</span>`);
   if(b.pan.name||b.pan.enchant)tl.push(`Pan: ${nm("Pan",b.pan)}${b.pan.enchant?` with the <b>${esc(b.pan.enchant)}</b> enchant`:""}${b.pan.trinket?` and the <b>${esc(b.pan.trinket)}</b> trinket`:""}${nt(b.pan.note)}`);
   if(b.shovel.name||b.shovel.enchant)tl.push(`Shovel: ${nm("Shovel",b.shovel)}${b.shovel.enchant?` with the <b>${esc(b.shovel.enchant)}</b> enchant`:""}${nt(b.shovel.note)}`);
   if(tl.length)h+=`<section><h2><span class="n">3</span>Pan &amp; shovel</h2><ul>${tl.map(x=>`<li${edit?` data-ed="${/^Pan:/.test(x)?"pan":/^Shovel:/.test(x)?"shovel":(x.match(/data-ed="(\w+)"/)||[])[1]}"`:""}>${x}</li>`).join("")}</ul></section>`;
+  SX.tools=h;h=h0+joinSecs(b,SX,edit);
   h+=`</div>${b.author?`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`:""}</div>`;return colourStats(h)}
 let viewRings="8";try{const v=localStorage.getItem("pbs-rings");if(v==="6"||v==="8")viewRings=v}catch(e){}
 function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.view===viewMode)));document.getElementById("sheet").innerHTML=sheetHTML(getB(),true)}
 document.querySelector(".vtoggle").addEventListener("click",e=>{const t=e.target.closest("[data-view]");if(!t)return;viewMode=t.dataset.view;try{localStorage.setItem("pbs-view",viewMode)}catch(err){}renderSheet()});
+// moving sections: drag the grip, or the arrows (keyboard and touch)
+function moveSec(k,to){const b=getB();const o=secOrder(b).filter(x=>x!==k);o.splice(Math.max(0,Math.min(to,o.length)),0,k);b.order=o;touch()}
+const SHEET=document.getElementById("sheet");let DRG=null;
+SHEET.addEventListener("click",e=>{const m=e.target.closest(".dmv");if(!m)return;e.stopPropagation();const o=secOrder(getB());const k=m.dataset.sec;moveSec(k,o.indexOf(k)+(+m.dataset.mv));const n=SHEET.querySelector(`.dmv[data-sec="${k}"][data-mv="${m.dataset.mv}"]`);if(n&&!n.disabled)n.focus()},true);
+SHEET.addEventListener("dragstart",e=>{const g=e.target.closest&&e.target.closest(".dgrip");if(!g)return;const sec=g.closest(".dsec");DRG=sec.dataset.sec;sec.classList.add("dragging");e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",DRG);e.dataTransfer.setDragImage(sec,20,20)}catch(err){}});
+SHEET.addEventListener("dragover",e=>{if(!DRG)return;const sec=e.target.closest(".dsec");if(!sec)return;e.preventDefault();SHEET.querySelectorAll(".dsec").forEach(x=>x.classList.remove("dropb","dropa"));
+  if(sec.dataset.sec===DRG)return;const r=sec.getBoundingClientRect();sec.classList.add(e.clientY<r.top+r.height/2?"dropb":"dropa")});
+SHEET.addEventListener("drop",e=>{if(!DRG)return;e.preventDefault();const sec=e.target.closest(".dsec");const k=DRG;DRG=null;if(!sec||sec.dataset.sec===k){renderSheet();return}
+  const r=sec.getBoundingClientRect();const o=secOrder(getB()).filter(x=>x!==k);let at=o.indexOf(sec.dataset.sec);if(e.clientY>=r.top+r.height/2)at++;moveSec(k,at)});
+SHEET.addEventListener("dragend",()=>{DRG=null;SHEET.querySelectorAll(".dsec").forEach(x=>x.classList.remove("dropb","dropa","dragging"))});
 document.getElementById("sheet").addEventListener("click",e=>{const t=e.target.closest(".rtoggle button");if(!t)return;viewRings=t.dataset.rings;try{localStorage.setItem("pbs-rings",viewRings)}catch(err){}renderSheet()});
 
 // ---------- editor ----------
@@ -249,7 +277,7 @@ function renderEditor(){
   <label class="field"><span>Title</span><input class="inp" autocomplete="off" id="f-name" value="${esc(b.name)}" placeholder="e.g. ${esc(randomName())}"></label>
   <div class="row"><label class="field"><span>Subtitle</span><input class="inp" autocomplete="off" id="f-subtitle" maxlength="120" value="${esc(b.subtitle)}" placeholder="e.g. ${esc(SUB_EX[Math.floor(Math.random()*SUB_EX.length)])}"></label>
   <label class="field"><span>Warning (shown in red)</span><input class="inp" autocomplete="off" id="f-warning" maxlength="200" value="${esc(b.warning)}" placeholder="e.g. Needs modification for Fungal Marsh"></label></div>
-  <label class="field"><span>Notes, one bullet per line</span><textarea class="inp" id="f-notes" maxlength="1500" placeholder="This is a one-tap build.&#10;Use with Luck, Strength and Luminant totems.">${esc(b.notes)}</textarea></label>
+  <label class="field"><span>Notes, one bullet per line <small style="font-weight:400;color:var(--muted)">start a line with RED, GREEN, BLUE, YELLOW, PURPLE… (or #ff8800) to colour it</small></span><textarea class="inp" id="f-notes" maxlength="1500" placeholder="This is a one-tap build.&#10;Use with Luck, Strength and Luminant totems.">${esc(b.notes)}</textarea></label>
   <label class="field"><span>Author / credit</span><input class="inp" autocomplete="off" id="f-author" maxlength="60" value="${esc(b.author)}" placeholder="e.g. YourName (@handle)"></label>
   <div class="field"><span>Picture <small style="font-weight:400;color:var(--muted)">shown top left, cropped to a square</small></span><div class="picrow">${b.pic?`<img class="picprev" src="${b.pic}" alt="">`:`<span class="picprev none">No picture</span>`}<label class="btn sm" for="f-pic">${b.pic?"Change":"Upload image"}</label><input type="file" id="f-pic" accept="image/*" hidden>${b.pic?`<button type="button" class="btn sm" data-act="rmpic">Remove</button>`:""}</div></div></section>`;
   h+=`<section class="card"><h2>Museum</h2>
