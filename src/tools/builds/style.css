@@ -332,3 +332,8 @@ textarea.inp{min-height:90px;resize:vertical}
 .edpop{max-height:none!important;overflow:visible!important}
 .edpop .sbox{position:static!important;width:100%!important;max-width:none;max-height:none;margin-top:6px;box-shadow:none;left:0!important}
 .edpop .slist{max-height:min(60vh,560px)}
+/* "Any" museum slot: no particular mineral, only the modifier counts */
+.anyi{display:inline-grid;place-items:center;color:#97a3b0;font-size:16px}
+.sopt .si.anyi{width:28px;height:28px;border:1px dashed #56616c;border-radius:8px}
+.op.anyop .ph.anyi{width:34px;height:34px;border:1px dashed #56616c;border-radius:8px}
+.op.anyop .gs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;color:#97a3b0;font-size:12px}

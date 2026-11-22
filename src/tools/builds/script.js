@@ -43,6 +43,10 @@ const PAN_EN=["Forceful","Strong","Swift","Lucky","Boosting","Destructive","Giga
 const SH_EN=["Crystal Touch","Excavating","Geothermal","Mastered","Mythical","Non Euclidean","Overdrive","Rhythmic","Synergized","Tempered","Toughened","Treasure Hunter","Void Touched","Well Balanced","Wormhole"];
 function blankBuild(name){return{id:uid(),name:name||randomName(),subtitle:"",warning:"",notes:"",author:"",mod:"Any",modFallback:"",museum:Object.fromEntries(ORDER.map(r=>[r,Array.from({length:SLOTS[r]},()=>({m:[],pick:1,join:"|",mark:"",span:1}))])),charm:{mut:"",name:"",note:""},neck:{mut:"",name:"",note:""},rings:[{count:"",mut:"",name:"",note:""}],split6:false,rings6:[],runes:"",pan:{name:"",enchant:"",trinket:"",note:""},shovel:{name:"",enchant:"",note:""},extras:[],updated:Date.now()}}
 
+// fallback modifiers: a list (old builds kept one in modFallback)
+const fbs=b=>(Array.isArray(b.modFallbacks)?b.modFallbacks:(b.modFallback?[b.modFallback]:[])).filter(m=>m&&m!=="None"&&m!=="Any");
+const fbL=b=>Array.isArray(b.modFallbacks)?b.modFallbacks:fbs(b);
+const setFbs=(b,l)=>{b.modFallbacks=l;b.modFallback=l.filter(Boolean)[0]||""};
 // ---------- storage ----------
 let B=[],cur=null,armDel=false;
 try{const x=JSON.parse(localStorage.getItem("pbs-builds")||"[]");if(Array.isArray(x))B=x.filter(b=>b&&b.id&&b.museum);}catch(e){}
@@ -94,11 +98,11 @@ function findItem(kind,typed){const t=normN(String(typed||"").split("|")[0]);if(
   return L.find(n=>normN(n)===t)||L.find(n=>normN(n).startsWith(t))||L.find(n=>normN(n).includes(t))||null}
 const imgTag=(u,cls)=>u?`<img src="${u}" alt=""${cls?` class="${cls}"`:""}>`:`<span class="ph"${cls?` class="${cls}"`:""}></span>`;
 const gainSpans=d=>d?d[3].map(([s,v])=>`<span style="color:${SC2(s)}">${s} ${fx(v)}</span>`).join(""):"";
-function slotCard(s,span,ed){const da=ed?` data-ed="${ed}"`:"";
+function slotCard(s,span,ed,r,mod){const da=ed?` data-ed="${ed}"`:"";
   if(!s.m.length)return `<div class="sl empty"${da}${span>1?` style="grid-column:span ${span}"`:""}>Any mineral</div>`;
   const multi=s.m.length>1;const pick=multi&&s.pick>1?Math.min(s.pick,s.m.length):1;
   const how=!multi?"":pick>1?`Pick ${pick} of these`:s.join===">"?"Best first, then the next":"Any one of these";
-  const ops=s.m.map((n,i)=>{const d=BY[n.toLowerCase()];const nm=d?d[0]:n;
+  const ops=s.m.map((n,i)=>{if(n==="Any")return `<div class="op anyop"><span class="ph anyi">✦</span><span class="nm">Any ${esc(String(r||"").toLowerCase())} mineral</span><span class="gs">${mod&&mod!=="Any"?`<span>only the modifier counts:</span> ${modTag(mod)}`:"<span>only the modifier counts</span>"}</span></div>`;const d=BY[n.toLowerCase()];const nm=d?d[0]:n;
     return `<div class="op">${imgTag(d?picOf("Mineral",nm):"")}<span class="nm"${d?` data-mineral="${esc(nm)}"`:""}>${multi&&s.join===">"&&pick===1?`<span class="rk">${i+1}</span>`:""}${esc(nm)}</span><span class="gs">${gainSpans(d)}</span>${d?`<span class="kgl">Max boost at ${d[2]} kg</span>`:""}</div>`}).join("");
   return `<div class="sl"${da}${span>1?` style="grid-column:span ${span}"`:""}>${how?`<span class="how">${how}</span>`:""}${ops}${s.mark?`<span class="mark">${esc(s.mark)}</span>`:""}</div>`}
 function modTag(m){if(!m||m==="None"||m==="Any")return `<span class="modtag" style="color:#c7d0d9">Any modifier</span>`;const st=(MODSTATS[m]||[[]])[0];return `<span class="modtag" style="color:${MC(m)}">${esc(m)}</span>${st.length?`<span class="k">boosts ${st.join(", ")}</span>`:""}`}
@@ -151,8 +155,8 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   const q=[];if(b.pan.name)q.push(quickChip("Pan","Pan",b.pan.name));if(b.shovel.name)q.push(quickChip("Shovel","Shovel",b.shovel.name));if(b.charm.name)q.push(quickChip("Charm","Equipment",b.charm.name));if(b.neck.name)q.push(quickChip("Necklace","Equipment",b.neck.name));
   if(notes.length)h+=`<div class="tips"${edA(edit,"info")}><h3>Read this first</h3><ul>${notes.map(n=>`<li><span>${esc(n)}</span></li>`).join("")}</ul></div>`;
   // museum
-  h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3><div class="modline"${edA(edit,"mod")}><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${b.modFallback&&b.modFallback!=="None"?`<span class="k">· if you can't, use</span>${modTag(b.modFallback)}`:""}</div>`;
-  ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(Math.max(1,sl[i].span||1),sl.length-i);cells+=slotCard(sl[i],sp,edit?`slot-${r}-${i}`:"")}
+  h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3><div class="modline"${edA(edit,"mod")}><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${fbs(b).length?`<span class="k">· if you can't, use</span>${fbs(b).map(modTag).join(`<span class="k">then</span>`)}`:""}</div>`;
+  ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(Math.max(1,sl[i].span||1),sl.length-i);cells+=slotCard(sl[i],sp,edit?`slot-${r}-${i}`:"",r,b.mod)}
     h+=`<div class="rrow" style="--rc:${RC(r)}"><div class="rlab"><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slots">${cells}</div></div>`});
   const t=museumTotals(b);const tl=STATS.filter(s=>Math.abs(t[s])>1e-9);
   if(tl.length)h+=`<div class="tot">${tl.map(s=>`<span style="border-color:${SC2(s)}55"><span style="color:${SC2(s)}">${s}</span><em style="color:${t[s]<0?"#ef7a66":"#e8ecf0"}">${fx(t[s])}</em></span>`).join("")}</div><span class="em" style="font-size:12px">Museum total with the first choice in each slot at full weight, including the modifier.</span>`;
@@ -180,8 +184,8 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   if(tc.length)h+=`<div class="blk"><h3><span class="n">3</span>Pan &amp; shovel</h3><div class="gear">${tc.join("")}</div></div>`;
   if(b.author)h+=`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`;
   return colourStats(h+`</div>`)}
-function slotText(s){if(!s.m.length)return '<span class="dim">any mineral</span>';
-  const one=n=>{const d=BY[n.toLowerCase()];const nm=d?d[0]:n;const u=d?picOf("Mineral",nm):"";const g=d?d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", "):"";return `${u?`<img src="${u}" alt="">`:""}<span${d?` data-mineral="${esc(nm)}"`:""}><b>${esc(nm)}</b></span>${d?` <span class="gv">(${g}, needs ${d[2]} kg)</span>`:""}`};
+function slotText(s,r,mod){if(!s.m.length)return '<span class="dim">any mineral</span>';
+  const one=n=>{if(n==="Any")return `<b>any ${esc(String(r||"").toLowerCase())} mineral</b> <span class="gv">(only the modifier counts${mod&&mod!=="Any"?`: <span style="color:${MC(mod)}">${esc(mod)}</span>`:""})</span>`;const d=BY[n.toLowerCase()];const nm=d?d[0]:n;const u=d?picOf("Mineral",nm):"";const g=d?d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", "):"";return `${u?`<img src="${u}" alt="">`:""}<span${d?` data-mineral="${esc(nm)}"`:""}><b>${esc(nm)}</b></span>${d?` <span class="gv">(${g}, needs ${d[2]} kg)</span>`:""}`};
   let t;if(s.m.length===1)t=one(s.m[0]);
   else if(s.pick>1)t=`pick ${Math.min(s.pick,s.m.length)}: ${s.m.map(one).join(", ")}`;
   else if(s.join===">")t=s.m.map(one).join(" → if you don't have it, ");
@@ -195,9 +199,9 @@ function textHTML(b0,edit){const b=tidy(b0);const notes=b.notes.split("\n").map(
   if(b.split6)h+=`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`;
   h+=`<div class="tx">`;
   if(notes.length)h+=`<section class="tsm"${edA(edit,"info")}><h2>Read this first</h2><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>`;
-  h+=`<section><h2><span class="n">1</span>Museum</h2><p${edA(edit,"mod")}>Use ${modT(b.mod)} modifier on every mineral${b.modFallback&&b.modFallback!=="None"?`; if you can't get it, use ${modT(b.modFallback)}`:""}. Put these in each rarity:</p><ul>`;
+  h+=`<section><h2><span class="n">1</span>Museum</h2><p${edA(edit,"mod")}>Use ${modT(b.mod)} modifier on every mineral${fbs(b).length?`; if you can't get it, use ${fbs(b).map(modT).join(", then ")}`:""}. Put these in each rarity:</p><ul>`;
   ORDER.forEach(r=>{const sl=b.museum[r];const items=sl.map((s,i)=>covered(sl,i)?null:[s,i]).filter(Boolean);
-    h+=`<li><span class="r" style="color:${RC(r)}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(([s,i])=>`<li${edA(edit,`slot-${r}-${i}`)}>${slotText(s)}</li>`).join("")}</ol></li>`});
+    h+=`<li><span class="r" style="color:${RC(r)}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(([s,i])=>`<li${edA(edit,`slot-${r}-${i}`)}>${slotText(s,r,b.mod)}</li>`).join("")}</ol></li>`});
   h+=`</ul>`;
   {const XS=(b.extra||[]).filter(x=>x&&x.n);if(!XS.length)h+=addChip(edit,"extra","Add backup minerals");if(XS.length)h+=`<p${edA(edit,"extra")}>Backup minerals, if one is hard to get:</p><ul${edA(edit,"extra")}>${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];return `<li><b${d?` style="color:${RC(d[1])}"`:""}>${esc(d?d[0]:x.n)}</b>${d?` <span class="dim">(${d[1]})</span> ${d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", ")}, max boost at ${d[2]} kg`:""}${x.note?` · ${esc(x.note)}`:""}</li>`}).join("")}</ul>`}
   h+=`</section>`;
@@ -248,7 +252,8 @@ function renderEditor(){
   <div class="field"><span>Picture <small style="font-weight:400;color:var(--muted)">shown top left, cropped to a square</small></span><div class="picrow">${b.pic?`<img class="picprev" src="${b.pic}" alt="">`:`<span class="picprev none">No picture</span>`}<label class="btn sm" for="f-pic">${b.pic?"Change":"Upload image"}</label><input type="file" id="f-pic" accept="image/*" hidden>${b.pic?`<button type="button" class="btn sm" data-act="rmpic">Remove</button>`:""}</div></div></section>`;
   h+=`<section class="card"><h2>Museum</h2>
   <div data-part="mod"><div class="row"><label class="field"><span>Modifier</span><select class="inp" id="f-mod">${opts(modList.filter(m=>m!=="None"),b.mod)}</select></label>
-  <label class="field"><span>Fallback modifier</span><select class="inp" id="f-modFallback">${opts(["",...modList.filter(m=>m!=="Any"&&m!=="None")],b.modFallback)}</select></label></div>
+  </div>
+  <div class="field"><span>Fallback modifiers <small style="font-weight:400;color:var(--muted)">in order, if the one above can't be had</small></span>${fbL(b).map((m,k)=>`<div class="row" style="gap:6px;margin-bottom:6px;align-items:center"><span class="hint" style="margin:0;min-width:18px">${k+1}.</span><select class="inp" id="fb-${k}" aria-label="Fallback ${k+1}">${opts(["",...modList.filter(x=>x!=="Any"&&x!=="None")],m)}</select><button type="button" class="x" data-act="rmfb" data-i="${k}" aria-label="Remove fallback ${k+1}">×</button></div>`).join("")}<div class="row"><button class="btn sm" type="button" data-act="addfb">+ Add a fallback</button></div></div>
   <p class="hint">Click a slot’s box to see every mineral with what it gives; hover one to preview the museum total. Add more than one to a slot to list choices; the first one counts in the total.</p>
   <div class="row" style="margin-bottom:8px"><button class="btn sm" type="button" data-act="mymuseum" title="Fill these slots and the modifier from your current board on the Museum Planner page">Use my Museum Planner board</button></div></div>
   <div class="mtot"><div class="mtoth"><b>Museum total</b><span>first mineral in each slot + main modifier, at max weight</span></div><div class="mtotv" id="mtot"></div></div>`;
@@ -304,6 +309,7 @@ function setPath(b,id,v){
   let r=id.match(/^ring-(count|name|mut|note)-(\d+)$/);if(r){b.rings[+r[2]][r[1]]=v;return true}
   r=id.match(/^ring6-(count|name|mut|note)-(\d+)$/);if(r){b.rings6[+r[2]][r[1]]=v;return true}
   r=id.match(/^ex-(label|name|note)-(\d+)$/);if(r){b.extras[+r[2]][r[1]]=v;return true}
+  r=id.match(/^fb-(\d+)$/);if(r){const L=[...fbL(b)];L[+r[1]]=v;setFbs(b,L);return true}
   return false;
 }
 const ed=document.getElementById("editor");
@@ -347,9 +353,11 @@ function openSugg(inp){
   const inSlot=slot.m.map(x=>x.toLowerCase());
   let list=D.filter(d=>d[1]===r&&(!q||d[0].toLowerCase().includes(q)));
   list.sort((a,c)=>Math.max(...c[3].map(x=>x[1]))-Math.max(...a[3].map(x=>x[1]))||a[0].localeCompare(c[0]));
+  // "Any": no particular mineral, only the modifier counts (allowed in any number of slots)
+  if(!q||"any".includes(q))list=[["Any",r,0,[]],...list];delete usedAt.any;
   const box=sbox(inp);
   if(!list.length){box.innerHTML=`<div class="spv">No ${r.toLowerCase()} mineral matches “${esc(inp.value)}”.</div>`;box.hidden=false;inp.setAttribute("aria-expanded","true");SG={inp,items:[],hot:-1};return}
-  box.innerHTML=`<div class="slist">${list.map((d,k)=>{const lc=d[0].toLowerCase();const here=inSlot.includes(lc);const other=usedAt[lc];const dis=here||!!other;const u=picOf("Mineral",d[0]);return `<button type="button" class="sopt${dis?" taken":""}" role="option" data-mineral="${esc(d[0])}" id="so-${r}-${i}-${k}" data-name="${esc(d[0])}"${dis?' aria-disabled="true"':""}>${u?`<img class="si" src="${u}" alt="">`:'<span class="si"></span>'}<b>${esc(d[0])}</b><span class="kgs">${d[2]} kg for max</span><span class="g">${here?"<span>Already in this slot</span>":other?`<span>Already in slot ${other}</span>`:gainsHTML(d[3])}</span></button>`}).join("")}</div><div class="spv" id="spv-${r}-${i}" hidden></div>`;
+  box.innerHTML=`<div class="slist">${list.map((d,k)=>{const lc=d[0].toLowerCase();const here=inSlot.includes(lc);const other=usedAt[lc];const dis=here||!!other;const u=picOf("Mineral",d[0]);if(d[0]==="Any")return `<button type="button" class="sopt" role="option" id="so-${r}-${i}-${k}" data-name="Any"${here?' aria-disabled="true"':""}><span class="si anyi">✦</span><b>Any ${r.toLowerCase()} mineral</b><span class="kgs"></span><span class="g">${here?"<span>Already in this slot</span>":`<span>Only the modifier counts${b.mod&&b.mod!=="Any"?": "+esc(b.mod):""}</span>`}</span></button>`;return `<button type="button" class="sopt${dis?" taken":""}" role="option" data-mineral="${esc(d[0])}" id="so-${r}-${i}-${k}" data-name="${esc(d[0])}"${dis?' aria-disabled="true"':""}>${u?`<img class="si" src="${u}" alt="">`:'<span class="si"></span>'}<b>${esc(d[0])}</b><span class="kgs">${d[2]} kg for max</span><span class="g">${here?"<span>Already in this slot</span>":other?`<span>Already in slot ${other}</span>`:gainsHTML(d[3])}</span></button>`}).join("")}</div><div class="spv" id="spv-${r}-${i}" hidden></div>`;
   box.hidden=false;inp.setAttribute("aria-expanded","true");
   // wider than a slot; keep it on screen
   box.style.left="0px";{const rc=box.getBoundingClientRect(),over=rc.right-(document.documentElement.clientWidth-8);if(over>0)box.style.left=(-Math.min(over,rc.left-8))+"px"}
@@ -381,7 +389,7 @@ ed.addEventListener("keydown",e=>{const t=e.target;if(t.dataset.act!=="add")retu
 function renderMTot(){const el=document.getElementById("mtot");if(!el)return;const t=museumTotals(getB());const on=STATS.filter(s=>Math.abs(t[s])>1e-9);el.innerHTML=on.length?on.map(s=>`<span>${s} <em${t[s]<0?' style="color:var(--neg)"':""}>${fx(t[s])}</em></span>`).join(""):'<span class="hint">Add minerals to see the total.</span>'}
 function addMineral(t,pickName){const v=(pickName||t.value).trim();if(!v)return;const b=getB(),s=b.museum[t.dataset.r][+t.dataset.i];const d=BY[v.toLowerCase()];const name=d?d[0]:v;
   if(d&&d[1]!==t.dataset.r){toast(`${name} is ${d[1]}, not ${t.dataset.r}`);return}
-  const other=b.museum[t.dataset.r].findIndex((x,k)=>k!==+t.dataset.i&&x.m.some(y=>y.toLowerCase()===name.toLowerCase()));
+  const other=name==="Any"?-1:b.museum[t.dataset.r].findIndex((x,k)=>k!==+t.dataset.i&&x.m.some(y=>y.toLowerCase()===name.toLowerCase()));
   if(other>=0){toast(`${name} is already in ${t.dataset.r} slot ${other+1}. Each mineral can only go in one slot.`);return}
   if(!s.m.some(x=>x.toLowerCase()===name.toLowerCase()))s.m.push(name);
   const keep=t.id;touch();renderEditor();const n=document.getElementById(keep);if(n){quiet=true;n.focus();quiet=false}}
@@ -403,15 +411,17 @@ ed.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;
   else if(a==="addring6"){if(!Array.isArray(b.rings6))b.rings6=[];b.rings6.push({count:"",mut:"",name:"",note:""})}
   else if(a==="rmring6")b.rings6.splice(+t.dataset.i,1);
   else if(a==="addex")b.extras.push({label:"",name:"",note:""});
+  else if(a==="addfb")setFbs(b,[...fbL(b),""]);
+  else if(a==="rmfb"){const L=[...fbL(b)];L.splice(+t.dataset.i,1);setFbs(b,L)}
   else if(a==="mymuseum"){let bd=null;try{bd=JSON.parse(localStorage.getItem("mp-board")||"null")}catch(e){}
-    const real=x=>x&&x.m&&x.m!=="Any";
+    const real=x=>x&&x.m;
     if(!bd||!ORDER.some(r=>(bd[r]||[]).some(real))){toast("Your Museum Planner board is empty. Fill it on the Museum Planner page first.");return}
     // the planner has a modifier per slot, a build has one main modifier (+ fallback): use the most common ones
     const cnt={};
     b.museum=Object.fromEntries(ORDER.map(r=>[r,Array.from({length:SLOTS[r]},(_,i)=>{const x=(bd[r]||[])[i];if(!real(x))return {m:[],pick:1,join:"|",mark:"",span:1};
       if(x.u&&x.u!=="None"&&MODS[x.u])cnt[x.u]=(cnt[x.u]||0)+1;const d=BY[String(x.m).toLowerCase()];return {m:[d?d[0]:x.m],pick:1,join:"|",mark:"",span:1}})]));
     const mods=Object.entries(cnt).sort((x,y)=>y[1]-x[1]).map(x=>x[0]);
-    if(mods.length){b.mod=mods[0];b.modFallback=mods[1]||""}
+    if(mods.length){b.mod=mods[0];setFbs(b,mods.slice(1))}
     toast(mods.length>1?`Museum filled from your Museum Planner board (modifiers: ${mods[0]}, fallback ${mods[1]})`:"Museum filled from your Museum Planner board")}
   else if(a==="myrunes"){let sel=[];try{sel=(JSON.parse(localStorage.getItem("pr-s")||"{}").sel)||[]}catch(e){}if(!sel.length){toast("Your Runes loadout is empty. Pick runes on the Runes page first.");return}b.runeSlots=Array.from({length:5},(_,i)=>sel[i]||"");syncRunes(b);toast("Runes filled from your loadout")}
   else if(a==="rmex")b.extras.splice(+t.dataset.i,1);
