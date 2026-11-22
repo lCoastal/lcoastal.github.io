@@ -882,7 +882,7 @@ window.ptRefresh=()=>{fillMus();render()};window.ptYouChanged=renderSpread;
 // Boosts stays as it is, so every build is compared with the same boosts.
 const BF_UNIQ=new Set(["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"]);
 const BF_GOALS=[["rare","Rare finds per pan"],["luck","Luck only"]];
-const BF_SKIPMUS=new Set(["Key of Life"]);
+const BF_SKIPMUS=new Set();
 function bfCfg(){S.bf=Object.assign({goal:"rare",muts:MUTS.map(m=>m[0]).filter(m=>m!=="Festive"),tools:true,trinket:true,museum:true,owned:false,perfect:true},S.bf||{});return S.bf}
 function bfScore(st,goal){const t=compute(st).tot;const L=Math.max(1e-9,t.Luck),C=Math.max(1e-9,t.Capacity);return goal==="luck"?Math.log(L):Math.log(L)+.565*Math.log(C)}
 function renderBf(){const c=bfCfg();const on=S.showBf===true;$("showBf").checked=on;$("bfBody").hidden=!on;if(!on)return;
