@@ -38,7 +38,7 @@ const LIST = [
   { id: "testlog", name: "Test Log", desc: "Every test behind the formulas and what it showed" },
   { id: "codes", name: "Codes", desc: "Active codes with one-tap copy" },
   { id: "tierlist", name: "Tier List", desc: "Rank minerals, equipment or runes" },
-  { id: "settings", name: "Settings", desc: "Compact view, short numbers and scroll memory" },
+  { id: "settings", name: "Settings", desc: "Your stats, theme and colour, display and browsing" },
 ];
 const main = document.getElementById("main"),
   drawer = document.getElementById("drawer"),

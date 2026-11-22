@@ -40,7 +40,14 @@ const SECTIONS = [
       ["events", "m:Starshine"],
     ],
   ],
-  ["More", "#94a3b8", [["h-misc", "m:Radiant Gold"]]],
+  [
+    "More",
+    "#94a3b8",
+    [
+      ["h-misc", "m:Radiant Gold"],
+      ["settings", ""],
+    ],
+  ],
 ];
 const navImg = (src) => {
   const D = window.PTDATA || {};

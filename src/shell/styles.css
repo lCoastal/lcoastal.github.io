@@ -313,6 +313,24 @@ main iframe {
   place-items: center;
   padding: 0;
 }
+.gbtn .gtx {
+  display: none;
+}
+@media (min-width: 760px) {
+  .gbtn {
+    width: auto;
+    padding: 0 12px 0 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .gbtn .gtx {
+    display: inline;
+  }
+}
 .gbtn[aria-current="page"] {
   color: var(--fg);
   border-color: var(--accent);
