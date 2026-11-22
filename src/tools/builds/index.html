@@ -14,7 +14,7 @@
 <div class="wrap">
   <header>
     <h1 class="app">Prospecting Build Sheets</h1>
-    <p class="lede">Write full builds the way the community guides lay them out: museum slots with modifiers, equipment with notes, runes, pan and shovel. The sheet on the right updates as you type, and every build can be saved, downloaded and imported again.</p>
+    <p class="lede">Write full builds the way the community guides lay them out: museum slots with modifiers, equipment with notes, runes, pan and shovel. Click any part of the sheet to edit it, in either view. Every build can be saved, downloaded and imported again.</p>
   </header>
 
   <div class="topbar">
@@ -30,16 +30,14 @@
       <button class="smi" id="bCalc" type="button" role="menuitem">Open in Stat Calculator<small>Load this build's gear into the calculator</small></button>
     </div></details>
     <input id="imp" type="file" accept=".html,text/html" hidden>
-    <button class="btn" id="bHideP" type="button" aria-pressed="false" title="Hide the sheet preview to give the editor more room">Hide preview</button>
-    <div class="tabs" role="group" aria-label="View"><button class="btn" id="tEdit" type="button" aria-pressed="true">Edit</button><button class="btn" id="tPrev" type="button" aria-pressed="false">Preview</button></div>
   </div>
 
-  <div class="split" id="split" data-view="edit">
-    <div class="editor" id="editor"></div>
+  <div class="edpop" id="edpop" hidden role="dialog" aria-labelledby="edT"><div class="edph"><b id="edT"></b><button type="button" class="btn sm" id="edX">Done</button></div><div class="editor" id="editor"></div></div>
+  <div class="split" id="split">
     <div class="previewcol"><div class="vtoggle" role="group" aria-label="Show the build as"><span>Show as</span><button type="button" data-view="table">Sheet</button><button type="button" data-view="text">Text</button></div><div id="sheet"></div></div>
   </div>
 
-  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 17/11/26 · Made by @__coastal</p>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 22/11/26 · Made by @__coastal</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>

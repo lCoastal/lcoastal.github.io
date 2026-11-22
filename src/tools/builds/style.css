@@ -307,3 +307,24 @@ textarea.inp{min-height:90px;resize:vertical}
 /* light theme: the sheet turns into a light card, on the page and in the saved image */
 :root[data-theme="light"] .sheet{--bg:#f3f5f7;--card:#ffffff;--card2:#eceff3;--line:#dde3e9;--tx:#1d2228;--ink:#0b1116;--dim:#5d6670;--warn:#9a5b00;--bad:#b3402f;--rh-exotic:#a3268c;--rh-mythic:#b3254a;--rh-legendary:#8a6300;--rh-epic:#6b31a8;--rh-rare:#1f5fae;--rh-uncommon:#2f7a34;--rh-common:#5d6670;--sh-luck:#2f8f1f;--sh-capacity:#8a5400;--sh-sizeboost:#b3402f;--sh-digstrength:#9c4420;--sh-digspeed:#1f5fae;--sh-sellboost:#8a6300;--sh-walkspeed:#5d6670;--sh-modifierboost:#1f7a4d;--sh-shakestrength:#a3365c;--sh-shakespeed:#5b3fb0;--mc-perfect:#0e8b86;--mc-treasured:#8a6300;--mc-lunar:#8a6a00;--mc-voidtorn:#6b31c0;--mc-mutated:#6b45c0;--mc-cosmic:#b32565;--mc-electrified:#7a6a00;--mc-iridescent:#a32bb0;--mc-irradiated:#2d7a12;--mc-crystalline:#1f6a9c;--mc-scorching:#a34a00;--mc-glowing:#8a6a00;--mc-pure:#5d6670;--mc-shiny:#3a6aa8;--eq-silver:#5d6670;--eq-gold:#8a6300;--eq-diamond:#1f6a9c;--eq-granite:#7a5a3a;--eq-overclocked:#3a4fb0;--eq-festive:#b3302f;--eq-prismatic:#a32b86}
 @media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .sheet{--bg:#f3f5f7;--card:#ffffff;--card2:#eceff3;--line:#dde3e9;--tx:#1d2228;--ink:#0b1116;--dim:#5d6670;--warn:#9a5b00;--bad:#b3402f;--rh-exotic:#a3268c;--rh-mythic:#b3254a;--rh-legendary:#8a6300;--rh-epic:#6b31a8;--rh-rare:#1f5fae;--rh-uncommon:#2f7a34;--rh-common:#5d6670;--sh-luck:#2f8f1f;--sh-capacity:#8a5400;--sh-sizeboost:#b3402f;--sh-digstrength:#9c4420;--sh-digspeed:#1f5fae;--sh-sellboost:#8a6300;--sh-walkspeed:#5d6670;--sh-modifierboost:#1f7a4d;--sh-shakestrength:#a3365c;--sh-shakespeed:#5b3fb0;--mc-perfect:#0e8b86;--mc-treasured:#8a6300;--mc-lunar:#8a6a00;--mc-voidtorn:#6b31c0;--mc-mutated:#6b45c0;--mc-cosmic:#b32565;--mc-electrified:#7a6a00;--mc-iridescent:#a32bb0;--mc-irradiated:#2d7a12;--mc-crystalline:#1f6a9c;--mc-scorching:#a34a00;--mc-glowing:#8a6a00;--mc-pure:#5d6670;--mc-shiny:#3a6aa8;--eq-silver:#5d6670;--eq-gold:#8a6300;--eq-diamond:#1f6a9c;--eq-granite:#7a5a3a;--eq-overclocked:#3a4fb0;--eq-festive:#b3302f;--eq-prismatic:#a32b86}}
+
+/* ---- editing from the sheet ---- */
+.split{grid-template-columns:minmax(0,1fr)!important}
+.previewcol{position:static!important;max-height:none!important;overflow:visible!important}
+.edtip{margin:-4px 0 10px;color:var(--muted);font-size:13px}
+.edpop{position:absolute;z-index:40;background:var(--card,var(--panel));border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.35);padding:10px 12px 12px;max-height:min(70vh,640px);overflow:auto;box-sizing:border-box}
+.edph{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.edph b{font-size:14px}
+.edpop .editor{display:block}
+.edpop .editor>section.card{border:0;padding:0;margin:0;background:none;box-shadow:none}
+.edpop .gedits{display:block}
+.edhide{display:none!important}
+#sheet [data-ed]{cursor:pointer;border-radius:8px;transition:outline-color .12s}
+#sheet [data-ed]:hover,#sheet [data-ed].edon{outline:2px dashed var(--acc,#3cc2a8);outline-offset:2px}
+#sheet [data-ed]:focus-visible{outline:2px solid var(--acc,#3cc2a8)}
+.edadd{display:inline-flex;align-items:center;gap:4px;margin:6px 6px 0 0;padding:5px 11px;border-radius:999px;border:1px dashed #56616c;background:transparent;color:#97a3b0;font:600 12.5px inherit;cursor:pointer}
+.edadd.in{margin:0;padding:2px 9px}
+.gc.edgh{opacity:.7;border-style:dashed}
+.edpop .slotgrid,.edpop .rar{display:block}
+.edpop .se{grid-column:auto!important;width:auto}
+.edpop .rarh{display:none}

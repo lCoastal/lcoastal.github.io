@@ -94,13 +94,13 @@ function findItem(kind,typed){const t=normN(String(typed||"").split("|")[0]);if(
   return L.find(n=>normN(n)===t)||L.find(n=>normN(n).startsWith(t))||L.find(n=>normN(n).includes(t))||null}
 const imgTag=(u,cls)=>u?`<img src="${u}" alt=""${cls?` class="${cls}"`:""}>`:`<span class="ph"${cls?` class="${cls}"`:""}></span>`;
 const gainSpans=d=>d?d[3].map(([s,v])=>`<span style="color:${SC2(s)}">${s} ${fx(v)}</span>`).join(""):"";
-function slotCard(s,span){
-  if(!s.m.length)return `<div class="sl empty"${span>1?` style="grid-column:span ${span}"`:""}>Any mineral</div>`;
+function slotCard(s,span,ed){const da=ed?` data-ed="${ed}"`:"";
+  if(!s.m.length)return `<div class="sl empty"${da}${span>1?` style="grid-column:span ${span}"`:""}>Any mineral</div>`;
   const multi=s.m.length>1;const pick=multi&&s.pick>1?Math.min(s.pick,s.m.length):1;
   const how=!multi?"":pick>1?`Pick ${pick} of these`:s.join===">"?"Best first, then the next":"Any one of these";
   const ops=s.m.map((n,i)=>{const d=BY[n.toLowerCase()];const nm=d?d[0]:n;
     return `<div class="op">${imgTag(d?picOf("Mineral",nm):"")}<span class="nm"${d?` data-mineral="${esc(nm)}"`:""}>${multi&&s.join===">"&&pick===1?`<span class="rk">${i+1}</span>`:""}${esc(nm)}</span><span class="gs">${gainSpans(d)}</span>${d?`<span class="kgl">Max boost at ${d[2]} kg</span>`:""}</div>`}).join("");
-  return `<div class="sl"${span>1?` style="grid-column:span ${span}"`:""}>${how?`<span class="how">${how}</span>`:""}${ops}${s.mark?`<span class="mark">${esc(s.mark)}</span>`:""}</div>`}
+  return `<div class="sl"${da}${span>1?` style="grid-column:span ${span}"`:""}>${how?`<span class="how">${how}</span>`:""}${ops}${s.mark?`<span class="mark">${esc(s.mark)}</span>`:""}</div>`}
 function modTag(m){if(!m||m==="None"||m==="Any")return `<span class="modtag" style="color:#c7d0d9">Any modifier</span>`;const st=(MODSTATS[m]||[[]])[0];return `<span class="modtag" style="color:${MC(m)}">${esc(m)}</span>${st.length?`<span class="k">boosts ${st.join(", ")}</span>`:""}`}
 function gearCard(label,kind,e,extra,rs,count){
   const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";
@@ -139,38 +139,46 @@ function statsHTML(b,text){const key=statKey(b);
 // shown text: ";" reads as ",", and a ";" at the end of a line is dropped
 const tidyT=t=>String(t).replace(/[ \t]*;[ \t]*$/gm,"").replace(/\s*;\s*/g,", ");
 const tidy=o=>{if(typeof o==="string")return tidyT(o);if(Array.isArray(o))return o.map(tidy);if(o&&typeof o==="object"){const r={};for(const k in o)r[k]=k==="pic"||k==="id"?o[k]:tidy(o[k]);return r}return o};
-function sheetHTML(b0){if(viewMode==="text")return textHTML(b0);const b=tidy(b0);
+// edit=true only for the page's own preview: parts get data-ed (click to edit) and empty parts get "+ Add" chips.
+// Saved images and downloads call these without it, so none of that ends up in them.
+const edA=(on,part)=>on?` data-ed="${part}"`:"";
+const addChip=(on,part,t)=>on?`<button type="button" class="edadd" data-ed="${part}">+ ${t}</button>`:"";
+function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const b=tidy(b0);
   const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
-  let h=`<div class="sheet" data-rings="${has6(b)?viewRings:""}"><div class="bh">${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
-  if(b.warning)h+=`<div class="warnbox"><b>⚠</b><span>${esc(b.warning)}</span></div>`;
+  let h=`<div class="sheet" data-rings="${has6(b)?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
+  if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
+  if(!notes.length&&!b.warning)h+=addChip(edit,"info",b.subtitle?"Add a warning or notes":"Add a subtitle, warning or notes");
   const q=[];if(b.pan.name)q.push(quickChip("Pan","Pan",b.pan.name));if(b.shovel.name)q.push(quickChip("Shovel","Shovel",b.shovel.name));if(b.charm.name)q.push(quickChip("Charm","Equipment",b.charm.name));if(b.neck.name)q.push(quickChip("Necklace","Equipment",b.neck.name));
-  if(notes.length)h+=`<div class="tips"><h3>Read this first</h3><ul>${notes.map(n=>`<li><span>${esc(n)}</span></li>`).join("")}</ul></div>`;
+  if(notes.length)h+=`<div class="tips"${edA(edit,"info")}><h3>Read this first</h3><ul>${notes.map(n=>`<li><span>${esc(n)}</span></li>`).join("")}</ul></div>`;
   // museum
-  h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3><div class="modline"><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${b.modFallback&&b.modFallback!=="None"?`<span class="k">· if you can't, use</span>${modTag(b.modFallback)}`:""}</div>`;
-  ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(Math.max(1,sl[i].span||1),sl.length-i);cells+=slotCard(sl[i],sp)}
+  h+=`<div class="blk"><h3><span class="n">1</span>Museum</h3><div class="modline"${edA(edit,"mod")}><span class="k">Modifier on every mineral:</span>${modTag(b.mod)}${b.modFallback&&b.modFallback!=="None"?`<span class="k">· if you can't, use</span>${modTag(b.modFallback)}`:""}</div>`;
+  ORDER.forEach(r=>{const sl=b.museum[r];let cells="";for(let i=0;i<sl.length;i++){if(covered(sl,i))continue;const sp=Math.min(Math.max(1,sl[i].span||1),sl.length-i);cells+=slotCard(sl[i],sp,edit?`slot-${r}-${i}`:"")}
     h+=`<div class="rrow" style="--rc:${RC(r)}"><div class="rlab"><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slots">${cells}</div></div>`});
   const t=museumTotals(b);const tl=STATS.filter(s=>Math.abs(t[s])>1e-9);
   if(tl.length)h+=`<div class="tot">${tl.map(s=>`<span style="border-color:${SC2(s)}55"><span style="color:${SC2(s)}">${s}</span><em style="color:${t[s]<0?"#ef7a66":"#e8ecf0"}">${fx(t[s])}</em></span>`).join("")}</div><span class="em" style="font-size:12px">Museum total with the first choice in each slot at full weight, including the modifier.</span>`;
-  const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length)h+=`<div class="xtra"><h4>Backup minerals <span>if one is hard to get</span></h4><div class="xl">${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];const u=d?picOf("Mineral",d[0]):"";return `<div class="xc" style="--rc:${d?RHX[d[1]]:"#56616c"}">${u?`<img src="${u}" alt="">`:""}<span><b style="color:var(--rc)">${esc(d?d[0]:x.n)}</b>${d?`<span class="gs">${gainSpans(d)}</span><small class="kgl">Max boost at ${d[2]} kg</small>`:""}${x.note?`<small class="xnote">${esc(x.note)}</small>`:""}</span></div>`}).join("")}</div></div>`;
+  const XS=(b.extra||[]).filter(x=>x&&x.n);if(!XS.length)h+=addChip(edit,"extra","Add backup minerals");if(XS.length)h+=`<div class="xtra"${edA(edit,"extra")}><h4>Backup minerals <span>if one is hard to get</span></h4><div class="xl">${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];const u=d?picOf("Mineral",d[0]):"";return `<div class="xc" style="--rc:${d?RHX[d[1]]:"#56616c"}">${u?`<img src="${u}" alt="">`:""}<span><b style="color:var(--rc)">${esc(d?d[0]:x.n)}</b>${d?`<span class="gs">${gainSpans(d)}</span><small class="kgl">Max boost at ${d[2]} kg</small>`:""}${x.note?`<small class="xnote">${esc(x.note)}</small>`:""}</span></div>`}).join("")}</div></div>`;
   h+=`</div>`;
   // gear
   const cards=[];
-  if(b.charm.name||b.charm.note)cards.push(gearCard({t:"Charm",ico:"🔗"},"Equipment",b.charm));
-  if(b.neck.name||b.neck.note)cards.push(gearCard({t:"Necklace",ico:"📿"},"Equipment",b.neck));
+  const tag=(h0,part)=>edit?h0.replace('<div class="gc"',`<div class="gc" data-ed="${part}"`):h0;
+  const ph=(part,t,ico)=>edit?`<div class="gc edgh" data-ed="${part}"><span class="ph">${ico}</span><div class="gt"><small>${t}</small><b>+ Add ${t.toLowerCase()}</b></div></div>`:"";
+  if(b.charm.name||b.charm.note)cards.push(tag(gearCard({t:"Charm",ico:"🔗"},"Equipment",b.charm),"charm"));else if(edit)cards.push(ph("charm","Charm","🔗"));
+  if(b.neck.name||b.neck.note)cards.push(tag(gearCard({t:"Necklace",ico:"📿"},"Equipment",b.neck),"neck"));else if(edit)cards.push(ph("neck","Necklace","📿"));
   h+=`<div class="blk"><h3><span class="n">2</span>Equipment</h3>`;
   h+=cards.length?`<div class="gear">${cards.join("")}</div>`:"";
-  h+=ringGrids(b);
-  if(b.runes){const rs=b.runes.split(",").map(x=>x.trim()).filter(Boolean);h+=`<h3 style="margin:6px 0 0;font:700 11px/1 inherit;letter-spacing:.12em;text-transform:uppercase;color:#97a3b0">Runes</h3><div class="runes">${rs.map(x=>{const parts=x.split("/").map(y=>y.trim());return `<span>${parts.map(p=>{const real=findItem("Rune",p);const u=real?picOf("Rune",real):"";return (u?`<img src="${u}" alt="">`:"")+esc(p)}).join(' <i class="alt">or</i> ')}</span>`}).join("")}</div>`}
+  {const rg=ringGrids(b);h+=rg?(edit?`<div data-ed="rings">${rg}</div>`:rg):addChip(edit,"rings","Add rings")}
+  if(!b.runes)h+=addChip(edit,"runes","Add runes");if(b.runes){const rs=b.runes.split(",").map(x=>x.trim()).filter(Boolean);h+=`<h3 style="margin:6px 0 0;font:700 11px/1 inherit;letter-spacing:.12em;text-transform:uppercase;color:#97a3b0">Runes</h3><div class="runes"${edA(edit,"runes")}>${rs.map(x=>{const parts=x.split("/").map(y=>y.trim());return `<span>${parts.map(p=>{const real=findItem("Rune",p);const u=real?picOf("Rune",real):"";return (u?`<img src="${u}" alt="">`:"")+esc(p)}).join(' <i class="alt">or</i> ')}</span>`}).join("")}</div>`}
   // extra rows go last, after the rings and runes (same order as the text view)
-  const xc=b.extras.filter(x=>x.label||x.name).map(x=>gearCard({t:x.label||"Other",ico:"✦"},"Equipment",x));
+  const xc=b.extras.filter(x=>x.label||x.name).map(x=>tag(gearCard({t:x.label||"Other",ico:"✦"},"Equipment",x),"extras"));
   if(xc.length)h+=`<div class="gear" style="margin-top:8px">${xc.join("")}</div>`;
+  h+=addChip(edit,"extras",xc.length?"Add another row":"Add a row (totems, potions, anything else)");
   h+=`</div>`;
   // pan + shovel
   const tc=[];
-  if(b.pan.name||b.pan.enchant||b.pan.trinket)tc.push(gearCard({t:"Pan",ico:"🥘"},"Pan",b.pan,`${b.pan.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.pan.enchant)}</span>`:""}${b.pan.trinket?`<span class="ex"><i>Trinket</i> ${esc(b.pan.trinket)}</span>`:""}`));
-  if(b.shovel.name||b.shovel.enchant)tc.push(gearCard({t:"Shovel",ico:"⛏"},"Shovel",b.shovel,b.shovel.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.shovel.enchant)}</span>`:""));
+  if(!(b.pan.name||b.pan.enchant||b.pan.trinket)){if(edit)tc.push(ph("pan","Pan","🥘"))}else tc.push(tag(gearCard({t:"Pan",ico:"🥘"},"Pan",b.pan,`${b.pan.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.pan.enchant)}</span>`:""}${b.pan.trinket?`<span class="ex"><i>Trinket</i> ${esc(b.pan.trinket)}</span>`:""}`),"pan"));
+  if(b.shovel.name||b.shovel.enchant)tc.push(tag(gearCard({t:"Shovel",ico:"⛏"},"Shovel",b.shovel,b.shovel.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.shovel.enchant)}</span>`:""),"shovel"));else if(edit)tc.push(ph("shovel","Shovel","⛏"));
   if(tc.length)h+=`<div class="blk"><h3><span class="n">3</span>Pan &amp; shovel</h3><div class="gear">${tc.join("")}</div></div>`;
-  if(b.author)h+=`<p class="author">${esc(b.author)}</p>`;
+  if(b.author)h+=`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`;
   return colourStats(h+`</div>`)}
 function slotText(s){if(!s.m.length)return '<span class="dim">any mineral</span>';
   const one=n=>{const d=BY[n.toLowerCase()];const nm=d?d[0]:n;const u=d?picOf("Mineral",nm):"";const g=d?d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", "):"";return `${u?`<img src="${u}" alt="">`:""}<span${d?` data-mineral="${esc(nm)}"`:""}><b>${esc(nm)}</b></span>${d?` <span class="gv">(${g}, needs ${d[2]} kg)</span>`:""}`};
@@ -179,35 +187,39 @@ function slotText(s){if(!s.m.length)return '<span class="dim">any mineral</span>
   else if(s.join===">")t=s.m.map(one).join(" → if you don't have it, ");
   else t=s.m.map(one).join(" <span class=\"dim\">or</span> ");
   return t+(s.mark?` <span class="mark">${esc(s.mark)}</span>`:"")}
-function textHTML(b0){const b=tidy(b0);const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
+function textHTML(b0,edit){const b=tidy(b0);const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
   const modT=m=>!m||m==="None"||m==="Any"?"<b>any</b>":`<b style="color:${MC(m)}">${esc(m)}</b>`;
-  let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh">${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
-  if(b.warning)h+=`<div class="warnbox"><b>⚠</b><span>${esc(b.warning)}</span></div>`;
+  let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
+  if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
+  if(!notes.length&&!b.warning)h+=addChip(edit,"info",b.subtitle?"Add a warning or notes":"Add a subtitle, warning or notes");
   if(b.split6)h+=`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`;
   h+=`<div class="tx">`;
-  if(notes.length)h+=`<section class="tsm"><h2>Read this first</h2><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>`;
-  h+=`<section><h2><span class="n">1</span>Museum</h2><p>Use ${modT(b.mod)} modifier on every mineral${b.modFallback&&b.modFallback!=="None"?`; if you can't get it, use ${modT(b.modFallback)}`:""}. Put these in each rarity:</p><ul>`;
-  ORDER.forEach(r=>{const sl=b.museum[r];const items=sl.map((s,i)=>covered(sl,i)?null:s).filter(Boolean);
-    h+=`<li><span class="r" style="color:${RC(r)}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(s=>`<li>${slotText(s)}</li>`).join("")}</ol></li>`});
+  if(notes.length)h+=`<section class="tsm"${edA(edit,"info")}><h2>Read this first</h2><ul>${notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></section>`;
+  h+=`<section><h2><span class="n">1</span>Museum</h2><p${edA(edit,"mod")}>Use ${modT(b.mod)} modifier on every mineral${b.modFallback&&b.modFallback!=="None"?`; if you can't get it, use ${modT(b.modFallback)}`:""}. Put these in each rarity:</p><ul>`;
+  ORDER.forEach(r=>{const sl=b.museum[r];const items=sl.map((s,i)=>covered(sl,i)?null:[s,i]).filter(Boolean);
+    h+=`<li><span class="r" style="color:${RC(r)}">${r}</span> <span class="dim">(${sl.length} slot${sl.length>1?"s":""})</span><ol>${items.map(([s,i])=>`<li${edA(edit,`slot-${r}-${i}`)}>${slotText(s)}</li>`).join("")}</ol></li>`});
   h+=`</ul>`;
-  {const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length)h+=`<p>Backup minerals, if one is hard to get:</p><ul>${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];return `<li><b${d?` style="color:${RC(d[1])}"`:""}>${esc(d?d[0]:x.n)}</b>${d?` <span class="dim">(${d[1]})</span> ${d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", ")}, max boost at ${d[2]} kg`:""}${x.note?` · ${esc(x.note)}`:""}</li>`}).join("")}</ul>`}
+  {const XS=(b.extra||[]).filter(x=>x&&x.n);if(!XS.length)h+=addChip(edit,"extra","Add backup minerals");if(XS.length)h+=`<p${edA(edit,"extra")}>Backup minerals, if one is hard to get:</p><ul${edA(edit,"extra")}>${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];return `<li><b${d?` style="color:${RC(d[1])}"`:""}>${esc(d?d[0]:x.n)}</b>${d?` <span class="dim">(${d[1]})</span> ${d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", ")}, max boost at ${d[2]} kg`:""}${x.note?` · ${esc(x.note)}`:""}</li>`}).join("")}</ul>`}
   h+=`</section>`;
   const nm=(kind,e)=>{const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";return (u?`<img src="${u}" alt="">`:"")+(e.mut?`<span style="color:${EC(e.mut)}">${esc(e.mut)}</span> `:"")+`<b>${esc(e.name)}</b>`};
-  const nt=n=>n?` <span class="dim">· ${esc(n)}</span>`:"";const eq=[];
-  if(b.charm.name||b.charm.note)eq.push(`Charm: ${nm("Equipment",b.charm)}${nt(b.charm.note)}`);
-  if(b.neck.name||b.neck.note)eq.push(`Necklace: ${nm("Equipment",b.neck)}${nt(b.neck.note)}`);
-  const rings=(list,label,rs)=>{const xs=list.filter(x=>x.name||x.note);if(xs.length)eq.push([`${label}:<ul>${xs.map(x=>`<li>${x.count?`<b>${esc(x.count)}</b> `:""}${nm("Equipment",x)}${nt(x.note)}</li>`).join("")}</ul>`,rs])};
-  if(b.split6){rings(b.rings,"Rings (8 ring slots)","8");rings(b.rings6||[],"Rings (6 ring slots)","6")}else rings(b.rings,"Rings","");
-  if(b.runes)eq.push(`Runes: <b>${esc(b.runes)}</b>`);
-  b.extras.filter(x=>x.label||x.name).forEach(x=>eq.push(`${esc(x.label||"Other")}: ${nm("Equipment",x)}${nt(x.note)}`));
-  h+=`<section><h2><span class="n">2</span>Equipment</h2>${eq.length?`<ul>${eq.map(x=>Array.isArray(x)?`<li${x[1]?` data-rs="${x[1]}"`:""}>${x[0]}</li>`:`<li>${x}</li>`).join("")}</ul>`:'<p class="dim">No equipment yet.</p>'}</section>`;
+  const nt=n=>n?` <span class="dim">· ${esc(n)}</span>`:"";const eq=[];const ad=(part,t)=>edit?{h:`<span class="edadd in">+ ${t}</span>`,p:part}:null;
+  if(b.charm.name||b.charm.note)eq.push({h:`Charm: ${nm("Equipment",b.charm)}${nt(b.charm.note)}`,p:"charm"});else eq.push(ad("charm","Add a charm"));
+  if(b.neck.name||b.neck.note)eq.push({h:`Necklace: ${nm("Equipment",b.neck)}${nt(b.neck.note)}`,p:"neck"});else eq.push(ad("neck","Add a necklace"));
+  const rings=(list,label,rs)=>{const xs=list.filter(x=>x.name||x.note);if(xs.length)eq.push({h:`${label}:<ul>${xs.map(x=>`<li>${x.count?`<b>${esc(x.count)}</b> `:""}${nm("Equipment",x)}${nt(x.note)}</li>`).join("")}</ul>`,rs,p:"rings"});return xs.length};
+  let nr=0;if(b.split6){nr+=rings(b.rings,"Rings (8 ring slots)","8");nr+=rings(b.rings6||[],"Rings (6 ring slots)","6")}else nr+=rings(b.rings,"Rings","");if(!nr)eq.push(ad("rings","Add rings"));
+  if(b.runes)eq.push({h:`Runes: <b>${esc(b.runes)}</b>`,p:"runes"});else eq.push(ad("runes","Add runes"));
+  b.extras.filter(x=>x.label||x.name).forEach(x=>eq.push({h:`${esc(x.label||"Other")}: ${nm("Equipment",x)}${nt(x.note)}`,p:"extras"}));eq.push(ad("extras","Add a row (totems, potions, anything else)"));
+  const EQ=eq.filter(Boolean);
+  h+=`<section><h2><span class="n">2</span>Equipment</h2>${EQ.length?`<ul>${EQ.map(x=>`<li${x.rs?` data-rs="${x.rs}"`:""}${edA(edit,x.p)}>${x.h}</li>`).join("")}</ul>`:'<p class="dim">No equipment yet.</p>'}</section>`;
   const tl=[];
+  if(!(b.pan.name||b.pan.enchant)&&edit)tl.push(`<span class="edadd in" data-ed="pan">+ Add a pan</span>`);
+  if(!(b.shovel.name||b.shovel.enchant)&&edit)tl.push(`<span class="edadd in" data-ed="shovel">+ Add a shovel</span>`);
   if(b.pan.name||b.pan.enchant)tl.push(`Pan: ${nm("Pan",b.pan)}${b.pan.enchant?` with the <b>${esc(b.pan.enchant)}</b> enchant`:""}${b.pan.trinket?` and the <b>${esc(b.pan.trinket)}</b> trinket`:""}${nt(b.pan.note)}`);
   if(b.shovel.name||b.shovel.enchant)tl.push(`Shovel: ${nm("Shovel",b.shovel)}${b.shovel.enchant?` with the <b>${esc(b.shovel.enchant)}</b> enchant`:""}${nt(b.shovel.note)}`);
-  if(tl.length)h+=`<section><h2><span class="n">3</span>Pan &amp; shovel</h2><ul>${tl.map(x=>`<li>${x}</li>`).join("")}</ul></section>`;
-  h+=`</div>${b.author?`<p class="author">${esc(b.author)}</p>`:""}</div>`;return colourStats(h)}
+  if(tl.length)h+=`<section><h2><span class="n">3</span>Pan &amp; shovel</h2><ul>${tl.map(x=>`<li${edit?` data-ed="${/^Pan:/.test(x)?"pan":/^Shovel:/.test(x)?"shovel":(x.match(/data-ed="(\w+)"/)||[])[1]}"`:""}>${x}</li>`).join("")}</ul></section>`;
+  h+=`</div>${b.author?`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`:""}</div>`;return colourStats(h)}
 let viewRings="8";try{const v=localStorage.getItem("pbs-rings");if(v==="6"||v==="8")viewRings=v}catch(e){}
-function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.view===viewMode)));document.getElementById("sheet").innerHTML=sheetHTML(getB())}
+function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.view===viewMode)));document.getElementById("sheet").innerHTML=sheetHTML(getB(),true)}
 document.querySelector(".vtoggle").addEventListener("click",e=>{const t=e.target.closest("[data-view]");if(!t)return;viewMode=t.dataset.view;try{localStorage.setItem("pbs-view",viewMode)}catch(err){}renderSheet()});
 document.getElementById("sheet").addEventListener("click",e=>{const t=e.target.closest(".rtoggle button");if(!t)return;viewRings=t.dataset.rings;try{localStorage.setItem("pbs-rings",viewRings)}catch(err){}renderSheet()});
 
@@ -227,7 +239,7 @@ document.addEventListener("keydown",e=>{const h=e.target.closest&&e.target.close
 function renderEditor(){
   const b=getB();const ed=document.getElementById("editor");
   const modList=Object.keys(MODS);
-  let h=`<section class="card"><h2>Build info</h2>
+  let h=`<section class="card" data-part="info"><h2>Build info</h2>
   <label class="field"><span>Title</span><input class="inp" autocomplete="off" id="f-name" value="${esc(b.name)}" placeholder="e.g. ${esc(randomName())}"></label>
   <div class="row"><label class="field"><span>Subtitle</span><input class="inp" autocomplete="off" id="f-subtitle" maxlength="120" value="${esc(b.subtitle)}" placeholder="e.g. ${esc(SUB_EX[Math.floor(Math.random()*SUB_EX.length)])}"></label>
   <label class="field"><span>Warning (shown in red)</span><input class="inp" autocomplete="off" id="f-warning" maxlength="200" value="${esc(b.warning)}" placeholder="e.g. Needs modification for Fungal Marsh"></label></div>
@@ -235,17 +247,17 @@ function renderEditor(){
   <label class="field"><span>Author / credit</span><input class="inp" autocomplete="off" id="f-author" maxlength="60" value="${esc(b.author)}" placeholder="e.g. YourName (@handle)"></label>
   <div class="field"><span>Picture <small style="font-weight:400;color:var(--muted)">shown top left, cropped to a square</small></span><div class="picrow">${b.pic?`<img class="picprev" src="${b.pic}" alt="">`:`<span class="picprev none">No picture</span>`}<label class="btn sm" for="f-pic">${b.pic?"Change":"Upload image"}</label><input type="file" id="f-pic" accept="image/*" hidden>${b.pic?`<button type="button" class="btn sm" data-act="rmpic">Remove</button>`:""}</div></div></section>`;
   h+=`<section class="card"><h2>Museum</h2>
-  <div class="row"><label class="field"><span>Modifier</span><select class="inp" id="f-mod">${opts(modList.filter(m=>m!=="None"),b.mod)}</select></label>
+  <div data-part="mod"><div class="row"><label class="field"><span>Modifier</span><select class="inp" id="f-mod">${opts(modList.filter(m=>m!=="None"),b.mod)}</select></label>
   <label class="field"><span>Fallback modifier</span><select class="inp" id="f-modFallback">${opts(["",...modList.filter(m=>m!=="Any"&&m!=="None")],b.modFallback)}</select></label></div>
   <p class="hint">Click a slot’s box to see every mineral with what it gives; hover one to preview the museum total. Add more than one to a slot to list choices; the first one counts in the total.</p>
-  <div class="row" style="margin-bottom:8px"><button class="btn sm" type="button" data-act="mymuseum" title="Fill these slots and the modifier from your current board on the Museum Planner page">Use my Museum Planner board</button></div>
+  <div class="row" style="margin-bottom:8px"><button class="btn sm" type="button" data-act="mymuseum" title="Fill these slots and the modifier from your current board on the Museum Planner page">Use my Museum Planner board</button></div></div>
   <div class="mtot"><div class="mtoth"><b>Museum total</b><span>first mineral in each slot + main modifier, at max weight</span></div><div class="mtotv" id="mtot"></div></div>`;
   const mname=n=>BY[n.toLowerCase()]?BY[n.toLowerCase()][0]:n;
   ORDER.forEach(r=>{const sl=b.museum[r];
     h+=`<div class="rar" style="--rc:${RC(r)}"><div class="rarh"><i></i><b>${r}</b><span>${sl.length} slot${sl.length>1?"s":""}</span></div><div class="slotgrid">`;
     sl.forEach((s,i)=>{if(covered(sl,i))return;const sp=Math.min(Math.max(1,s.span||1),sl.length-i);const maxSpan=SLOTS[r]-i;
       const how=s.m.length>1?(s.pick>1?`Pick ${Math.min(s.pick,s.m.length)}`:s.join===">"?"Best first":"Any one"):"";
-      h+=`<div class="se"${sp>1?` style="grid-column:span ${sp}"`:""}><div class="seh"><span>Slot ${i+1}${sp>1?`–${i+sp}`:""}</span>${how?`<em>${how}</em>`:""}${s.mark?`<em class="mk">${esc(s.mark)}</em>`:""}</div>
+      h+=`<div class="se" data-part="slot-${r}-${i}"${sp>1?` style="grid-column:span ${sp}"`:""}><div class="seh"><span>Slot ${i+1}${sp>1?`–${i+sp}`:""}</span>${how?`<em>${how}</em>`:""}${s.mark?`<em class="mk">${esc(s.mark)}</em>`:""}</div>
       ${s.m.length?`<div class="mlist">${s.m.map((n,k)=>{const nm=mname(n);const u=BY[n.toLowerCase()]?picOf("Mineral",nm):"";return `<div class="mrow${k===0?" counted":""}" data-mineral="${esc(nm)}" title="${k===0?"Counted in the museum total":"Alternative, not counted in the total"}">${u?`<img src="${u}" alt="">`:`<span class="np"></span>`}<span class="mt"><b>${esc(nm)}</b><span class="cg">${gainsHTML(gainOf(n))}</span></span><button type="button" class="rmx" aria-label="Remove ${esc(n)}" data-act="rm" data-r="${r}" data-i="${i}" data-k="${k}">×</button></div>`}).join("")}</div>`:""}
       <div class="sugg"><input class="inp addm" placeholder="${s.m.length?"+ Add another choice":"+ Add "+(/^[AEIOU]/.test(r)?"an ":"a ")+r.toLowerCase()+" mineral"}" data-act="add" data-r="${r}" data-i="${i}" id="add-${r}-${i}" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="sb-${r}-${i}"><div class="sbox" id="sb-${r}-${i}" role="listbox" hidden></div></div>
       </div>`;
@@ -253,32 +265,32 @@ function renderEditor(){
     h+=`</div></div>`;
   });
   const XS=b.extra||[];
-  h+=`<div class="xed"><div class="xedh"><b>Backup minerals</b><span>In case one is hard to get. Shown on the sheet, not counted in the total.</span></div>
+  h+=`<div class="xed" data-part="extra"><div class="xedh"><b>Backup minerals</b><span>In case one is hard to get. Shown on the sheet, not counted in the total.</span></div>
     ${XS.map((x,k)=>{const d=BY[String(x.n).toLowerCase()];const u=d?picOf("Mineral",d[0]):"";return `<div class="xrow" style="--rc:${d?RHX[d[1]]:"var(--line)"}">${u?`<img src="${u}" alt="">`:`<span class="np"></span>`}<span class="xn"><b style="color:var(--rc)">${esc(d?d[0]:x.n)}</b>${d?`<small>${d[1]} · max boost at ${d[2]} kg</small><span class="cg">${gainsHTML(d[3])}</span>`:""}</span><input class="inp" autocomplete="off" data-act="xnote" data-k="${k}" maxlength="80" value="${esc(x.note||"")}" placeholder="Note, e.g. instead of Bloodstone" aria-label="Note for ${esc(x.n)}"><button type="button" class="rmx" data-act="xrm" data-k="${k}" aria-label="Remove ${esc(x.n)}">×</button></div>`}).join("")}
     <div class="xadd"><input class="inp" id="xIn" autocomplete="off" placeholder="+ Add a backup mineral" aria-label="Add a backup mineral"><div class="xbox" id="xBox" hidden></div></div></div>`;
   h+=`</section>`;
   const mutSel=(id,v)=>`<input class="inp mutin" readonly id="${id}" data-sg="dl-mut" value="${esc(v||"")}" placeholder="No mutation" aria-label="Equipment mutation"${v&&EQMUT[v]?` style="color:${EC(v)}"`:""}>`;
   const gpic=(kind,name)=>{const real=name?findItem(kind,name):null;const u=real?picOf(kind,real):"";return `<span class="gpic" data-pk="${kind}">${u?`<img src="${u}" alt="">`:""}</span>`};
   h+=`<section class="card"><h2>Equipment</h2><div class="gedits">
-  <div class="ge"><div class="geh">${gpic("Equipment",b.charm.name)}<b>Charm</b></div><div class="g2"><input class="inp" autocomplete="off" id="f-charm-name" list="dl-charm" data-pk="Equipment" value="${esc(b.charm.name)}" placeholder="Charm name">${mutSel("f-charm-mut",b.charm.mut)}</div><input class="inp" autocomplete="off" id="f-charm-note" maxlength="100" value="${esc(b.charm.note)}" placeholder="Notes, e.g. fallback: Pumpkin Lord"></div>
-  <div class="ge"><div class="geh">${gpic("Equipment",b.neck.name)}<b>Necklace</b></div><div class="g2"><input class="inp" autocomplete="off" id="f-neck-name" list="dl-neck" data-pk="Equipment" value="${esc(b.neck.name)}" placeholder="Necklace name">${mutSel("f-neck-mut",b.neck.mut)}</div><input class="inp" autocomplete="off" id="f-neck-note" maxlength="100" value="${esc(b.neck.note)}" placeholder="Notes"></div></div>
-  <div class="ringh"><b>Rings</b><label class="mini" style="color:var(--fg)"><input type="checkbox" id="f-split6"${b.split6?" checked":""}> Separate 8-slot and 6-slot setups</label></div>`;
+  <div class="ge" data-part="charm"><div class="geh">${gpic("Equipment",b.charm.name)}<b>Charm</b></div><div class="g2"><input class="inp" autocomplete="off" id="f-charm-name" list="dl-charm" data-pk="Equipment" value="${esc(b.charm.name)}" placeholder="Charm name">${mutSel("f-charm-mut",b.charm.mut)}</div><input class="inp" autocomplete="off" id="f-charm-note" maxlength="100" value="${esc(b.charm.note)}" placeholder="Notes, e.g. fallback: Pumpkin Lord"></div>
+  <div class="ge" data-part="neck"><div class="geh">${gpic("Equipment",b.neck.name)}<b>Necklace</b></div><div class="g2"><input class="inp" autocomplete="off" id="f-neck-name" list="dl-neck" data-pk="Equipment" value="${esc(b.neck.name)}" placeholder="Necklace name">${mutSel("f-neck-mut",b.neck.mut)}</div><input class="inp" autocomplete="off" id="f-neck-note" maxlength="100" value="${esc(b.neck.note)}" placeholder="Notes"></div></div>
+  <div data-part="rings"><div class="ringh"><b>Rings</b><label class="mini" style="color:var(--fg)"><input type="checkbox" id="f-split6"${b.split6?" checked":""}> Separate 8-slot and 6-slot setups</label></div>`;
   const ringList=(list,p,act,ph)=>{let s="";list.forEach((x,i)=>{s+=`<div class="rge">${gpic("Equipment",x.name)}<input class="inp cnt" autocomplete="off" id="${p}-count-${i}" value="${esc(x.count)}" placeholder="${ph}" aria-label="Count"><input class="inp" autocomplete="off" id="${p}-name-${i}" list="dl-ring" data-pk="Equipment" value="${esc(x.name)}" placeholder="Ring" aria-label="Ring name">${mutSel(p+"-mut-"+i,x.mut)}<input class="inp nt" autocomplete="off" id="${p}-note-${i}" maxlength="100" value="${esc(x.note)}" placeholder="Notes" aria-label="Ring notes"><button type="button" class="x" data-act="rm${act}" data-i="${i}" aria-label="Remove ring">×</button></div>`});return s+`<div class="row"><button class="btn sm" type="button" data-act="add${act}">+ Add ring</button></div>`};
   const cnt=list=>list.reduce((a,x)=>a+(parseInt(x.count)||0),0);
   if(b.split6){
     h+=`<p class="hint"><b>8 ring slots</b> · <span id="cnt8">${cnt(b.rings)}</span>/8 used</p>${ringList(b.rings,"ring","ring","5×")}`;
     h+=`<p class="hint"><b>6 ring slots</b> · <span id="cnt6">${cnt(b.rings6)}</span>/6 used</p>${ringList(b.rings6,"ring6","ring6","3×")}`;
   } else h+=ringList(b.rings,"ring","ring","1×");
-  h+=`
-  <div class="field"><span>Runes <small style="font-weight:400;color:var(--muted)">one per slot; use / for "either", e.g. Sunblessed/Abyssal</small></span><div class="runegrid">${rslots(b).map((v,i)=>`<input class="inp" autocomplete="off" id="rn-${i}" list="dl-rune" value="${esc(v)}" placeholder="Slot ${i+1}" aria-label="Rune slot ${i+1}">`).join("")}</div><div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-act="myrunes" title="Fill these slots from your loadout on the Runes page">Use my Runes loadout</button></div></div>
+  h+=`</div>
+  <div class="field" data-part="runes"><span>Runes <small style="font-weight:400;color:var(--muted)">one per slot; use / for "either", e.g. Sunblessed/Abyssal</small></span><div class="runegrid">${rslots(b).map((v,i)=>`<input class="inp" autocomplete="off" id="rn-${i}" list="dl-rune" value="${esc(v)}" placeholder="Slot ${i+1}" aria-label="Rune slot ${i+1}">`).join("")}</div><div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-act="myrunes" title="Fill these slots from your loadout on the Runes page">Use my Runes loadout</button></div></div>
   <div class="gedits">
-  <div class="ge"><div class="geh">${gpic("Pan",b.pan.name)}<b>Pan</b></div><input class="inp" autocomplete="off" id="f-pan-name" list="dl-pan" data-pk="Pan" value="${esc(b.pan.name)}" placeholder="Pan"><div class="g2 half"><input class="inp" autocomplete="off" id="f-pan-enchant" list="dl-panen" value="${esc(b.pan.enchant)}" placeholder="Enchant"><input class="inp" autocomplete="off" id="f-pan-trinket" list="dl-trinket" value="${esc(b.pan.trinket)}" placeholder="Trinket (optional)"></div></div>
-  <div class="ge"><div class="geh">${gpic("Shovel",b.shovel.name)}<b>Shovel</b></div><input class="inp" autocomplete="off" id="f-shovel-name" list="dl-shovel" data-pk="Shovel" value="${esc(b.shovel.name)}" placeholder="Shovel"><div class="g2 half"><input class="inp" autocomplete="off" id="f-shovel-enchant" list="dl-shen" value="${esc(b.shovel.enchant)}" placeholder="Enchant"><input class="inp" autocomplete="off" id="f-shovel-note" maxlength="100" value="${esc(b.shovel.note)}" placeholder="Notes"></div></div></div>
-  <b>Extra rows</b><p class="hint">For totems, potions, trinkets or anything else.</p>`;
+  <div class="ge" data-part="pan"><div class="geh">${gpic("Pan",b.pan.name)}<b>Pan</b></div><input class="inp" autocomplete="off" id="f-pan-name" list="dl-pan" data-pk="Pan" value="${esc(b.pan.name)}" placeholder="Pan"><div class="g2 half"><input class="inp" autocomplete="off" id="f-pan-enchant" list="dl-panen" value="${esc(b.pan.enchant)}" placeholder="Enchant"><input class="inp" autocomplete="off" id="f-pan-trinket" list="dl-trinket" value="${esc(b.pan.trinket)}" placeholder="Trinket (optional)"></div></div>
+  <div class="ge" data-part="shovel"><div class="geh">${gpic("Shovel",b.shovel.name)}<b>Shovel</b></div><input class="inp" autocomplete="off" id="f-shovel-name" list="dl-shovel" data-pk="Shovel" value="${esc(b.shovel.name)}" placeholder="Shovel"><div class="g2 half"><input class="inp" autocomplete="off" id="f-shovel-enchant" list="dl-shen" value="${esc(b.shovel.enchant)}" placeholder="Enchant"><input class="inp" autocomplete="off" id="f-shovel-note" maxlength="100" value="${esc(b.shovel.note)}" placeholder="Notes"></div></div></div>
+  <div data-part="extras"><b>Extra rows</b><p class="hint">For totems, potions, trinkets or anything else.</p>`;
   b.extras.forEach((x,i)=>{h+=`<div class="eqrow"><input class="inp" autocomplete="off" id="ex-label-${i}" value="${esc(x.label)}" placeholder="Label" aria-label="Row label"><input class="inp" autocomplete="off" id="ex-name-${i}" value="${esc(x.name)}" placeholder="Name" aria-label="Row name"><input class="inp" autocomplete="off" id="ex-note-${i}" maxlength="100" value="${esc(x.note)}" placeholder="Notes" aria-label="Row notes"><button type="button" class="x" data-act="rmex" data-i="${i}" aria-label="Remove row">×</button></div>`});
-  h+=`<div class="row"><button class="btn sm" type="button" data-act="addex">Add row</button></div>
+  h+=`<div class="row"><button class="btn sm" type="button" data-act="addex">Add row</button></div></div>
   ${dl("dl-charm",SUGGEST.charm)}${dl("dl-neck",SUGGEST.neck)}${dl("dl-ring",SUGGEST.ring)}${dl("dl-pan",SUGGEST.pan)}${dl("dl-shovel",SUGGEST.shovel)}${dl("dl-panen",PAN_EN)}${dl("dl-shen",SH_EN)}${dl("dl-rune",RUNE_NAMES)}${dl("dl-trinket",TRINKETS)}</section>`;
-  ed.innerHTML=h;SG=null;renderMTot();hookSugg();foldSetup();
+  ed.innerHTML=h;SG=null;renderMTot();hookSugg();markPart();
 }
 // runes: five slots, kept in step with the comma list the sheet shows
 const RUNE_NAMES=(()=>{try{const X=window.parent.PTDATA.x2||{};return (X.runes||[]).map(r=>r.n)}catch(e){return []}})();
@@ -462,16 +474,29 @@ document.getElementById("bDl").onclick=async()=>{const b=getB();const html=fileH
 document.getElementById("imp").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const m=String(rd.result).match(/<script type="application\/json" id="build-data">([\s\S]*?)<\/script>/);const o=m&&JSON.parse(m[1]);if(!o||o.app!=="prospecting-build-sheets"||!o.build||!o.build.museum)throw 0;const nb=Object.assign(blankBuild(),o.build,{id:uid()});ORDER.forEach(r=>{if(!Array.isArray(nb.museum[r])||nb.museum[r].length!==SLOTS[r])nb.museum[r]=blankBuild().museum[r]});if(!Array.isArray(nb.rings6))nb.rings6=[];ORDER.forEach(r=>nb.museum[r].forEach(x=>{if(!x.span)x.span=1}));B.push(nb);cur=nb.id;persist();renderAll();toast(`Imported “${nb.name}”`)}catch(err){toast("That file isn't a build sheet from this page")}};rd.readAsText(f)});
 
 // ---------- view tabs, toast ----------
-const split=document.getElementById("split");
-function view(v){split.dataset.view=v;document.getElementById("tEdit").setAttribute("aria-pressed",v==="edit");document.getElementById("tPrev").setAttribute("aria-pressed",v==="preview")}
-// hide / show the preview, remembered between visits
-let hideP=false;try{hideP=localStorage.getItem("pbs-hidep")==="1"}catch(e){}
+// ---------- editing straight from the sheet: a click opens just that part's fields in a small panel ----------
+let PART=null;const POP=document.getElementById("edpop");
+const PARTN=p=>{const m=p.match(/^slot-(\w+)-(\d+)$/);if(m)return `${m[1]} slot ${+m[2]+1}`;return {info:"Build info",mod:"Museum modifier",extra:"Backup minerals",charm:"Charm",neck:"Necklace",rings:"Rings",runes:"Runes",pan:"Pan",shovel:"Shovel",extras:"Extra rows"}[p]||"Edit"};
+// show only the chosen part: hide everything in the editor that isn't it or one of its parents
+function markPart(){const ed=document.getElementById("editor");ed.querySelectorAll(".edhide").forEach(x=>x.classList.remove("edhide"));if(!PART)return;
+  const t=ed.querySelector(`[data-part="${PART}"]`);if(!t){closeEd();return}
+  for(let n=t;n&&n!==ed;n=n.parentElement)[...n.parentElement.children].forEach(c=>{if(c!==n)c.classList.add("edhide")})}
+function openEd(part,anchor){PART=part;document.getElementById("edT").textContent=PARTN(part);POP.hidden=false;markPart();
+  document.querySelectorAll("#sheet .edon").forEach(x=>x.classList.remove("edon"));anchor.classList.add("edon");
+  // place it under what was clicked, kept on screen
+  const r=anchor.getBoundingClientRect(),W=Math.min(480,document.documentElement.clientWidth-16);POP.style.width=W+"px";
+  POP.style.left=(Math.max(8,Math.min(r.left,document.documentElement.clientWidth-W-8))+scrollX)+"px";POP.style.top=(r.bottom+6+scrollY)+"px";
+  const f=document.querySelector(`#editor [data-part="${part}"]`).querySelector("input:not([type=checkbox]):not([readonly]),textarea,select");
+  if(f&&!/^slot-/.test(part))f.focus({preventScroll:true})}
+function closeEd(){PART=null;POP.hidden=true;markPart();document.querySelectorAll("#sheet .edon").forEach(x=>x.classList.remove("edon"))}
+document.getElementById("edX").onclick=closeEd;
+document.addEventListener("click",e=>{if(POP.contains(e.target)||e.target.closest(".sbox,.sgx,.toast"))return;
+  const t=e.target.closest("#sheet [data-ed]");if(t&&!e.target.closest(".rtoggle")){e.preventDefault();openEd(t.dataset.ed,t);return}
+  if(!POP.hidden)closeEd()},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!POP.hidden&&!SG){closeEd()}
+  const t=e.target.closest&&e.target.closest("#sheet [data-ed]");if(t&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openEd(t.dataset.ed,t)}});
 document.addEventListener("click",e=>{const m=document.getElementById("sMenu");if(!m||!m.open)return;if(!m.contains(e.target)||e.target.closest(".smi"))m.open=false});
 document.addEventListener("keydown",e=>{const m=document.getElementById("sMenu");if(e.key==="Escape"&&m&&m.open){m.open=false;m.querySelector("summary").focus()}});
-function applyHideP(){split.classList.toggle("nopv",hideP);const hb=document.getElementById("bHideP");hb.textContent=hideP?"Show preview":"Hide preview";hb.setAttribute("aria-pressed",String(hideP));document.querySelector(".topbar .tabs").style.visibility=hideP?"hidden":""}
-document.getElementById("bHideP").onclick=()=>{hideP=!hideP;try{localStorage.setItem("pbs-hidep",hideP?"1":"0")}catch(e){}if(hideP)view("edit");applyHideP()};
-applyHideP();
-document.getElementById("tEdit").onclick=()=>view("edit");document.getElementById("tPrev").onclick=()=>view("preview");
 let tt;function toast(m){let el=document.querySelector(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=m;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,1700)}
 // ---- Stat Calculator <-> build sheet ----
 
