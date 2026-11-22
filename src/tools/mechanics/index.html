@@ -39,6 +39,12 @@
     <p class="txt">A full pan doesn't give one mineral per point of capacity. On average it gives about <b>0.68 × capacity<sup>0.565</sup></b> minerals, so 400 capacity is about 20, 1,600 is about 44, 5,462 about 87 and 7,240 about 102. Every pan lands between <b>½ × √capacity</b> and about <b>2.5 × √capacity</b>, and most pans sit in the lower two thirds of that range, which is why the average is below the middle. Doubling capacity gives roughly 1.4× the minerals, so capacity helps steadily but never explodes. Luck doesn't change the count. The Pan Size tool shows yours.</p>
     <div class="row"><label class="fld"><span class="lab">Capacity</span><input type="number" id="cap" min="1" value="1000"></label><label class="fld"><span class="lab">Chance per pick (%)</span><input type="number" id="pick" min="0" step="0.01" value="0.1"></label></div>
     <p class="big" id="capOut"></p>
+    <h3 class="sec">What the next +1,000 capacity is worth</h3>
+    <p class="txt">Because of the 0.565 power, each extra 1,000 capacity adds less than the one before. The line shows how many more minerals per pan (and so how much better your odds at any one mineral) the next +1,000 gives at each capacity. Luck doesn't fade like this for the rarest minerals: +1% luck stays about +1% odds, so the more capacity you have, the more luck a point of capacity is worth giving up. The dot is the capacity you typed in.</p>
+    <div class="cgw" id="capG"></div>
+    <div class="row"><label class="fld"><span class="lab">Your luck (for the trade-off)</span><input type="number" id="luck2" min="1" value="1000"></label></div>
+    <p class="big" id="capVs"></p>
+    <p class="note">Worked out as 1 capacity ≈ 0.565 × luck ÷ capacity in luck points, for a mineral that's the rarest in its zone (where odds go up in step with luck). For less rare minerals luck is worth less, so capacity is worth even more. This is per pan, not per hour: bigger pans take longer.</p>
   </section>
 
   <section class="card">

@@ -34,3 +34,10 @@ td.bw{width:40%}
 .row .ck{display:inline-flex;align-items:center;gap:7px;padding-bottom:8px;cursor:pointer}
 .row .ck input{width:16px;height:16px;accent-color:var(--accent)}
 mark.hl{background:color-mix(in srgb,#f2d13a 45%,transparent);color:inherit;padding:1px 4px;border-radius:4px}
+.cgw{width:100%;max-width:760px}
+.cgw svg{width:100%;height:auto;display:block}
+.cgw .gl{stroke:var(--line);stroke-width:1}
+.cgw .tk{fill:var(--muted);font:11px var(--f-mono)}
+.cgw .ln{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round}
+.cgw .dot{fill:var(--accent);stroke:var(--panel);stroke-width:2}
+.cgw .dl{fill:var(--fg);font:600 12px var(--f-mono)}
