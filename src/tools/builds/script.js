@@ -47,6 +47,8 @@ function blankBuild(name){return{id:uid(),name:name||randomName(),subtitle:"",wa
 const fbs=b=>(Array.isArray(b.modFallbacks)?b.modFallbacks:(b.modFallback?[b.modFallback]:[])).filter(m=>m&&m!=="None"&&m!=="Any");
 const fbL=b=>Array.isArray(b.modFallbacks)?b.modFallbacks:fbs(b);
 const setFbs=(b,l)=>{b.modFallbacks=l;b.modFallback=l.filter(Boolean)[0]||""};
+// "Empty slots count as Any": every empty museum slot is shown and counted as Any (modifier only)
+const withAny=b=>{if(!b.emptyAny)return b;const c=Object.assign({},b,{museum:{}});ORDER.forEach(r=>{const sl=b.museum[r]||[];c.museum[r]=sl.map((x,i)=>!covered(sl,i)&&!(x.m||[]).length?Object.assign({},x,{m:["Any"]}):x)});return c};
 // ---------- storage ----------
 let B=[],cur=null,armDel=false;
 try{const x=JSON.parse(localStorage.getItem("pbs-builds")||"[]");if(Array.isArray(x))B=x.filter(b=>b&&b.id&&b.museum);}catch(e){}
@@ -67,7 +69,7 @@ const r4=v=>Math.round(v*1000)/1000;
 const fx=v=>(v<0?"−":"+")+r4(Math.abs(v))+"×";
 function covered(sl,i){for(let j=0;j<i;j++){if(j+Math.max(1,sl[j].span||1)>i)return true}return false}
 function gainOf(name){const d=BY[name.toLowerCase()];return d?d[3]:[]}
-function museumTotals(b,ov){const t=Object.fromEntries(STATS.map(s=>[s,0]));const md=MODSTATS[b.mod];
+function museumTotals(b0,ov){const b=withAny(b0);const t=Object.fromEntries(STATS.map(s=>[s,0]));const md=MODSTATS[b.mod];
   ORDER.forEach(r=>{const sl=b.museum[r];sl.forEach((s,i)=>{if(covered(sl,i))return;const k=s.m.length>1&&s.pick>1?Math.min(s.pick,s.m.length):1;let names=s.m.slice(0,k);if(ov&&ov.r===r&&ov.i===i)names=[ov.name,...names.slice(1)];names.forEach(n=>{if(!n)return;gainOf(n).forEach(([st,v])=>t[st]+=v);if(md)md[0].forEach(st=>t[st]+=MULT[r]*md[1])})})});return t}
 const gainsHTML=g=>g.map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fx(v)}</em></span>`).join("");
 function slotHTML(s){
@@ -147,7 +149,7 @@ const tidy=o=>{if(typeof o==="string")return tidyT(o);if(Array.isArray(o))return
 // Saved images and downloads call these without it, so none of that ends up in them.
 const edA=(on,part)=>on?` data-ed="${part}"`:"";
 const addChip=(on,part,t)=>on?`<button type="button" class="edadd" data-ed="${part}">+ ${t}</button>`:"";
-function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const b=tidy(b0);
+function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const b=withAny(tidy(b0));
   const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
   let h=`<div class="sheet" data-rings="${has6(b)?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
   if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
@@ -191,7 +193,7 @@ function slotText(s,r,mod){if(!s.m.length)return '<span class="dim">any mineral<
   else if(s.join===">")t=s.m.map(one).join(" → if you don't have it, ");
   else t=s.m.map(one).join(" <span class=\"dim\">or</span> ");
   return t+(s.mark?` <span class="mark">${esc(s.mark)}</span>`:"")}
-function textHTML(b0,edit){const b=tidy(b0);const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
+function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
   const modT=m=>!m||m==="None"||m==="Any"?"<b>any</b>":`<b style="color:${MC(m)}">${esc(m)}</b>`;
   let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${esc(b.subtitle)}</p>`:""}</div></div>`;
   if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
@@ -254,6 +256,7 @@ function renderEditor(){
   <div data-part="mod"><div class="row"><label class="field"><span>Modifier</span><select class="inp" id="f-mod">${opts(modList.filter(m=>m!=="None"),b.mod)}</select></label>
   </div>
   <div class="field"><span>Fallback modifiers <small style="font-weight:400;color:var(--muted)">in order, if the one above can't be had</small></span>${fbL(b).map((m,k)=>`<div class="row" style="gap:6px;margin-bottom:6px;align-items:center"><span class="hint" style="margin:0;min-width:18px">${k+1}.</span><select class="inp" id="fb-${k}" aria-label="Fallback ${k+1}">${opts(["",...modList.filter(x=>x!=="Any"&&x!=="None")],m)}</select><button type="button" class="x" data-act="rmfb" data-i="${k}" aria-label="Remove fallback ${k+1}">×</button></div>`).join("")}<div class="row"><button class="btn sm" type="button" data-act="addfb">+ Add a fallback</button></div></div>
+  <label class="mini" style="display:flex;gap:6px;align-items:center;margin:2px 0 8px;color:var(--fg)"><input type="checkbox" id="f-emptyAny"${b.emptyAny?" checked":""}> Empty slots count as Any <small style="color:var(--muted)">(any mineral, the modifier still counts)</small></label>
   <p class="hint">Click a slot’s box to see every mineral with what it gives; hover one to preview the museum total. Add more than one to a slot to list choices; the first one counts in the total.</p>
   <div class="row" style="margin-bottom:8px"><button class="btn sm" type="button" data-act="mymuseum" title="Fill these slots and the modifier from your current board on the Museum Planner page">Use my Museum Planner board</button></div></div>
   <div class="mtot"><div class="mtoth"><b>Museum total</b><span>first mineral in each slot + main modifier, at max weight</span></div><div class="mtotv" id="mtot"></div></div>`;
@@ -341,6 +344,7 @@ ed.addEventListener("change",e=>{const t=e.target,b=getB();
   if(t.dataset.act==="join"){b.museum[t.dataset.r][+t.dataset.i].join=t.value;touch()}
   else if(t.dataset.act==="mark"){b.museum[t.dataset.r][+t.dataset.i].mark=t.value;touch()}
   else if(t.dataset.act==="span"){b.museum[t.dataset.r][+t.dataset.i].span=+t.value||1;touch();renderEditor()}
+  else if(t.id==="f-emptyAny"){b.emptyAny=t.checked;touch()}
   else if(t.id==="f-split6"){b.split6=t.checked;if(!Array.isArray(b.rings6))b.rings6=[];if(b.split6&&!b.rings6.some(x=>x.name))b.rings6=b.rings.map(x=>Object.assign({},x,{count:(String(x.count).split("/")[1]||x.count||"").trim()}));if(b.split6)b.rings=b.rings.map(x=>Object.assign({},x,{count:String(x.count).split("/")[0].trim()}));
     else b.rings=b.rings.map(x=>{const m=b.rings6.find(y=>y.name&&y.name===x.name);return m&&m.count&&m.count!==x.count&&!String(x.count).includes("/")?Object.assign({},x,{count:x.count+"/"+m.count}):x});
     touch();renderEditor()}});
@@ -587,7 +591,7 @@ window.addEventListener("scroll",e=>{if(!SGI||!SGX||SGX.contains(e.target))retur
 window.ptSetRunes=names=>{const b=getB();b.runeSlots=Array.from({length:5},(_,i)=>(names||[])[i]||"");syncRunes(b);touch();renderEditor();toast(`Added ${names.length} rune${names.length===1?"":"s"} to “${b.name||"this build"}”`)};
 window.ptAddBuild=src=>{const nb=Object.assign(blankBuild(randomName()),JSON.parse(JSON.stringify(src)),{id:uid(),updated:Date.now()});if(!nb.name)nb.name=randomName();B.push(nb);cur=nb.id;armDel=false;persist();renderAll();toast(`Added “${nb.name}” from the Stat Calculator`)};
 window.ptListBuilds=()=>B.map(b=>({id:b.id,name:b.name||"Untitled build"}));
-function calcState(b){
+function calcState(b0){const b=withAny(b0);
   const slots={};const eq=e=>e&&e.name?{n:e.name.trim(),m:e.mut||"None",l:/5★/.test(e.note||"")?"5":/0★/.test(e.note||"")?"0":"6",q:(()=>{const m=String(e.note||"").match(/(\d+)%\s*quality/);return m?+m[1]:100})()}:{};
   slots.neck=eq(b.neck);slots.charm=eq(b.charm);let k=0;
   let total=0;(b.rings||[]).forEach(x=>{if(!x.name)return;const n=Math.max(1,parseInt(x.count)||1);total+=n;for(let i=0;i<n&&k<8;i++)slots["r"+(k++)]=eq(x)});
