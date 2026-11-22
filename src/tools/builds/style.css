@@ -422,3 +422,6 @@ textarea.inp{min-height:90px;resize:vertical}
 .op.anyop .ph.anyi{width:34px;height:34px;font-size:10.5px}
 .sopt .si.anyi{width:28px;height:28px;font-size:9px}
 .mrow .np.anyi{width:28px;height:28px;font-size:9px;flex:none}
+
+.tutfmt>summary{cursor:pointer;font-size:13px;font-weight:600;color:#c7d0d9;padding:4px 0}
+.tutfmt[open]>summary{margin-bottom:8px}
