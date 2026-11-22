@@ -1,4 +1,5 @@
 const LIST = [
+  { id: "home", name: "Home", desc: "Start here: find a build, check your stats, plan your museum" },
   { id: "builds", name: "Build Sheets", desc: "Write full builds in the guide layout" },
   { id: "bestbuild", name: "Best Build", desc: "Pick a mineral or goal, get the best build as a build sheet" },
   { id: "planner", name: "Museum Planner", desc: "Pick minerals and mutations, see totals" },

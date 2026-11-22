@@ -1,0 +1,20 @@
+.wrap{max-width:1100px;margin:0 auto;padding:26px 18px 40px;display:flex;flex-direction:column;gap:16px}
+h1{font:700 1.8rem var(--f-display);margin:0}
+h2{font:700 1.05rem var(--f-display);margin:0}
+.jobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.job{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--fg);font:inherit;cursor:pointer;transition:border-color .15s,transform .15s}
+.job:hover,.job:focus-visible{border-color:var(--accent);transform:translateY(-1px)}
+.job b{font:700 1.15rem var(--f-display)}
+.job span:last-child{color:var(--muted);font-size:13.5px;line-height:1.45}
+.ji{width:44px;height:44px;border-radius:10px;background:var(--sunk);display:grid;place-items:center}
+.ji img{width:36px;height:36px;object-fit:contain}
+.sh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
+.feat{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.fc{display:flex;flex-direction:column;gap:4px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--sunk);text-align:left;font:inherit;color:var(--fg);cursor:pointer}
+.fc:hover,.fc:focus-visible{border-color:var(--accent)}
+.fc b{font-weight:700}
+.fc .by,.fc .g{font-size:12.5px;color:var(--muted)}
+.fc .o{font:600 12.5px var(--f-mono);color:var(--accent)}
+.ql{display:flex;flex-wrap:wrap;gap:8px}
+.hint{color:var(--muted);font-size:13px;margin:0}

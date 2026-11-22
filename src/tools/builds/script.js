@@ -820,6 +820,8 @@ function calcState(b0){const b=withAny(b0);
   ORDER.forEach(r=>{const sl=b.museum[r]||[];board[r]=Array.from({length:SLOTS[r]},()=>({m:null,u:"None"}));
     sl.forEach((s,i)=>{if(covered(sl,i))return;const k2=s.m.length>1&&s.pick>1?Math.min(s.pick,s.m.length):1;s.m.slice(0,k2).forEach((n,j)=>{if(n&&board[r][i+j]){const o=uAt(s,j);board[r][i+j]={m:n,u:o?(o==="Any"?"None":o):u}}})})});
   return {extraRings:Math.max(0,total-8),from:plainC(b.name),pan:(b.pan.name||"").trim(),panEn:first(b.pan.enchant),trinket:first(b.pan.trinket),shovel:(b.shovel.name||"").trim(),shEn:first(b.shovel.enchant),slots,museumBoard:board}}
+window.ptFeaturedInfo=()=>FEATURED.map(f=>({id:f.id,t:f.t,by:f.by,goal:f.goal,odds:f.odds}));
+window.ptOpenFeatured=id=>{const f=FEATURED.find(x=>x.id===id);if(!f){viewMode="feat";SHARED=null;renderSheet();return}const {b}=fromText(f.txt,blankBuild());SHARED={b,txt:f.txt,feat:f.t};renderSheet();window.scrollTo(0,0)};
 window.ptBuildsList=()=>B.map(b=>({id:b.id,name:plainC(b.name)||"Untitled build",kind:"mine"})).concat(FEATURED.map(f=>({id:"feat:"+f.id,name:f.t,kind:"feat"})));
 window.ptCalcStateAny=id=>{id=String(id||"");if(id.startsWith("feat:")){const f=FEATURED.find(x=>x.id===id.slice(5));return f?calcState(fromText(f.txt,blankBuild()).b):null}const b=B.find(x=>x.id===id);return b?calcState(b):null};
 window.ptCalcState=id=>{const b=B.find(x=>x.id===id)||getB();return calcState(b)};

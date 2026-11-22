@@ -95,3 +95,12 @@ document.getElementById("hubbar").addEventListener("keydown", (e) => {
   }
 });
 document.getElementById("gBtn").onclick = () => show("settings");
+// the "Prospecting Toolkit" name in the top bar goes home
+{
+  const br = document.querySelector(".brand small");
+  if (br) {
+    br.style.cursor = "pointer";
+    br.title = "Home";
+    br.onclick = () => show("home");
+  }
+}

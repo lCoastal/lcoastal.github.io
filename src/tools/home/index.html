@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Home</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>What do you want to do?</h1>
+    <p class="lede">Every tool for Prospecting in one place. Start with one of these, or open the menu for the rest.</p>
+  </header>
+  <div class="jobs">
+    <button type="button" class="job" data-go="bestbuild"><span class="ji" id="ic-bestbuild"></span><b>Find my best build</b><span>Pick a mineral or a goal and what you can get. Get the best build as a finished build sheet.</span></button>
+    <button type="button" class="job" data-go="calc"><span class="ji" id="ic-calc"></span><b>Check my stats</b><span>Put in your gear, museum and boosts and see your full stat panel, with what to upgrade next.</span></button>
+    <button type="button" class="job" data-go="planner"><span class="ji" id="ic-planner"></span><b>Plan my museum</b><span>Fill your museum slot by slot, or let it find the best museum for a goal.</span></button>
+  </div>
+  <section class="card">
+    <div class="sh"><h2>Featured builds</h2><button type="button" class="lnk" data-go="builds" data-feat="1">See them all</button></div>
+    <div class="feat" id="feat"><p class="hint">Loading…</p></div>
+  </section>
+  <section class="card">
+    <h2>Quick links</h2>
+    <div class="ql">
+      <button type="button" class="btn" data-go="buildcmp">Compare builds</button>
+      <button type="button" class="btn" data-go="bestcap">Best luck cap</button>
+      <button type="button" class="btn" data-go="odds">Luck odds</button>
+      <button type="button" class="btn" data-go="events">Event clock</button>
+      <button type="button" class="btn" data-go="codes">Codes</button>
+      <button type="button" class="btn" data-go="mechanics">How it works</button>
+    </div>
+  </section>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>

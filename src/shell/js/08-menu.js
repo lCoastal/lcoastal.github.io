@@ -1,5 +1,6 @@
 // menu groups: [title, colour, [tool or hub id, game image (m: mineral, e: equipment, g: gear)]...]
 const SECTIONS = [
+  ["Start", "#94a3b8", [["home", "m:Gold"]]],
   [
     "Builds & stats",
     "#14b8a6",

@@ -29,7 +29,7 @@ let start = location.hash.slice(1);
 start = OLD_IDS[start] || start;
 if (!TOOLS[start]) {
   try {
-    start = localStorage.getItem("pt-tool") || "builds";
+    start = localStorage.getItem("pt-tool") || "home";
   } catch (e) {
     start = "builds";
   }
