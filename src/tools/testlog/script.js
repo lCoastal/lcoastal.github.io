@@ -3,19 +3,19 @@ const $=id=>document.getElementById(id);
 // Each session: when, where, setup, how much was logged, what was tested, what it showed, what changed on the site.
 const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables",kg:"Weights"};
 const S=[
-{id:"galaxis2-2011",date:"20/11/26",title:"GalaxisHub log 2: re-check on fresh data, Size Boost 12.6×",zone:"29 zones, mostly Sandstone Stream",topics:["lk","kg"],kind:"lk",
+{id:"galaxis2-2011",date:"20/11/26",title:"Luck caps and weights, re-check at Size Boost 12.6×",zone:"29 zones, mostly Sandstone Stream",topics:["lk","kg"],kind:"lk",
  setup:{Luck:"Caps 1 – 50,000, and up to 123,000 uncapped",Capacity:"8,160 – 9,245",["Modifier Boost"]:"4.75×",["Size Boost"]:"7.15× and 12.6×",Zones:"29 zones; 543,000 of the minerals from Sandstone Stream"},
  amount:{Minerals:652655},
- tested:["Whether the zone size factors from the first GalaxisHub log hold on separate data and at a new Size Boost","Whether a luck cap still works like 56% of its number","Whether anything in the log makes weights 1.5× or 2× heavier (Solar Magnifier)"],
+ tested:["Whether the zone size factors hold on separate data and at a new Size Boost","Whether a luck cap still works like 56% of its number","Whether anything in the log makes weights 1.5× or 2× heavier (Solar Magnifier)"],
  found:["Zone factors repeat: Rubble Creek 0.80 (0.80 before), Rubble Creek Deposits 0.88 (0.89), Sandstone Stream 1.00 (1.00), Volcanic Sands 0.95–0.96 (0.96), and the same at Size Boost 12.6×, which the first log never had","Caps again behave like 56% of their number: exactly 0.56 for caps of 100 to 50,000 (72,000 capped minerals), 0.54–0.58 for caps of 1 and 10. Uncapped luck came out at 0.96× the luck shown","No stretch of the log has weights 1.5× or 2× above the normal range. The heaviest Gold anywhere is 16.96× its base × (1 + Size Boost) × zone, against a normal top of 15.5×","For about 7 minutes (09:41–09:49, mostly Rubble Creek) every weight was 1.10× heavier, smallest and biggest alike. What caused it isn't known: it isn't in the logged Size Boost"],
  changed:["Nothing: the zone factors and the 0.56 luck cap already in the toolkit both held up"]},
-{id:"galaxis-2011",date:"20/11/26",title:"GalaxisHub log: 26 zones, capped and uncapped luck",zone:"26 zones",topics:["lk","cp","md","kg"],kind:"lk",
+{id:"galaxis-2011",date:"20/11/26",title:"Capped and uncapped luck in 26 zones",zone:"26 zones",topics:["lk","cp","md","kg"],kind:"lk",
  setup:{Luck:"Caps 1 – 10,000, and 2,500 – 99,000 uncapped",Capacity:"7,817 – 10,493",["Modifier Boost"]:"4.75×",["Size Boost"]:"7.15× and 7.55×",Zones:"26 zones, from Rubble Creek to Timelocked Sanctuary"},
  amount:{Pans:6080,Minerals:650265},
  tested:["What a luck cap really gives, with more than half the log panned at a cap","Whether weights still fit 0.75 to 15.5 × base × (1 + Size Boost) in zones other than Meteor Falls","Minerals per pan and the modifier rate at a new capacity and Modifier Boost"],
  found:["Every cap from 100 to 10,000 behaved like 56% of its number (54–60% in each of 17 zones, 326,000 capped minerals). Uncapped luck came out at about 86% of the luck shown, so a cap is about 0.65× of uncapped luck, close to the old 63%","Each zone multiplies weights by its own factor: ×0.80 in Rubble Creek, ×0.93 in Fortune River, about ×1 in most zones, ×1.12 in Infernal Heart, Abyssal Depth and Windswept Beach, ×1.20 in Timelocked Sanctuary. The factor was the same at both Size Boosts and hours apart","With the zone factor, weights stay between 0.75 and 15.5 × base × (1 + Size Boost) (Gold reached 15.0–15.5 in every long session), and the spread matched the weight model: median 11.1–11.6× vs 11.2–11.5×, top 10% 14.5× vs 14.5×, 27.6% small vs 26%","Minerals per pan at 8,160 capacity (2,220 pans): 109.3 vs 109.7 predicted. Some zones ran lower (Abyssal Depth about 19%, Fortune River about 15%), on short runs","Modifier rate 26.5% vs 27% predicted at 4.75×, the lowest boost checked since the refit; the mix within about 10% for the common ones, Cosmic, Mutated and Perfect a little more often than predicted","A few base weights look slightly off: Selenite about 10% heavier than listed, Pyrelith and Golden Pearl about 8%, Pearl about 8% lighter"],
  changed:["Luck caps now count as 0.56 × the cap everywhere (was 0.63): Best Luck Cap, Dredge, Build Compare and the farm routes","New zone size factor: Weight Range, Size Boost Finder, Mechanics and the 5-Star Crafter's max weight let you pick a zone; Test Data Check uses each row's zone","Formulas: weight formulas now include the zone factor, plus a zone table and the luck cap formula"]},
-{id:"logger4-1711",date:"17/11/26",title:"Long check run at two capacities",zone:"Meteor Falls",topics:["lk","my","cp","md","kg"],kind:"lk",
+{id:"logger4-1711",date:"17/11/26",title:"Check at two capacities",zone:"Meteor Falls",topics:["lk","my","cp","md","kg"],kind:"lk",
  setup:{Luck:"26,400 – 267,000",Capacity:"7,240 then 5,462",["Modifier Boost"]:"16.6×"},
  amount:{Pans:8180,Minerals:776278},
  tested:["Whether the 17/11 formulas hold on the biggest run so far","The lowest and highest number of minerals a pan can hold"],
@@ -27,19 +27,19 @@ const S=[
  tested:["Where weights fall between the lightest and heaviest possible","Whether capacity, luck, modifier, mineral or position in the pan changes the weight"],
  found:["Every weight falls between 0.75 and 15.5 × base weight × (1 + Size Boost); common minerals hit both ends almost exactly","About 26% of minerals always come out small (0.75 – 1.88 × base × (1 + Size Boost))","The rest are spread evenly at low capacity; the bigger the pan, the more of them lean to the heavy end (half beat 5.6× at 1,856 capacity, 10.9× at 7,240)","Luck, modifier, which mineral and where it lands in the pan made no difference"],
  changed:["New tools: Weight Range and Size Boost Finder","Test Data Check shows each mineral's lightest and heaviest against the limits"]},
-{id:"logger3-1711",date:"17/11/26",title:"Check run on new data",zone:"Meteor Falls",topics:["lk","my","cp","md"],kind:"lk",
+{id:"logger3-1711",date:"17/11/26",title:"Check on new data",zone:"Meteor Falls",topics:["lk","my","cp","md"],kind:"lk",
  setup:{Luck:"40,500 – 264,000",Capacity:"7,240",["Modifier Boost"]:"16.6×"},
  amount:{Pans:1096,Minerals:112342},
  tested:["Whether the 17/11 formulas predict a run they weren't fitted on"],
  found:["Items per pan: 102.5 measured, formula 102.5","Gold, Pyrite, Nickel and Sapphire within 3%; mid-tier minerals within 3–10%","Normal modifier rate 69.6% vs 66.1% predicted, and the modifier mix within about 2 points for every modifier","649 Mythics vs 754 predicted: the very rare boost was a little too strong (without it the prediction would be 398)","Lapis Lazuli again about 1.8× more common than predicted, as in every run"],
  changed:["Very rare boost refit on all data: up to ×1.86 instead of ×1.9"]},
-{id:"mods-1711",date:"17/11/26",title:"Modifier run with full logging",zone:"Meteor Falls",topics:["md","my"],kind:"md",
+{id:"mods-1711",date:"17/11/26",title:"Modifiers",zone:"Meteor Falls",topics:["md","my"],kind:"md",
  setup:{Luck:"27,800 – 267,000",["Modifier Boost"]:"16.6× (1,660%)",Capacity:"5,462 and 7,240"},
  amount:{Pans:918,Minerals:84522},
- tested:["How often a mineral gets a normal modifier at a high Modifier Boost","Which modifier you get, at many different luck values","Whether the overnight Mythic result repeats"],
+ tested:["How often a mineral gets a normal modifier at a high Modifier Boost","Which modifier you get, at many different luck values","Whether the earlier Mythic result repeats"],
  found:["68.8% of minerals got a normal modifier. The toolkit said 39% and never went higher","The rate didn't move with luck: 68–69.5% from 45,000 to 207,000 luck","Modifier mix: Iridescent 28.9%, Cosmic 20.2%, Irradiated 12.7%, Shiny 11.4%, Pure 9.4%, Glowing 6.4%, Mutated 5.6%, Scorching 4.9%, Perfect 0.56%","Mythics again about 1.5× what the luck model said (441 found vs 288), while Gold, Pyrite, Nickel and Diamond were within 1%"],
  changed:["Modifier chance is now 1 − 0.937^boost (no 39% cap)","Which-modifier rolls are now 11.7 × boost^0.84 + 2 per 1,000 luck, with no luck cap","Very rare minerals get up to ×1.86 in the luck model"]},
-{id:"night-1711",date:"17/11/26",title:"Overnight run, luck changing every pan",zone:"Meteor Falls",topics:["lk","my","cp"],kind:"lk",
+{id:"night-1711",date:"17/11/26",title:"Luck changing every pan",zone:"Meteor Falls",topics:["lk","my","cp"],kind:"lk",
  setup:{Luck:"26,400 – 266,000",Capacity:"7,240 then 5,462",["Size Boost"]:"14.76×"},
  amount:{Pans:4975,Minerals:457578},
  tested:["The luck formula across a ten times wider luck range than before","Items per pan at two capacities","Whether the Mythic odds listed for Meteor Falls hold"],
@@ -75,7 +75,7 @@ const S=[
  tested:["How often modifiers show up with almost no Modifier Boost"],
  found:["Only about 10% of minerals got a normal modifier at 1.13× boost","With so little boost the mix leans heavily to Irradiated, Scorching and Glowing; Cosmic and up are rare"],
  changed:["The low end of the modifier formula (1 − 0.937^boost) rests on this"]},
-{id:"big-1111",date:"11/11/26",title:"Long sessions in Haunted Creek and Meteor Falls",zone:"Haunted Creek, Meteor Falls, plus Timelocked Sanctuary, Frozen Peak, Astral Caverns, Fungal Marsh, Sandstone Stream, Starfall River, The Void",topics:["lk","my","md"],kind:"lk",
+{id:"big-1111",date:"11/11/26",title:"Haunted Creek and Meteor Falls",zone:"Haunted Creek, Meteor Falls, plus Timelocked Sanctuary, Frozen Peak, Astral Caverns, Fungal Marsh, Sandstone Stream, Starfall River, The Void",topics:["lk","my","md"],kind:"lk",
  setup:{Luck:"19,500 – 74,000",Capacity:"1,856 – 4,101",["Size Boost"]:"14.2× – 22.4×",["Modifier Boost"]:"5.97× – 9.19×"},
  amount:{Minerals:2353754},
  tested:["The first proper fit of the luck formula","Modifier rate and mix at 6× to 9× boost"],
@@ -118,22 +118,20 @@ function tiles(){
     ["Modifier Boost tested","1.1× – 16.6×",""],["Logged pans",n0(pans),"in sessions that counted pans"]]
     .map(([l,v,s])=>`<div class="tile"><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`).join("");
   const nm=id=>{const x=S.find(s=>s.id===id);return x?`<a href="#${id}" data-go="${id}">${esc(x.title)}</a>`:""};
-  $("find").innerHTML=FIND.map(([t,ids])=>`<li>${esc(t)} <span class="src">— from: ${ids.map(nm).join(" · ")}</span></li>`).join("");
-  $("open").innerHTML=OPEN.map(t=>`<li>${esc(t)}</li>`).join("");
+  if(false)$("find").innerHTML=FIND.map(([t,ids])=>`<li>${esc(t)} <span class="src">— from: ${ids.map(nm).join(" · ")}</span></li>`).join("");
+  if(false)$("open").innerHTML=OPEN.map(t=>`<li>${esc(t)}</li>`).join("");
 }
 function hi(t,q){t=esc(t);if(!q)return t;const i=t.toLowerCase().indexOf(q);return i<0?t:t.slice(0,i)+"<mark>"+t.slice(i,i+q.length)+"</mark>"+t.slice(i+q.length)}
 function render(){
   const q=st.q.trim().toLowerCase();
   $("topics").querySelectorAll("[data-t]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.t===st.t)));
-  const rows=S.filter(x=>(!st.t||x.topics.includes(st.t))&&(!q||JSON.stringify(x).toLowerCase().includes(q)));
+  const rows=S.filter(x=>(!st.t||x.topics.includes(st.t))&&(!q||JSON.stringify([x.title,x.zone,x.setup,x.tested]).toLowerCase().includes(q)));
   $("count").textContent=`${rows.length} of ${S.length} sessions`;
   $("list").innerHTML=rows.length?rows.map(x=>`<article class="ses ${x.kind}" id="${x.id}">
-    <div class="sh"><h3>${hi(x.title,q)}</h3><span class="dt">${esc(x.date)}</span></div>
-    <div class="tags"><span class="tag">${hi(x.zone,q)}</span>${x.topics.map(t=>`<span class="tag">${TOPICS[t]}</span>`).join("")}</div>
-    <div class="setup">${Object.entries(x.amount).map(([k,v])=>`<div><span>${k}</span><b>${n0(v)}</b></div>`).join("")}${setupOf(x).map(([k,v])=>`<div><span>${esc(k)}</span><b>${hi(v,q)}</b></div>`).join("")}</div>
+    <div class="sh"><h3>${hi(x.title,q)}</h3></div>
+    <div class="tags"><span class="tag">${hi(x.zone,q)}</span></div>
+    <div class="setup">${x.amount.Minerals?`<div><span>Minerals</span><b>${n0(x.amount.Minerals)}</b></div>`:""}${setupOf(x).filter(([k])=>k!=="Zones").map(([k,v])=>`<div><span>${esc(k)}</span><b>${hi(v,q)}</b></div>`).join("")}</div>
     <h4>What was tested</h4><ul>${x.tested.map(t=>`<li>${hi(t,q)}</li>`).join("")}</ul>
-    <h4>What it showed</h4><ul>${x.found.map(t=>`<li>${hi(t,q)}</li>`).join("")}</ul>
-    <h4>What changed on the site</h4><ul class="chg">${x.changed.map(t=>`<li>${hi(t,q)}</li>`).join("")}</ul>
   </article>`).join(""):`<p class="empty">No sessions match.</p>`;
 }
 $("topics").insertAdjacentHTML("beforeend",`<button type="button" class="chip sm" data-t="">All</button>`+Object.entries(TOPICS).map(([k,v])=>`<button type="button" class="chip sm" data-t="${k}">${v}</button>`).join(""));
