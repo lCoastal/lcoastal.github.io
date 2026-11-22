@@ -765,6 +765,40 @@ function toBuildSheet(){
     neck:eqOut(S.slots.neck),charm:eqOut(S.slots.charm),rings:groups.length?groups.map(g=>({count:g.c+"×",name:g.v.n,mut:g.v.m&&g.v.m!=="None"?g.v.m:"",note:extra(g.v)})):[{count:"",mut:"",name:"",note:""}],
     split6:false,rings6:[],pan:{name:S.pan||"",enchant:S.panEn||"",trinket:S.trinket||"",note:""},shovel:{name:S.shovel||"",enchant:S.shEn||"",note:""}}}
 $("toBuild").onclick=()=>{try{window.parent.ptSendBuild(toBuildSheet())}catch(e){}};
+// ---- the build as Build Sheets text (paste it in Build Sheets > Edit as text > Paste as new build) ----
+function buildSheetText(){const L=[];const r=compute(S);const tv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,0);
+  const eqT=v=>{const t=[];if(v.l==="5")t.push("5★");else if(v.l==="0")t.push("0★");if((v.q??100)!==100)t.push((v.q??100)+"% quality");return `${v.n}${v.m&&v.m!=="None"?` (${v.m})`:""}${t.length?" // "+t.join(", "):""}`};
+  L.push("Title: "+((S.bname||"").trim()||"Stat Calculator build"),"Subtitle: GRAY From the Stat Calculator","Notes:");
+  // totals, each in its stat's colour
+  [["Luck","GREEN BOLD"],["Capacity","GOLD"],["Size Boost","RED"],["Modifier Boost","LIME"],["Sell Boost","YELLOW"]].forEach(([st,c])=>{const v=r.tot[st]||0;if(v>0)L.push(`- ${c} ${st}: ${tv(st,v)}`)});
+  L.push("- FADED Totals with every boost ticked in the Stat Calculator");
+  if(sunOn(S))L.push("- FADED Sun Blessing counted as fully charged");
+  if(rhyOn(S))L.push(`- FADED ${S.shEn} counted at a full perfect-dig streak`);
+  if(S.trinket==="Nomad's Compass")L.push("- FADED Nomad's Compass counted fully stacked");
+  if(S.trinket==="Senet Die")L.push("- FADED Senet Die counted as ×1.33");
+  if(TRROLL[S.trinket])L.push(`- FADED ${S.trinket} counted at the ${S.trkMax?"max":"average"} roll`);
+  if(S.trinket==="Embalmer's Salt")L.push("- FADED Embalmer's Salt counted as maxed");
+  // museum: the most used modifier goes on top, any other one is written after its mineral
+  const mb=musBoard()||{};const cnt={};MORDER.forEach(rr=>(mb[rr]||[]).forEach(sl=>{if(sl&&sl.m&&sl.u&&sl.u!=="None")cnt[sl.u]=(cnt[sl.u]||0)+1}));
+  const main=(Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0]||["Any"])[0];
+  L.push("","Museum","Modifier: "+main);
+  MORDER.forEach(rr=>{L.push(`${rr}: `+Array.from({length:MSLOTS[rr]},(_,i)=>{const sl=(mb[rr]||[])[i];if(!sl||!sl.m)return "-";const u=sl.u||"None";
+    const ov=main==="Any"?(u!=="None"?u:""):(u===main?"":u);return sl.m+(ov?` (${ov})`:"")}).join(" | "))});
+  // equipment
+  L.push("","Equipment");if(S.slots.charm&&S.slots.charm.n)L.push("Charm: "+eqT(S.slots.charm));if(S.slots.neck&&S.slots.neck.n)L.push("Necklace: "+eqT(S.slots.neck));
+  const rings=[];SLOTDEF.filter(d=>d[2]==="Ring").forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const t=eqT(v);const g=rings.find(x=>x.t===t);if(g)g.c++;else rings.push({t,c:1})});
+  if(rings.length){L.push("Rings:");rings.forEach(g=>L.push(`- ${g.c}× ${g.t}`))}
+  if((S.runes||[]).length)L.push("Runes: "+S.runes.join(", "));
+  (S.pots||[]).forEach(n=>L.push("Extra: Potion = "+n));
+  (S.cons||[]).forEach(n=>L.push("Extra: Consumable = "+n));
+  const BN={luckTotem:"Luck Totem",strTotem:"Strength Totem",lumTotem:"Luminant Totem",cookie:"XP Cookie",daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)",meteor:"Meteor shower",weather:"Weather event"};
+  Object.keys(BN).forEach(k=>{if(S.b&&S.b[k])L.push(`Extra: ${k==="meteor"||k==="weather"?"Event":"Boost"} = ${BN[k]}`)});
+  if(+S.n.friendTotem>=0)L.push(`Extra: Boost = Friendship Totem // ${+S.n.friendTotem} nearby`);
+  L.push("","Pan & shovel");
+  if(S.pan)L.push("Pan: "+[S.pan,S.panEn?"enchant "+S.panEn:"",S.trinket?"trinket "+S.trinket:""].filter(Boolean).join("; "));
+  if(S.shovel)L.push("Shovel: "+[S.shovel,S.shEn?"enchant "+S.shEn:""].filter(Boolean).join("; "));
+  return L.join("\n")}
+$("toBuildTxt").onclick=async()=>{const t=buildSheetText();try{await navigator.clipboard.writeText(t);toast("Copied. In Build Sheets: Edit as text, then Paste as new build")}catch(e){toast("Couldn't copy")}};
 $("fromBuild").onclick=()=>{try{window.parent.ptPickBuild()}catch(e){}};
 // called by the shell with a state made from a build sheet: gear + museum are replaced, boosts are kept
 // build sheets are hand-typed, so match names loosely: curly quotes, footnote marks and short names like "Pharaoh's"
