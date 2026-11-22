@@ -18,3 +18,10 @@
 .fbox .row:last-child{border-bottom:0}
 .fbox span{color:var(--muted);font-size:12.5px}
 .fbox code{font-family:var(--f-mono);font-size:13px}
+.dist{display:flex;flex-direction:column;gap:3px;margin:8px 0}
+.dist .dr{display:grid;grid-template-columns:minmax(76px,96px) 1fr 52px;gap:8px;align-items:center;padding:2px 4px;border-radius:6px}
+.dist .dr.avg{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.dist .dl{font:12.5px var(--f-mono);color:var(--muted);text-align:right}
+.dist .db{height:14px;background:var(--sunk);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.dist .db i{display:block;height:100%;background:color-mix(in srgb,var(--accent) 70%,transparent);border-radius:99px}
+.dist .dp{font:12.5px var(--f-mono);text-align:right}

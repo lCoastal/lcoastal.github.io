@@ -24,7 +24,12 @@
     <div class="acts" id="acts" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end"></div>
     <div class="big" id="sum"></div>
     <div class="range" id="range"></div>
-    <p class="hint">Every full pan lands somewhere between the fewest and the most. Most pans sit in the lower two thirds of that range; the high end is rare.</p>
+  </section>
+  <section class="card" id="distCard" hidden>
+    <h2>How common each pan size is</h2>
+    <p class="hint">Share of full pans that land in each range at your capacity. Most pans spread evenly over the lower part; the top end is rare.</p>
+    <div class="dist" id="dist"></div>
+    <p class="hint" id="distNote"></p>
   </section>
   <section class="card">
     <h2>Capacity you need</h2>
@@ -33,7 +38,7 @@
   </section>
   <section class="card"><h2>How it works</h2>
     <div class="fbox">
-      <div class="row"><span>Fewest</span><code>½ × √capacity</code></div>
+      <div class="row"><span>Fewest</span><code>½ × √capacity, rounded down</code></div>
       <div class="row"><span>Average</span><code>about 0.68 × capacity<sup>0.565</sup></code></div>
       <div class="row"><span>Most</span><code>about 2.5 × √capacity</code></div>
     </div>
@@ -42,7 +47,7 @@
       <li>Luck doesn't change how many minerals you get. Events and items that give extra items (like the Calibrator, Volcanic Eruption or the Fortune River events) come on top.</li>
     </ul>
   </section>
-  <p class="foot">Last edited 17/11/26 · Made by @__coastal</p>
+  <p class="foot">Last edited 23/11/26 · Made by @__coastal</p>
 </div>
 <script data-file="script.js"></script>
 </body>
