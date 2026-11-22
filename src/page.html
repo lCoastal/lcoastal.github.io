@@ -115,5 +115,11 @@
   })({
 @@data@@
   });
+  // equipment everywhere in the same order: normal items first, then event items; each by rarity (Common to Ascended), then A–Z
+  (function () {
+    const R = ["Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Exotic", "Ascended"];
+    const E = window.PTDATA.equip || [];
+    E.sort((a, b) => !!a.ev - !!b.ev || R.indexOf(a.r) - R.indexOf(b.r) || a.n.localeCompare(b.n));
+  })();
 @@js@@
 </script>
