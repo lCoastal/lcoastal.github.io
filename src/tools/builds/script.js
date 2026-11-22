@@ -113,7 +113,7 @@ function gearCard(label,kind,e,extra,rs,count){
   const alts=String(e.name||"").split("|").map(x=>x.trim()).filter(Boolean);
   const main=alts[0]||"—";const altT=alts.slice(1);
   const mut=e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:"";
-  return `<div class="gc"${rs?` data-rs="${rs}"`:""}>${u?`<img src="${u}" alt="">`:`<span class="ph">${label.ico||""}</span>`}<div class="gt"><small>${esc(label.t)}</small><b>${mut}${esc(main)}${count?`<span class="cnt">${esc(count)}</span>`:""}</b>${altT.length?`<span class="alt">or ${altT.map(esc).join(" or ")}</span>`:""}${extra||""}${e.note?`<span class="nt">${escC(e.note)}</span>`:""}</div></div>`}
+  return `<div class="gc"${rs?` data-rs="${rs}"`:""}>${u?`<img src="${u}" alt="">`:`<span class="ph">${label.ico||""}</span>`}<div class="gt"><small>${esc(label.t)}</small><b>${mut}${esc(main)}${count?`<span class="cnt">${esc(count)}</span>`:""}</b>${altT.length?`<span class="alt">or ${altT.map(esc).join(" or ")}</span>`:""}${extra||""}${e.note?`<span class="nt">${escCL(e.note)}</span>`:""}</div></div>`}
 function quickChip(t,kind,name){const real=name?findItem(kind,name):null;const u=real?picOf(kind,real):"";return `<div class="qc">${u?`<img src="${u}" alt="">`:`<span class="ph"></span>`}<span><small>${t}</small><b>${esc(String(name).split("|")[0].trim())}</b></span></div>`}
 // rings: always 8 slots; each ring is shown as many times as its count; with 6 ring slots, slots 7 and 8 are locked
 const has6=b=>!!b.split6||(b.rings||[]).some(x=>String(x.count||"").includes("/"));
@@ -127,7 +127,7 @@ function ringGrid(b,v,rs){const got=ringSlots(b,v);let h=`<div class="rings8"${r
     if(i>=v){h+=`<div class="rs lock"><span class="lk">🔒</span><small>Slot ${i+1}</small><span class="lt">Locked</span></div>`;continue}
     const g=got[i];if(!g){h+=`<div class="rs empty"><small>Slot ${i+1}</small><span class="lt">Any ring</span></div>`;continue}
     const e=g.x;const real=findItem("Equipment",e.name);const u=real?picOf("Equipment",real):"";const alts=String(e.name).split("|").map(t=>t.trim()).filter(Boolean);
-    h+=`<div class="rs">${u?`<img src="${u}" alt="">`:`<span class="ph">💍</span>`}<small>Slot ${i+1}</small><b>${e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:""}${esc(alts[0]||"")}</b>${g.first&&e.note?`<span class="lt">${escC(e.note)}</span>`:""}</div>`}
+    h+=`<div class="rs">${u?`<img src="${u}" alt="">`:`<span class="ph">💍</span>`}<small>Slot ${i+1}</small><b>${e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:""}${esc(alts[0]||"")}</b>${g.first&&e.note?`<span class="lt">${escCL(e.note)}</span>`:""}</div>`}
   return h+`</div>`}
 function ringGrids(b){if(!(b.rings||[]).some(x=>x.name)&&!(b.rings6||[]).some(x=>x.name))return "";
   return `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:6px"><h3 style="margin:0;font:700 11px/1 inherit;letter-spacing:.12em;text-transform:uppercase;color:#97a3b0">Rings</h3>${has6(b)?`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`:""}</div>`+(has6(b)?ringGrid(b,8,"8")+ringGrid(b,6,"6"):ringGrid(b,8,""))}
@@ -167,6 +167,9 @@ const LCRE1=new RegExp("^(?:("+LTOK.map(x=>x.toUpperCase()).join("|")+")\\b|\\[(
 // notes under any area (written as "-- note" lines in Edit as text): b.anotes[key] = "line\nline"
 const anL=(b,k)=>String((b.anotes||{})[k]||"").split("\n").map(x=>x.trim()).filter(Boolean);
 const an=(b,k)=>{const L=anL(b,k);return L.length?`<div class="anote${/^r:/.test(k)?" rn":""}">${L.map(l=>`<div>${escC(l)}</div>`).join("")}</div>`:""};
+function plainC(t){t=String(t??"");let m,n=0;while(n++<8&&(m=t.match(LCRE1))&&(!m[1]||m[1]===m[1].toUpperCase()))t=t.slice(m[0].length);return t}
+// several lines (a note with "--" lines under it): each line styled on its own
+const escCL=t=>String(t??"").split("\n").map(escC).join("<br>");
 function escC(t){t=String(t??"");let col="",st=[],hi=false,m,n=0;
   while(n++<8&&(m=t.match(LCRE1))){if(m[1]&&m[1]!==m[1].toUpperCase())break;const w=(m[1]||m[2]||"").toLowerCase();
     if(m[3])col=m[3];else if(LCOL[w])col=LCOL[w];else if(w==="highlight")hi=true;else st.push(LSTY[w.toUpperCase()]);t=t.slice(m[0].length)}
@@ -177,7 +180,7 @@ function escC(t){t=String(t??"");let col="",st=[],hi=false,m,n=0;
 const addChip=(on,part,t)=>on?`<button type="button" class="edadd" data-ed="${part}">+ ${t}</button>`:"";
 function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const b=withAny(tidy(b0));
   const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
-  let h=`<div class="sheet" data-rings="${has6(b)?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${escC(b.subtitle)}</p>`:""}</div></div>`;
+  let h=`<div class="sheet" data-rings="${has6(b)?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${escC(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${escC(b.subtitle)}</p>`:""}</div></div>`;
   if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
   if(!notes.length&&!b.warning)h+=addChip(edit,"info",b.subtitle?"Add a warning or notes":"Add a subtitle, warning or notes");
   const q=[];if(b.pan.name)q.push(quickChip("Pan","Pan",b.pan.name));if(b.shovel.name)q.push(quickChip("Shovel","Shovel",b.shovel.name));if(b.charm.name)q.push(quickChip("Charm","Equipment",b.charm.name));if(b.neck.name)q.push(quickChip("Necklace","Equipment",b.neck.name));
@@ -225,7 +228,7 @@ function slotText(s,r,mod){if(!s.m.length)return '<span class="dim">any mineral<
   return t+(s.mark?` <span class="mark">${esc(s.mark)}</span>`:"")}
 function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
   const modT=m=>!m||m==="None"||m==="Any"?"<b>any</b>":`<b style="color:${MC(m)}">${esc(m)}</b>`;
-  let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${esc(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${escC(b.subtitle)}</p>`:""}</div></div>`;
+  let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${escC(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${escC(b.subtitle)}</p>`:""}</div></div>`;
   if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
   if(!notes.length&&!b.warning)h+=addChip(edit,"info",b.subtitle?"Add a warning or notes":"Add a subtitle, warning or notes");
   if(b.split6)h+=`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`;
@@ -240,7 +243,7 @@ function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("
   {const XS=(b.extra||[]).filter(x=>x&&x.n);if(!XS.length)h+=addChip(edit,"extra","Add backup minerals");if(XS.length)h+=`<p${edA(edit,"extra")}>Backup minerals, if one is hard to get:</p><ul${edA(edit,"extra")}>${XS.map(x=>{const d=BY[String(x.n).toLowerCase()];return `<li><b${d?` style="color:${RC(d[1])}"`:""}>${esc(d?d[0]:x.n)}</b>${d?` <span class="dim">(${d[1]})</span> ${d[3].map(([st,v])=>`${st} ${fx(v)}`).join(", ")}, max boost at ${d[2]} kg`:""}${x.note?` · ${esc(x.note)}`:""}</li>`}).join("")}</ul>`}
   h+=an(b,"backup");h+=`</section>`;SX.museum=h;h="";
   const nm=(kind,e)=>{const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";return (u?`<img src="${u}" alt="">`:"")+(e.mut?`<span style="color:${EC(e.mut)}">${esc(e.mut)}</span> `:"")+`<b>${esc(e.name)}</b>`};
-  const nt=n=>n?` <span class="dim">· ${escC(n)}</span>`:"";const eq=[];const ad=(part,t)=>edit?{h:`<span class="edadd in">+ ${t}</span>`,p:part}:null;
+  const nt=n=>n?` <span class="dim">· ${escCL(n)}</span>`:"";const eq=[];const ad=(part,t)=>edit?{h:`<span class="edadd in">+ ${t}</span>`,p:part}:null;
   if(b.charm.name||b.charm.note)eq.push({h:`Charm: ${nm("Equipment",b.charm)}${nt(b.charm.note)}${an(b,"charm")}`,p:"charm"});else eq.push(ad("charm","Add a charm"));
   if(b.neck.name||b.neck.note)eq.push({h:`Necklace: ${nm("Equipment",b.neck)}${nt(b.neck.note)}${an(b,"neck")}`,p:"neck"});else eq.push(ad("neck","Add a necklace"));
   const rings=(list,label,rs)=>{const xs=list.filter(x=>x.name||x.note);if(xs.length)eq.push({h:`${label}:<ul>${xs.map(x=>`<li>${x.count?`<b>${esc(x.count)}</b> `:""}${nm("Equipment",x)}${nt(x.note)}</li>`).join("")}</ul>${an(b,rs==="6"?"rings6":"rings")}`,rs,p:"rings"});return xs.length};
@@ -271,7 +274,8 @@ function toText(b){const L=[];const AN=k=>anL(b,k).forEach(x=>L.push("-- "+x));c
   ORDER.forEach(r=>{const sl=b.museum[r]||[];L.push(`${r}: `+sl.map((s,i)=>covered(sl,i)?"~":slotTxt(s)).join(" | "));AN("r:"+r)});
   const XS=(b.extra||[]).filter(x=>x&&x.n);if(XS.length||has("backup"))L.push("Backup: "+XS.map(x=>x.n).join(", "));AN("backup");
   L.push("","Equipment");AN("equip");if(b.charm.name||b.charm.note||has("charm"))L.push("Charm: "+eqTxt(b.charm));AN("charm");if(b.neck.name||b.neck.note||has("neck"))L.push("Necklace: "+eqTxt(b.neck));AN("neck");
-  const rl=(head,list,k)=>{const xs=(list||[]).filter(x=>x.name||x.note);if(!xs.length&&!has(k))return;L.push(head);xs.forEach(x=>L.push("- "+(x.count?String(x.count).trim()+" ":"")+eqTxt(x)));AN(k)};
+  const rl=(head,list,k)=>{const xs=(list||[]).filter(x=>x.name||x.note);if(!xs.length&&!has(k))return;L.push(head);AN(k);
+    xs.forEach(x=>{const nl=String(x.note||"").split("\n");L.push("- "+(x.count?String(x.count).trim()+" ":"")+eqTxt(Object.assign({},x,{note:nl[0]})));nl.slice(1).forEach(l=>L.push("-- "+l))})};
   if(b.split6){rl("Rings (8 slots):",b.rings,"rings");rl("Rings (6 slots):",b.rings6,"rings6")}else rl("Rings:",b.rings,"rings");
   if(b.runes||has("runes"))L.push("Runes: "+(b.runes||""));AN("runes");
   (b.extras||[]).filter(x=>x.label||x.name).forEach(x=>L.push(`Extra: ${x.label||"Other"} = `+eqTxt(x)));AN("extras");
@@ -290,12 +294,13 @@ function parseSlot(t){const s={m:[],pick:1,join:"|",mark:"",span:1};t=String(t).
   else if(t.includes(">")){s.m=t.split(">").map(minN).filter(Boolean);s.join=">"}
   else s.m=t.split(/\s+or\s+/i).map(minN).filter(Boolean);
   s.multi=s.m.length>1;return s}
-function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pic;b.rings=[];b.anotes={};const bad=[];let ctx=null,area=null;const notes=[];const R={};
+function fromText(txt,old){const b=blankBuild(old.name);b.id=old.id;b.pic=old.pic;b.rings=[];b.anotes={};const bad=[];let ctx=null,area=null,lastRing=null;const notes=[];const R={};
   String(txt).split("\n").forEach((raw,ln)=>{const line=raw.trim();if(!line)return;let m;
+    if(!/^--/.test(line)&&!(/^-\s*/.test(line)&&ctx))lastRing=null;
     if(TXT_SEC.some(x=>x.toLowerCase()===line.toLowerCase())){ctx=null;area={museum:"museum",equipment:"equip","pan & shovel":"tools"}[line.toLowerCase()];return}
     // "-- note": a note under the area just above
-    if(/^--/.test(line)){const v=line.replace(/^--\s*/,"");if(!area){bad.push(ln+1);return}b.anotes[area]=(b.anotes[area]?b.anotes[area]+"\n":"")+v;return}
-    if(/^-\s*/.test(line)&&ctx){const v=line.replace(/^-\s*/,"");if(ctx==="notes")notes.push(v);else{const c=v.match(/^(\d+(?:\/\d+)?\s*[×x]?)\s+(.*)$/i);const e=parseEq(c?c[2]:v);e.count=c?c[1].replace(/\s+/g,"").replace(/x$/i,"×"):"";(ctx==="r6"?(b.rings6=b.rings6||[]):b.rings).push(e)}return}
+    if(/^--/.test(line)){const v=line.replace(/^--\s*/,"");if(lastRing){lastRing.note=(lastRing.note?lastRing.note+"\n":"")+v;return}if(!area){bad.push(ln+1);return}b.anotes[area]=(b.anotes[area]?b.anotes[area]+"\n":"")+v;return}
+    if(/^-\s*/.test(line)&&ctx){const v=line.replace(/^-\s*/,"");if(ctx==="notes")notes.push(v);else{const c=v.match(/^(\d+(?:\/\d+)?\s*[×x]?)\s+(.*)$/i);const e=parseEq(c?c[2]:v);e.count=c?c[1].replace(/\s+/g,"").replace(/x$/i,"×"):"";(ctx==="r6"?(b.rings6=b.rings6||[]):b.rings).push(e);lastRing=e}return}
     if(!(m=line.match(/^([^:]+?):\s*(.*)$/))){bad.push(ln+1);return}
     const k=m[1].trim().toLowerCase(),v=m[2].trim();ctx=null;
     area=["modifier","fallbacks","fallback","empty slots"].includes(k)?"mod":ciKey(SLOTS,k)?"r:"+ciKey(SLOTS,k):k==="necklace"?"neck":k==="extra"?"extras":k==="rings"||k==="rings (8 slots)"?"rings":k==="rings (6 slots)"?"rings6":["backup","charm","runes","pan","shovel"].includes(k)?k:null;
@@ -326,7 +331,7 @@ function renderSheet(){document.querySelectorAll(".vtoggle [data-view]").forEach
   document.getElementById("txR").innerHTML=sheetHTML(getB(),false)}
 // formatting helper under the text box: every style and colour drawn in its own look; hover explains, click adds it to the current line
 const FDESC={BOLD:"Heavy, thick text",ITALIC:"Slanted text",UNDERLINE:"A line under the text",STRIKE:"Crossed out, e.g. old advice",BIG:"Bigger text",HUGE:"Much bigger text, for headings",SMALL:"Smaller text, for fine print",CAPS:"Turns the line into capitals",GLOW:"A glow around the text",OUTLINE:"A rounded box around the line",HIGHLIGHT:"A soft background behind the line, in its colour (yellow if no colour is set)",FADED:"Dimmed, for optional tips"};
-const FSYN=[["- line","A note line, under Notes:"],["-- note","A note under the area above it: a heading, rarity row or item"],["// note","A note on one item, at the end of its line"],["A | B | C","Museum slots in a rarity row, left to right"],["A or B","Any one of these in that slot"],["A > B","Best first, then the next"],["pick 2: A, B, C","Put two of these in"],["Any","Any mineral: only the modifier counts"],["-","Leave the slot empty"],["[note]","A short label on a museum slot"],["Name (Mutation)","Equipment with a mutation, e.g. Sun's Gift (Sunforged)"],["- 5× Name","A ring and how many of it"],["#ff8800","Any colour by hex code, at the start of a line"],["[red] [big]","Brackets work in any case"]];
+const FSYN=[["- line","A note line, under Notes:"],["-- note","A note under the line above it: a heading, rarity row or item. Right under a ring, it goes on that ring; right under Rings:, it's for all the rings"],["// note","A note on one item, at the end of its line"],["A | B | C","Museum slots in a rarity row, left to right"],["A or B","Any one of these in that slot"],["A > B","Best first, then the next"],["pick 2: A, B, C","Put two of these in"],["Any","Any mineral: only the modifier counts"],["-","Leave the slot empty"],["[note]","A short label on a museum slot"],["Name (Mutation)","Equipment with a mutation, e.g. Sun's Gift (Sunforged)"],["- 5× Name","A ring and how many of it"],["#ff8800","Any colour by hex code, at the start of a line"],["[red] [big]","Brackets work in any case"]];
 function fmtHelp(){const chip=(w,desc)=>`<button type="button" class="fchip" data-ins="${w} " title="${esc(desc)} · click to add it to this line">${escC(w+" "+(w.length>2?w[0]+w.slice(1).toLowerCase():w))}</button>`;
   return `<div class="fmt"><div class="fmth"><b>Formatting</b><span>Write these in capitals at the start of a line, and mix them: <code>RED BIG BOLD …</code>. Hover for what they do, click to add one to the line you're on.</span></div>
   <div class="fgrp"><small>Styles</small>${Object.keys(FDESC).map(w=>chip(w,FDESC[w])).join("")}</div>
@@ -571,7 +576,7 @@ ed.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;
 function touch(){getB().updated=Date.now();persist();renderSheet();renderMTot()}
 
 // ---------- build list ----------
-function renderSelect(){const s=document.getElementById("buildSel");s.innerHTML=B.map(b=>`<option value="${b.id}"${b.id===cur?" selected":""}>${esc(b.name||"Untitled build")}</option>`).join("")}
+function renderSelect(){const s=document.getElementById("buildSel");s.innerHTML=B.map(b=>`<option value="${b.id}"${b.id===cur?" selected":""}>${esc(plainC(b.name)||"Untitled build")}</option>`).join("")}
 document.getElementById("buildSel").addEventListener("change",e=>{cur=e.target.value;armDel=false;delBtn();persist();renderAll()});
 
 const S1=(m,o)=>Object.assign({m,pick:1,join:"|",mark:"",span:1},o||{});
@@ -615,12 +620,12 @@ document.getElementById("bImg").onclick=async()=>{
   try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     window.ptNoImgTheme=true;let cv;try{cv=await html2canvas(frame,{backgroundColor:page,scale:2,useCORS:true,logging:false})}finally{window.ptNoImgTheme=false}
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
-    const b=getB();const fn=((b.name||"Build").replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Build")+".png";
+    const b=getB();const fn=((plainC(b.name)||"Build").replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Build")+".png";
     if(blob&&await saveFile(fn,blob))toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})());
   }catch(e){toast("Couldn't make the image"+(e&&e.message?": "+e.message:""))}
   finally{box.remove();btn.disabled=false;btn.textContent=old}};
 let dlcap=null;(async()=>{try{if(window.hostBridge&&hostBridge.use)dlcap=await hostBridge.use("downloads")}catch(e){dlcap=null}})();
-document.getElementById("bDl").onclick=async()=>{const b=getB();const html=fileHTML(b);const filename=((b.name||"Build").replace(/[\\/:*?"<>|]+/g," ").trim()||"Build")+" - Prospecting Build.html";if(await saveFile(filename,html))toast("Download started")};
+document.getElementById("bDl").onclick=async()=>{const b=getB();const html=fileHTML(b);const filename=((plainC(b.name)||"Build").replace(/[\\/:*?"<>|]+/g," ").trim()||"Build")+" - Prospecting Build.html";if(await saveFile(filename,html))toast("Download started")};
 document.getElementById("imp").addEventListener("change",e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const m=String(rd.result).match(/<script type="application\/json" id="build-data">([\s\S]*?)<\/script>/);const o=m&&JSON.parse(m[1]);if(!o||o.app!=="prospecting-build-sheets"||!o.build||!o.build.museum)throw 0;const nb=Object.assign(blankBuild(),o.build,{id:uid()});ORDER.forEach(r=>{if(!Array.isArray(nb.museum[r])||nb.museum[r].length!==SLOTS[r])nb.museum[r]=blankBuild().museum[r]});if(!Array.isArray(nb.rings6))nb.rings6=[];ORDER.forEach(r=>nb.museum[r].forEach(x=>{if(!x.span)x.span=1}));B.push(nb);cur=nb.id;persist();renderAll();toast(`Imported “${nb.name}”`)}catch(err){toast("That file isn't a build sheet from this page")}};rd.readAsText(f)});
 
 // ---------- view tabs, toast ----------
