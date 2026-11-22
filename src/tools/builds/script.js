@@ -653,6 +653,14 @@ async function saveFile(filename,data){
   if(parentSave){try{await parentSave(filename,data);return true}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":c==="unavailable"?"Saving isn't available in this view":"Couldn't save here");return false}}
   if(window.hostBridge&&hostBridge.use){if(!dlcap){toast("Downloads aren't available in this view");return false}try{await dlcap.save({filename,data});return true}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save here");return false}}
   const a=document.createElement("a");a.href=URL.createObjectURL(data instanceof Blob?data:new Blob([data]));a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);return true}
+// html2canvas can't read newer colour formats (color-mix() shows up as color(srgb …)), so turn them into plain rgba first
+const NEWCOL=/(?:color|oklch|oklab|lab|lch)\([^()]*(?:\([^()]*\)[^()]*)*\)/g;let _cc=null;
+function toRgba(v){const m=v.match(/^color\(srgb\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)(?:\s*\/\s*([\d.e+-]+%?))?\)$/);
+  if(m){let a=m[4]==null?1:m[4].endsWith("%")?parseFloat(m[4])/100:+m[4];const c=x=>Math.round(Math.max(0,Math.min(1,+x))*255);return `rgba(${c(m[1])},${c(m[2])},${c(m[3])},${+a.toFixed(3)})`}
+  try{if(!_cc)_cc=document.createElement("canvas").getContext("2d",{willReadFrequently:true});_cc.clearRect(0,0,1,1);_cc.fillStyle="#000";_cc.fillStyle=v;_cc.fillRect(0,0,1,1);const d=_cc.getImageData(0,0,1,1).data;return `rgba(${d[0]},${d[1]},${d[2]},${+(d[3]/255).toFixed(3)})`}catch(e){return "transparent"}}
+const COLPROPS=["color","background-color","background-image","border-top-color","border-right-color","border-bottom-color","border-left-color","outline-color","text-decoration-color","box-shadow","text-shadow","-webkit-text-stroke-color","fill","stroke","caret-color","column-rule-color"];
+function plainColours(root){[root,...root.querySelectorAll("*")].forEach(el=>{const cs=getComputedStyle(el);
+  COLPROPS.forEach(k=>{const v=cs.getPropertyValue(k);if(v&&/(?:color|oklch|oklab|lab|lch)\(/.test(v))el.style.setProperty(k,v.replace(NEWCOL,toRgba))})})}
 document.getElementById("bImg").onclick=async()=>{
   if(typeof html2canvas!=="function"){toast("The image maker didn't load. Check your connection and try again.");return}
   const btn=document.getElementById("bImg");btn.disabled=true;const old=btn.textContent;btn.textContent="Making image…";
@@ -675,6 +683,7 @@ document.getElementById("bImg").onclick=async()=>{
   by.appendChild(site);by.appendChild(pill);frame.appendChild(by);
   document.body.appendChild(box);
   try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    plainColours(frame);
     window.ptNoImgTheme=true;let cv;try{cv=await html2canvas(frame,{backgroundColor:page,scale:2,useCORS:true,logging:false})}finally{window.ptNoImgTheme=false}
     const blob=await new Promise(r=>cv.toBlob(r,"image/png"));
     const b=getB();const fn=((plainC(b.name)||"Build").replace(/[\\/:*?"<>|]+/g," ").trim().replace(/\.+$/,"")||"Build")+".png";
