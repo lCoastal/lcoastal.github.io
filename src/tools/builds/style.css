@@ -328,3 +328,7 @@ textarea.inp{min-height:90px;resize:vertical}
 .edpop .slotgrid,.edpop .rar{display:block}
 .edpop .se{grid-column:auto!important;width:auto}
 .edpop .rarh{display:none}
+/* the mineral list sits in the panel itself, tall enough to browse */
+.edpop{max-height:none!important;overflow:visible!important}
+.edpop .sbox{position:static!important;width:100%!important;max-width:none;max-height:none;margin-top:6px;box-shadow:none;left:0!important}
+.edpop .slist{max-height:min(60vh,560px)}

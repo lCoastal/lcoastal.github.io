@@ -485,9 +485,16 @@ function openEd(part,anchor){PART=part;document.getElementById("edT").textConten
   document.querySelectorAll("#sheet .edon").forEach(x=>x.classList.remove("edon"));anchor.classList.add("edon");
   // place it under what was clicked, kept on screen
   const r=anchor.getBoundingClientRect(),W=Math.min(480,document.documentElement.clientWidth-16);POP.style.width=W+"px";
-  POP.style.left=(Math.max(8,Math.min(r.left,document.documentElement.clientWidth-W-8))+scrollX)+"px";POP.style.top=(r.bottom+6+scrollY)+"px";
+  POP.style.left=(Math.max(8,Math.min(r.left,document.documentElement.clientWidth-W-8))+scrollX)+"px";POPA=anchor;placePop();
   const f=document.querySelector(`#editor [data-part="${part}"]`).querySelector("input:not([type=checkbox]):not([readonly]),textarea,select");
-  if(f&&!/^slot-/.test(part))f.focus({preventScroll:true})}
+  // a slot opens straight onto its mineral list
+  const add=/^slot-/.test(part)?document.querySelector(`#editor [data-part="${part}"] [data-act="add"]`):null;
+  if(add)add.focus({preventScroll:true});else if(f)f.focus({preventScroll:true});
+  requestAnimationFrame(()=>{try{POP.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}})}
+// under the part if it fits inside the page, otherwise above it; redone when the panel changes size
+let POPA=null;function placePop(){if(POP.hidden||!POPA||!POPA.isConnected)return;const r=POPA.getBoundingClientRect(),H=POP.offsetHeight,pageH=document.querySelector(".wrap").offsetHeight;
+  const below=r.bottom+6+scrollY;POP.style.top=(below+H<=pageH||r.top+scrollY-H-6<8?below:r.top+scrollY-H-6)+"px"}
+try{new ResizeObserver(placePop).observe(POP)}catch(e){}
 function closeEd(){PART=null;POP.hidden=true;markPart();document.querySelectorAll("#sheet .edon").forEach(x=>x.classList.remove("edon"))}
 document.getElementById("edX").onclick=closeEd;
 document.addEventListener("click",e=>{if(POP.contains(e.target)||e.target.closest(".sbox,.sgx,.toast"))return;
