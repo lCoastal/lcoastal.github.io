@@ -61,6 +61,23 @@ h2{font:700 1.05rem var(--f-display);margin:0}
 .stt .up{color:var(--pos,#2a9d6f)}.stt .dn{color:var(--neg,#d0563b)}
 .stt tr.w0 td{color:var(--muted)}
 .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.bimg{margin:12px 0;border-radius:12px;overflow:hidden;border:1px solid var(--line);min-height:60px;display:flex;align-items:center;justify-content:center}
-.bimg img{display:block;width:100%;height:auto}
-.bimg .hint{padding:20px}
+.bgrid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:12px 0 4px}
+.bgrid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
+.bk{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel);min-width:0}
+.bk.eq{border-left:3px solid var(--rc,var(--line))}
+.bk.empty{color:var(--muted)}
+.bk>div:last-child{display:flex;flex-direction:column;min-width:0}
+.bk b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk small{font-size:12px;color:var(--muted)}
+.bk .en{color:#9a6ee6}.bk .mu{color:#d79a1c;font-weight:600}
+.bk .ic,.mit img,.mit .noimg{flex:none}
+.bk .ic{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--sunk);border-radius:8px}
+.bk .ic img{max-width:40px;max-height:40px}
+.noimg{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:8px;background:var(--sunk);color:var(--muted);font-weight:700}
+.mus2{display:flex;flex-direction:column;gap:6px}
+.mrow{display:grid;grid-template-columns:86px 1fr;gap:8px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:6px}
+.mrow .lab{padding-top:8px}
+.mits{display:flex;flex-wrap:wrap;gap:6px}
+.mit{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:3px 8px 3px 3px;background:var(--panel)}
+.mit img{width:30px;height:30px;object-fit:contain}
+.mit>span{display:flex;flex-direction:column;line-height:1.15}.mit b{font-size:13px}.mit small{font-size:11.5px;color:#d79a1c}
