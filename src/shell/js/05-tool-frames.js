@@ -630,7 +630,31 @@ window.ptCopyShare=function(text){const pr=window.ptPackText(text).then(window.p
   try{if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)return navigator.clipboard.write([new ClipboardItem({"text/plain":pr.then(u=>new Blob([u],{type:"text/plain"}))})]).then(()=>pr,plain)}catch(e){}
   return plain().catch(()=>null)}
 }
-const PRE = PRE0 + "<script>(" + ptFrameInit.toString() + ")()<\/script><script>(" + ptShareKit.toString() + ")()<\/script><script>(" + ptDeclutter.toString() + ")()<\/script>";
+// one look for every tool: base styles for titles, notes, buttons, chips, toggles, tabs, tables and cards.
+// Wrapped in :where() so they weigh nothing: a tool's own specific rules still win.
+const PT_KIT_CSS =
+  ":where(h1){font-family:var(--f-display);font-size:2rem;line-height:1.1;margin:0;text-wrap:balance}" +
+  "@media (max-width:600px){:where(h1){font-size:1.6rem}}" +
+  ":where(h2){font:700 1.05rem var(--f-display);margin:0}" +
+  ":where(.lede){color:var(--muted);margin:6px 0 0;max-width:72ch}" +
+  ":where(.hint){font-size:12.5px;color:var(--muted);margin:0}" +
+  ":where(.lab){font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}" +
+  ":where(.card){background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}" +
+  ":where(.btn){font:600 13px var(--f-body);padding:7px 12px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}" +
+  ":where(.chip){font:500 12.5px var(--f-body);padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}" +
+  ":where(.chip[aria-pressed=\"true\"]){background:var(--accent);border-color:var(--accent);color:var(--bg)}" +
+  ":where(.seg){display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;flex:none}" +
+  ":where(.seg button){border:0;background:var(--panel);color:var(--fg);padding:6px 12px;font:500 13px var(--f-body);cursor:pointer}" +
+  ":where(.seg button + button){border-left:1px solid var(--line)}" +
+  ":where(.seg button[aria-pressed=\"true\"]){background:var(--accent);color:var(--bg)}" +
+  ":where(.tabs){display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--line)}" +
+  ":where(.tabs button){background:none;border:0;border-bottom:3px solid transparent;padding:8px 14px;font:600 14px var(--f-body);color:var(--muted);cursor:pointer;margin-bottom:-1px}" +
+  ":where(.tabs button[aria-selected=\"true\"]){color:var(--fg);border-bottom-color:var(--accent)}" +
+  ":where(.acts){display:flex;gap:8px;flex-wrap:wrap;align-items:center}" +
+  ":where(.ck){display:inline-flex;align-items:center;gap:7px;cursor:pointer}" +
+  ":where(table){border-collapse:collapse}" +
+  ":where(th){font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left}";
+const PRE = PRE0 + "<style data-pt-kit>" + PT_KIT_CSS + "</style><script>(" + ptFrameInit.toString() + ")()<\/script><script>(" + ptShareKit.toString() + ")()<\/script><script>(" + ptDeclutter.toString() + ")()<\/script>";
 
 function syncTheme(f) {
   try {

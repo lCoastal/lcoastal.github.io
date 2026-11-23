@@ -22,7 +22,6 @@
 .chart .mkt{fill:var(--fg)}
 .cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
 .cols2 h2{margin:0 0 6px}
-.hint{font-size:12.5px;color:var(--muted);margin:0}
 .tw{overflow-x:auto}
 table.t{width:100%;border-collapse:collapse;font-size:13.5px}
 table.t th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}

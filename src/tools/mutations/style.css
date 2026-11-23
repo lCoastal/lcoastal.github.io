@@ -1,8 +1,6 @@
 
 /* Layout: three tabs (gear mutations, pan enchants, shovel enchants), each a reference table with a small tool on top */
 .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:0}
-.tabs button{font:600 14px var(--f-body);padding:9px 14px;border:1px solid transparent;border-bottom:0;border-radius:8px 8px 0 0;background:transparent;color:var(--muted);cursor:pointer;margin-bottom:-1px}
-.tabs button[aria-selected="true"]{background:var(--panel);color:var(--fg);border-color:var(--line);border-bottom:1px solid var(--panel)}
 .tw{overflow-x:auto}
 table.t{width:100%;border-collapse:collapse;font-size:13.5px}
 table.t th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -32,10 +30,7 @@ table.t .nm{font-weight:600;font-size:14px;white-space:nowrap}
 .top{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}
 .tr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .cfr{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}.cfr .lab{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:104px}.cfr .chips{display:flex;flex-wrap:wrap;gap:6px}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
-.seg button{border:0;background:var(--panel);color:var(--fg);padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit}
 .seg button+button{border-left:1px solid var(--line)}
-.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
 .top h2{margin:0}
 .hb{font:600 12px var(--f-body);padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--sunk);color:var(--muted);cursor:pointer;white-space:nowrap}
 

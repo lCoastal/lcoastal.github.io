@@ -4,10 +4,6 @@
 .fld{display:flex;flex-direction:column;gap:4px;min-width:0}
 .fld input,.fld select{width:100%;box-sizing:border-box}
 #pph::placeholder{font-size:11px;opacity:.85}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
-.seg button{border:0;background:var(--panel);padding:6px 12px;font-size:13px;cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
-.hint{font-size:12.5px;color:var(--muted);margin:0}
 .tw{overflow-x:auto}
 table.o{width:100%;border-collapse:collapse;font-size:13.5px}
 table.o th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:right;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}

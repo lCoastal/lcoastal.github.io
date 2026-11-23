@@ -7,7 +7,6 @@
 .big b{display:block;font-family:var(--f-mono);font-size:1.45rem;font-weight:500}
 .big small{color:var(--muted);font-size:12px}
 .big div.avg{border-color:color-mix(in srgb,var(--accent) 60%,var(--line))}
-.hint{font-size:12.5px;color:var(--muted);margin:0}
 .range{position:relative;height:46px;margin:6px 4px 0}
 .range .track{position:absolute;left:0;right:0;top:14px;height:10px;border-radius:99px;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 75%,transparent) 0%,color-mix(in srgb,var(--accent) 55%,transparent) 55%,color-mix(in srgb,var(--accent) 12%,transparent) 100%);border:1px solid var(--line)}
 .range .mk{position:absolute;top:8px;width:2px;height:22px;background:var(--fg);border-radius:2px}
@@ -27,9 +26,6 @@
 .dist .dp{font:12.5px var(--f-mono);text-align:right}
 .dhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .dhead h2{margin:0}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
-.seg button{border:0;background:var(--panel);color:var(--fg);padding:5px 10px;font-size:12.5px;cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg)}
 .cols{display:flex;align-items:flex-end;gap:2px;height:170px;margin:10px 0 0;border-bottom:1px solid var(--line)}
 .cols .cl{flex:1;height:100%;display:flex;align-items:flex-end;cursor:default;border-radius:3px 3px 0 0;outline-offset:1px}
 .cols .cl i{display:block;width:100%;background:color-mix(in srgb,var(--accent) 70%,transparent);border-radius:3px 3px 0 0;min-height:1px}
