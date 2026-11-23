@@ -34,6 +34,16 @@ const PT_RESET = {
   tierlist: { keys: ["pt-tier"], what: "your tier list arrangement" },
   testlog: { keys: ["tl-s"] },
   checklist: { keys: ["pc-list"], what: "everything on the checklist" },
+  bestbuild: { keys: ["pt-bestbuild"], what: "the goal, choices and assumptions (your owned ticks stay)" },
+  buildmaker: { keys: ["pt-buildmaker"], what: "the weights, consumables, events and choices" },
+  // these keep nothing between visits, so a reset just reloads them: searches, filters and open sections clear
+  home: { keys: [], what: "the page" },
+  npcs: { keys: [], what: "the search and filters" },
+  events: { keys: [], what: "the view" },
+  formulas: { keys: [], what: "the search" },
+  testdata: { keys: [], what: "the loaded file and results (nothing was saved)" },
+  codes: { keys: [], what: "the view" },
+  settings: { keys: ["pt-settings", "pt-compact"], reloadAll: true, what: "theme, accent and display settings (your stats stay)" },
 };
 function ptAddReset(f, id) {
   const R = PT_RESET[id];
@@ -85,6 +95,10 @@ function ptAddReset(f, id) {
         } else localStorage.removeItem(k);
       } catch (e) {}
     });
+    if (R.reloadAll) {
+      location.reload();
+      return;
+    }
     f.dataset.ok = "";
     f.srcdoc = f.srcdoc;
   };

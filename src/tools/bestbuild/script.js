@@ -72,7 +72,7 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
   const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"—"}</td><td class="was">${now===was?"":(was||"—")}</td></tr>`;
   const tl=(p,e)=>esc(p||"")+(e?` · ${esc(e)}`:"");
   const rows=[row("Pan",tl(st.pan,st.panEn),tl(b.pan,b.panEn)),row("Shovel",tl(st.shovel,st.shEn),tl(b.shovel,b.shEn)),row("Trinket",esc(st.trinket||""),esc(b.trinket||""))].concat(cw.ptSlotDefs().map(([k,l])=>row(l,it(st.slots[k]),it(b.slots[k]))));
-  let mus="";if(R.museum){const bd=st.museumBoard||{};mus=`<h3 class="sec">Museum</h3><div class="mus">${cw.ptMusRows().map(([r])=>`<div><span class="lab" style="color:${rc(r)}">${r}</span> ${(bd[r]||[]).filter(Boolean).map(x=>`${esc(x.m)}${x.u&&x.u!=="None"?` <span class="hint">(${esc(x.u)})</span>`:""}`).join(", ")||"—"}</div>`).join("")}</div>`}
+  let mus="";if(R.museum)mus=`<h3 class="sec">Museum</h3>${ptMuseumView(st.museumBoard,{empty:"Nothing here helps"})}`;
   const capL=.565*t.Luck/Math.max(1,t.Capacity);
   $("res").innerHTML=`<div class="sum">${head}<div><span class="lab">Luck</span><b>${fmt(t.Luck,0)}</b><span class="hint">now ${fmt(R.before.Luck,0)}</span></div><div><span class="lab">Capacity</span><b>${fmt(t.Capacity,0)}</b><span class="hint">now ${fmt(R.before.Capacity,0)}</span></div></div>
     ${L.goal==="luck"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}

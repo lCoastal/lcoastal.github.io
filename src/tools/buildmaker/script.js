@@ -49,9 +49,7 @@ function buildHTML(st,cw){
   const card=([k,l])=>{const v=(st.slots||{})[k];if(!v||!v.n)return `<div class="bk eq empty"><span class="lab">${l}</span><b>—</b></div>`;const x=EQR[v.n]||{};const col=rc(x.r||"");
     return `<div class="bk eq" style="--rc:${col}"><div class="ic">${pic(IC("Equipment",v.n),v.n)}</div><div><span class="lab">${l}</span><b style="color:${col}">${esc(v.n)}</b><small>${esc(x.r||"")} · ${v.l==="5"?"5":"6"}★${v.m&&v.m!=="None"?` · <span class="mu">${esc(v.m)}</span>`:""}${(v.q??100)!==100?` · ${v.q}%`:""}</small></div></div>`};
   const defs=cw.ptSlotDefs(),eq=`<div class="bgrid2">${defs.filter(d=>d[2]!=="Ring").map(card).join("")}</div><div class="rings">${defs.filter(d=>d[2]==="Ring").map(card).join("")}</div>`;
-  let mus="";const bd=st.museumBoard;if(bd&&Object.values(bd).some(a=>(a||[]).some(x=>x&&x.m))){
-    mus=`<h3 class="sec">Museum</h3><div class="mus2">${cw.ptMusRows().map(([r])=>{const row=(bd[r]||[]).filter(x=>x&&x.m);if(!row.length)return "";
-      return `<div class="mrow"><span class="lab" style="color:${rc(r)}">${r}</span><div class="mits">${row.map(x=>{const m=MNR[x.m];return `<span class="mit">${x.m==="Any"?"":pic(m&&m.ic,x.m)}<span><b>${esc(x.m==="Any"?"Any":x.m)}</b>${x.u&&x.u!=="None"?`<small>${esc(x.u)}</small>`:""}</span></span>`}).join("")}</div></div>`}).join("")}</div>`}
+  let mus="";const bd=st.museumBoard;if(bd&&Object.values(bd).some(a=>(a||[]).some(x=>x&&x.m)))mus=`<h3 class="sec">Museum</h3>${ptMuseumView(bd,{empty:"Nothing here helps"})}`;
   return `${top}<h3 class="sec">Equipment</h3>${eq}${mus}`}
 async function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCard").hidden=false;const {R,cw,W}=L;const t=R.tot;
   const wOf=s=>(W.find(x=>x[0]===s)||[,0])[1];

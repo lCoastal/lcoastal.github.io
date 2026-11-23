@@ -253,4 +253,18 @@ function ptPageButtons(box,name,read,note){const mk=(lab,fn)=>{const b=document.
   mk("Save as image",()=>{const r=read();ptSaveImg(typeof name==="function"?name():name,()=>ptTableImage({title:r.title,tic:r.tic,sub:r.sub,sections:r.secs.map(s=>({h:s.h,cols:s.cols,rows:s.rows})),chart:r.chart,note}))})}
 async function ptSaveImg(name,make){let blob=null;try{blob=await make()}catch(e){console.error(e)}if(!blob){ptToast("Couldn't draw the image");return}
   try{await window.parent.ptSave(name.replace(/[\\/:*?"<>|]+/g," ").trim()+".png",blob);ptToast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")ptToast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}}
+// ---- one museum view for every tool that shows a finished museum (Best Museum Finder, Best Build, Build Maker) ----
+// board: {Exotic:[{m,u}], Mythic:[...], ...}. Each display: picture, name, what it boosts, modifier and max-boost weight.
+// o.skip adds a Skip button per mineral (data-skip), o.empty is the text for an empty display, o.hideEmpty drops empty rarities.
+const PT_MUS_ORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"],PT_MUS_SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
+function ptMuseumView(board,o){o=o||{};board=board||{};const MI={};P.mins.forEach(m=>MI[m.n.toLowerCase()]=m);
+  const eff=v=>`<em class="${v<0?"neg":""}">${v<0?"−":"+"}${Math.abs(v)}×</em>`;
+  const filled=r=>(board[r]||[]).filter(x=>x&&x.m).length;
+  return `<div class="pt-mus">${PT_MUS_ORDER.filter(r=>!o.hideEmpty||filled(r)).map(r=>{const row=(board[r]||[]).slice(0,PT_MUS_SLOTS[r]);while(row.length<PT_MUS_SLOTS[r])row.push(null);
+    return `<div class="pt-mband" style="--rc:${rc(r)}"><h3>${r} <small>${filled(r)} of ${PT_MUS_SLOTS[r]}</small></h3><div class="pt-mslots">${row.map(sl=>{
+      if(!sl||!sl.m)return `<div class="pt-mslot"><div><b class="muted">Empty</b><span>${esc(o.empty||"Nothing picked here")}</span></div></div>`;
+      const u=sl.u&&sl.u!=="None"?`<i class="pt-mmod">${esc(sl.u)}</i>`:"";
+      if(sl.m==="Any")return `<div class="pt-mslot"><span class="pt-many" aria-hidden="true">?</span><div><b>Any ${esc(r)}</b><span>Any mineral, for its modifier${u?" ":""}${u}</span></div></div>`;
+      const m=MI[String(sl.m).toLowerCase()];if(!m)return `<div class="pt-mslot"><div><b>${esc(sl.m)}</b>${u}</div></div>`;
+      return `<div class="pt-mslot" data-mineral="${esc(m.n)}" title="Ctrl+click to open ${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<div><b>${esc(m.n)}</b><span>${m.mu&&m.mu.b?m.mu.b.map(([st,v])=>`${esc(st)} ${eff(v)}`).join(", "):""}${u?" · "+u:""}${m.mu&&m.mu.kg?` · ${m.mu.kg} kg`:""}</span></div>${o.skip?`<button type="button" class="pt-mskip" data-skip="${esc(m.n)}" title="Leave ${esc(m.n)} out for now, e.g. if you can't get it yet or it's limited-time. The next best mineral takes its place.">Skip</button>`:""}</div>`}).join("")}</div></div>`}).join("")}</div>`}
 </script>

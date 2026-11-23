@@ -22,8 +22,6 @@
 .bt tr.chg td:nth-child(2){color:var(--accent);font-weight:600}
 .bt td.was{color:var(--muted);text-decoration:line-through}
 .sec{margin:14px 0 6px;font:700 12px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.mus{display:flex;flex-direction:column;gap:4px;font-size:13.5px}
-.mus .lab{display:inline-block;min-width:88px}
 .foot{color:var(--muted);font-size:12px;margin:4px 0 0}
 .fld .ac{flex:none;width:100%}
 

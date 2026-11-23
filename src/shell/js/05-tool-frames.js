@@ -657,7 +657,20 @@ const PT_KIT_CSS =
   ":where(table.t){width:100%;font-size:13.5px}:where(table.t th){text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}" +
   ":where(table.t td){padding:5px 8px;border-bottom:1px dashed var(--line);text-align:right;font-family:var(--f-mono);white-space:nowrap}" +
   ":where(table.t th:first-child,table.t td:first-child){text-align:left;font-family:var(--f-body)}:where(table.t tr[data-c]:hover td,table.t tr[data-m]:hover td){background:var(--sunk)}" +
-  ":where(.tw){overflow-x:auto}";
+  ":where(.tw){overflow-x:auto}" +
+  // the shared museum view (ptMuseumView in common.html)
+  ".pt-mus{display:flex;flex-direction:column;gap:8px}" +
+  ".pt-mband{border:1px solid var(--rc);border-left-width:5px;border-radius:8px;overflow:hidden;background:var(--panel)}" +
+  ".pt-mband h3{margin:0;padding:6px 12px;font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--rc);background:var(--sunk);border-bottom:1px solid var(--rc);display:flex;justify-content:space-between}" +
+  ".pt-mband h3 small{font:500 11px var(--f-body);color:var(--muted);text-transform:none;letter-spacing:0}" +
+  ".pt-mslots{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}" +
+  ".pt-mslot{display:flex;gap:8px;align-items:center;padding:8px 12px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:0;margin:0 -1px -1px 0}" +
+  ".pt-mslot img,.pt-many{width:34px;height:34px;object-fit:contain;flex:none}" +
+  ".pt-many{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:var(--sunk);color:var(--muted);font-weight:700}" +
+  ".pt-mslot>div{flex:1;min-width:0}.pt-mslot b{display:block;font-size:14px}.pt-mslot b.muted{color:var(--muted);font-weight:500}" +
+  ".pt-mslot span{font-size:12px;color:var(--muted)}.pt-mslot em{font-style:normal;font-family:var(--f-mono);color:var(--accent)}.pt-mslot em.neg{color:var(--neg)}" +
+  ".pt-mmod{font-style:normal;font-weight:600;color:#d79a1c}" +
+  ".pt-mskip{flex:none;margin-left:auto;font:600 11.5px var(--f-body);padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}";
 const PRE = PRE0 + "<style data-pt-kit>" + PT_KIT_CSS + "</style><script>(" + ptFrameInit.toString() + ")()<\/script><script>(" + ptShareKit.toString() + ")()<\/script><script>(" + ptDeclutter.toString() + ")()<\/script>";
 
 function syncTheme(f) {
