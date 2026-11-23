@@ -653,7 +653,11 @@ const PT_KIT_CSS =
   ":where(.acts){display:flex;gap:8px;flex-wrap:wrap;align-items:center}" +
   ":where(.ck){display:inline-flex;align-items:center;gap:7px;cursor:pointer}" +
   ":where(table){border-collapse:collapse}" +
-  ":where(th){font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left}";
+  ":where(th){font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left}" +
+  ":where(table.t){width:100%;font-size:13.5px}:where(table.t th){text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}" +
+  ":where(table.t td){padding:5px 8px;border-bottom:1px dashed var(--line);text-align:right;font-family:var(--f-mono);white-space:nowrap}" +
+  ":where(table.t th:first-child,table.t td:first-child){text-align:left;font-family:var(--f-body)}:where(table.t tr[data-c]:hover td,table.t tr[data-m]:hover td){background:var(--sunk)}" +
+  ":where(.tw){overflow-x:auto}";
 const PRE = PRE0 + "<style data-pt-kit>" + PT_KIT_CSS + "</style><script>(" + ptFrameInit.toString() + ")()<\/script><script>(" + ptShareKit.toString() + ")()<\/script><script>(" + ptDeclutter.toString() + ")()<\/script>";
 
 function syncTheme(f) {

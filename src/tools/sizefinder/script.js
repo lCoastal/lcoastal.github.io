@@ -35,14 +35,27 @@ function chart(w,B,M,model,lo,hi,rec,mine){
     <path d="${d}" fill="none" stroke="var(--accent)" stroke-width="2"/>${mk(rec,"recommended")}${mine!=null?mk(mine,"you"):""}
     ${tk.map(s=>`<text x="${xs(s)}" y="${H-Bm+16}" text-anchor="${s===tk[0]?"start":s===tk[4]?"end":"middle"}">${pc(s)}</text>`).join("")}</svg>`}
 
+// nothing picked: every mineral at the weight that maxes its museum boost
+const RORD=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
+function all(cap,good,M){const model=wtModel(cap||4000),mine=S.sb===""?null:Math.max(0,+S.sb||0);
+  const list=MINS.filter(m=>m.mu&&m.mu.kg>0).sort((a,b)=>RORD.indexOf(a.r)-RORD.indexOf(b.r)||a.n.localeCompare(b.n));
+  $("uhead").innerHTML=`<div><b>Every mineral at its museum max-boost weight</b><br><span>Nothing picked, so here's the Size Boost each mineral needs to reach the weight that maxes its museum boost · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${zoneSize(S.wz)!==1?` · zone weights ×${zoneSize(S.wz).toFixed(2)}`:""}</span></div>`;
+  $("utbl").innerHTML=`<table class="t"><tr><th>Mineral</th><th>Max-boost weight</th><th>Possible at all</th><th>${esc($("good").selectedOptions[0].textContent)}</th><th>Half of them</th>${mine!=null?"<th>Your chance</th>":""}</tr>${list.map(m=>{const w=m.mu.kg,B=m.bw;
+    return `<tr data-m="${esc(m.n)}" style="cursor:pointer" title="Open ${esc(m.n)} here"><td><span style="color:${rc(m.r)}">${esc(m.n)}</span></td><td>${fmt(w,0)} kg</td><td>${pc(need(w,B,M,WT_MAX))}</td><td>${pc(need(w,B,M,model.q(good)))}</td><td>${pc(need(w,B,M,model.q(.5)))}</td>${mine!=null?`<td>${oneIn(chance(w,B,M,mine,model))}</td>`:""}</tr>`}).join("")}</table>
+    <p class="hint" style="margin-top:8px">By rarity, then A–Z. Click a mineral to work out any weight for it.</p>`}
+$("utbl").addEventListener("click",e=>{const r=e.target.closest("[data-m]");if(!r)return;S.min=r.dataset.m;$("min").value=S.min;save();render();try{AC.sync()}catch(err){}window.scrollTo({top:0,behavior:"smooth"})});
+ptPageButtons($("uacts"),()=>"Size Boost for museum weights",()=>ptPageRead($("uhead"),[{h:"",el:$("utbl")}]),"Estimates from a fitted model, so real results can differ.");
 function render(){
-  const m=BY[String(S.min).trim().toLowerCase()],w=+S.kg||0,cap=+S.cap||0,good=+S.good||.1,M=(S.mag?1.5:1)*zoneSize(S.wz);
-  if(!m||!(w>0)){$("out").hidden=true;return}
+  const m=BY[String(S.min).trim().toLowerCase()],cap=+S.cap||0,good=+S.good||.1,M=(S.mag?1.5:1)*zoneSize(S.wz);
+  // a mineral with no weight typed: use the weight that maxes its museum boost
+  const auto=m&&!(+S.kg>0)&&m.mu&&m.mu.kg>0,w=auto?m.mu.kg:(+S.kg||0);
+  $("uout").hidden=!!m;if(!m){$("out").hidden=true;all(cap,good,M);return}
+  if(!(w>0)){$("out").hidden=true;return}
   $("out").hidden=false;
   const model=wtModel(cap||4000),B=m.bw;
   const minSB=need(w,B,M,WT_MAX),recSB=need(w,B,M,model.q(good)),halfSB=need(w,B,M,model.q(.5));
   const mine=S.sb===""?null:Math.max(0,+S.sb||0);
-  $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b class="mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}">${esc(m.n)} at ${fmt(w,2)} kg</b><br><span>Base weight ${B} kg · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${cap&&(cap<1856||cap>7240)?' · <span class="warn">the chances are a rougher estimate at this capacity</span>':""}</span></div>`;
+  $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b class="mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}">${esc(m.n)} at ${fmt(w,2)} kg</b><br><span>${auto?"Its museum max-boost weight (type a weight to change it) · ":""}Base weight ${B} kg · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${cap&&(cap<1856||cap>7240)?' · <span class="warn">the chances are a rougher estimate at this capacity</span>':""}</span></div>`;
   const tile=(l,v,s,c)=>`<div${c?` class="${c}"`:""}><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
   const goodTxt=$("good").selectedOptions[0].textContent;
   let h=tile("Minimum Size Boost",pc(minSB),minSB<=0?"no Size Boost needed to make it possible":"if 15.5× really is the top roll (best guess)")

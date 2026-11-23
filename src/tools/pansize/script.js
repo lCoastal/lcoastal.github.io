@@ -16,6 +16,7 @@ function dist(C,n){const r=Math.sqrt(C),a=lo(C),b=Math.round(hi(C)),step=Math.ma
   const tot=rows.reduce((t,x)=>t+x.p,0)||1;rows.forEach(x=>x.p=x.p/tot*100);return rows}
 const n0=v=>fmt(Math.round(v),0);
 document.querySelectorAll("[data-dv]").forEach(b=>b.addEventListener("click",()=>{S.dv=b.dataset.dv;save();render()}));
+$("capRows").addEventListener("click",e=>{const r=e.target.closest("[data-c]");if(!r)return;S.cap=r.dataset.c;$("cap").value=S.cap;save();render()});
 ["cap","want"].forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t||!t.Capacity)return;S.cap=String(Math.round(t.Capacity));$("cap").value=S.cap;save();render()};
 // the chart: in minerals for your capacity, or in multiples of √capacity when no capacity is typed
@@ -57,7 +58,9 @@ function universal(dv,pc,row,H0){const B=SHAPE.slice();B[1]+=B[0];B[B.length-2]+
     $("dist").querySelectorAll(".cl").forEach(el=>{const show=()=>{$("ctip").textContent=el.title};el.addEventListener("mouseenter",show);el.addEventListener("focus",show);el.addEventListener("click",show)})}
   const top=R.filter(d=>d.a>=2.19).reduce((t,d)=>t+d.p,0);
   $("distNote").textContent=`Multiply by √capacity to get minerals: at 8,000 capacity √capacity is about 89, so 1× is 89 minerals and 2.5× is 224. About ${fmt(top,1)}% of pans reach 2.2× or more. From 14,306 logged pans at 5,600–10,500 capacity.`;CHART.note=$("distNote").textContent}
-function render(){const C=+S.cap||0;$("out").hidden=!(C>0);
+const COMMON=[500,1000,2500,5000,7500,10000,15000,20000,30000,50000];
+function render(){const C=+S.cap||0;$("out").hidden=!(C>0);$("capTab").hidden=C>0;
+  if(!(C>0))$("capRows").innerHTML=`<table class="t"><tr><th>Capacity</th><th>Fewest</th><th>Average</th><th>Most</th></tr>${COMMON.map(c=>`<tr data-c="${c}" style="cursor:pointer" title="Use ${fmt(c,0)} capacity"><td>${fmt(c,0)}</td><td>${n0(lo(c))}</td><td>${fmt(panItems(c),1)}</td><td>${n0(hi(c))}</td></tr>`).join("")}</table>`;
   if(C>0){const a=lo(C),m=panItems(C),b=hi(C);
     const tile=(l,v,s,c)=>`<div${c?` class="${c}"`:""}><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
     $("sum").innerHTML=tile("Fewest",n0(a),"½ × √capacity, rounded down")+tile("Average",fmt(m,1),"what you get over many pans","avg")+tile("Most",n0(b),"about 2.5 × √capacity");

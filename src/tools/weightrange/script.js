@@ -4,7 +4,7 @@ let S={min:"",sb:"",cap:"",mag:false};try{Object.assign(S,JSON.parse(localStorag
 const youPush=ptYouLink(S,{sb:"sb",cap:"cap",mag:"mag"},()=>{["sb","cap"].forEach(k=>$(k).value=S[k]);$("mag").checked=!!S.mag;render()});
 const save=()=>{try{localStorage.setItem("wr-s",JSON.stringify(S))}catch(e){}youPush()};
 ptPageButtons($("acts"),()=>"Weight range "+curName(),()=>ptPageRead($("head"),[{h:"",el:$("sum")},{h:"How heavy the top ones get",el:$("pct")}]),"Estimates from a fitted model, so real results can differ.");
-ptPageButtons($("zacts"),()=>"Weights in "+curName(),()=>ptPageRead($("zhead"),[{h:"",el:$("ztbl")}]),"Estimates from a fitted model, so real results can differ.");
+ptPageButtons($("zacts"),()=>curName()?"Weights in "+curName():"Mineral weights",()=>ptPageRead($("zhead"),[{h:"",el:$("ztbl")}]),"Estimates from a fitted model, so real results can differ.");
 const baseLoc=n=>n.replace(/\s*\((inside|outside) Firefly Zones\)/,"").replace(/\s*\(when in the loot pool\)/,"");
 const MINS=P.mins.filter(m=>m.bw>0).sort((a,b)=>a.n.localeCompare(b.n));
 const BY=Object.fromEntries(MINS.map(m=>[m.n.toLowerCase(),m]));
@@ -59,13 +59,15 @@ function mineral(m,sb,cap,model,M){
   $("pct").innerHTML=[[.5,"Top half"],[.25,"Top 25%"],[.1,"Top 10%"],[.01,"Top 1%"],[.001,"Top 0.1%"]].map(([p,l])=>`<div><span>${l}</span><b>${kg(base*model.q(p)*M)}</b><small>or heavier · ${oneIn(p)}</small></div>`).join("");
 }
 
+// z is a zone name, or null for every mineral (shown when nothing is picked)
+const RORD=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
 function zone(z,sb,cap,model,M){
-  const list=ZONES[z].slice().sort((a,b)=>a.p-b.p),er=ERUPT.has(z),f=1+sb/100,half=model.q(.5);
-  $("zhead").innerHTML=`<div><b>${esc(z)}</b><br><span>${list.length} minerals · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${zoneSize(z)!==1?` · zone weights ×${zoneSize(z).toFixed(2)}`:""}${er?" · has Volcanic Eruptions":""}</span></div>`;
+  const list=z?ZONES[z].slice().sort((a,b)=>a.p-b.p):MINS.map(m=>({m,p:0})).sort((a,b)=>RORD.indexOf(a.m.r)-RORD.indexOf(b.m.r)||a.m.n.localeCompare(b.m.n)),er=!!z&&ERUPT.has(z),f=1+sb/100,half=model.q(.5);
+  $("zhead").innerHTML=`<div><b>${z?esc(z):"Every mineral"}</b><br><span>${z?"":"Nothing picked, so here's every mineral · "}${list.length} minerals · Size Boost ${fmt(sb,1)}% · ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?" · Solar Magnifier":""}${z&&zoneSize(z)!==1?` · zone weights ×${zoneSize(z).toFixed(2)}`:!z&&zoneSize(S.wz)!==1?` · zone weights ×${zoneSize(S.wz).toFixed(2)}`:""}${er?" · has Volcanic Eruptions":""}</span></div>`;
   const hiAll=Math.max(...list.map(x=>x.m.bw))*f*WT_MAX*M*(er?2:1),loAll=Math.min(...list.map(x=>x.m.bw))*f*WT_MIN*M,lg=v=>Math.log(v/loAll)/Math.log(hiAll/loAll)*100;
   $("ztbl").innerHTML=`<table class="z"><thead><tr><th>Mineral</th><th>Lightest</th><th>Typical</th><th>Heaviest</th>${er?"<th>In an eruption</th>":""}<th class="hide-s"></th></tr></thead><tbody>${list.map(({m})=>{const b=m.bw*f*M,lo=b*WT_MIN,hi=b*WT_MAX;
     return `<tr data-m="${esc(m.n)}" title="Open ${esc(m.n)}"><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}<span><span style="color:${rc(m.r)}">${esc(m.n)}</span><small>${esc(m.r)} · base ${m.bw} kg</small></span></span></td><td>${kg(lo)}</td><td>${kg(b*half)}</td><td class="hv">${kg(hi)}</td>${er?`<td class="er">${kg(m.bw*f*WT_MAX*2*M)}</td>`:""}<td class="hide-s" style="width:22%"><div class="rngbar"><i style="left:${lg(lo).toFixed(1)}%;right:${(100-lg(hi)).toFixed(1)}%"></i></div></td></tr>`}).join("")}</tbody></table>
-    <p class="hint" style="margin-top:8px">Rarest first. Click a mineral to see how its weights spread. The bar shows each mineral's range on the same scale.</p>`;
+    <p class="hint" style="margin-top:8px">${z?"Rarest first":"By rarity, then A–Z. Pick a mineral or a zone above to narrow it down"}. Click a mineral to see how its weights spread. The bar shows each mineral's range on the same scale.</p>`;
 }
 $("ztbl").addEventListener("click",e=>{const r=e.target.closest("[data-m]");if(!r)return;S.min=r.dataset.m;$("min").value=S.min;save();render();AC.sync();window.scrollTo({top:0,behavior:"smooth"})});
 
@@ -78,8 +80,8 @@ chartEl.addEventListener("mouseleave",()=>{const tip=$("tip");if(tip)tip.hidden=
 chartEl.addEventListener("click",e=>e.target.dispatchEvent(new MouseEvent("mousemove",{clientX:e.clientX,clientY:e.clientY,bubbles:true})));
 function render(){
   const q=String(S.min).trim().toLowerCase(),m=BY[q],z=!m&&ZBY[q],sb=Math.max(0,+S.sb||0),cap=+S.cap||0,M=(S.mag?1.5:1)*(z?zoneSize(z):zoneSize(S.wz)),model=wtModel(cap||4000);
-  $("out").hidden=!m;$("zout").hidden=!z;
-  if(m)mineral(m,sb,cap,model,M);else if(z)zone(z,sb,cap,model,M);
+  $("out").hidden=!m;$("zout").hidden=!!m;
+  if(m)mineral(m,sb,cap,model,M);else zone(z||null,sb,cap,model,M);
 }
 render();
 window.ptOpenFor=(kind,name)=>{if(kind!=="mineral")return;S.min=name;$("min").value=name;save();render();try{AC.sync()}catch(e){}};

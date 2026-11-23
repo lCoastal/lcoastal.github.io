@@ -64,9 +64,20 @@ function rows(){const m=curMin();if(!m)return null;const zs=zonesOf(m);if(!zs.le
     let best=null;cand.forEach(z=>{const r=bestEff(z,m,L);if(!best||r.eff>best.eff)best={...r,z}});
     const pp=1-Math.pow(1-best.eff,panItems(C));const pans=pp>0?1/pp:Infinity;return {i,b,L,C,pph,z:best.z,cap:best.cap,eff:best.eff,pp,pans,hours:pph>0?pans/pph:null}});
   return {m,zs,list}}
+// no mineral picked: compare for the rarest minerals in general. A pan holds 0.678 × capacity^0.565 minerals and, for a
+// zone's rarest mineral, the chance per mineral grows in step with luck, so finds per pan go with luck × capacity^0.565
+function anyMineral(){const L=S.b.map((b,i)=>{const Lk=Math.max(1,num0(b.luck)||1),C=Math.max(1,num0(b.cap)||1),pph=num0(b.pph);const sc=Lk*panItems(C);return {i,b,L:Lk,C,pph,n:panItems(C),sc,hr:pph>0?sc*pph:null}});
+  const allT=L.every(x=>x.hr!=null),key=allT?"hr":"sc",best=L.reduce((a,x)=>x[key]>a[key]?x:a,L[0]);
+  const rel=x=>{if(x===best)return '<span class="tag">Best</span>';const r=best[key]/x[key];return r<1.0005?'<span class="sl">Same as best</span>':`<span class="sl">${fmt(r,r<10?2:1)}× fewer</span>`};
+  $("sum").innerHTML=`<div><span class="lab">Most rare finds ${allT?"per hour":"per pan"}</span><b style="color:${COLS[best.i%COLS.length]}">${esc(best.b.n)}</b><span class="hint">for any zone's rarest minerals</span></div>
+    <div><span class="lab">Mineral</span><b style="font-size:.95rem;font-weight:500">Any rare mineral</b><span class="hint">Pick one above for exact odds and zones</span></div>`;
+  $("tbl").innerHTML=`<table class="o"><thead><tr><th>Build</th><th>Minerals per pan</th><th>Rare finds per pan</th>${allT?"<th>Per hour</th>":""}<th>Compared</th></tr></thead><tbody>${L.map(x=>`<tr class="${x===best?"win":""}" style="--bc:${COLS[x.i%COLS.length]}">
+    <td><span class="bn"><i></i><span>${esc(x.b.n)}<small>${fmt(x.L,0)} luck · ${fmt(x.C,0)} capacity</small></span></span></td>
+    <td data-l="Minerals per pan">${fmt(x.n,1)}</td><td data-l="Rare finds per pan">${fmt(x.sc/best.sc*100,1)}%</td>${allT?`<td data-l="Per hour">${fmt(x.hr/best.hr*100,1)}%</td>`:""}<td data-l="Compared" style="font-family:var(--f-body)">${rel(x)}</td></tr>`).join("")}</tbody></table>
+    <p class="hint" style="margin-top:8px">With no mineral picked, builds are compared on luck × minerals per pan, which is how often they find a zone's rarest minerals; shown as a % of the best build. Pick a mineral for its exact odds, zone and luck cap.</p>`}
 function render(){renderDiff();$("useCap").checked=!!S.useCap;const R=rows();const m=R&&R.m;
   $("zone").innerHTML=`<option value="">Best zone for each build</option>`+(R?R.zs.map(z=>`<option value="${esc(z)}"${z===S.zone?" selected":""}>${esc(z)}</option>`).join(""):"");
-  if(!m){$("sum").innerHTML="";$("tbl").innerHTML='<p class="hint">Pick a mineral to compare your builds.</p>';return}
+  if(!m){anyMineral();return}
   if(!R.list.length){$("sum").innerHTML="";$("tbl").innerHTML='<p class="hint">There are no drop rates for this mineral, so it can\'t be compared.</p>';return}
   const L=R.list,anyT=L.some(x=>x.hours!=null),allT=L.every(x=>x.hours!=null);
   // the zone column only shows when the builds end up panning in different places
