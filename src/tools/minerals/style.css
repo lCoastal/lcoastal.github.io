@@ -131,3 +131,4 @@ table.locs tr.best td{font-weight:600}
 .yopen{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .yopen>span{font-size:12.5px;color:var(--muted);margin-right:2px}
 td.yp{font-family:var(--f-mono);font-size:13.5px;white-space:nowrap}
+.locs .chs{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}

@@ -37,12 +37,19 @@ function drawDir(){const d=(NAT[st.sort]||1)*(st.rev?-1:1);const b=document.getE
 
 // The Void goes last even when its odds look best (its pool is a rotating event), unless it's the only place
 const isVoid=c=>/^The Void/.test(c[0]);
+// treasure chests that can give this mineral as a reward: chance per reward and per chest (average number of rewards)
+const CHESTS=(()=>{try{return window.parent.PTDATA.chests||[]}catch(e){return []}})();
+function chestsOf(m){return CHESTS.map(c=>{const r=c.r.find(x=>x[0]===m.n);if(!r)return null;const tw=c.r.reduce((s,x)=>s+x[1],0),p=r[1]/tw,n=(c.rw[0]+c.rw[1])/2,pc=1-Math.pow(1-p,n);
+  return {name:`${c.place} · ${c.chest==="Treasure"?"treasure chest":c.chest+" chest"}`,place:c.place,dep:c.dep,p,pc,rw:c.rw}}).filter(Boolean).sort((a,b)=>b.pc-a.pc)}
+const fmtN=(v,d)=>Number(v).toLocaleString("en-US",{maximumFractionDigits:d});
+const oneInN=p=>p>=.5?fmtN(p*100,1)+"%":"1 in "+fmtN(Math.round(1/p),0);
 function sortedCh(m){return [...m.ch].sort((a,b)=>isVoid(a)-isVoid(b)||oneIn(a[2])-oneIn(b[2]))}
 const realCh=m=>m.ch.some(c=>!isVoid(c))?m.ch.filter(c=>!isVoid(c)):m.ch;
 function chanceAt(m,l){const c=m.ch.filter(x=>baseLoc(x[0])===l);return c.length?Math.min(...c.map(x=>oneIn(x[2]))):Infinity}
 function rowHTML(m){
   const ch=sortedCh(m);const best=st.loc?ch.find(c=>baseLoc(c[0])===st.loc):(ch.find(c=>!/^The Void/.test(c[0]))||ch[0]);
-  const bestTxt=best?`<span data-location="${esc(baseLoc(best[0]))}">${esc(best[0])}</span><small>${odds(best[2])}${ch.length>1?` · +${ch.length-1} more`:""}</small>`:'<span class="none">No drop location listed</span>';
+  const cb0=!best&&chestsOf(m)[0];
+  const bestTxt=cb0?`<span data-location="${esc(cb0.place)}">${esc(cb0.name)}</span><small>${oneInN(cb0.pc)} chests</small>`:best?`<span data-location="${esc(baseLoc(best[0]))}">${esc(best[0])}</span><small>${odds(best[2])}${ch.length>1?` · +${ch.length-1} more`:""}</small>`:'<span class="none">No drop location listed</span>';
   return `<div class="row" data-mineral="${esc(m.n)}" role="button" tabindex="0" aria-label="Open ${esc(m.n)}" style="--rc:${rc(m.r)}" data-n="${esc(m.n)}">
   <div class="c ic"><div class="icon"><img src="${m.ic}" alt="" width="44" height="44" loading="lazy"></div></div>
   <div class="c"><div class="nm"><b>${esc(m.n)}</b><span>${esc(m.r)}</span></div></div>
@@ -76,7 +83,7 @@ function render(){
 const scrim=document.getElementById("scrim"),page=document.getElementById("page");let opener=null;
 function openMineral(name,fromEl){
   const m=BYN[name.toLowerCase()];if(!m)return;if(fromEl)opener=fromEl;try{window.ptRecent&&ptRecent("Mineral",m.n)}catch(e){}
-  const ch=sortedCh(m);
+  const ch=sortedCh(m),chs=chestsOf(m);
   const recipes=m.u.map(([e])=>e).filter((e,i,a)=>a.indexOf(e)===i).map(e=>[e,E[e]]).filter(x=>x[1]);
   page.style.setProperty("--rc",rc(m.r));
   page.innerHTML=`<div class="ph"><div class="icon"><img src="${window.ptBig?ptBig(m.ic):m.ic}" alt="${esc(m.n)} icon" width="120" height="120"></div>
@@ -88,7 +95,7 @@ function openMineral(name,fromEl){
     <div class="you"><label>Luck<input type="number" min="1" id="yLuck" inputmode="numeric"></label><label>Capacity<input type="number" min="1" id="yCap" inputmode="numeric"></label><label>Size Boost %<input type="number" min="0" id="ySb" inputmode="decimal"></label><label class="ck"><input type="checkbox" id="yMag"> Solar Magnifier</label><button type="button" class="cpy" id="yCalc">Use my Stat Calculator stats</button></div>
     <div class="ytiles" id="yOut"></div>
     <div class="yopen"><span>Open in</span>${OPEN.map(([id,lab])=>`<button type="button" class="cpy" data-tool="${id}">${lab}</button>`).join("")}</div></div>
-  <div class="psec">${ch.length?`<div class="lochd"><h3>Where to find it</h3><button type="button" class="cpy" id="copyLocs" title="Copy every zone and how rare it is there">Copy as text</button></div>`:""}<div class="tw">${ch.length?`<table class="locs"><tr><th>Found in</th><th class="rt">How rare</th><th class="rt">Per pan for you</th></tr>${ch.map((c,i)=>`<tr class="${i===0?"best":""}"><td data-location="${esc(baseLoc(c[0]))}" title="Ctrl+click to open this location">${esc(c[0])}</td><td class="rt"><span class="rate"><span class="odd">${odds(c[2])}</span><span class="pct">${esc(c[1])} chance</span></span></td><td class="rt yp" data-yz="${esc(c[0])}">…</td></tr>`).join("")}</table>`:'<h3>Found in</h3><span class="none">No drop locations listed</span>'}</div></div>
+  <div class="psec">${ch.length||chs.length?`<div class="lochd"><h3>Where to find it</h3><button type="button" class="cpy" id="copyLocs" title="Copy every zone and how rare it is there">Copy as text</button></div>`:""}<div class="tw">${ch.length||chs.length?`<table class="locs"><tr><th>Found in</th><th class="rt">How rare</th><th class="rt">Per pan for you</th></tr>${ch.map((c,i)=>`<tr class="${i===0?"best":""}"><td data-location="${esc(baseLoc(c[0]))}" title="Ctrl+click to open this location">${esc(c[0])}</td><td class="rt"><span class="rate"><span class="odd">${odds(c[2])}</span><span class="pct">${esc(c[1])} chance</span></span></td><td class="rt yp" data-yz="${esc(c[0])}">…</td></tr>`).join("")}${chs.map((c,i)=>`<tr class="${!ch.length&&i===0?"best":""}"><td data-location="${esc(c.place)}" title="Chest found while digging ${esc(c.dep)}. Ctrl+click to open this location">${esc(c.name)}<small class="chs">from ${esc(c.dep)} · ${c.rw[0]}–${c.rw[1]} rewards</small></td><td class="rt"><span class="rate"><span class="odd">${oneInN(c.pc)} chests</span><span class="pct">${fmtN(c.p*100,c.p<.01?4:2)}% per reward</span></span></td><td class="rt"><span class="hint">chest</span></td></tr>`).join("")}</table>`:'<h3>Found in</h3><span class="none">No drop locations listed</span>'}</div></div>
   <div class="psec"><h3>Recipes that use ${esc(m.n)}</h3>${recipes.length?`<div class="recipes">${recipes.map(([e,o])=>`<div class="rec" style="--rc:${rc(o.r)}"><div class="rt"><b data-equip="${esc(e)}" title="Ctrl+click to open ${esc(e)} on the Equipment page" style="cursor:pointer">${esc(e)}</b><span>${esc(o.r)}${o.n?" · "+esc(o.n):""}</span></div><ul class="ing">${o.i.map(([q,ing])=>{const im=BYN[ing.toLowerCase()];const me=im&&im.n===m.n;return `<li class="${me?"me":""}"><span class="q">${q}×</span>${im?`<img src="${im.ic}" alt="">`:""}${im&&!me?`<button type="button" data-open="${esc(im.n)}" data-mineral="${esc(im.n)}">${esc(im.n)}</button>`:esc(ing)}</li>`}).join("")}</ul></div>`).join("")}</div>`:'<span class="none">Not used in any recipe yet</span>'}</div>`;
   const cb=document.getElementById("copyLocs");if(cb)cb.onclick=()=>copyText(locText(m,ch),cb);
   youWire(m);
@@ -122,7 +129,7 @@ function youWire(m){CUR=m;const y=youGet(),I={yLuck:"luck",yCap:"cap",ySb:"sb"};
   youDraw()}
 window.ptYouChanged=()=>{if(scrim.hidden||!CUR)return;const y=youGet();[["yLuck","luck"],["yCap","cap"],["ySb","sb"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=y[k]??""});const mg=document.getElementById("yMag");if(mg)mg.checked=!!y.mag;youDraw()};
 function locText(m,ch){const n=s=>isFinite(oneIn(s))?oneIn(s).toLocaleString("en-US"):"?";
-  return `**${m.n}** (${m.r}) · $${m.v}/kg\nWhere to find it:\n`+ch.map(c=>`• ${c[0]}: ~1 in ${n(c[2])} (${c[1]})`).join("\n")}
+  return `**${m.n}** (${m.r}) · $${m.v}/kg\nWhere to find it:\n`+ch.map(c=>`• ${c[0]}: ~1 in ${n(c[2])} (${c[1]})`).concat(chestsOf(m).map(c=>`• ${c.name} (from ${c.dep}): ${oneInN(c.pc)} chests (${fmtN(c.p*100,4)}% per reward, ${c.rw[0]}–${c.rw[1]} rewards)`)).join("\n")}
 async function copyText(t,btn){let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
   if(!btn)return;const o=btn.textContent;btn.textContent=ok?"Copied!":"Couldn't copy";btn.classList.toggle("ok",ok);setTimeout(()=>{btn.textContent=o;btn.classList.remove("ok")},1600)}
 function closeMineral(){scrim.hidden=true;if(opener&&document.contains(opener))opener.focus();opener=null;if(window.PT_POPUP){try{window.parent.ptPopupClosed()}catch(e){}}}
