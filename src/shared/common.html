@@ -124,7 +124,10 @@ async function ptTableImage(o){const F='"IBM Plex Sans","Segoe UI",system-ui,san
   // optional donut chart with a legend: o.pie={h,center,centerSub,note,parts:[{n,col,v,left,pct,ic}]}
   const PIE=o.pie&&o.pie.parts&&o.pie.parts.length?o.pie:null;const PR=110,LROW=34,pieH=PIE?(PIE.h?40:0)+Math.max(PR*2+20,PIE.parts.length*LROW+10)+(PIE.note?28:0)+10:0;
   if(PIE)PIE.parts.forEach(x=>{if(x.ic)srcs0.push(x.ic)});
-  let H=PAD+(o.sub&&o.sub.length?82:52)+pieH;secs.forEach(s=>{H+=(s.h?40:8)+(s.nh?0:30)+s.rows.reduce((a,r)=>a+r.h,0)+20});H+=o.note?48:20;
+  let H=PAD+(o.sub&&o.sub.length?82:52)+pieH;secs.forEach(s=>{H+=(s.h?40:8)+(s.nh?0:30)+s.rows.reduce((a,r)=>a+r.h,0)+20});
+  // optional bar chart after the sections: o.chart={h,kind:"rows"|"cols",bars:[{l,p,t,on}],axis:[left,mid,midPos 0-1,right],note}
+  const CH=o.chart&&o.chart.bars&&o.chart.bars.length?o.chart:null,CHN=CH&&CH.note?wrapT(CH.note,W-PAD*2,`13px ${F}`):[];
+  const chH=CH?(CH.h?40:0)+(CH.kind==="cols"?250:CH.bars.length*28+6)+CHN.length*19+(CHN.length?8:0)+16:0;H+=chH;H+=o.note?48:20;
   const cv=document.createElement("canvas");const sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
   const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
   const fit=(t,w)=>{t=String(t);if(c.measureText(t).width<=w)return t;while(t.length>1&&c.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"};
@@ -161,6 +164,21 @@ async function ptTableImage(o){const F='"IBM Plex Sans","Segoe UI",system-ui,san
         if(C.sub){c.font=`11.5px ${F}`;c.fillStyle=C.subcol||"#98a2ad";const t=fit(C.sub,w);c.fillText(t,al==="r"?cx[i]+s.cw[i]-18-c.measureText(t).width:x,top+L.lines.length*L.lh+12)}});
       y+=r.h});
     y+=20});
+  if(CH){if(CH.h){c.fillStyle="#e6e9ec";c.font=`700 19px ${FD}`;c.fillText(CH.h,PAD,y+26);y+=40}
+    const mxp=Math.max(...CH.bars.map(b=>b.p))||1;
+    if(CH.kind==="cols"){const top=y+6,bh=210,n=CH.bars.length,gw=(W-PAD*2)/n;
+      CH.bars.forEach((b,i)=>{const h=Math.max(1,b.p/mxp*bh);c.fillStyle=b.on?"#14b8a6":"rgba(20,184,166,.62)";rr(PAD+i*gw+1.5,top+bh-h,gw-3,h,3);c.fill()});
+      c.strokeStyle="#2c333a";c.lineWidth=1;c.beginPath();c.moveTo(PAD,top+bh+.5);c.lineTo(W-PAD,top+bh+.5);c.stroke();
+      const ax=CH.axis||[];c.font=`13px ${FM}`;c.fillStyle="#98a2ad";if(ax[0]!=null)c.fillText(ax[0],PAD,top+bh+22);if(ax[3]!=null)c.fillText(ax[3],W-PAD-c.measureText(ax[3]).width,top+bh+22);
+      if(ax[1]!=null){c.fillStyle="#e6e9ec";const t=String(ax[1]),tw=c.measureText(t).width;c.fillText(t,Math.min(W-PAD-tw,Math.max(PAD,PAD+ax[2]*(W-PAD*2)-tw/2)),top+bh+22)}
+      y+=250}
+    else{const lw=150,vw=90,bx=PAD+lw,bw=W-PAD*2-lw-vw;
+      CH.bars.forEach(b=>{if(b.on){c.fillStyle="rgba(20,184,166,.14)";rr(PAD,y+1,W-PAD*2,26,6);c.fill()}
+        c.font=`14px ${FM}`;c.fillStyle="#98a2ad";c.fillText(fit(b.l,lw-20),bx-16-c.measureText(fit(b.l,lw-20)).width,y+19);
+        c.fillStyle="#232a31";rr(bx,y+7,bw,14,7);c.fill();if(b.p>0){const bw2=Math.max(8,b.p/mxp*bw);c.fillStyle="rgba(20,184,166,.8)";rr(bx,y+7,bw2,14,Math.min(7,bw2/2));c.fill()}
+        c.fillStyle="#e6e9ec";c.fillText(b.t,W-PAD-10-c.measureText(b.t).width,y+19);y+=28});y+=6}
+    if(CHN.length){c.fillStyle="#98a2ad";c.font=`13px ${F}`;CHN.forEach(l=>{c.fillText(l,PAD,y+14);y+=19});y+=8}
+    y+=16}
   if(o.note){const et=o.note;c.font=`600 13px ${F}`;const ew=Math.min(W-PAD*2,c.measureText(et).width+30),ex=PAD,ey=y;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(fit(et,ew-30),ex+22,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 function ptToast(t){const d=document.createElement("div");d.className="ptoast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
@@ -229,10 +247,10 @@ function ptPageRead(head,parts){const T=e=>(e?e.textContent:"").replace(/\s+/g,"
     if(tiles.length)out.secs.push({h,cols:[{h:"",w:.36},{h:"",w:.26,al:"r"},{h:"",w:.38}],rows:tiles.map(t=>({cells:[{t:t.l,b:true},{t:t.v,mono:true},{t:t.s,col:"#98a2ad"}]})),text:tiles.map(t=>`${t.l}: ${t.v}${t.s?" ("+t.s+")":""}`)})});
   return out}
 function ptPageButtons(box,name,read,note){const mk=(lab,fn)=>{const b=document.createElement("button");b.type="button";b.className="btn";b.textContent=lab;b.onclick=fn;box.appendChild(b)};
-  mk("Copy as text",async()=>{const r=read();const t=[`**${r.title}**`+(r.sub.length?" ("+r.sub.join(" · ")+")":"")].concat(...r.secs.map(s=>(s.h?["",s.h+":"]:[""]).concat(s.text.map(x=>"• "+x)))).join("\n");
+  mk("Copy as text",async()=>{const r=read();const t=[`**${r.title}**`+(r.sub.length?" ("+r.sub.join(" · ")+")":"")].concat(...r.secs.map(s=>(s.h?["",s.h+":"]:[""]).concat(s.text.map(x=>"• "+x)))).concat(r.chart?["",r.chart.h+":"].concat(r.chart.bars.map(b=>"• "+b.l+": "+b.t)):[]).join("\n");
     let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(_){}}
     ptToast(ok?"Copied":"Couldn't copy")});
-  mk("Save as image",()=>{const r=read();ptSaveImg(typeof name==="function"?name():name,()=>ptTableImage({title:r.title,tic:r.tic,sub:r.sub,sections:r.secs.map(s=>({h:s.h,cols:s.cols,rows:s.rows})),note}))})}
+  mk("Save as image",()=>{const r=read();ptSaveImg(typeof name==="function"?name():name,()=>ptTableImage({title:r.title,tic:r.tic,sub:r.sub,sections:r.secs.map(s=>({h:s.h,cols:s.cols,rows:s.rows})),chart:r.chart,note}))})}
 async function ptSaveImg(name,make){let blob=null;try{blob=await make()}catch(e){console.error(e)}if(!blob){ptToast("Couldn't draw the image");return}
   try{await window.parent.ptSave(name.replace(/[\\/:*?"<>|]+/g," ").trim()+".png",blob);ptToast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")ptToast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}}
 </script>
