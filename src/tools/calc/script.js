@@ -58,13 +58,13 @@ const sunOn=S=>!S.noSun&&(sunGear(S).length>1||!!S.sunKeep);
 const STREAK={"Rhythmic":["Luck",.3],"Non Euclidean":["Capacity",1]};
 const rhyOn=S=>!!STREAK[S.shEn]&&S.rhy!==false;
 function compute(S0){const S=S0||window.S;
-  const base=Object.fromEntries(STATS.map(s=>[s,0]));let luckMult=1,totemMult=1;const notes=[];
+  const base=Object.fromEntries(STATS.map(s=>[s,0]));let luckMult=1,totemMult=1,toolLuck=0;const notes=[];
   const pan=G.pans.find(x=>x.name===S.pan),sh=G.shovels.find(x=>x.name===S.shovel);
   const EN=(P.ench||{pan:[],shovel:[]});const pe=EN.pan.find(e=>e.n===S.panEn),se=EN.shovel.find(e=>e.n===S.shEn);
   if(pan){const pm=k=>pe&&pe.m[k]?pe.m[k]:1;base.Luck+=(num(pan.luck)||0)*pm("Luck");base.Capacity+=(num(pan.capacity)||0)*pm("Capacity");base["Shake Strength"]+=(num(pan.strength)||0)*pm("Shake Strength");const sp=String(pan.speed).includes("%")?num(pan.speed):(num(pan.speed)||0)*100;base["Shake Speed"]+=sp;
     if(pe)Object.entries(pe.a).forEach(([k,v])=>{if(k in base)base[k]+=v});
-    const p=passive(pan.passive);Object.entries(p.o).forEach(([k,v])=>base[k]+=v);luckMult*=p.lm;if(/totem/i.test(pan.passive||""))notes.push(`${pan.name} also boosts totems (not counted).`)}
-  if(sh){base["Dig Strength"]+=num(sh.strength)||0;base["Dig Speed"]+=(num(sh.speed)||0)*100;base.Toughness=(num(sh.toughness)||0)+(se&&se.tough?se.tough:0);if(se&&!se.tough&&!STREAK[se.n])notes.push(`${se.n}: ${se.d}`);const p=passive(sh.passive);luckMult*=p.lm;if(/25% buffs from Totems/i.test(sh.passive||""))totemMult=1.25}
+    const p=passive(pan.passive);Object.entries(p.o).forEach(([k,v])=>base[k]+=v);toolLuck+=p.lm-1;if(/totem/i.test(pan.passive||""))notes.push(`${pan.name} also boosts totems (not counted).`)}
+  if(sh){base["Dig Strength"]+=num(sh.strength)||0;base["Dig Speed"]+=(num(sh.speed)||0)*100;base.Toughness=(num(sh.toughness)||0)+(se&&se.tough?se.tough:0);if(se&&!se.tough&&!STREAK[se.n])notes.push(`${se.n}: ${se.d}`);const p=passive(sh.passive);toolLuck+=p.lm-1;if(/25% buffs from Totems/i.test(sh.passive||""))totemMult=1.25}
   // Embalmer's Salt: +0.25% sell value per item panned, up to +100%. Counted as maxed out, added like gear.
   if(S.trinket==="Embalmer's Salt")base["Sell Boost"]+=100;
   SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
@@ -75,7 +75,9 @@ function compute(S0){const S=S0||window.S;
   flat.Luck+=(S.b.lighthouse?3:0)+(S.b.ancient?5:0)+(S.b.spirits?50:0)+3*Math.max(0,+S.n.dredge||0)+5*Math.max(0,+S.n.xp||0)+(TOMB[+S.n.tomb||0]||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
   // Trader's Recommendation: permanent quest reward, +20 flat Sell Boost. Almost everyone has it, so it's on unless unticked.
   if(S.b.trader!==false)flat["Sell Boost"]+=20;
-  const pile=Object.fromEntries(STATS.map(s=>[s,0]));const mt=musTotals(S);Object.entries(mt.t).forEach(([k,v])=>{if(k in pile)pile[k]+=v});
+  const pile=Object.fromEntries(STATS.map(s=>[s,0]));
+  // Nebula Pan and Starcrusher "1.1× additional Luck": +0.1× on the luck boost pile, like other boosts
+  pile.Luck+=toolLuck;const mt=musTotals(S);Object.entries(mt.t).forEach(([k,v])=>{if(k in pile)pile[k]+=v});
   const b=S.b;
   // potions add flat points (their % lines go straight onto the % stats)
   (S.pots||[]).forEach(pn=>{const p=((P.x2||{}).potions||[]).find(x=>x.n===pn);if(!p)return;String(p.fx).replace(/\([^)]*\)\s*$/,"").split(/,\s*/).forEach(part=>{const m=part.match(/^\+?(-?[\d.,]+)(%?)\s+(.+)$/);if(!m)return;let k=m[3].trim().replace(/Walkspeed|WalkSpeed/i,"Walk Speed");k=STATS.find(s=>s.toLowerCase()===k.toLowerCase())||k;if(k in flat)flat[k]+=parseFloat(m[1].replace(/,/g,""))})});
@@ -513,7 +515,7 @@ function render(){renderSpread();if(typeof fillProg==="function"&&$("progSum"))f
   const f=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
   $("out").innerHTML=`<table class="out"><tr><th>Stat</th><th>Gear</th><th>Boost pile</th><th>Total</th><th class="bkc" title="Show this stat in the detailed breakdown">Breakdown</th></tr>${STATS.map(s=>{const show=r.base[s]||r.tot[s]||s==="Luck";if(!show)return "";const on=!(S.brkHide||[]).includes(s);
     return `<tr class="${s==="Luck"?"big":""}"><td>${s}</td><td>${f(s,r.base[s]+r.flat[s])}</td><td>${["Toughness","Inventory Size"].includes(s)?"—":"×"+fmt(1+r.pile[s],2)}</td><td class="tot">${f(s,r.tot[s])}</td><td class="bkc"><button type="button" class="sw2" role="switch" data-bstat="${esc(s)}" aria-checked="${on}" aria-label="Show ${esc(s)} in the detailed breakdown" title="${on?"Shown":"Hidden"} in the detailed breakdown"></button></td></tr>`}).join("")}</table>
-    <p class="hint" style="margin-top:8px">${[r.ev>1?`Events multiply final luck by ×${r.ev}.`:"",r.luckMult>1?`Your tools add ×${fmt(r.luckMult,2)} luck at the end.`:"",r.mt.n?`Museum: ${r.mt.n} display${r.mt.n===1?"":"s"} counted.`:"No museum counted.",...r.notes].filter(Boolean).join(" ")}</p>`;
+    <p class="hint" style="margin-top:8px">${[r.ev>1?`Events multiply final luck by ×${r.ev}.`:"",r.luckMult>1?`Your trinket multiplies final luck by ×${fmt(r.luckMult,2)}.`:"",r.mt.n?`Museum: ${r.mt.n} display${r.mt.n===1?"":"s"} counted.`:"No museum counted.",...r.notes].filter(Boolean).join(" ")}</p>`;
   const mtS=musTotals(S);$("musTxt").textContent=S.mus==="none"?"":mtS.n?Object.entries(mtS.t).filter(([,v])=>v).map(([k,v])=>`${k} ${v<0?"−":"+"}${fmt(Math.abs(v),3)}×`).join(" · "):"That museum board is empty. Fill it in on the Museum Planner page.";
 }
 // ---- save the build as an image: gear, boosts, then the stats table (what "Your stats" shows) ----
@@ -558,13 +560,13 @@ async function buildImage(st,r){
   if(+n.mastery>0)boosts.push({t:`Location mastery +${n.mastery}×`,col:TX});if(+n.flatLuck>0)boosts.push({t:`+${fmt(+n.flatLuck,0)} flat luck`,col:statHex("Luck")});if(+n.flatDig>0)boosts.push({t:`+${fmt(+n.flatDig,0)} flat dig strength`,col:statHex("Dig Strength")});
   const hideS=new Set(S.brkHide||[]),stats=SHOW.filter(x=>(Math.abs(r.tot[x]||0)>1e-9||x==="Luck")&&!hideS.has(x));
   const LV=brkLvl(),DET=LV===2?brkData(st).stats:null;
-  const sub=[];const ex=[r.ev>1?`events ×${r.ev} luck`:"",r.luckMult>1?`tools ×${fmt(r.luckMult,2)} luck`:""].filter(Boolean);if(ex.length)sub.push("Includes "+ex.join(" and "));
+  const sub=[];const ex=[r.ev>1?`events ×${r.ev} luck`:"",r.luckMult>1?`trinket ×${fmt(r.luckMult,2)} luck`:""].filter(Boolean);if(ex.length)sub.push("Includes "+ex.join(" and "));
   if((S.isoOff||[]).length||S.only)sub.push("Only some parts counted");
   // ---- measure ----
   const m=document.createElement("canvas").getContext("2d");
   const chipRows=(list,w,font)=>{m.font=font;const rows=[[]];let x=0;list.forEach(ch=>{const cw=m.measureText(ch.t).width+22;if(x+cw>w&&rows[rows.length-1].length){rows.push([]);x=0}rows[rows.length-1].push({...ch,w:cw});x+=cw+8});return rows};
   // pan / shovel lines: base stats, plus the passive when it's a stat (+25% Size Boost, 1.1× additional Luck)
-  const pasL=it=>{if(!it||!it.passive)return [];const ps=passive(it.passive),L2=Object.entries(ps.o).filter(([,v])=>v).map(([k,v])=>[k,(v<0?"−":"+")+fmt(Math.abs(v),0)+"%"]);if(ps.lm&&ps.lm!==1)L2.push(["Luck","×"+fmt(ps.lm,2)]);return L2};
+  const pasL=it=>{if(!it||!it.passive)return [];const ps=passive(it.passive),L2=Object.entries(ps.o).filter(([,v])=>v).map(([k,v])=>[k,(v<0?"−":"+")+fmt(Math.abs(v),0)+"%"]);if(ps.lm&&ps.lm!==1)L2.push(["Luck","+"+fmt(ps.lm-1,2)+"×"]);return L2};
   const panL=pan?[["Luck",fmt(+pan.luck||0,2)],["Capacity",fmt(+pan.capacity||0,0)],["Shake Strength",fmt(+pan.strength||0,2)],...pasL(pan)]:[];
   const shL=sh?[["Dig Strength",fmt(+sh.strength||0,2)],["Dig Speed",fmt((+sh.speed||0)*100,0)+"%"],["Toughness",fmt(+sh.toughness||0,0)],...pasL(sh)]:[];
   const HERO=Math.max(212,122+(Math.max(panL.length,shL.length)-1)*24+(st.trinket?46:24)),SC=4,STH=96,SECH=44,TOPH=104,RC=4,RH=98,MRH=58;
