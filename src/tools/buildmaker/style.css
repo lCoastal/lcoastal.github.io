@@ -81,3 +81,5 @@ h2{font:700 1.05rem var(--f-display);margin:0}
 .mit{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:3px 8px 3px 3px;background:var(--panel)}
 .mit img{width:30px;height:30px;object-fit:contain}
 .mit>span{display:flex;flex-direction:column;line-height:1.15}.mit b{font-size:13px}.mit small{font-size:11.5px;color:#d79a1c}
+.rings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+@media (max-width:760px){.rings{grid-template-columns:repeat(2,minmax(0,1fr))}}

@@ -158,7 +158,10 @@ function shares(base,full){const P=parts(base),n=P.length,memo=new Map();
 // One line per source: every ring on its own line, every museum display, every potion, totem and rune.
 // Each line is "what changes if you take just that away"; anything left over (two sources boosting each other) is shown as "Combined effect".
 const TMB=B=>{const sh=G.shovels.find(x=>x.name===B.shovel);return sh&&/25% buffs from Totems/i.test(sh.passive||"")?1.25:1};
-const BLAB={trader:"Trader's Recommendation",lighthouse:"Lighthouse Blessing",ancient:"Ancient Blessing",spirits:"Blessing of the Spirits",daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
+// rune switches (S.b.sun etc.) and the runes they stand for, so the breakdown names the rune instead of "sun"
+const RUNEFLAG={Sunblessed:"sun",Abyssal:"sun",Solitude:"solo",Purity:"purity",Veteran:"vet"};
+const runeCovers=(B,k)=>(B.runes||[]).some(n=>RUNEFLAG[n]===k);
+const BLAB={sun:"Sunblessed / Abyssal rune",solo:"Solitude rune",purity:"Purity rune",vet:"Veteran rune",trader:"Trader's Recommendation",lighthouse:"Lighthouse Blessing",ancient:"Ancient Blessing",spirits:"Blessing of the Spirits",daily:"Daily login luck",dailyStr:"Daily login strength",empower:"Empowering sluice",egg:"Easter Sluice (Egg Hunter)"};
 function brkSources(B){const L=[];const sunB=sunOn(B);const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   if(B.pan){if(B.panEn)L.push({key:"pan:",label:`Pan enchant: ${B.panEn}`,cut:t=>{t.panEn=""}});L.push({key:"pan:",label:"Pan: "+B.pan,cut:t=>{t.pan="";t.panEn="";if(sunB)t.sunKeep=true},minus:B.panEn?0:null})}
   if(B.shovel){if(B.shEn)L.push({key:"shovel:",label:STREAK[B.shEn]?`${B.shEn} (${rhyOn(B)?"Assuming a full streak":"streak off"})`:`Shovel enchant: ${B.shEn}`,cut:t=>{t.shEn=""}});const tmB=compute(B).totemMult;L.push({key:"shovel:",label:"Shovel: "+B.shovel,cut:t=>{t.shovel="";t.shEn="";if(sunB)t.sunKeep=true;if(tmB!==1)t.totemKeep=tmB},minus:B.shEn?0:null})}
@@ -169,10 +172,10 @@ function brkSources(B){const L=[];const sunB=sunOn(B);const lab=k=>{if(BLAB[k])r
   const bd=B.mus!=="none"?musBoard(B):null;
   if(bd)MORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const u=sl.u||"None";
     L.push({key:"group:museum",label:`Museum: ${sl.m==="Any"?"Any "+r:sl.m}`,sub:[sl.m==="Any"?"":r,u==="None"?"":u].filter(Boolean).join(" · "),cut:t=>{const b2=JSON.parse(JSON.stringify(musBoard(t)||{}));if(b2[r]&&b2[r][i])b2[r][i]={m:null,u:"None"};t.mus="custom";t.museumBoard=b2}})}));
-  Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather"||k==="trader")return;L.push({key:"group:boosts",label:lab(k),sub:/Totem$/.test(k)&&TMB(B)!==1?`incl. the shovel's +${fmt((TMB(B)-1)*100,0)}% totem bonus`:"",cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
+  Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather"||k==="trader"||runeCovers(B,k))return;L.push({key:"group:boosts",label:lab(k),sub:/Totem$/.test(k)&&TMB(B)!==1?`incl. the shovel's +${fmt((TMB(B)-1)*100,0)}% totem bonus`:"",cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
   (B.pots||[]).forEach(n=>L.push({key:"group:boosts",label:"Potion: "+n,cut:t=>{t.pots=(t.pots||[]).filter(x=>x!==n)}}));
   (B.cons||[]).forEach(n=>L.push({key:"group:boosts",label:"Consumable: "+n,cut:t=>{t.cons=(t.cons||[]).filter(x=>x!==n)}}));
-  (B.runes||[]).forEach(n=>L.push({key:"group:boosts",label:"Rune: "+n,cut:t=>{t.runes=(t.runes||[]).filter(x=>x!==n)}}));
+  (B.runes||[]).forEach(n=>L.push({key:"group:boosts",label:"Rune: "+n,cut:t=>{t.runes=(t.runes||[]).filter(x=>x!==n);const f=RUNEFLAG[n];if(f&&!runeCovers(t,f))t.b=Object.assign({},t.b,{[f]:false})}}));
   const n=B.n||{};
   if(+n.friendTotem>=0)L.push({key:"group:boosts",label:`Friendship Totem (${+n.friendTotem} nearby)`,sub:TMB(B)!==1?`incl. the shovel's +${fmt((TMB(B)-1)*100,0)}% totem bonus`:"",cut:t=>{t.n=Object.assign({},t.n,{friendTotem:-1})}});
   if(+n.friends>0)L.push({key:"group:boosts",label:`${+n.friends} friend${+n.friends===1?"":"s"} online`,cut:t=>{t.n=Object.assign({},t.n,{friends:0})}});
@@ -548,7 +551,7 @@ async function buildImage(st,r){
   const MODCOL={Perfect:"#5ef1e1",Treasured:"#ffd849",Entombed:"#40c8be",Lunar:"#ffe99b",Voidtorn:"#a35bff",Mutated:"#a07bff",Cosmic:"#ff5f9e",Electrified:"#ffeb0b",Iridescent:"#f36bff",Irradiated:"#67ff20",Crystalline:"#b7e6ff",Scorching:"#ff861c",Glowing:"#fff292",Pure:"#ffffff",Shiny:"#d4e7ff"};
   const MROWS=board?MORDER.map(r=>({r,slots:Array.from({length:MSLOTS[r]},(_,i)=>{const sl=(board[r]||[])[i]||{};const mm=sl.m&&sl.m!=="Any"?MIN[String(sl.m).toLowerCase()]:null;return {m:sl.m||null,any:sl.m==="Any",ic:mm&&mm.ic,u:sl.u||"None"}})})):[];
   const boosts=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
-  Object.entries(st.b||{}).forEach(([k,v])=>{if(v)boosts.push({t:lab(k),col:TX})});
+  Object.entries(st.b||{}).forEach(([k,v])=>{if(v&&!runeCovers(st,k))boosts.push({t:lab(k),col:TX})});
   (st.pots||[]).forEach(n=>boosts.push({t:n,col:"#b880ee"}));(st.cons||[]).forEach(n=>boosts.push({t:n,col:"#e0a050"}));
   if(sunOn(st))boosts.push({t:"Sun Blessing (assumed charged)",col:"#ffc800"});if(rhyOn(st))boosts.push({t:st.shEn+" full streak (assumed)",col:TX});(st.runes||[]).forEach(n=>boosts.push({t:n+" rune",col:"#68a6f0"}));
   const n=st.n||{};if(+n.friendTotem>=0)boosts.push({t:`Friendship Totem (${+n.friendTotem} nearby)`,col:TX});if(+n.friends>0)boosts.push({t:`${+n.friends} friend${+n.friends===1?"":"s"} online`,col:TX});
