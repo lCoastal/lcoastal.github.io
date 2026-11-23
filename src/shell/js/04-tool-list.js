@@ -2,6 +2,7 @@ const LIST = [
   { id: "home", name: "Home", desc: "Start here: find a build, check your stats, plan your museum" },
   { id: "builds", name: "Build Sheets", desc: "Write full builds in the guide layout" },
   { id: "bestbuild", name: "Best Build", desc: "Pick a mineral or goal, get the best build as a build sheet" },
+  { id: "buildmaker", name: "Build Maker", desc: "Set how much each stat matters (0 to 5) and get the best build for it" },
   { id: "planner", name: "Museum Planner", desc: "Pick minerals and mutations, see totals" },
   { id: "boosts", name: "Museum Boosts", desc: "Every mineral's boost and max weight" },
   { id: "minerals", name: "Minerals", desc: "Value, drop rates, recipes and museum boost" },

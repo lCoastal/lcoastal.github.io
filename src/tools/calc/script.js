@@ -915,6 +915,8 @@ async function bfEngine(c,scoreTot,onProg){
   if(c.sun===false)base.noSun=true;if(c.sun===true)delete base.noSun;if(c.nomad===false)base.nomadOff=true;if(c.nomad===true)delete base.nomadOff;
   if(c.trkMax!=null)base.trkMax=!!c.trkMax;if(c.mastery!=null)base.n=Object.assign({},base.n,{mastery:+c.mastery||0});
   if(c.events)base.b=Object.assign({},base.b,{meteor:!!c.events.meteor,weather:!!c.events.weather});
+  // potions and consumables (Build Maker): none, every one at once, or as set here
+  if(c.cons==="none"){base.pots=[];base.cons=[]}else if(c.cons==="all"){base.pots=((P.x2||{}).potions||[]).map(p=>p.n);base.cons=CONS.map(x=>x.n)}
   // can't do perfect digs: streak enchants never build up, and digging without Mastered means autopan at about two thirds of your luck
   const tot=st=>{const t=compute(st).tot;if(noPerf&&st.shEn!=="Mastered")t.Luck*=2/3;return t};
   const score=st=>scoreTot(tot(st),st);
@@ -983,7 +985,8 @@ async function bfEngine(c,scoreTot,onProg){
   if(TRROLL[fin.trinket])as.push(`${fin.trinket} at its ${fin.trkMax?"max":"average"} roll`);
   if(+n.mastery>0)as.push(`Location mastery +${n.mastery}× luck`);
   const rn=(fin.runes||[]).length?fin.runes:[b.purity&&"Purity",b.vet&&"Veteran",b.sun&&"Abyssal or Sunblessed",b.solo&&"Solitude"].filter(Boolean);if(rn.length)as.push("Runes: "+rn.join(", "));
-  if((fin.pots||[]).length)as.push("Potions: "+fin.pots.join(", "));if((fin.cons||[]).length)as.push("Consumables: "+fin.cons.join(", "));
+  if(c.cons==="all")as.push("Every potion and consumable active at once");else if(c.cons==="none")as.push("No potions or consumables");
+  else{if((fin.pots||[]).length)as.push("Potions: "+fin.pots.join(", "));if((fin.cons||[]).length)as.push("Consumables: "+fin.cons.join(", "))}
   if(b.luckTotem||b.strTotem||b.lumTotem||+n.friendTotem>=0)as.push("Totems as set under Boosts");
   if(b.meteor||b.weather)as.push("Event: "+[b.meteor&&"Meteor Shower",b.weather&&"weather"].filter(Boolean).join(" + "));
   as.push("Luck and capacity worked out with the formulas in How It Works, which are estimates fitted on testing");

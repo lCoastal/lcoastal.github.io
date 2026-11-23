@@ -6,6 +6,7 @@ const SECTIONS = [
     "#14b8a6",
     [
       ["bestbuild", "e:Guardian Pendant.png"],
+      ["buildmaker", "e:Clockwork.png"],
       ["builds", "e:Celestial Rings.png"],
       ["calc", "e:Prismatic Star.png"],
       ["buildcmp", "m:Gold"],

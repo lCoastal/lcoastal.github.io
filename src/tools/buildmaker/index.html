@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Build Maker</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Build Maker</h1>
+    <p class="lede">Set how much each stat matters, from 0 to 5, and it finds the build that fits best: every piece and mutation, pan, shovel, enchants, trinket and museum.</p>
+  </header>
+
+  <section class="card">
+    <div class="top"><span class="lab">Consumables</span><span class="chips" id="cons" role="group" aria-label="Consumables"></span></div>
+    <p class="hint" id="consTxt"></p>
+  </section>
+
+  <section class="card">
+    <div class="top" style="justify-content:space-between"><h2 style="margin:0">1. How much does each stat matter?</h2><span class="acts"><button type="button" class="btn sm" id="wLuck">Luck only</button><button type="button" class="btn sm" id="wRare">Luck + capacity</button><button type="button" class="btn sm" id="wClear">All to 0</button></span></div>
+    <div class="wts" id="weights"></div>
+    <p class="hint">0 ignores a stat. A stat on 2 counts twice as much as one on 1. Each stat counts by how many times bigger it gets, not by its raw number, so stats with big numbers (like luck) don't drown out small ones (like walk speed), and the more you already have of one, the less extra counts.</p>
+  </section>
+
+  <section class="card">
+    <h2>2. What can you use?</h2>
+    <div class="iso"><span class="lab">Mutations you can get</span><span id="muts" class="chips"></span></div>
+    <div class="iso"><label class="ck"><input type="checkbox" id="owned"> Only items I own</label><span class="hint">Tick what you own in Best Build's "What I own" list or any tool with owned ticks.</span></div>
+    <div class="iso"><span class="lab">Also change</span><label class="ck"><input type="checkbox" id="tools"> Pan and shovel</label><label class="ck"><input type="checkbox" id="trinket"> Trinket</label><label class="ck"><input type="checkbox" id="museum"> Museum</label></div>
+    <details class="own"><summary><b>What can you keep up?</b> <span class="hint" id="asSum"></span></summary>
+      <div class="asl">
+        <label class="ck"><input type="checkbox" id="perfect"> <span><b>I can do perfect digs</b><small>Off: streak enchants are skipped, and anything but Mastered counts as autopan at about two thirds of your luck</small></span></label>
+        <label class="ck"><input type="checkbox" id="streak"> <span><b>I can hold a full perfect-dig streak</b><small>Non Euclidean up to 2× capacity, Rhythmic up to 1.3× luck</small></span></label>
+        <label class="ck"><input type="checkbox" id="sun"> <span><b>I can keep Sun Blessing fully charged</b><small>Needs both the Pharaoh's Pan and Shovel</small></span></label>
+        <label class="ck"><input type="checkbox" id="nomad"> <span><b>I can keep Nomad's Compass fully stacked</b><small>×1.9 luck once stacked</small></span></label>
+        <label class="ck"><input type="checkbox" id="night"> <span><b>It's night</b><small>Counts Night Luck, like Dullahan's Curse</small></span></label>
+      </div>
+    </details>
+    <p class="hint">Totems, runes, mastery and events come from the Stat Calculator, so every build is compared with the same ones. <button type="button" class="lnk" id="openCalc">Open the Stat Calculator</button></p>
+    <div class="acts"><button type="button" class="btn pri" id="run">Find the best build</button><span class="hint" id="prog" aria-live="polite"></span></div>
+  </section>
+
+  <section class="card" id="resCard" hidden>
+    <h2>Your build</h2>
+    <div id="res"></div>
+  </section>
+  <p class="foot">Stats are worked out like the Stat Calculator, with formulas that are estimates. Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>
