@@ -2,19 +2,16 @@
 const SECTIONS = [
   ["Start", "#94a3b8", [["home", "m:Gold"]]],
   [
-    "Builds & stats",
+    "Builds",
     "#14b8a6",
     [
       ["bestbuild", "e:Guardian Pendant.png"],
       ["buildmaker", "e:Clockwork.png"],
-      ["builds", "e:Celestial Rings.png"],
       ["calc", "e:Prismatic Star.png"],
+      ["builds", "e:Celestial Rings.png"],
       ["buildcmp", "m:Gold"],
-      ["h-equip", "e:ringofchampions.png"],
-      ["h-boosts", "m:Aetherium"],
     ],
   ],
-  ["Museum", "#a78bfa", [["h-museum", "m:Key of Life"]]],
   [
     "Panning",
     "#f59e0b",
@@ -23,14 +20,16 @@ const SECTIONS = [
       ["h-weights", "m:Amethyst"],
     ],
   ],
-  ["Research", "#f472b6", [["h-research", "m:Aetherite"]]],
+  ["Museum", "#a78bfa", [["h-museum", "m:Key of Life"]]],
   [
-    "Crafting & gear",
+    "Gear & boosts",
     "#60a5fa",
     [
-      ["checklist", "e:Gold Ring.png"],
+      ["h-equip", "e:ringofchampions.png"],
       ["h-gear", "g:MeteoricPan.png"],
       ["h-muts", "m:Opal"],
+      ["h-boosts", "m:Aetherium"],
+      ["h-craft", "e:Gold Ring.png"],
     ],
   ],
   [
@@ -41,13 +40,15 @@ const SECTIONS = [
       ["locations", "m:Azuralite"],
       ["h-quests", "e:MeteorCore.png"],
       ["events", "m:Starshine"],
+      ["codes", "m:Radiant Gold"],
     ],
   ],
+  ["Research", "#f472b6", [["h-research", "m:Aetherite"]]],
   [
     "More",
     "#94a3b8",
     [
-      ["h-misc", "m:Radiant Gold"],
+      ["tierlist", "m:Opal"],
       ["settings", ""],
     ],
   ],

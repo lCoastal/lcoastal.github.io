@@ -25,17 +25,18 @@ const HUBS = [
   ],
   [
     "h-luck",
-    "Luck & Drops",
-    "What you find in a pan: drop odds, the best luck cap and modifier odds",
+    "Luck & Modifiers",
+    "What you find in a pan: drop odds, the best luck cap, modifier odds and what each modifier is worth",
     [
       ["odds", "Luck Odds"],
       ["bestcap", "Best Luck Cap"],
       ["mododds", "Modifier Odds"],
+      ["minmuts", "Modifier Values"],
     ],
   ],
   [
     "h-weights",
-    "Weights & Pans",
+    "Weights & Pan Size",
     "How heavy minerals get, the Size Boost you need and how many fit in a pan",
     [
       ["weightrange", "Weight Range"],
@@ -45,10 +46,9 @@ const HUBS = [
   ],
   [
     "h-muts",
-    "Mutations & Enchants",
-    "Mineral mutations, gear mutations and enchants",
+    "Gear Mutations & Enchants",
+    "Gear mutations, pan enchants and shovel enchants",
     [
-      ["minmuts", "Mineral mutations"],
       ["mutations", "Gear mutations", "mut"],
       ["mutations", "Pan enchants", "pan"],
       ["mutations", "Shovel enchants", "sh"],
@@ -57,12 +57,11 @@ const HUBS = [
   [
     "h-equip",
     "Equipment",
-    "Every ring, necklace and charm, and your loadouts",
+    "Every ring, necklace and charm, side-by-side compare and your loadouts",
     [
       ["equipment", "All equipment"],
-      ["eqload", "Loadouts"],
-      ["craftquality", "5-Star Crafter"],
       ["eqcompare", "Equipment Compare"],
+      ["eqload", "Loadouts"],
     ],
   ],
   [
@@ -98,12 +97,12 @@ const HUBS = [
     ],
   ],
   [
-    "h-misc",
-    "Codes & Tier List",
-    "Active codes and a tier list maker",
+    "h-craft",
+    "Crafting",
+    "What to farm for what you want to craft, and the ore weights for 5 stars",
     [
-      ["codes", "Codes"],
-      ["tierlist", "Tier List"],
+      ["checklist", "Crafting Checklist"],
+      ["craftquality", "5-Star Crafter"],
     ],
   ],
 ];
