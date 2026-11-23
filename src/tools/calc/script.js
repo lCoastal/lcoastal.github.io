@@ -922,6 +922,7 @@ async function bfEngine(c,scoreTot,onProg){
   if(c.fresh){base.slots={};if(c.trinket)base.trinket="";if(c.museum){base.museumBoard={};base.mus="custom"}}
   // potions and consumables (Build Maker): none, every one at once, or as set here
   if(c.cons==="none"){base.pots=[];base.cons=[]}else if(c.cons==="all"){base.pots=((P.x2||{}).potions||[]).map(p=>p.n);base.cons=CONS.map(x=>x.n)}
+  else if(c.cons==="pick"){const PN=((P.x2||{}).potions||[]).map(p=>p.n);base.pots=(c.pots||[]).filter(n=>PN.includes(n));base.cons=(c.consList||[]).filter(n=>CONS.some(x=>x.n===n))}
   // can't do perfect digs: streak enchants never build up, and digging without Mastered means autopan at about two thirds of your luck
   const tot=st=>{const t=compute(st).tot;if(noPerf&&st.shEn!=="Mastered")t.Luck*=2/3;return t};
   const score=st=>scoreTot(tot(st),st);
@@ -990,7 +991,7 @@ async function bfEngine(c,scoreTot,onProg){
   if(TRROLL[fin.trinket])as.push(`${fin.trinket} at its ${fin.trkMax?"max":"average"} roll`);
   if(+n.mastery>0)as.push(`Location mastery +${n.mastery}× luck`);
   const rn=(fin.runes||[]).length?fin.runes:[b.purity&&"Purity",b.vet&&"Veteran",b.sun&&"Abyssal or Sunblessed",b.solo&&"Solitude"].filter(Boolean);if(rn.length)as.push("Runes: "+rn.join(", "));
-  if(c.cons==="all")as.push("Every potion and consumable active at once");else if(c.cons==="none")as.push("No potions or consumables");
+  if(c.cons==="all")as.push("Every potion and consumable active at once");else if(c.cons==="none"||(c.cons==="pick"&&!(fin.pots||[]).length&&!(fin.cons||[]).length))as.push("No potions or consumables");
   else{if((fin.pots||[]).length)as.push("Potions: "+fin.pots.join(", "));if((fin.cons||[]).length)as.push("Consumables: "+fin.cons.join(", "))}
   if(b.luckTotem||b.strTotem||b.lumTotem||+n.friendTotem>=0)as.push("Totems as set under Boosts");
   if(b.meteor||b.weather)as.push("Event: "+[b.meteor&&"Meteor Shower",b.weather&&"weather"].filter(Boolean).join(" + "));
@@ -1021,6 +1022,7 @@ async function runBf(){const c=bfCfg();if(!c.muts.length){ptToast("Pick at least
 document.addEventListener("click",e=>{const q=e.target.closest("[data-qopen]");if(!q)return;const inp=document.querySelector(`[data-q="${q.dataset.qopen}"]`);q.hidden=true;if(inp){inp.hidden=false;inp.focus();inp.select()}});
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.lvl)return;const k=t.dataset.lvl,inp=document.querySelector(`[data-q="${k}"]`),qb=document.querySelector(`[data-qopen="${k}"]`);if(!inp||!qb)return;const show=t.value!=="6"||+inp.value!==100;inp.hidden=!show;qb.hidden=show});
 window.ptFindBuild=(c,sf,onProg)=>bfEngine(c,sf,onProg);
+window.ptConsumables=()=>CONS.map(c=>({n:c.n,fx:c.fx}));
 // the saved build card for any build (Build Maker shows it on the page)
 window.ptBuildImage=async(st,title)=>{const keep={bname:S.bname,isoOff:S.isoOff,only:S.only,brkLevel:S.brkLevel,brkHide:S.brkHide};
   Object.assign(S,{bname:title||"",isoOff:[],only:null,brkLevel:0,brkHide:[]});try{return await buildImage(st,compute(st))}finally{Object.assign(S,keep)}};

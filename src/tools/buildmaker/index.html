@@ -19,6 +19,10 @@
   <section class="card">
     <div class="top"><span class="lab">Consumables</span><span class="chips" id="cons" role="group" aria-label="Consumables"></span></div>
     <p class="hint" id="consTxt"></p>
+    <div id="consPick" hidden>
+      <div class="acts"><button type="button" class="btn sm" id="pkAll">Tick all</button><button type="button" class="btn sm" id="pkNone">Untick all</button><button type="button" class="btn sm" id="pkMoney">Only money potions</button><button type="button" class="btn sm" id="pkCalc">Copy from Stat Calculator</button><span class="hint" id="pkCount"></span></div>
+      <div class="pkgrid" id="pkList"></div>
+    </div>
     <div class="top"><span class="lab">Events</span><label class="ck"><input type="checkbox" id="evMeteor"> Meteor Shower (2× luck)</label><label class="ck"><input type="checkbox" id="evWeather"> Weather (1.5× luck)</label></div>
     <p class="hint">Both on counts as 3× luck. Off means no event, whatever the Stat Calculator has set.</p>
   </section>
