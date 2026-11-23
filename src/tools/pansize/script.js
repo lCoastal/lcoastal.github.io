@@ -1,6 +1,6 @@
 (()=>{
 const $=id=>document.getElementById(id);
-let S={cap:"",want:""};try{Object.assign(S,JSON.parse(localStorage.getItem("ps-s")||"{}"))}catch(e){}
+let S={cap:"",want:"",dv:"rows"};try{Object.assign(S,JSON.parse(localStorage.getItem("ps-s")||"{}"))}catch(e){}
 const youPush=ptYouLink(S,{cap:"cap"},()=>{$("cap").value=S.cap;render()});
 const save=()=>{try{localStorage.setItem("ps-s",JSON.stringify(S))}catch(e){}youPush()};
 ptPageButtons($("acts"),()=>"Pan size "+(S.cap||""),()=>{const r=ptPageRead(null,[{h:"Minerals per pan",el:$("sum")},{h:"Capacity you need for "+(S.want||"")+" minerals",el:$("need")}]);r.title="Pan size";r.sub=["Capacity "+Number(S.cap||0).toLocaleString("en-US")];return r},"Estimates from a fitted model, so real results can differ.");
@@ -11,10 +11,11 @@ const lo=C=>Math.floor(.5*Math.sqrt(C)),hi=C=>2.5*Math.sqrt(C);
 const SHAPE=[0.17,1.84,2.8,3.24,3.45,3.21,3.46,3.6,3.9,4.35,4.1,4.15,4.05,4.4,4.56,4.1,4.73,4.41,4.75,4.33,4.57,3.43,2.61,2.11,1.85,1.6,1.36,1.27,1.1,1.11,0.82,0.8,0.79,0.69,0.5,0.38,0.43,0.37,0.29,0.18,0.13,0.01];
 const SH0=.45,SHW=.05;
 function shareOf(x0,x1){let t=0;SHAPE.forEach((v,i)=>{const a=SH0+i*SHW,b=a+SHW,o=Math.min(b,x1)-Math.max(a,x0);if(o>0)t+=v*o/SHW});return t}
-function dist(C){const r=Math.sqrt(C),a=lo(C),b=Math.round(hi(C)),step=Math.max(1,Math.ceil((b-a+1)/14)),rows=[];
+function dist(C,n){const r=Math.sqrt(C),a=lo(C),b=Math.round(hi(C)),step=Math.max(1,Math.ceil((b-a+1)/(n||14))),rows=[];
   for(let s=a;s<=b;s+=step){const e=Math.min(b,s+step-1);rows.push({s,e,p:shareOf(s/r,(e+1)/r)})}
   const tot=rows.reduce((t,x)=>t+x.p,0)||1;rows.forEach(x=>x.p=x.p/tot*100);return rows}
 const n0=v=>fmt(Math.round(v),0);
+document.querySelectorAll("[data-dv]").forEach(b=>b.addEventListener("click",()=>{S.dv=b.dataset.dv;save();render()}));
 ["cap","want"].forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t||!t.Capacity)return;S.cap=String(Math.round(t.Capacity));$("cap").value=S.cap;save();render()};
 function render(){const C=+S.cap||0;$("out").hidden=!(C>0);
@@ -24,10 +25,20 @@ function render(){const C=+S.cap||0;$("out").hidden=!(C>0);
     const x=v=>((v-a)/(b-a)*100).toFixed(1);
     $("range").innerHTML=`<div class="track"></div><div class="mk" style="left:0"></div><div class="mk" style="left:${x(m)}%"></div><div class="mk" style="left:calc(100% - 2px)"></div>
       <span class="lb l" style="left:0">${n0(a)}</span><span class="lb" style="left:${x(m)}%">avg ${fmt(m,1)}</span><span class="lb r" style="left:100%">${n0(b)}</span>`;
-    const D=dist(C),mx=Math.max(...D.map(d=>d.p));
-    $("dist").innerHTML=D.map(d=>{const has=m>=d.s&&m<d.e+1;return `<div class="dr${has?" avg":""}"><span class="dl">${d.s===d.e?n0(d.s):n0(d.s)+"–"+n0(d.e)}</span><span class="db"><i style="width:${(d.p/mx*100).toFixed(1)}%"></i></span><span class="dp">${d.p<.1&&d.p>0?"<0.1":fmt(d.p,1)}%</span></div>`}).join("");
+    const D=dist(C),mx=Math.max(...D.map(d=>d.p)),pc=p=>p<.1&&p>0?"<0.1":fmt(p,1),rng=d=>d.s===d.e?n0(d.s):n0(d.s)+"–"+n0(d.e);
+    const row=(l,p,w,on)=>`<div class="dr${on?" avg":""}"><span class="dl">${l}</span><span class="db"><i style="width:${w.toFixed(1)}%"></i></span><span class="dp">${pc(p)}%</span></div>`;
+    const dv=["rows","cols","atleast"].includes(S.dv)?S.dv:"rows";
+    document.querySelectorAll("[data-dv]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.dv===dv)));
+    $("distHint").textContent=dv==="atleast"?"Your chance that a full pan gives at least this many minerals.":dv==="cols"?"Each column is a range of pan sizes; taller means more common. Hover or tap a column for its numbers.":"Share of full pans that land in each range at your capacity. Most pans spread evenly over the lower part; the top end is rare.";
+    if(dv==="rows")$("dist").innerHTML=D.map(d=>row(rng(d),d.p,d.p/mx*100,m>=d.s&&m<d.e+1)).join("");
+    else if(dv==="atleast"){let left=100;$("dist").innerHTML=D.map(d=>{const h=row("≥ "+n0(d.s),Math.max(0,left),Math.max(0,left),m>=d.s&&m<d.e+1);left-=d.p;return h}).join("")}
+    else{const K=dist(C,30),km=Math.max(...K.map(d=>d.p)),ai=K.findIndex(d=>m>=d.s&&m<d.e+1);
+      $("dist").innerHTML=`<div class="cols">${K.map((d,i)=>`<span class="cl${i===ai?" avg":""}" tabindex="0" title="${rng(d)} minerals: ${pc(d.p)}% of pans"><i style="height:${(d.p/km*100).toFixed(1)}%"></i></span>`).join("")}</div>
+        <div class="cax"><span>${n0(K[0].s)}</span><span style="left:${((ai+.5)/K.length*100).toFixed(1)}%" class="mid">avg ${fmt(m,1)}</span><span class="r">${n0(K[K.length-1].e)}</span></div>
+        <p class="hint ctip" id="ctip">&nbsp;</p>`;
+      $("dist").querySelectorAll(".cl").forEach(el=>{const show=()=>{$("ctip").textContent=el.title};el.addEventListener("mouseenter",show);el.addEventListener("focus",show);el.addEventListener("click",show)})}
     const t0=(D.find(d=>d.s>=2.2*Math.sqrt(C))||D[D.length-1]).s,top=D.filter(d=>d.s>=t0).reduce((t,d)=>t+d.p,0);
-    $("distNote").textContent=`The highlighted row holds the average. About ${fmt(top,1)}% of pans reach ${n0(t0)} or more. From 14,306 logged pans at 5,600–10,500 capacity; at much lower or higher capacity the shape is a best guess.`}
+    $("distNote").textContent=`The highlighted ${dv==="cols"?"column":"row"} holds the average. About ${fmt(top,1)}% of pans reach ${n0(t0)} or more. From 14,306 logged pans at 5,600–10,500 capacity; at much lower or higher capacity the shape is a best guess.`}
   $("distCard").hidden=!(C>0);
   const n=+S.want||0;
   if(n>0){const avg=Math.pow(n/0.6779,1/0.56474),can=Math.pow(n/2.5,2),always=Math.pow(2*n,2);

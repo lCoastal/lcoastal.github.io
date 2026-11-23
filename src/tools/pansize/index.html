@@ -26,8 +26,9 @@
     <div class="range" id="range"></div>
   </section>
   <section class="card" id="distCard" hidden>
-    <h2>How common each pan size is</h2>
-    <p class="hint">Share of full pans that land in each range at your capacity. Most pans spread evenly over the lower part; the top end is rare.</p>
+    <div class="dhead"><h2>How common each pan size is</h2>
+      <span class="seg" role="group" aria-label="Chart style"><button type="button" data-dv="rows">Ranges</button><button type="button" data-dv="cols">Columns</button><button type="button" data-dv="atleast">At least</button></span></div>
+    <p class="hint" id="distHint"></p>
     <div class="dist" id="dist"></div>
     <p class="hint" id="distNote"></p>
   </section>
