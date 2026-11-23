@@ -61,3 +61,6 @@ h2{font:700 1.05rem var(--f-display);margin:0}
 .stt .up{color:var(--pos,#2a9d6f)}.stt .dn{color:var(--neg,#d0563b)}
 .stt tr.w0 td{color:var(--muted)}
 .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bimg{margin:12px 0;border-radius:12px;overflow:hidden;border:1px solid var(--line);min-height:60px;display:flex;align-items:center;justify-content:center}
+.bimg img{display:block;width:100%;height:auto}
+.bimg .hint{padding:20px}

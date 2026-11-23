@@ -915,6 +915,8 @@ async function bfEngine(c,scoreTot,onProg){
   if(c.sun===false)base.noSun=true;if(c.sun===true)delete base.noSun;if(c.nomad===false)base.nomadOff=true;if(c.nomad===true)delete base.nomadOff;
   if(c.trkMax!=null)base.trkMax=!!c.trkMax;if(c.mastery!=null)base.n=Object.assign({},base.n,{mastery:+c.mastery||0});
   if(c.events)base.b=Object.assign({},base.b,{meteor:!!c.events.meteor,weather:!!c.events.weather});
+  // a brand-new build (Build Maker): no equipment, trinket or museum to start from
+  if(c.fresh){base.slots={};if(c.trinket)base.trinket="";if(c.museum){base.museumBoard={};base.mus="custom"}}
   // potions and consumables (Build Maker): none, every one at once, or as set here
   if(c.cons==="none"){base.pots=[];base.cons=[]}else if(c.cons==="all"){base.pots=((P.x2||{}).potions||[]).map(p=>p.n);base.cons=CONS.map(x=>x.n)}
   // can't do perfect digs: streak enchants never build up, and digging without Mastered means autopan at about two thirds of your luck
@@ -1016,6 +1018,9 @@ async function runBf(){const c=bfCfg();if(!c.muts.length){ptToast("Pick at least
 document.addEventListener("click",e=>{const q=e.target.closest("[data-qopen]");if(!q)return;const inp=document.querySelector(`[data-q="${q.dataset.qopen}"]`);q.hidden=true;if(inp){inp.hidden=false;inp.focus();inp.select()}});
 document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.dataset.lvl)return;const k=t.dataset.lvl,inp=document.querySelector(`[data-q="${k}"]`),qb=document.querySelector(`[data-qopen="${k}"]`);if(!inp||!qb)return;const show=t.value!=="6"||+inp.value!==100;inp.hidden=!show;qb.hidden=show});
 window.ptFindBuild=(c,sf,onProg)=>bfEngine(c,sf,onProg);
+// the saved build card for any build (Build Maker shows it on the page)
+window.ptBuildImage=async(st,title)=>{const keep={bname:S.bname,isoOff:S.isoOff,only:S.only,brkLevel:S.brkLevel,brkHide:S.brkHide};
+  Object.assign(S,{bname:title||"",isoOff:[],only:null,brkLevel:0,brkHide:[]});try{return await buildImage(st,compute(st))}finally{Object.assign(S,keep)}};
 window.ptBuildTextOf=st=>{const keep=S;S=Object.assign(clone(keep),st);window.S=S;try{return buildSheetText()}finally{S=keep;window.S=keep}};
 window.ptUseBuild=(st,museum)=>{Object.assign(S,{pan:st.pan,panEn:st.panEn,shovel:st.shovel,shEn:st.shEn,trinket:st.trinket,slots:clone(st.slots)});if(museum){S.mus="custom";S.museumBoard=clone(st.museumBoard)}if(st.b&&"night" in st.b)S.b.night=st.b.night;if(st.rhy===false)S.rhy=false;save();all()};
 // a build's gear with your own boosts (for comparing builds fairly)

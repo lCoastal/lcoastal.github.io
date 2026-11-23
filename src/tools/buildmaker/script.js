@@ -36,32 +36,37 @@ $("run").onclick=async()=>{const W=STATS.filter(s=>r1(S.w[s])>0).map(s=>[s,r1(S.
   const btn=$("run");btn.disabled=true;$("prog").textContent="Loading the Stat Calculator…";
   let cw=null;try{cw=await window.parent.ptCalcWin()}catch(e){}
   if(!cw||!cw.ptFindBuild){btn.disabled=false;$("prog").textContent="";ptToast("Couldn't load the Stat Calculator");return}
-  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,night:S.night,cons:S.cons,useful:W.map(x=>x[0])},t=>scoreOf(t,W),(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
+  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,night:S.night,cons:S.cons,fresh:true,useful:W.map(x=>x[0])},t=>scoreOf(t,W),(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
   btn.disabled=false;$("prog").textContent="";LAST={R,W,cw,cons:S.cons};showRes()};
 const fv=(s,v)=>PCT.has(s)?fmt(v,v<10?1:0)+"%":fmt(v,Math.abs(v)<10?2:0);
-function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCard").hidden=false;const {R,cw,W}=L;const st=R.st,t=R.tot,b=R.base,bt=R.before;
+let IMGURL="";
+async function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCard").hidden=false;const {R,cw,W}=L;const t=R.tot;
   const wOf=s=>(W.find(x=>x[0]===s)||[,0])[1];
-  const g=Math.exp(R.sc-R.beforeSc)-1;
-  const stRows=STATS.map(s=>{const a=+t[s]||0,o=+bt[s]||0,ch=o?a/o-1:(a?1:0),w=wOf(s);const cls=Math.abs(a-o)<1e-9?"":a>o?"up":"dn";
-    return `<tr class="${w>0?"":"w0"}"><td>${s}</td><td>${w>0?w.toFixed(1):"—"}</td><td>${fv(s,a)}</td><td>${fv(s,o)}</td><td class="${cls}">${cls?(o?(ch>0?"+":"")+fmt(ch*100,Math.abs(ch)<.1?1:0)+"%":"new"):"="}</td></tr>`}).join("");
-  const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":` · ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
-  const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"—"}</td><td class="was">${now===was?"":(was||"—")}</td></tr>`;
-  const tl=(p,e)=>esc(p||"")+(e?` · ${esc(e)}`:"");
-  const rows=[row("Pan",tl(st.pan,st.panEn),tl(b.pan,b.panEn)),row("Shovel",tl(st.shovel,st.shEn),tl(b.shovel,b.shEn)),row("Trinket",esc(st.trinket||""),esc(b.trinket||""))].concat(cw.ptSlotDefs().map(([k,l])=>row(l,it(st.slots[k]),it(b.slots[k]))));
-  let mus="";if(R.museum){const bd=st.museumBoard||{};mus=`<h3 class="sec">Museum</h3><div class="mus">${cw.ptMusRows().map(([r])=>`<div><span class="lab" style="color:${rc(r)}">${r}</span> ${(bd[r]||[]).filter(Boolean).map(x=>`${esc(x.m)}${x.u&&x.u!=="None"?` <span class="hint">(${esc(x.u)})</span>`:""}`).join(", ")||"—"}</div>`).join("")}</div>`}
-  $("res").innerHTML=`<div class="sum"><div><span class="lab">Overall</span><b class="${g>0.0005?"pos":""}">${g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":g+1>=1000?"over ×1,000":"×"+fmt(g+1,g+1<10?2:0)):"no better build found"}</b><span class="hint">weighted, vs your current build</span></div></div>
-    <table class="stt"><tr><th>Stat</th><th>Weight</th><th>Build</th><th>Now</th><th>Change</th></tr>${stRows}</table>
-    <table class="bt"><tr><th></th><th>Best build</th><th>Now</th></tr>${rows.join("")}</table>${mus}
+  const ws=STATS.filter(s=>wOf(s)>0),rest=STATS.filter(s=>!(wOf(s)>0)&&Math.abs(+t[s]||0)>1e-9);
+  const tile=s=>`<div><span class="lab">${s}${wOf(s)>0?` · ${wOf(s).toFixed(1)}`:""}</span><b>${fv(s,+t[s]||0)}</b></div>`;
+  $("res").innerHTML=`<p class="hint">Weights: ${esc(wTxt())} · Consumables: ${esc((CONSOPT.find(x=>x[0]===L.cons)||[,""])[1])}</p>
+    <div class="sum">${ws.map(tile).join("")}</div>
+    <div class="bimg" id="bimg"><span class="hint">Drawing the build…</span></div>
+    ${rest.length?`<details class="own"><summary><b>Every other stat</b></summary><div class="sum">${rest.map(tile).join("")}</div></details>`:""}
     ${cw.ptWhyHTML?cw.ptWhyHTML(R):""}
-    <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
+    <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="saveImg">Save as image</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`;
+  let blob=null;try{blob=cw.ptBuildImage?await cw.ptBuildImage(R.st,"Build Maker build"):null}catch(e){console.error(e)}
+  if(LAST!==L)return;L.blob=blob;if(IMGURL)URL.revokeObjectURL(IMGURL);IMGURL=blob?URL.createObjectURL(blob):"";
+  const gear=[R.st.pan,R.st.shovel,R.st.trinket].concat(Object.values(R.st.slots||{}).map(v=>v&&v.n)).filter(Boolean);
+  $("bimg").innerHTML=blob?`<img src="${IMGURL}" alt="${esc("Build: "+gear.join(", "))}">`:'<span class="hint">Couldn\'t draw the build picture.</span>'}
 const wTxt=()=>LAST.W.map(([s,w])=>`${s} ${w.toFixed(1)}`).join(", ");
 function sheetText(){return LAST.cw.ptBuildTextOf(LAST.R.st).replace(/^(Title:[^\n]*\n)/,`$1Subtitle: Build Maker: ${wTxt()}\n`)}
 document.addEventListener("click",async e=>{if(!LAST)return;
   if(e.target.closest("#toSheet")){try{window.parent.ptCallTool("builds","ptAddBuildText",sheetText());ptToast("Saved to Build Sheets")}catch(err){ptToast("Couldn't reach Build Sheets")}return}
   if(e.target.closest("#share")){const url=await ptCopyShare(sheetText());ptToast(url?"Share link copied":"Couldn't copy, your browser blocked it");return}
   if(e.target.closest("#csv")){const L=LAST;const head=[["Goal","Build Maker"],["Weights",wTxt()],["Consumables",(CONSOPT.find(x=>x[0]===L.cons)||[,""])[1]],[]];
-    STATS.forEach(s=>head.push([s,Math.round((+L.R.tot[s]||0)*100)/100,"now",Math.round((+L.R.before[s]||0)*100)/100]));head.push([]);
-    if(await ptDownloadCSV("Build Maker",L.cw.ptFinderRows(L.R,head)))ptToast("Download started");return}
+    STATS.forEach(s=>head.push([s,Math.round((+L.R.tot[s]||0)*100)/100]));head.push([]);
+    const st=L.R.st,it=v=>v&&v.n?v.n+(v.m&&v.m!=="None"?` (${v.m})`:""):"";head.push(["Part","Build"],["Pan",[st.pan,st.panEn].filter(Boolean).join(" · ")],["Shovel",[st.shovel,st.shEn].filter(Boolean).join(" · ")],["Trinket",st.trinket||""]);
+    L.cw.ptSlotDefs().forEach(([k,l])=>head.push([l,it((st.slots||{})[k])]));
+    if(L.R.museum){head.push([],["Museum","Mineral","Modifier"]);L.cw.ptMusRows().forEach(([r])=>((st.museumBoard||{})[r]||[]).forEach((x,i)=>{if(x&&x.m)head.push([`${r} ${i+1}`,x.m,x.u||""])}))}
+    if(L.R.assume){head.push([],["Assumes"]);L.R.assume.forEach(a=>head.push([a]))}
+    if(await ptDownloadCSV("Build Maker",head))ptToast("Download started");return}
+  if(e.target.closest("#saveImg")){const b=LAST.blob;if(!b){ptToast("The picture isn't ready yet");return}ptSaveImg("Build Maker build",async()=>b);return}
   if(e.target.closest("#use")){LAST.cw.ptUseBuild(LAST.R.st,LAST.R.museum);ptToast("Loaded into the Stat Calculator")}});
 drawW();drawForm();
 (async()=>{try{const cw=await window.parent.ptCalcWin();if(cw&&cw.ptWhyCSS)document.head.insertAdjacentHTML("beforeend",`<style>${cw.ptWhyCSS}</style>`)}catch(e){}})();
