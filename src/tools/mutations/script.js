@@ -60,11 +60,11 @@ $("imgCat").onclick=()=>{const rows=catRows();if(!rows.length){ptToast("Nothing 
     note:"Put the catalyst into the Mutation Forge at Frozen Peak to reroll the item's mutation."}))};
 // odds shown as % (as in game) or "1 in N"; one setting for both enchant tabs, kept per browser
 let OF="pct";try{OF=localStorage.getItem("pmu-ofmt")||"pct"}catch(e){}
-const od=v=>{const p=parseFloat(v);if(!(p>0))return "—";if(OF==="pct")return v;const n=100/p;return "1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
+const od=v=>{const p=parseFloat(v);if(!(p>0))return "-";if(OF==="pct")return v;const n=100/p;return "1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
 const segSync=()=>document.querySelectorAll("[data-ofmt]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.ofmt===OF)));
 // pan enchants
 const pans=P.gear.pans;let panN="";try{panN=localStorage.getItem("pmu-pan")||""}catch(e){}
-$("panSel").innerHTML=`<option value="">— no pan (just show effects) —</option>`+pans.map(p=>`<option${p.name===panN?" selected":""}>${esc(p.name)}</option>`).join("");
+$("panSel").innerHTML=`<option value="">No pan (just show effects)</option>`+pans.map(p=>`<option${p.name===panN?" selected":""}>${esc(p.name)}</option>`).join("");
 const panBase=p=>({"Luck":num(p.luck)||0,"Capacity":num(p.capacity)||0,"Shake Strength":num(p.strength)||0,"Shake Speed":String(p.speed).includes("%")?num(p.speed):(num(p.speed)||0)*100});
 // the stat name in each chip is in that stat's colour (Luck green and so on); "Pan Luck" style multipliers stay white
 const sk=k=>`<b class="sk" style="color:${statVar(k)}">${esc(k)}</b>`;
@@ -80,7 +80,7 @@ function panRows(){const p=pans.find(x=>x.name===$("panSel").value);const only=$
 function panTable(){const {base,rows,bestLuck}=panRows();
   $("pans").innerHTML=`<thead><tr><th>Enchant</th><th>Effect</th>${base?`<th class="r">Pan Luck</th><th class="r">Pan Capacity</th>`:""}<th class="r">Aurorite</th><th class="r">Aetherite</th><th class="r">Aetherium</th><th>Book</th><th></th></tr></thead><tbody>${rows.map(({e,res})=>`<tr class="${res&&res.Luck===bestLuck?"best":""}"><td class="nm">${esc(e.n)}</td><td class="full">${fxChips(e)}</td>
     ${res?`<td class="r" data-l="Luck">${fmt(base.Luck,2)} → <b>${fmt(res.Luck,1)}</b></td><td class="r" data-l="Capacity">${fmt(base.Capacity,2)} → <b>${fmt(res.Capacity,1)}</b></td>`:""}
-    <td class="r" data-l="Aurorite">${od(e.ch[0])}</td><td class="r" data-l="Aetherite">${od(e.ch[1])}</td><td class="r" data-l="Aetherium">${od(e.ch[2])}</td><td class="muted" style="font-size:12.5px">${e.src?esc(e.src):"—"}</td>${hideBtn("pan",e.n)}</tr>`).join("")||`<tr><td colspan="10" class="muted">Every enchant here is hidden.</td></tr>`}</tbody>`;
+    <td class="r" data-l="Aurorite">${od(e.ch[0])}</td><td class="r" data-l="Aetherite">${od(e.ch[1])}</td><td class="r" data-l="Aetherium">${od(e.ch[2])}</td><td class="muted" style="font-size:12.5px">${e.src?esc(e.src):"-"}</td>${hideBtn("pan",e.n)}</tr>`).join("")||`<tr><td colspan="10" class="muted">Every enchant here is hidden.</td></tr>`}</tbody>`;
   $("panHid").innerHTML=hidBar("pan");
   try{localStorage.setItem("pmu-pan",$("panSel").value)}catch(e){}}
 $("panSel").onchange=panTable;$("onlyAeth").onchange=panTable;panTable();
@@ -105,7 +105,7 @@ $("imgPan").onclick=()=>{const {p,base,only,rows,bestLuck}=panRows();if(!rows.le
     :[{h:"Enchant",w:.16},{h:"Effect",w:.4},{h:"Aurorite",w:.1,al:"r"},{h:"Aetherite",w:.1,al:"r"},{h:"Aetherium",w:.1,al:"r"},{h:"Book",w:.14}];
   const sub=[`${rows.length} enchant${rows.length===1?"":"s"}`];if(p)sub.push("on the "+p.name);if(only)sub.push("Aetherium only");if(HID.pan.length)sub.push(`${HID.pan.length} hidden`);
   return ptSaveImg(p?`Pan enchants on ${p.name}`:"Pan enchants",()=>ptTableImage({title:p?`Pan enchants on the ${p.name}`:"Pan enchants",sub,
-    sections:[{cols,rows:rows.map(({e,res})=>({cells:[{t:e.n,b:true,col:res&&res.Luck===bestLuck?"#3cc2a8":"#e6e9ec"},{chips:chipsOf(e)}].concat(res?[{t:fmt(res.Luck,1),sub:"from "+fmt(base.Luck,2),mono:true},{t:fmt(res.Capacity,1),sub:"from "+fmt(base.Capacity,2),mono:true}]:[]).concat([{t:od(e.ch[0]),mono:true},{t:od(e.ch[1]),mono:true},{t:od(e.ch[2]),mono:true},{t:e.src||"—",col:"#98a2ad",fs:12.5,wrap:true}])}))}]}))};
+    sections:[{cols,rows:rows.map(({e,res})=>({cells:[{t:e.n,b:true,col:res&&res.Luck===bestLuck?"#3cc2a8":"#e6e9ec"},{chips:chipsOf(e)}].concat(res?[{t:fmt(res.Luck,1),sub:"from "+fmt(base.Luck,2),mono:true},{t:fmt(res.Capacity,1),sub:"from "+fmt(base.Capacity,2),mono:true}]:[]).concat([{t:od(e.ch[0]),mono:true},{t:od(e.ch[1]),mono:true},{t:od(e.ch[2]),mono:true},{t:e.src||"-",col:"#98a2ad",fs:12.5,wrap:true}])}))}]}))};
 $("imgSh").onclick=()=>{const rows=X.shovel.filter(e=>!HID.sh.includes(e.n));if(!rows.length){ptToast("Nothing to save, every enchant is hidden");return}
   const sub=[`${rows.length} enchant${rows.length===1?"":"s"}`,"enchant at the altar in the Azuralite Oasis"];if(HID.sh.length)sub.push(`${HID.sh.length} hidden`);
   return ptSaveImg("Shovel enchants",()=>ptTableImage({title:"Shovel enchants",sub,

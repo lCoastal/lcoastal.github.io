@@ -9,7 +9,7 @@ const CFG={
 }[KIND];
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const num=v=>{const s=String(v??"").replace(/,/g,"");const n=parseFloat(s);return isNaN(n)?null:(s.endsWith("%")?n/100:n)};
-const fmt=n=>n==null?"—":n.toLocaleString("en-US",{maximumFractionDigits:2});
+const fmt=n=>n==null?"-":n.toLocaleString("en-US",{maximumFractionDigits:2});
 const rc=r=>"var(--c-"+String(r).toLowerCase()+")";
 const LOCS=new Set(D.locs);
 const ALIAS={"Rubble Creek":"Rubble Creek Sands","The Magma Furnace":"Magma Furnace","Crystal Caverns":"Crystal Cavern River"};
@@ -22,7 +22,7 @@ const ITEMS=D.items.map((x,i)=>{if(/^Given to the player/.test(x.location))x={..
   const s={};CFG.stats.forEach(([k])=>s[k]=num(x[k]));
   return {...x,i,ev,price,cur,s,img:D.img[x.image]||""}});
 const priceHtml=x=>x.cur==="free"?'Free<small>starter</small>':x.cur==="$"?"$"+fmt(x.price):`${fmt(x.price)}<small>${esc(x.cur)}</small>`;
-const passHtml=p=>p?p.split(/,\s*(?![^(]*\))/).map(t=>t.replace(/^([+\-−]?\d+(?:\.\d+)?%)/,(m)=>`<em>${m.replace("-","−")}</em>`)).map(t=>`<span class="${/^<em>−/.test(t)?"neg":""}">${t}</span>`).join(", "):'<span class="none">—</span>';
+const passHtml=p=>p?p.split(/,\s*(?![^(]*\))/).map(t=>t.replace(/^([+\-−]?\d+(?:\.\d+)?%)/,(m)=>`<em>${m.replace("-","−")}</em>`)).map(t=>`<span class="${/^<em>−/.test(t)?"neg":""}">${t}</span>`).join(", "):'<span class="none">-</span>';
 
 const Store={get:n=>{try{return window.parent.ptStore.get(n)}catch(e){return {}}},toggle:(n,k)=>{try{window.parent.ptStore.toggle(n,k)}catch(e){}}};
 const tgHtml=n=>{const s=Store.get(n);return `<span class="tg"><button type="button" class="fav" data-tg="fav" data-name="${esc(n)}" aria-pressed="${!!s.fav}" title="Favourite" aria-label="Favourite ${esc(n)}">★</button><button type="button" class="own" data-tg="own" data-name="${esc(n)}" aria-pressed="${!!s.own}" title="I own this" aria-label="Owned: ${esc(n)}">✓</button></span>`};
@@ -46,7 +46,7 @@ function table(rows,ev){
     <td class="pr">${priceHtml(x)}</td>
     ${CFG.stats.map(([k])=>{const v=x.s[k];const top=v!=null&&v===max[k]&&rows.length>1;return `<td class="n${top?" top":""}" data-l="${esc((CFG.stats.find(z=>z[0]===k)||[])[2]||(CFG.stats.find(z=>z[0]===k)||[])[1])}" ${top?'title="Highest in this list"':""}>${fmt(v)}${v!=null&&max[k]?`<span class="bar" style="width:${(v/max[k]*100).toFixed(1)}%"></span>`:""}</td>`}).join("")}
     ${CFG.passive?`<td class="ps">${passHtml(x.passive)}</td>`:""}
-    ${CFG.upg?`<td class="n" data-l="Upg.">${u?u.points+" pts":'<span class="none">—</span>'}</td>`:""}
+    ${CFG.upg?`<td class="n" data-l="Upg.">${u?u.points+" pts":'<span class="none">-</span>'}</td>`:""}
     <td class="lc">${locHtml(x.location)}</td></tr>`}).join("");
   return `<section class="grp${ev?" ev":""}"><div class="gh"><b>${ev?"Limited-time "+KIND:"Shop "+KIND}</b><span>${rows.length} ${rows.length===1?"item":"items"}${ev?", event currency or past events":", in the order you unlock them"}</span></div>
     <div class="tw"><table class="gear"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></section>`}
@@ -103,7 +103,7 @@ function openItem(i){
   document.getElementById("cmpWith").onchange=e=>{const y=ITEMS[+e.target.value];const o=document.getElementById("cmpOut");if(!e.target.value){o.innerHTML="";return}
     const rowsC=[["Price",x.cur==="$"||x.cur==="free"?x.price:null,y.cur==="$"||y.cur==="free"?y.price:null,true],...CFG.stats.map(([k,l])=>[l,x.s[k],y.s[k]])];
     o.innerHTML=`<table class="cmpt"><tr><th>Stat</th><th>${esc(x.name)}</th><th>${esc(y.name)}</th><th>Difference</th></tr>${rowsC.map(([l,a,b,isP])=>{const d=a!=null&&b!=null?+(a-b).toFixed(3):null;const good=isP?d<0:d>0;
-      return `<tr><td>${l}</td><td>${isP&&a!=null?"$"+fmt(a):fmt(a)}</td><td>${isP&&b!=null?"$"+fmt(b):fmt(b)}</td><td class="${d?good?"up":"dn":""}">${d==null?"—":(d>0?"+":d<0?"−":"±")+(isP?"$":"")+fmt(Math.abs(d))}</td></tr>`}).join("")}
+      return `<tr><td>${l}</td><td>${isP&&a!=null?"$"+fmt(a):fmt(a)}</td><td>${isP&&b!=null?"$"+fmt(b):fmt(b)}</td><td class="${d?good?"up":"dn":""}">${d==null?"-":(d>0?"+":d<0?"−":"±")+(isP?"$":"")+fmt(Math.abs(d))}</td></tr>`}).join("")}
       ${CFG.passive?`<tr><td>Passive</td><td style="white-space:normal;font-family:var(--f-body)">${passHtml(x.passive)}</td><td style="white-space:normal;font-family:var(--f-body)">${passHtml(y.passive)}</td><td></td></tr>`:""}</table>`};
   lastFocus=document.activeElement;scrim.hidden=false;document.getElementById("pclose").onclick=closeItem;document.getElementById("pclose").focus();
 }

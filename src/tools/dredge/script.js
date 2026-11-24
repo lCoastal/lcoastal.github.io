@@ -46,9 +46,9 @@ const MINS=P.mins.filter(m=>ZONES.some(z=>fullList(z).some(x=>x.m===m))).sort((a
 const ACITEMS=MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)}));
 const findMin=t=>{t=String(t||"").trim().toLowerCase();return t?MINS.find(m=>m.n.toLowerCase()===t):null};
 const isVoid=z=>/Void/.test(z);
-const oneInD=p=>{if(!(p>0))return "—";const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
+const oneInD=p=>{if(!(p>0))return "-";const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
 const hrs=pans=>{const pph=+S.pph;if(!(pph>0)||!isFinite(pans))return "";const h=pans/pph;return h*60<1?"under 1 min":h<1?fmt(h*60,0)+" min":h<48?fmt(h,1)+" h":fmt(h/24,1)+" days"};
-const pansT=x=>!isFinite(x)?"—":x<1?"under 1":x<10?fmt(x,1):fmt(Math.round(x),0);
+const pansT=x=>!isFinite(x)?"-":x<1?"under 1":x<10?fmt(x,1):fmt(Math.round(x),0);
 const pansW=x=>(x<1?"under 1 pan":(x<10?fmt(x,1):fmt(Math.round(x),0))+(Math.round(x*10)/10===1?" pan":" pans"));
 // best (zone, cap) for a group of wanted items: the one where the slowest item finishes first
 function bestFor(group,L,per){let best=null;
@@ -112,7 +112,7 @@ $("toImg").onclick=()=>{const r=plan();if(!r||r.none){ptToast(r?"No zone drops t
   const sub=[`Luck ${fmt(Math.max(1,effLuck()),0)}`,`Capacity ${fmt(+S.cap||1,0)}`,`${p.stops.length} stop${p.stops.length===1?"":"s"}`,`${p.total<1?"":"~"}${pansW(p.total)} in total`];if(walk)sub.push(`plus ~${fmt(walk,0)} pans walking`);if(pph&&hrs(p.total))sub.push("about "+hrs(p.total));
   const cols=[{h:"Mineral",w:pph?.34:.4},{h:"How many",w:.12,al:"r"},{h:"Per mineral",w:.2,al:"r"},{h:"Pans",w:pph?.17:.28,al:"r"}].concat(pph?[{h:"Time",w:.17,al:"r"}]:[]);
   const rows=[];p.stops.forEach((st,k)=>{rows.push({group:`${p.stops.length>1?"Stop "+(k+1)+", ":""}${st.z}${isVoid(st.z)?" (loot pool changes)":""}, ${st.cap==null?"No cap":"Luck cap "+fmt(st.cap,0)}, ${st.pans<1?"":"about "}${pansW(st.pans)}`});
-    st.its.forEach(x=>rows.push({cells:[{t:x.g.m.n,b:true,ic:x.g.m.ic,sub:x.g.m.r,subcol:RHX[x.g.m.r]||"#98a2ad"},{t:fmt(x.g.n,0)+"×",mono:true},{t:oneInD(x.e),mono:true},{t:(x.pans<1?"":"~")+pansW(x.pans),mono:true}].concat(pph?[{t:hrs(x.pans)||"—",mono:true}]:[])}))});
+    st.its.forEach(x=>rows.push({cells:[{t:x.g.m.n,b:true,ic:x.g.m.ic,sub:x.g.m.r,subcol:RHX[x.g.m.r]||"#98a2ad"},{t:fmt(x.g.n,0)+"×",mono:true},{t:oneInD(x.e),mono:true},{t:(x.pans<1?"":"~")+pansW(x.pans),mono:true}].concat(pph?[{t:hrs(x.pans)||"-",mono:true}]:[])}))});
   const t=r.want.map(w=>`${fmt(w.n,0)}× ${w.m.n}`).join(", ");
   ptSaveImg("Dredge Master plan",()=>ptTableImage({title:"What the Dredge Master wants",sub,sections:[{h:t,cols,rows}],note:"Estimates only: modifiers, Size Boost, enchants, events and weather aren't counted."}))};
 window.ptRefresh=()=>{youPull(["luck","cap","pph"]);render()};

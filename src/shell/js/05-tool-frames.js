@@ -628,6 +628,7 @@ window.ptCopyShare=function(text){const pr=window.ptPackText(text).then(window.p
 // one look for every tool: base styles for titles, notes, buttons, chips, toggles, tabs, tables and cards.
 // Wrapped in :where() so they weigh nothing: a tool's own specific rules still win.
 const PT_KIT_CSS =
+  "html:has(.scrim:not([hidden])),html:has(.ov:not([hidden])),html:has(.picker:not([hidden])){overflow:hidden}" +
   ":where(h1){font-family:var(--f-display);font-size:2rem;line-height:1.1;margin:0;text-wrap:balance}" +
   "@media (max-width:600px){:where(h1){font-size:1.6rem}}" +
   ":where(h2){font:700 1.05rem var(--f-display);margin:0}" +

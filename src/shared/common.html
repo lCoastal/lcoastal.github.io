@@ -72,7 +72,7 @@ const P=(()=>{try{return window.parent.PTDATA||null}catch(e){return null}})()||{
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const rc=r=>"var(--c-"+String(r).toLowerCase()+")";
 const num=v=>{const s=String(v??"").replace(/,/g,"").trim();const n=parseFloat(s);return isNaN(n)?null:n};
-const fmt=(n,d=2)=>n==null||!isFinite(n)?"—":Number(n).toLocaleString("en-US",{maximumFractionDigits:d});
+const fmt=(n,d=2)=>n==null||!isFinite(n)?"-":Number(n).toLocaleString("en-US",{maximumFractionDigits:d});
 const MIN=Object.fromEntries(P.mins.map(m=>[m.n.toLowerCase(),m]));
 const oneIn=s=>parseFloat(String(s).split("=")[0].replace(/1 in\s*/,"").replace(/,/g,""))||Infinity;
 const baseLoc=n=>n.replace(/\s*\((inside|outside) Firefly Zones\)/,"").replace(/\s*\(when in the loot pool\)/,"");

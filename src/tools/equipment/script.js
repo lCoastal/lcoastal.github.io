@@ -84,14 +84,14 @@ const bpTag=x=>x.bp?`<span class="bp" title="${esc(x.bp)}">${BPI}Blueprint</span
 $("q").oninput=()=>{st.q=$("q").value.trim().toLowerCase();render()};
 $("sort").onchange=()=>{st.sort=$("sort").value;st.rev=false;save();render()};
 $("dir").onclick=()=>{st.rev=!st.rev;save();render()};
-const priceHtml=x=>x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):`${fmt(x.price)}<small>${esc(x.cur)}</small>`;
+const priceHtml=x=>x.price==null?"-":x.cur==="$"?"$"+fmt(x.price):`${fmt(x.price)}<small>${esc(x.cur)}</small>`;
 const matHtml=([q,n,kg],big)=>{const m=MIN[n.toLowerCase()];return `<span data-mineral="${esc(n)}" title="${esc(n)}${kg?" (+"+esc(kg)+")":""}, Ctrl+click to open">${m&&m.ic?`<img src="${m.ic}" alt="" width="18" height="18" loading="lazy">`:""}<span class="q">${q}×</span>${esc(n)}${kg?` <span class="muted">+${esc(kg)}</span>`:""}</span>`};
 const sName=n=>KCOL[n]?`<span class="sk" style="color:var(--k-${KCOL[n]})">${esc(n)}</span>`:esc(n);
 const stHtml=(x,hl)=>st.lvls.length===1?statsAt(x,st.lvl).map(r=>`<span class="${r[1]<0?"neg":""}${hl&&r[0].toLowerCase().includes(hl)?" hl":""}">${sName(r[0])} <em>${svr(r)}</em></span>`).join(""):multiHtml(x,hl);
 // one row per stat, one column per picked level; Sunforged can add Luck and Sell Boost rows the item doesn't normally have
 function multiRows(x){const per=st.lvls.map(l=>statsAt(x,l));const names=[];per.forEach(rs=>rs.forEach(r=>{if(!names.includes(r[0]))names.push(r[0])}));
   return names.map(n=>({n,v:per.map(rs=>rs.find(r=>r[0]===n)||null)}))}
-const multiHtml=(x,hl)=>`<table class="mst"><tr><th></th>${st.lvls.map(l=>`<th>${LVLS[l]}</th>`).join("")}</tr>${multiRows(x).map(({n,v})=>`<tr${hl&&n.toLowerCase().includes(hl)?' class="hl"':""}><td>${sName(n)}</td>${v.map(r=>r?`<td class="${r[1]<0?"neg":""}">${svr(r)}</td>`:`<td class="na">—</td>`).join("")}</tr>`).join("")}</table>`;
+const multiHtml=(x,hl)=>`<table class="mst"><tr><th></th>${st.lvls.map(l=>`<th>${LVLS[l]}</th>`).join("")}</tr>${multiRows(x).map(({n,v})=>`<tr${hl&&n.toLowerCase().includes(hl)?' class="hl"':""}><td>${sName(n)}</td>${v.map(r=>r?`<td class="${r[1]<0?"neg":""}">${svr(r)}</td>`:`<td class="na">-</td>`).join("")}</tr>`).join("")}</table>`;
 
 // rarity sort shows the rarest first, so it counts as descending
 const RNAT=-1;
@@ -135,7 +135,7 @@ function cmpTable(x,y){
   const g=(rows,n)=>{const r=rows.find(z=>z[0]===n);return r?{v:r[1],u:r[2]?"%":""}:null};
   const hx=`${esc(x.n)}<br><small class="muted">${LVLN[cmpLvl]}</small>`,hy=y?`${esc(y.n)}<br><small class="muted">${LVLN[cmpLvl2]}</small>`:"";
   return `<table class="st"><tr><th>Stat</th><th>${hx}</th>${y?`<th>${hy}</th><th>Difference</th>`:""}</tr>${names.map(n=>{const a=g(A,n),b=y?g(B,n):null;const d=(a?a.v:0)-(b?b.v:0);
-    return `<tr><td>${esc(n)}</td><td>${a?fmt(a.v)+a.u:"—"}</td>${y?`<td>${b?fmt(b.v)+b.u:"—"}</td><td class="${d>0?"up":d<0?"dn":""}">${d>0?"+":d<0?"−":"±"}${fmt(Math.abs(d))}${(a||b).u}</td>`:""}</tr>`}).join("")}</table>`}
+    return `<tr><td>${esc(n)}</td><td>${a?fmt(a.v)+a.u:"-"}</td>${y?`<td>${b?fmt(b.v)+b.u:"-"}</td><td class="${d>0?"up":d<0?"dn":""}">${d>0?"+":d<0?"−":"±"}${fmt(Math.abs(d))}${(a||b).u}</td>`:""}</tr>`}).join("")}</table>`}
 let cmpLvl="6",cmpLvl2="p";
 function showEquip(i){
   const x=E[i];if(!x)return;cur=x;try{window.ptRecent&&ptRecent("Equipment",x.n)}catch(e){}
@@ -143,14 +143,14 @@ function showEquip(i){
   const others=E.filter(y=>y.slot===x.slot&&y!==x);
   page.innerHTML=`<div class="ph"><div class="icon">${x.img?`<img src="${window.ptBig?ptBig(x.img):x.img}" alt="" width="120" height="120">`:""}</div>
       <div><span class="rr" style="--rc:${rc(x.r)}">${x.r} ${x.slot}${x.ev?", limited-time":""}</span><h2 id="pname">${esc(x.n)}</h2>${oneTag(x)}</div>
-      <div class="pv">${x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):fmt(x.price)+" "+esc(x.cur)}<small>craft cost</small></div>
+      <div class="pv">${x.price==null?"-":x.cur==="$"?"$"+fmt(x.price):fmt(x.price)+" "+esc(x.cur)}<small>craft cost</small></div>
       <button type="button" class="btn" id="pclose">Close</button></div>
     ${x.d?`<p class="desc">${esc(x.d)}</p>`:""}
     ${["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"].includes(x.n)?`<p style="margin:0;color:var(--warn);font-weight:600;font-size:13.5px">Only one can be worn at a time.</p>`:""}
     ${x.bp?`<div class="bpbox"><b>Needs a blueprint</b>${x.bp==="Needs a blueprint"?"The wiki doesn't say where this blueprint comes from":esc(x.bp)}.</div>`:""}
     <div class="acts">${tgHtml(x.n)}<button type="button" class="btn pri" id="addCk">Add to crafting checklist</button><button type="button" class="btn" id="addCk6">Add as 6★ (2 crafts)</button></div>
     <div class="psec"><h3>Stats by star level</h3><div class="tw"><table class="st"><tr><th>Stat</th><th>5★ max</th><th>6★ max</th><th>6★ Prismatic</th><th>6★ Sunforged</th></tr>
-      ${(()=>{const S=statsAt(x,"s");return S.map(r=>{const s=x.st.find(z=>z[0]===r[0]);const u=r[2]?"%":"";return `<tr><td>${sName(r[0])}</td><td>${s?fmt(at(s,"5"))+u:"—"}</td><td>${s?fmt(at(s,"6"))+u:"—"}</td><td>${s?fmt(at(s,"p"))+u:"—"}</td><td>${fmt(r[1])+u}</td></tr>`}).join("")})()}</table></div>
+      ${(()=>{const S=statsAt(x,"s");return S.map(r=>{const s=x.st.find(z=>z[0]===r[0]);const u=r[2]?"%":"";return `<tr><td>${sName(r[0])}</td><td>${s?fmt(at(s,"5"))+u:"-"}</td><td>${s?fmt(at(s,"6"))+u:"-"}</td><td>${s?fmt(at(s,"p"))+u:"-"}</td><td>${fmt(r[1])+u}</td></tr>`}).join("")})()}</table></div>
       <p class="muted" style="margin:0;font-size:12.5px">All at 100% quality. Prismatic gives 1.6× the 6★ values. Sunforged gives 1.5× plus +300 Luck and +30% Sell Boost.</p></div>
     <div class="psec"><h3>Recipe</h3><ul class="ing">${x.rec.map(([q,n,kg])=>{const m=MIN[n.toLowerCase()];return `<li style="--rc:${m?rc(m.r):"var(--line)"}" data-mineral="${esc(n)}" title="Ctrl+click to open ${esc(n)}">${m&&m.ic?`<img src="${m.ic}" alt="" width="26" height="26">`:""}<span class="q">${q}×</span><span>${esc(n)}${kg?` <span class="muted">(+${esc(kg)})</span>`:""}<br><span class="rr" style="--rc:${m?rc(m.r):"var(--muted)"}">${m?m.r:""}</span></span></li>`}).join("")}</ul></div>
     ${catSection(x)}
@@ -235,11 +235,11 @@ async function equipImage(){
         const nameW=150,colW=(CW[2]-24-nameW)/NL,colR=i=>CX[2]+12+nameW+colW*(i+1);let sy=yy+(r.h-(r.S.length+1)*21)/2;
         c.font=`600 10.5px ${F}`;c.fillStyle="#98a2ad";st.lvls.forEach((l,i)=>{const t=LVLS[l].toUpperCase();c.fillText(t,colR(i)-c.measureText(t).width,sy+14)});sy+=21;
         r.S.forEach(({n:sn,v})=>{c.font=`600 13.5px ${F}`;c.fillStyle=KHX[sn]||"#e6e9ec";c.fillText(fit(sn,nameW-8),CX[2]+12,sy+15);
-          c.font=`14px ${FM}`;v.forEach((q,i)=>{const t=q?vtx(sn,q[1],q[2]):"—";c.fillStyle=!q?"#5d6670":q[1]<0?"#ef7a66":"#e6e9ec";c.fillText(t,colR(i)-c.measureText(t).width,sy+15)});sy+=21})}
+          c.font=`14px ${FM}`;v.forEach((q,i)=>{const t=q?vtx(sn,q[1],q[2]):"-";c.fillStyle=!q?"#5d6670":q[1]<0?"#ef7a66":"#e6e9ec";c.fillText(t,colR(i)-c.measureText(t).width,sy+15)});sy+=21})}
       // recipe
       let ry=yy+(r.h-r.R.length*26)/2;r.R.forEach(ln=>{let rx=CX[3]+12;ln.forEach(it=>{const mm=MIN[it.n.toLowerCase()];const mi=mm&&IMG[mm.ic];if(mi)c.drawImage(mi,rx,ry+3,18,18);c.font=`13px ${F}`;const q=it.t.split("× ")[0]+"×";c.fillStyle="#98a2ad";c.fillText(q,rx+22,ry+17);const qw=c.measureText(q+" ").width;c.fillStyle="#e6e9ec";c.fillText(it.t.slice(q.length+1),rx+22+qw,ry+17);rx+=it.w});ry+=26});
       // price
-      c.font=`600 14px ${FM}`;c.fillStyle="#e6e9ec";const sh=v=>{const u=[[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]].find(([d])=>v>=d);return u?fmt(v/u[0],2)+u[1]:fmt(v)};const pt=x.price==null?"—":x.cur==="$"?"$"+sh(x.price):sh(x.price)+" "+x.cur;c.fillText(pt,CX[4]+(CW[4]-c.measureText(pt).width)/2,yy+r.h/2+5);
+      c.font=`600 14px ${FM}`;c.fillStyle="#e6e9ec";const sh=v=>{const u=[[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]].find(([d])=>v>=d);return u?fmt(v/u[0],2)+u[1]:fmt(v)};const pt=x.price==null?"-":x.cur==="$"?"$"+sh(x.price):sh(x.price)+" "+x.cur;c.fillText(pt,CX[4]+(CW[4]-c.measureText(pt).width)/2,yy+r.h/2+5);
       yy+=r.h});
     y+=gh+GGAP});
   return await new Promise(res=>cv.toBlob(res,"image/png"))}

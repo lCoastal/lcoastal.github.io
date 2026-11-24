@@ -5,7 +5,7 @@ const save=()=>{try{localStorage.setItem("pfr-s",JSON.stringify(S))}catch(e){}};
 const looseMin=n=>{const k=n.trim().toLowerCase();if(MIN[k])return MIN[k];const s=k.replace(/[^a-z0-9]/g,"");return s?P.mins.find(m=>m.n.toLowerCase().replace(/[^a-z0-9]/g,"")===s)||null:null};
 function parse(txt){const out=[],bad=[];
   txt.split(/\n+/).forEach(line=>{line=line.trim();if(!line||/^total\b/i.test(line))return;let body=line;const m=line.match(/^([A-Za-z]+)\s*:\s*(.*)$/);if(m&&RT.RARS.some(r=>r.toLowerCase()===m[1].toLowerCase()))body=m[2];
-    body.split(/,(?![^(]*\))/).forEach(it=>{it=it.trim();if(!it||/^empty$/i.test(it)||it==="—"||/^any\b/i.test(it))return;const mm=it.match(/^(.*?)\s*(?:\(([^)]+)\))?\s*$/);const mi=looseMin(mm[1]);
+    body.split(/,(?![^(]*\))/).forEach(it=>{it=it.trim();if(!it||/^empty$/i.test(it)||it==="-"||it==="—"||/^any\b/i.test(it))return;const mm=it.match(/^(.*?)\s*(?:\(([^)]+)\))?\s*$/);const mi=looseMin(mm[1]);
       let u=(mm[2]||"None").trim();if(/^any\b/i.test(u))u="None";u=RT.MODS.find(x=>x.toLowerCase()===u.toLowerCase())||u;
       if(!mi){bad.push(mm[1]);return}if(!out.some(o=>o.m===mi))out.push({m:mi,u})})});
   return {items:out,bad}}

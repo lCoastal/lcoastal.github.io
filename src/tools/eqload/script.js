@@ -87,7 +87,7 @@ $("nRings").oninput=()=>{L().nRings=Math.max(0,Math.min(6,+$("nRings").value||0)
 $("oRobux").onchange=()=>{L().robux=$("oRobux").checked;save();render()};
 // ---- compare ----
 // % better or worse than the other loadout; "new" when the other has none of that stat
-const pctT=(a,b)=>{if(Math.abs(a-b)<1e-9)return "same";if(Math.abs(b)<1e-9)return a>0?"new":"—";const p=(a-b)/Math.abs(b)*100;return (p>0?"+":"−")+fmt(Math.abs(p),Math.abs(p)<10?1:0)+"%"+(p>0?" better":" worse")};
+const pctT=(a,b)=>{if(Math.abs(a-b)<1e-9)return "same";if(Math.abs(b)<1e-9)return a>0?"new":"-";const p=(a-b)/Math.abs(b)*100;return (p>0?"+":"−")+fmt(Math.abs(p),Math.abs(p)<10?1:0)+"%"+(p>0?" better":" worse")};
 function renderCmp(){const l=L();const others=D.list.filter(x=>x.id!==l.id);
   $("cmpSel").innerHTML=`<option value="">${others.length?"Pick a loadout":"Make another loadout to compare"}</option>`+others.map(x=>`<option value="${x.id}"${x.id===D.cmp?" selected":""}>${esc(x.name||"Untitled loadout")}</option>`).join("");
   const o=others.find(x=>x.id===D.cmp);if(!o){$("cmp").innerHTML='<p class="hint">Pick another saved loadout to see the stat differences side by side.</p>';return}

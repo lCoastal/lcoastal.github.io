@@ -391,7 +391,7 @@ export default {
       loc: "Volcanic Sands",
       npc: "Disgruntled Local",
       n: "Fireproofing",
-      sub: "The heat’s unbearable — bring materials that can handle it.",
+      sub: "The heat’s unbearable, bring materials that can handle it.",
       steps: ["Collect 100 Obsidian.", "Collect 100 Copper.", "Collect 20 Pyronium.", "Collect 1 Cinnabar."],
       rw: "$5,000,000 • 100,000 XP • 600 Meteor Shards",
       buff: "",
@@ -1233,7 +1233,7 @@ export default {
     {
       n: "Chief Archaeologist",
       reg: "Volcanic Sands",
-      d: "The Chief Archaeologist is a quest-giving NPC located at the Volcanic Ruins excavation camp. They are in charge of the dig site and offer players the chance to participate in excavations — for a price.",
+      d: "The Chief Archaeologist is a quest-giving NPC located at the Volcanic Ruins excavation camp. They are in charge of the dig site and offer players the chance to participate in excavations, for a price.",
     },
     {
       n: "A Site Manager",
@@ -1283,7 +1283,7 @@ export default {
     {
       n: "Master of the Forge",
       reg: "Magma Furnace",
-      d: "The Master of the Forge is a quest-giving NPC in The Magma Furnace, inside the volcano in Caldera Park. A boisterous smith who demands great sacrifice for top-tier gear, he is happy to mentor any aspiring crafter — so long as they don't leave a mess or sue him for magma-related injuries.",
+      d: "The Master of the Forge is a quest-giving NPC in The Magma Furnace, inside the volcano in Caldera Park. A boisterous smith who demands great sacrifice for top-tier gear, he is happy to mentor any aspiring crafter, so long as they don't leave a mess or sue him for magma-related injuries.",
     },
     {
       n: "Arctic Traveler",
@@ -1298,7 +1298,7 @@ export default {
     {
       n: "Apprentice Blacksmith",
       reg: "Snowy Shores",
-      d: "The Apprentice Blacksmith is a quest-giving NPC located in Snowy Shores. He is a young smith who finds himself way out of his element in the freezing cold, desperately searching for Mythril to prove the old family legends true—even if the shivering and lack of results have him constantly on the verge of packing it in and heading home.",
+      d: "The Apprentice Blacksmith is a quest-giving NPC located in Snowy Shores. He is a young smith who finds himself way out of his element in the freezing cold, desperately searching for Mythril to prove the old family legends true-even if the shivering and lack of results have him constantly on the verge of packing it in and heading home.",
     },
     { n: "Sherpa", reg: "Snowy Shores", d: "The Sherpa is an NPC located in Snowy Shores." },
     {
@@ -1542,7 +1542,7 @@ export default {
     {
       n: "Meteor Guardian",
       reg: "Astral Caverns",
-      d: "The Meteor Guardian is a quest-giving NPC located in the Meteor Valley. He is a dramatic spirit who insists the sky is falling—literally.",
+      d: "The Meteor Guardian is a quest-giving NPC located in the Meteor Valley. He is a dramatic spirit who insists the sky is falling-literally.",
     },
     {
       n: "Merchant",
@@ -1639,7 +1639,7 @@ export default {
     {
       n: "Chief Archaeologist",
       reg: "Sandstone Stream",
-      d: "The Chief Archaeologist is a quest-giving NPC located at the Volcanic Ruins excavation camp. They are in charge of the dig site and offer players the chance to participate in excavations — for a price.",
+      d: "The Chief Archaeologist is a quest-giving NPC located at the Volcanic Ruins excavation camp. They are in charge of the dig site and offer players the chance to participate in excavations, for a price.",
     },
     {
       n: "Two Tourists",

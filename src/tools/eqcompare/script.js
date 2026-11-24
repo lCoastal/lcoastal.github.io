@@ -25,7 +25,7 @@ const fd=(n,v)=>Math.abs(v)<1e-9?"same":(v>0?"+":"−")+fv(n,Math.abs(v)).replac
 const mutOf=it=>it.m||S.mut;
 function statsOf(x,mn){const mu=MUT[mn]||MUTS[0];const o=new Map();x.st.forEach(s=>o.set(s[0],{v:statVal(s,mu),r:lohi(s).map(z=>z*mu[1])}));
   Object.entries(mu[2]).forEach(([n,a])=>{const e=o.get(n);if(e){e.v+=a;e.r=e.r.map(z=>z+a)}else o.set(n,{v:a,r:[a,a]})});return o}
-const price=x=>x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):fmt(x.price)+" "+esc(x.cur);
+const price=x=>x.price==null?"-":x.cur==="$"?"$"+fmt(x.price):fmt(x.price)+" "+esc(x.cur);
 
 function render(){
   document.querySelectorAll("[data-star]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.star===S.star)));
@@ -40,12 +40,12 @@ function render(){
   const names=allNames.filter(n=>S.show.niche||!NICHE.has(n)).sort((a,b)=>{const ia=ORDER.indexOf(a),ib=ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b)});
   const head=items.map((x,i)=>`<th class="it" scope="col"><div class="ih"><button type="button" class="rm" data-rm="${i}" aria-label="Remove ${esc(x.n)}" title="Remove">×</button>${img(x)?`<img src="${img(x)}" alt="" loading="lazy">`:""}<b style="color:${rc(x.r)}">${esc(x.n)}</b><small>${esc(x.r)}, ${esc(x.slot)}${x.ev?", event":""}</small><select class="cm" data-cm="${i}" aria-label="Mutation for ${esc(x.n)}"><option value="">Top (${S.mut==="None"?"none":esc(S.mut)})</option>${MUTS.map(m=>`<option value="${m[0]}"${S.items[i].m===m[0]?" selected":""}>${m[0]==="None"?"No mutation":m[0]}</option>`).join("")}</select><button type="button" class="cp" data-cp="${i}" title="Add a copy of this piece, to compare it with another mutation">+ Copy</button>${i>0?`<span class="mv"><button type="button" data-mv="${i}" data-d="-1" aria-label="Move left" title="Move left">‹</button></span>`:""}</div></th>`).join("");
   const rows=names.map(n=>{const vals=st.map(m=>m.has(n)?m.get(n).v:null);const have=vals.filter(v=>v!=null);const best=have.length>1?Math.max(...have):null;
-    return `<tr><th scope="row"><span class="sd" style="background:${statHex(n)}"></span>${esc(n)}</th>${vals.map((v,i)=>{if(v==null)return `<td class="na">—</td>`;
+    return `<tr><th scope="row"><span class="sd" style="background:${statHex(n)}"></span>${esc(n)}</th>${vals.map((v,i)=>{if(v==null)return `<td class="na">-</td>`;
       const r=st[i].get(n).r,isBest=best!=null&&Math.abs(v-best)<1e-9&&have.filter(z=>Math.abs(z-best)<1e-9).length<have.length;
       const main=S.diff&&i>0?(vals[0]==null?`<span class="dn">new</span> ${fv(n,v)}`:`<span class="${v-vals[0]>1e-9?"up":v-vals[0]<-1e-9?"dn":""}">${fd(n,v-vals[0])}</span>`):fv(n,v);
       return `<td class="${isBest?"best":""}"><b>${main}</b><small>${fv(n,r[0])} – ${fv(n,r[1])}</small></td>`}).join("")}</tr>`}).join("");
-  const recipe=x=>(x.rec||[]).length?`<div class="rec">${x.rec.map(([q,m])=>`<span>${MIC[m]?`<img src="${MIC[m]}" alt="" loading="lazy">`:""}${q}× ${esc(m)}</span>`).join("")}</div>`:"—";
-  const notes=x=>[ONE_ONLY(x.n)?"Only one can be worn":"",x.bp?esc(x.bp):"",x.ev?"Event or limited-time item":""].filter(Boolean).map(t=>`<div>${t}</div>`).join("")||"—";
+  const recipe=x=>(x.rec||[]).length?`<div class="rec">${x.rec.map(([q,m])=>`<span>${MIC[m]?`<img src="${MIC[m]}" alt="" loading="lazy">`:""}${q}× ${esc(m)}</span>`).join("")}</div>`:"-";
+  const notes=x=>[ONE_ONLY(x.n)?"Only one can be worn":"",x.bp?esc(x.bp):"",x.ev?"Event or limited-time item":""].filter(Boolean).map(t=>`<div>${t}</div>`).join("")||"-";
   $("out").innerHTML=`<div class="tw"><table class="cmp"><thead><tr><th class="corner" scope="col"><span>${items.length} of ${MAX}</span><small>${S.star}★, ${S.q}% quality</small></th>${head}</tr></thead>
     <tbody>${rows}
     ${[S.show.cost?`<th scope="row">Craft cost</th>${items.map(x=>`<td><b>${price(x)}</b></td>`).join("")}`:"",

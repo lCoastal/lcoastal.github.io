@@ -136,7 +136,7 @@ function modTag(m){if(!m||m==="None"||m==="Any")return `<span class="modtag" sty
 function gearCard(label,kind,e,extra,rs,count){
   const real=e.name?findItem(kind,e.name):null;const u=real?picOf(kind,real):"";
   const alts=String(e.name||"").split("|").map(x=>x.trim()).filter(Boolean);
-  const main=alts[0]||"—";const altT=alts.slice(1);
+  const main=alts[0]||"-";const altT=alts.slice(1);
   const mut=e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:"";
   return `<div class="gc"${rs?` data-rs="${rs}"`:""}>${u?`<img src="${u}" alt="">`:`<span class="ph">${label.ico||""}</span>`}<div class="gt"><small>${esc(label.t)}</small><b>${mut}${esc(main)}${count?`<span class="cnt">${esc(count)}</span>`:""}</b>${altT.length?`<span class="alt">or ${altT.map(esc).join(" or ")}</span>`:""}${extra||""}${e.note?`<span class="nt">${escCL(e.note)}</span>`:""}</div></div>`}
 function quickChip(t,kind,name){const real=name?findItem(kind,name):null;const u=real?picOf(kind,real):"";return `<div class="qc">${u?`<img src="${u}" alt="">`:`<span class="ph"></span>`}<span><small>${t}</small><b>${esc(String(name).split("|")[0].trim())}</b></span></div>`}
@@ -160,13 +160,13 @@ function ringGrids(b){if(!(b.rings||[]).some(x=>x.name)&&!(b.rings6||[]).some(x=
 const SPCT=new Set(["Shake Speed","Dig Speed","Size Boost","Modifier Boost","Sell Boost"]);
 let STATC={key:"",rows:null},statBusy="";
 const nfs=(s,v)=>{const a=Math.abs(v);const d=s==="Luck"||s==="Capacity"?0:a<10?2:1;return (+a.toFixed(d)).toLocaleString("en-US",{maximumFractionDigits:d})};
-const sv=(s,v,plus)=>!v?'<span class="z">—</span>':(plus?(v<0?"−":"+"):(v<0?"−":""))+nfs(s,v)+(SPCT.has(s)?"%":"");
+const sv=(s,v,plus)=>!v?'<span class="z">-</span>':(plus?(v<0?"−":"+"):(v<0?"−":""))+nfs(s,v)+(SPCT.has(s)?"%":"");
 function statKey(b){return JSON.stringify(calcState(b))}
 function statsHTML(b,text){const key=statKey(b);
   if(STATC.key!==key){if(statBusy!==key){statBusy=key;try{window.parent.ptBuildStats(JSON.parse(key)).then(rows=>{STATC={key,rows:rows||[]};statBusy="";if(statKey(getB())===key)renderSheet()})}catch(e){statBusy=""}}return text?"":`<div class="blk"><h3><span class="n">4</span>Your stats</h3><span class="em">Working out stats…</span></div>`}
   const rows=STATC.rows||[];if(!rows.length)return "";
   if(text)return `<section><h2><span class="n">4</span>Your stats</h2><p class="dim" style="font-size:13px">Pan, shovel, equipment and museum only, before potions, totems and events.</p><ul>${rows.map(x=>`<li><b style="color:${SC2(x.s)}">${x.s}</b>: <b>${sv(x.s,x.total)}</b> <span class="gv">(${[x.tools?"pan & shovel "+sv(x.s,x.tools,1):"",x.jewelry?"equipment "+sv(x.s,x.jewelry,1):"",x.museum?"museum +"+(+x.museum.toFixed(3))+"×":""].filter(Boolean).join(", ")})</span></li>`).join("")}</ul></section>`;
-  return `<div class="blk"><h3><span class="n">4</span>Your stats</h3><div class="stt"><div class="sth"><span>Stat</span><span>Pan &amp; shovel</span><span>Equipment</span><span>Museum</span><span>Total</span></div>${rows.map(x=>`<div class="str"><b style="color:${SC2(x.s)}">${x.s}</b><span>${sv(x.s,x.tools,1)}</span><span>${sv(x.s,x.jewelry,1)}</span><span>${x.museum?"+"+(+x.museum.toFixed(3))+"×":'<span class="z">—</span>'}</span><span class="tt">${sv(x.s,x.total)}</span></div>`).join("")}</div><span class="em" style="font-size:12px">Pan, shovel, equipment and museum only, before potions, totems and events. Total = (pan &amp; shovel + equipment) × (1 + museum).</span></div>`}
+  return `<div class="blk"><h3><span class="n">4</span>Your stats</h3><div class="stt"><div class="sth"><span>Stat</span><span>Pan &amp; shovel</span><span>Equipment</span><span>Museum</span><span>Total</span></div>${rows.map(x=>`<div class="str"><b style="color:${SC2(x.s)}">${x.s}</b><span>${sv(x.s,x.tools,1)}</span><span>${sv(x.s,x.jewelry,1)}</span><span>${x.museum?"+"+(+x.museum.toFixed(3))+"×":'<span class="z">-</span>'}</span><span class="tt">${sv(x.s,x.total)}</span></div>`).join("")}</div><span class="em" style="font-size:12px">Pan, shovel, equipment and museum only, before potions, totems and events. Total = (pan &amp; shovel + equipment) × (1 + museum).</span></div>`}
 // shown text: ";" reads as ",", and a ";" at the end of a line is dropped
 const tidyT=t=>String(t).replace(/[ \t]*;[ \t]*$/gm,"").replace(/\s*;\s*/g,", ");
 const tidy=o=>{if(typeof o==="string")return tidyT(o);if(Array.isArray(o))return o.map(tidy);if(o&&typeof o==="object"){const r={};for(const k in o)r[k]=k==="pic"||k==="id"?o[k]:tidy(o[k]);return r}return o};
@@ -427,7 +427,7 @@ document.getElementById("sheet").addEventListener("click",e=>{const t=e.target.c
 
 // ---------- editor ----------
 function dl(id,list){return `<datalist id="${id}">${list.map(x=>`<option value="${esc(x)}"></option>`).join("")}</datalist>`}
-function opts(list,v){return list.map(o=>`<option value="${esc(o)}"${o===v?" selected":""}>${esc(o||"—")}</option>`).join("")}
+function opts(list,v){return list.map(o=>`<option value="${esc(o)}"${o===v?" selected":""}>${esc(o||"-")}</option>`).join("")}
 // example subtitles, one picked at random each time the editor is drawn
 const SUB_EX=["Highest average rerolls","Best for Exotic hunting","Max luck, no limited gear","Cheap early-game setup","Fast panning for sell runs","Size-focused for museum weights","Modifier farming build","Balanced all-rounder","Endgame luck stack","Budget build for new players","Night farming setup","Treasure hunting build","Speed build for quests","Big pans, big hauls"];
 // Build info, Museum and Equipment can be collapsed; remembered between visits

@@ -24,8 +24,8 @@ function bestEff(loc,m,L){let b={eff:effAt(loc,m,L),cap:null};if(S.useCap)CAPS.f
 const MINS=P.mins.filter(m=>Object.keys(LOC).some(l=>fullList(l).some(x=>x.m===m))).sort((a,b)=>a.n.localeCompare(b.n));
 const zonesOf=m=>Object.keys(LOC).filter(l=>fullList(l).some(x=>x.m===m)&&(LOC[l].length>1||baseLoc(l)!==l)).sort((a,b)=>a.localeCompare(b));
 const num0=v=>{const n=parseFloat(String(v).replace(/,/g,""));return n>0?n:0};
-const oneTxt=p=>{if(!(p>0))return "—";const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
-const pansTxt=x=>!isFinite(x)?"—":x<1?"under 1":fmt(x,x<10?1:0);
+const oneTxt=p=>{if(!(p>0))return "-";const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
+const pansTxt=x=>!isFinite(x)?"-":x<1?"under 1":fmt(x,x<10?1:0);
 const hrs=(pans,pph)=>{if(!(pph>0)||!isFinite(pans))return "";const h=pans/pph;return h*60<1?"under 1 min":h<1?fmt(h*60,0)+" min":h<48?fmt(h,1)+" h":fmt(h/24,1)+" days"};
 // ---- builds ----
 // build sheets (yours and the featured ones) can be loaded into a build: their gear is put through the Stat Calculator with your boosts
@@ -83,27 +83,27 @@ function render(){renderDiff();$("useCap").checked=!!S.useCap;const R=rows();con
   // the zone column only shows when the builds end up panning in different places
   const oneZ=L.every(x=>x.z===L[0].z);
   const key=allT?"hours":"pans";const best=L.reduce((a,x)=>x[key]<a[key]?x:a,L[0]);
-  const rel=x=>{if(x===best)return '<span class="tag">Best</span>';const r=x[key]/best[key];return isFinite(r)?`<span class="sl">${fmt(r,r<10?2:1)}× ${allT?"longer":"more pans"}</span>`:"—"};
+  const rel=x=>{if(x===best)return '<span class="tag">Best</span>';const r=x[key]/best[key];return isFinite(r)?`<span class="sl">${fmt(r,r<10?2:1)}× ${allT?"longer":"more pans"}</span>`:"-"};
   $("sum").innerHTML=`<div><span class="lab">Fastest ${allT?"by time":"by pans"}</span><b style="color:${COLS[best.i%COLS.length]}">${esc(best.b.n)}</b><span class="hint">${allT?"about "+hrs(best.pans,best.pph):pansTxt(best.pans)+" pans on average"}</span></div>
     <div><span class="lab">Mineral</span><b><span class="mn mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="">`:""}<span>${esc(m.n)} <span class="rr" style="--rc:${rc(m.r)}">${m.r}</span></span></span></b>${oneZ?`<span class="hint">in <span class="lk" data-location="${esc(baseLoc(L[0].z))}">${esc(L[0].z)}</span></span>`:""}</div>
     ${!allT?`<div><span class="lab">Time</span><b style="font-size:.95rem;font-weight:500">${anyT?"Add pans per hour to every build to compare time":"Add pans per hour to compare time"}</b></div>`:""}`;
   $("tbl").innerHTML=`<table class="o"><thead><tr><th>Build</th>${oneZ?"":"<th>Zone</th>"}<th>Per pan</th><th>Pans on average</th>${anyT?"<th>Time</th>":""}<th>Compared</th></tr></thead><tbody>${L.map(x=>`<tr class="${x===best?"win":""}" style="--bc:${COLS[x.i%COLS.length]}">
     <td><span class="bn"><i></i><span>${esc(x.b.n)}<small>${fmt(x.L,0)} luck, ${fmt(x.C,0)} capacity${x.cap!=null?`, cap ${fmt(x.cap,0)}`:""}</small></span></span></td>
     ${oneZ?"":`<td data-l="Zone" style="font-family:var(--f-body);white-space:normal"><span class="lk" data-location="${esc(baseLoc(x.z))}">${esc(x.z)}</span></td>`}
-    <td data-l="Per pan">${oneTxt(x.pp)}</td><td data-l="Pans">${pansTxt(x.pans)}</td>${anyT?`<td data-l="Time">${x.hours!=null?hrs(x.pans,x.pph):"—"}</td>`:""}<td data-l="Compared" style="font-family:var(--f-body)">${rel(x)}</td></tr>`).join("")}</tbody></table>
+    <td data-l="Per pan">${oneTxt(x.pp)}</td><td data-l="Pans">${pansTxt(x.pans)}</td>${anyT?`<td data-l="Time">${x.hours!=null?hrs(x.pans,x.pph):"-"}</td>`:""}<td data-l="Compared" style="font-family:var(--f-body)">${rel(x)}</td></tr>`).join("")}</tbody></table>
     <p class="hint" style="margin-top:8px">For rare minerals, more capacity helps less than the same boost in luck: 1.8× the capacity is worth about 1.39× the luck per pan.</p>`}
 // ---- save as image ----
 $("toImg").onclick=()=>{const R=rows();if(!R||!R.list.length){ptToast("Pick a mineral first");return}const L=R.list,anyT=L.some(x=>x.hours!=null),allT=L.every(x=>x.hours!=null);const key=allT?"hours":"pans";const best=L.reduce((a,x)=>x[key]<a[key]?x:a,L[0]);
   const HX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
   const oneZ=L.every(x=>x.z===L[0].z);
   const cols=[{h:"Build",w:(anyT?.28:.32)+(oneZ?.22:0)}].concat(oneZ?[]:[{h:"Zone",w:.22}]).concat([{h:"Per pan",w:.16,al:"r"},{h:"Pans on average",w:.14,al:"r"}]).concat(anyT?[{h:"Time",w:.1,al:"r"}]:[]).concat([{h:"Compared",w:anyT?.1:.16,al:"r"}]);
-  const rows2=L.map(x=>{const r=x[key]/best[key];return {cells:[{t:x.b.n,b:true,dot:COLS[x.i%COLS.length],sub:`${fmt(x.L,0)} luck, ${fmt(x.C,0)} capacity${x.cap!=null?", cap "+fmt(x.cap,0):""}`},...(oneZ?[]:[{t:x.z,wrap:true,fs:13}]),{t:oneTxt(x.pp),mono:true},{t:pansTxt(x.pans),mono:true}].concat(anyT?[{t:x.hours!=null?hrs(x.pans,x.pph):"—",mono:true}]:[]).concat([x===best?{t:"Best",b:true,col:"#3cc2a8"}:{t:isFinite(r)?fmt(r,r<10?2:1)+"×":"—",mono:true,col:"#98a2ad"}])}});
+  const rows2=L.map(x=>{const r=x[key]/best[key];return {cells:[{t:x.b.n,b:true,dot:COLS[x.i%COLS.length],sub:`${fmt(x.L,0)} luck, ${fmt(x.C,0)} capacity${x.cap!=null?", cap "+fmt(x.cap,0):""}`},...(oneZ?[]:[{t:x.z,wrap:true,fs:13}]),{t:oneTxt(x.pp),mono:true},{t:pansTxt(x.pans),mono:true}].concat(anyT?[{t:x.hours!=null?hrs(x.pans,x.pph):"-",mono:true}]:[]).concat([x===best?{t:"Best",b:true,col:"#3cc2a8"}:{t:isFinite(r)?fmt(r,r<10?2:1)+"×":"-",mono:true,col:"#98a2ad"}])}});
   ptSaveImg(R.m.n+" build comparison",()=>ptTableImage({title:R.m.n,tic:R.m.ic,tcol:HX[R.m.r],sub:[R.m.r,oneZ?L[0].z:"best zone for each build",S.useCap?"best luck cap":"own luck",`${L.length} builds`],sections:[{cols,rows:rows2}],note:"Estimates only: modifiers, Size Boost, enchants, events and weather aren't counted."}))};
 window.ptOpenFor=(kind,name)=>{if(kind==="mineral"){S.min=name;S.zone="";save();render()}};
 // what's different between the loaded build sheets, highlighted against the first one
 function renderDiff(){const el=$("diff");if(!el)return;const L=S.b.map((b,i)=>({b,i})).filter(x=>x.b.snap);if(L.length<2){el.innerHTML="";return}
   const keys=["Pan","Shovel","Trinket","Necklace","Charm","Rings"];const MO=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
-  const row=(lab,vals)=>{const same=vals.every(v=>v===vals[0]);return `<tr class="${same?"same":""}"><td>${lab}</td>${vals.map((v,j)=>`<td class="${j&&v!==vals[0]?"dif":""}">${esc(v||"—")}</td>`).join("")}</tr>`};
+  const row=(lab,vals)=>{const same=vals.every(v=>v===vals[0]);return `<tr class="${same?"same":""}"><td>${lab}</td>${vals.map((v,j)=>`<td class="${j&&v!==vals[0]?"dif":""}">${esc(v||"-")}</td>`).join("")}</tr>`};
   el.innerHTML=`<h3 class="dh">What's different</h3><p class="hint">Highlighted where a build differs from the first one. Rows that match everywhere are faded.</p><div class="tw"><table class="dt"><tr><th></th>${L.map(x=>`<th style="color:${COLS[x.i%COLS.length]}">${esc(x.b.n)}</th>`).join("")}</tr>${keys.map(k=>row(k,L.map(x=>x.b.snap[k]))).join("")}${MO.map(r=>row("Museum "+r,L.map(x=>(x.b.snap.mus||{})[r]||""))).join("")}</table></div>`}
 window.ptRefresh=()=>{loadBList();render()};
 $("csvB").onclick=async()=>{const R=rows();const out=[];if(R&&R.list.length){out.push(["Mineral",R.m.n],["Zone",S.zone||"best zone for each build"],["Luck cap",S.useCap?"each build's best":"none"],[]);

@@ -6,7 +6,7 @@ const save=()=>{try{localStorage.setItem("sf-s",JSON.stringify(S))}catch(e){}you
 ptPageButtons($("acts"),()=>"Size Boost for "+(String(S.min).trim()||"a mineral"),()=>ptPageRead($("head"),[{h:"",el:$("sum")},{h:"Chance per mineral at each Size Boost",el:$("tbl")}]),"Estimates from a fitted model, so actual results can differ.");
 const MINS=P.mins.filter(m=>m.bw>0).sort((a,b)=>a.n.localeCompare(b.n));
 const BY=Object.fromEntries(MINS.map(m=>[m.n.toLowerCase(),m]));
-const pc=v=>!isFinite(v)?"—":fmt(Math.max(0,v),v<100?1:0)+"%";
+const pc=v=>!isFinite(v)?"-":fmt(Math.max(0,v),v<100?1:0)+"%";
 const oneIn=p=>p<=0?"never":p>=.5?fmt(p*100,1)+"%":p>=.01?fmt(p*100,1)+"% (1 in "+fmt(Math.round(1/p),0)+")":"1 in "+fmt(Math.round(1/p),0);
 
 ["kg","cap","sb"].forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});

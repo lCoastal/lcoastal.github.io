@@ -49,7 +49,7 @@ window.ptSave = async (filename, data) => {
     } else ptImgLast = "Image saved";
   }
   const dl = await getDl();
-  // no host bridge present (page opened normally in a browser) — just download it the standard way
+  // no host bridge present (page opened normally in a browser), just download it the standard way
   if (!dl) {
     const blob =
       data instanceof Blob

@@ -97,7 +97,7 @@ export default [
     rg: "Caldera Park",
     n: "Infernal Heart",
     t: "5",
-    npc: "—",
+    npc: "-",
     d: "A deposit inside the volcano.",
     x: ["Opens once per hour at XX:15 for 30 minutes."],
   },
@@ -221,7 +221,7 @@ export default [
     rg: "Sunscorched Desert",
     n: "Mystic Floodplains",
     t: "10",
-    npc: "—",
+    npc: "-",
     d: "A greener section in the middle of the Sandstone Stream, behind the Pyramid.",
     x: ["Sells the Pharaoh's Sluice."],
   },
@@ -251,7 +251,7 @@ export default [
     rg: "Pharaoh's Tomb",
     n: "Tomb Vein II",
     t: "?",
-    npc: "—",
+    npc: "-",
     d: "Deeper in the tomb. Better odds than Vein I for the tomb minerals (Blue Faience, Canopic Gold, Ushabti) and the rarer desert ones.",
     x: [
       "Gilded chests and Cache II are near this vein; they can drop the 4 tomb equipment blueprints."
@@ -261,7 +261,7 @@ export default [
     rg: "Pharaoh's Tomb",
     n: "Tomb Vein III",
     t: "?",
-    npc: "—",
+    npc: "-",
     d: "The deepest part of the tomb, by the Sarcophagus. The only place Sky Iron and Eternal Lotus drop, and the best odds for every tomb mineral except Natron Salt, which is most common in Vein I.",
     x: [
       "Royal chests, Cache III and the Sarcophagus are near this vein. Only the Sarcophagus drops the Ring of Ra Blueprint (about 0.1%) and Feather of Ma'at."

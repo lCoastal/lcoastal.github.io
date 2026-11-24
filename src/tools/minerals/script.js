@@ -12,7 +12,7 @@ const oneIn=s=>parseFloat(String(s).split("=")[0].replace(/1 in\s*/,"").replace(
 const odds=s=>'~1 in '+(isFinite(oneIn(s))?oneIn(s).toLocaleString("en-US"):"?");
 const fx=v=>(v<0?"−":"+")+Math.abs(v)+"×";
 const baseLoc=n=>n.replace(/\s*\((inside|outside) Firefly Zones\)/,"").replace(/\s*\(when in the loot pool\)/,"");
-const musTxt=m=>m.mu?m.mu.b.map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fx(v)}</em></span>`).join(", "):"—";
+const musTxt=m=>m.mu?m.mu.b.map(([s,v])=>`<span class="${v<0?"neg":""}">${s} <em>${fx(v)}</em></span>`).join(", "):"-";
 let st={q:"",loc:"",sort:"rarity",rar:new Set(),stat:"",rev:false};
 try{const s=JSON.parse(localStorage.getItem("pm-filters")||"null");if(s){st.sort=s.sort&&s.sort!=="chance"?s.sort:"rarity";st.rev=!!s.rev;st.stat=s.stat||"";st.rar=new Set(s.rar||[])}}catch(e){}
 const save=()=>{try{localStorage.setItem("pm-filters",JSON.stringify({sort:st.sort,stat:st.stat,rar:[...st.rar],rev:st.rev}))}catch(e){}};
@@ -105,8 +105,8 @@ function openMineral(name,fromEl){
 // ---- the mineral at your stats: shared luck / capacity / Size Boost / magnifier, worked out by the toolkit's formulas ----
 const OPEN=[["odds","Luck Odds"],["bestcap","Best Luck Cap"],["buildcmp","Compare Builds"],["weightrange","Weight Range"],["sizefinder","Size Boost Finder"],["dredge","Dredge Master"]];
 const nf=(v,d)=>Number(v).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:0});
-const oneInP=p=>!(p>0)?"—":p>=.5?nf(p*100,0)+"%":"1 in "+nf(Math.round(1/p),0);
-const kgf=v=>!isFinite(v)?"—":v>=1000?nf(v,0)+" kg":v>=100?nf(v,1)+" kg":nf(v,2)+" kg";
+const oneInP=p=>!(p>0)?"-":p>=.5?nf(p*100,0)+"%":"1 in "+nf(Math.round(1/p),0);
+const kgf=v=>!isFinite(v)?"-":v>=1000?nf(v,0)+" kg":v>=100?nf(v,1)+" kg":nf(v,2)+" kg";
 const youGet=()=>{try{return window.parent.ptYou.get()}catch(e){return {}}};
 let CUR=null;
 async function youDraw(){const m=CUR;if(!m)return;const out=document.getElementById("yOut");if(!out)return;
@@ -115,10 +115,10 @@ async function youDraw(){const m=CUR;if(!m)return;const out=document.getElementB
   const y=youGet(),hasL=+y.luck>0,hasC=+y.cap>0;
   if(!r){out.innerHTML='<span class="none">Couldn\'t work this out here.</span>';return}
   const real=r.zones.filter(z=>z.pan!=null&&!/^The Void/.test(z.z)),best=(real.length?real:r.zones.filter(z=>z.pan!=null)).sort((a,b)=>b.pan-a.pan)[0];
-  document.querySelectorAll("[data-yz]").forEach(td=>{const z=r.zones.find(x=>x.z===td.dataset.yz);td.textContent=z&&z.pan!=null&&hasL&&hasC?oneInP(z.pan):"—"});
+  document.querySelectorAll("[data-yz]").forEach(td=>{const z=r.zones.find(x=>x.z===td.dataset.yz);td.textContent=z&&z.pan!=null&&hasL&&hasC?oneInP(z.pan):"-"});
   const T=(lab,v,sub)=>`<div class="yt"><span>${lab}</span><b>${v}</b>${sub?`<small>${sub}</small>`:""}</div>`;
-  out.innerHTML=(hasL&&hasC&&best?T("Best zone for you",esc(best.z),`${oneInP(best.pan)} per pan`):T("Best zone for you","—","Type your luck and capacity"))
-    +(r.wt?T("Weight",`${kgf(r.wt.lo)} – ${kgf(r.wt.hi)}`,`typical ${kgf(r.wt.mid)}, top 1% from ${kgf(r.wt.top)}`):T("Weight","—","No base weight listed"))}
+  out.innerHTML=(hasL&&hasC&&best?T("Best zone for you",esc(best.z),`${oneInP(best.pan)} per pan`):T("Best zone for you","-","Type your luck and capacity"))
+    +(r.wt?T("Weight",`${kgf(r.wt.lo)} – ${kgf(r.wt.hi)}`,`typical ${kgf(r.wt.mid)}, top 1% from ${kgf(r.wt.top)}`):T("Weight","-","No base weight listed"))}
 function youWire(m){CUR=m;const y=youGet(),I={yLuck:"luck",yCap:"cap",ySb:"sb"};
   Object.entries(I).forEach(([id,k])=>{const el=document.getElementById(id);el.value=y[k]??"";el.addEventListener("input",()=>{try{window.parent.ptYou.set({[k]:el.value},window)}catch(e){}clearTimeout(youWire.t);youWire.t=setTimeout(youDraw,200)})});
   const mg=document.getElementById("yMag");mg.checked=!!y.mag;mg.onchange=()=>{try{window.parent.ptYou.set({mag:mg.checked},window)}catch(e){}youDraw()};

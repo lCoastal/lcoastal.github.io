@@ -43,7 +43,7 @@ const curMin=()=>MIN[(S.min||"").trim().toLowerCase()]||null;
 // money is rounded to 2 decimals and shortened: K thousand, M million, B billion, T trillion, Qa, Qi, then e+ notation
 const SUF=["","K","M","B","T","Qa","Qi"];
 // full dollar amounts; the Short numbers setting shortens big ones everywhere
-const money=v=>{if(!isFinite(v))return "—";const neg=v<0;v=Math.abs(v);return (neg?"-$":"$")+(v>=100?Math.round(v):Number(v.toFixed(2))).toLocaleString("en-US",{maximumFractionDigits:2})};
+const money=v=>{if(!isFinite(v))return "-";const neg=v<0;v=Math.abs(v);return (neg?"-$":"$")+(v>=100?Math.round(v):Number(v.toFixed(2))).toLocaleString("en-US",{maximumFractionDigits:2})};
 // rarity order: most common first is "ascending"; non-panning ones go after, rarest-feeling by sell value
 const rareKey=m=>m.one?m.one:1e9+(100-m.sell);
 // the mutations the filters and sort currently show (the page and the saved image use the same list)
@@ -60,7 +60,7 @@ function render(){
   const rows=shownMuts();
   const card=x=>{const mv=MULT[S.rar]*x.f;
     return `<article class="m" style="--mc:${x.c}"><div class="mh"><b><span class="dot"></span>${esc(x.n)}</b><span class="tag">${esc(x.kind)}</span></div>
-    <div class="nums"><div><span class="lab">Sells for</span><b>${fmt(x.sell,2)}×</b></div><div><span class="lab">${m?esc(fmt(kg,2))+" kg "+esc(m.n):"Chance"}</span><b>${m?money(per*kg*x.sell):x.one?'~1 in '+fmt(x.one,0):"—"}</b></div></div>
+    <div class="nums"><div><span class="lab">Sells for</span><b>${fmt(x.sell,2)}×</b></div><div><span class="lab">${m?esc(fmt(kg,2))+" kg "+esc(m.n):"Chance"}</span><b>${m?money(per*kg*x.sell):x.one?'~1 in '+fmt(x.one,0):"-"}</b></div></div>
     ${m&&x.one?`<p class="row"><span class="lab">Chance</span>~1 in ${fmt(x.one,0)} per mineral</p>`:""}
     <div class="mus">${x.stats.length?x.stats.map(s=>`<span${window.ptK&&ptK(s)?` style="--kc:${ptK(s)}"`:""}>${esc(s)} <em>+${+(mv).toFixed(4)}×</em></span>`).join(""):'<span style="color:var(--muted);border-color:var(--line)">No museum boost</span>'}</div>
     <p class="row"><span class="lab">How to get</span>${esc(x.how)}</p>
@@ -83,7 +83,7 @@ $("q").oninput=render;
 $("toImg").onclick=()=>{const rows=shownMuts();if(!rows.length){ptToast("No mutations match, nothing to save");return}
   const m=curMin(),kg=Math.max(0,+S.kg||0),per=m?num(m.v):null,q=$("q").value.trim();
   const cols=[{h:"Mutation",w:.17},{h:"Sells for",w:.09,al:"r"},m?{h:`${fmt(kg,2)} kg ${m.n}`,w:.13,al:"r"}:null,{h:"Chance",w:.12,al:"r"},{h:`Museum (${S.rar})`,w:m?.22:.26},{h:"How to get",w:m?.27:.36}].filter(Boolean);
-  const row=x=>{const mv=MULT[S.rar]*x.f;return {cells:[{t:x.n,b:true,col:x.c,dot:x.c,sub:x.kind},{t:fmt(x.sell,2)+"×",mono:true}].concat(m?[{t:money(per*kg*x.sell),mono:true}]:[]).concat([{t:x.one?"~1 in "+fmt(x.one,0):"—",mono:true},x.stats.length?{chips:x.stats.map(st=>({t:`${st} +${+(mv).toFixed(4)}×`,col:statHex(st)}))}:{t:"No museum boost",col:"#98a2ad",fs:12.5},{t:x.how,wrap:true,fs:12.5}])}};
+  const row=x=>{const mv=MULT[S.rar]*x.f;return {cells:[{t:x.n,b:true,col:x.c,dot:x.c,sub:x.kind},{t:fmt(x.sell,2)+"×",mono:true}].concat(m?[{t:money(per*kg*x.sell),mono:true}]:[]).concat([{t:x.one?"~1 in "+fmt(x.one,0):"-",mono:true},x.stats.length?{chips:x.stats.map(st=>({t:`${st} +${+(mv).toFixed(4)}×`,col:statHex(st)}))}:{t:"No museum boost",col:"#98a2ad",fs:12.5},{t:x.how,wrap:true,fs:12.5}])}};
   const grouped=S.sort==="rare"&&!S.kind;
   const list=grouped?(S.rev?[...KINDS].reverse():KINDS).flatMap(k=>{const g=rows.filter(x=>x.kind===k);return g.length?[{group:k+", "+KIND_NOTE[k]}].concat(g.map(row)):[]}):rows.map(row);
   const sub=[`${rows.length} mutation${rows.length===1?"":"s"}`];if(S.kind)sub.push(S.kind);if(q)sub.push(`matching "${q}"`);sub.push(`museum values for ${S.rar}`);if(m)sub.push(`${fmt(kg,2)} kg ${m.n} sells for ${money(per*kg)} with no mutation`);

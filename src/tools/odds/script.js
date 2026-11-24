@@ -39,10 +39,10 @@ const perPan=()=>panItems(S.cap);
 // chances written as "1 in N", as a percentage, or both (picked with the 1 in / % / Both buttons)
 const pctTxt=p=>{const v=p*100;return (v>=10?fmt(v,1):v>=1?fmt(v,2):v>=0.01?fmt(v,3):Number(v.toPrecision(2)).toLocaleString("en-US",{maximumFractionDigits:20}))+"%"};
 const oneTxt=p=>{const n=1/p;return `~1 in ${n<10?fmt(n,1):fmt(Math.round(n),0)}`};
-const oneInTxt=p=>{if(!(p>0))return "—";const m=S.fmt||"one";if(m==="pct")return pctTxt(p);if(m==="both")return `${oneTxt(p)}<span class="pc2">${pctTxt(p)}</span>`;return oneTxt(p)};
-const hrs=pans=>{const pph=+S.pph;if(!(pph>0))return "—";const h=pans/pph;return h*60<1?"under 1 min":h<1?fmt(h*60,0)+" min":h<48?fmt(h,1)+" h":fmt(h/24,1)+" days"};
+const oneInTxt=p=>{if(!(p>0))return "-";const m=S.fmt||"one";if(m==="pct")return pctTxt(p);if(m==="both")return `${oneTxt(p)}<span class="pc2">${pctTxt(p)}</span>`;return oneTxt(p)};
+const hrs=pans=>{const pph=+S.pph;if(!(pph>0))return "-";const h=pans/pph;return h*60<1?"under 1 min":h<1?fmt(h*60,0)+" min":h<48?fmt(h,1)+" h":fmt(h/24,1)+" days"};
 function row(name,img,r,s){const pp=1-Math.pow(1-s.eff,perPan());const pans=pp>0?1/pp:Infinity;
-  return `<tr><td>${name}</td><td data-l="Base">${oneInTxt(s.base)}</td><td data-l="Per ore" class="${s.eff>s.base?"up":""}">${oneInTxt(s.eff)}</td><td data-l="Per pan">${oneInTxt(pp)}</td>${+S.pph>0?`<td data-l="Time">${isFinite(pans)?hrs(pans):"—"}</td>`:""}</tr>`}
+  return `<tr><td>${name}</td><td data-l="Base">${oneInTxt(s.base)}</td><td data-l="Per ore" class="${s.eff>s.base?"up":""}">${oneInTxt(s.eff)}</td><td data-l="Per pan">${oneInTxt(pp)}</td>${+S.pph>0?`<td data-l="Time">${isFinite(pans)?hrs(pans):"-"}</td>`:""}</tr>`}
 function render(){
   $("luck").value=S.luck;$("cap").value=S.cap;$("pph").value=S.pph;
   document.querySelectorAll("[data-fmt]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.fmt===(S.fmt||"one"))));document.body.classList.toggle("fmt-both",S.fmt==="both");
@@ -100,7 +100,7 @@ const HEX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b5
 async function oddsImage(){const L=Math.max(1,effLuck()),pp=perPan(),pph=+S.pph>0,mode=S.fmt||"one";
   const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
   const oneS=p=>{const n=1/p;return "~1 in "+(n<10?fmt(n,1):fmt(Math.round(n),0))};
-  const cell=p=>!(p>0)?["—",""]:mode==="pct"?[pctTxt(p),""]:mode==="both"?[oneS(p),pctTxt(p)]:[oneS(p),""];
+  const cell=p=>!(p>0)?["-",""]:mode==="pct"?[pctTxt(p),""]:mode==="both"?[oneS(p),pctTxt(p)]:[oneS(p),""];
   const calc=s=>{const p=1-Math.pow(1-s.eff,pp);const pans=p>0?1/p:Infinity;return {s,p,pans}};
   let title,tcol="#e6e9ec",rows,sums;
   if(S.by==="loc"){title=S.loc;const all=shares(S.loc,L).filter(s=>!S.hideR.includes(s.m.r)).sort((a,b)=>ORD.indexOf(a.m.r)-ORD.indexOf(b.m.r)||a.p-b.p);
@@ -136,7 +136,7 @@ async function oddsImage(){const L=Math.max(1,effLuck()),pp=perPan(),pph=+S.pph>
     let tx=PAD+12;if(icons[k]){c.drawImage(icons[k],tx,mid-15,30,30);tx+=40}
     c.fillStyle=S.by==="loc"?r.col:"#e6e9ec";c.font=`600 15px ${F}`;c.fillText(fit(r.name,nameW-(tx-PAD)),tx,r.sub?mid-2:mid+5);
     if(r.sub){c.fillStyle=S.by==="loc"?r.col:"#98a2ad";c.globalAlpha=.8;c.font=`11.5px ${F}`;c.fillText(r.sub,tx,mid+14);c.globalAlpha=1}
-    const vals=[cell(r.s.base),cell(r.s.eff),cell(r.p)];if(pph)vals.push([isFinite(r.pans)?hrs(r.pans):"—",""]);
+    const vals=[cell(r.s.base),cell(r.s.eff),cell(r.p)];if(pph)vals.push([isFinite(r.pans)?hrs(r.pans):"-",""]);
     vals.forEach((v,i)=>{const x=cx(i+1);c.font=`14px ${FM}`;c.fillStyle=i===1&&r.s.eff>r.s.base?"#3cc2a8":"#e6e9ec";c.fillText(v[0],x-c.measureText(v[0]).width,v[1]?mid-3:mid+5);
       if(v[1]){c.font=`11.5px ${F}`;c.fillStyle="#98a2ad";c.fillText(v[1],x-c.measureText(v[1]).width,mid+14)}})});
   y+=Math.max(1,rows.length)*RH+28;{const et="Estimates from a fitted luck model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}

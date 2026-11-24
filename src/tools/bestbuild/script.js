@@ -20,7 +20,7 @@ const MINS=P.mins.filter(m=>Object.keys(LOC).some(l=>fullList(l).some(x=>x.m===m
 const zonesOf=m=>Object.keys(LOC).filter(l=>fullList(l).some(x=>x.m===m)&&(LOC[l].length>1||baseLoc(l)!==l)).sort((a,b)=>a.localeCompare(b));
 const minObj=()=>MINS.find(m=>m.n===S.min)||null;
 
-const oneInT=p=>!(p>0)?"—":p>=.5?fmt(p*100,0)+"% per pan":"1 in "+(1/p<10?fmt(1/p,1):fmt(Math.round(1/p),0))+" pans";
+const oneInT=p=>!(p>0)?"-":p>=.5?fmt(p*100,0)+"% per pan":"1 in "+(1/p<10?fmt(1/p,1):fmt(Math.round(1/p),0))+" pans";
 // ---- form ----
 function drawForm(){
   $("goal").innerHTML=GOALS.map(([k,l])=>`<button type="button" class="chip" data-g="${k}" aria-pressed="${S.goal===k}">${l}</button>`).join("");
@@ -69,7 +69,7 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
     head=`<div><span class="lab">${esc(L.info.m.n)} in ${esc(L.zone)}</span><b class="pos">${oneInT(now.p)}</b><span class="hint">now ${oneInT(was.p)}</span></div><div><span class="lab">Luck cap</span><b>${now.cap?fmt(now.cap,0):"None"}</b><span class="hint">${now.cap?"pan with this cap on":"pan at your own luck"}</span></div>`}
   else head=`<div><span class="lab">${L.goal==="luck"?"Luck":"Rare finds per pan"}</span><b class="${g>0.0005?"pos":""}">${gTxt}</b><span class="hint">vs your current build</span></div>`;
   const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":`, ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
-  const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"—"}</td><td class="was">${now===was?"":(was||"—")}</td></tr>`;
+  const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"-"}</td><td class="was">${now===was?"":(was||"-")}</td></tr>`;
   const tl=(p,e)=>esc(p||"")+(e?`, ${esc(e)}`:"");
   const rows=[row("Pan",tl(st.pan,st.panEn),tl(b.pan,b.panEn)),row("Shovel",tl(st.shovel,st.shEn),tl(b.shovel,b.shEn)),row("Trinket",esc(st.trinket||""),esc(b.trinket||""))].concat(cw.ptSlotDefs().map(([k,l])=>row(l,it(st.slots[k]),it(b.slots[k]))));
   let mus="";if(R.museum)mus=`<h3 class="sec">Museum</h3>${ptMuseumView(st.museumBoard,{empty:"Nothing here helps"})}`;

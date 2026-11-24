@@ -23,7 +23,7 @@ function modShares(eff,night,luck){const list=MODW.filter(([k])=>night||k!=="Lun
   const L=modStrength(eff/100,luck),parts=[f(1),f(Math.max(1,L*MOD_PART)),f(L)];const s={};
   list.forEach(([k])=>s[k]=100*(MOD_MIX[0]*parts[0][k]+MOD_MIX[1]*parts[1][k]+MOD_MIX[2]*parts[2][k]));return s}
 function shares(eff){return modShares(eff,S.night,S.luck)}
-const oneInP=p=>p<=0?"—":p>=.5?fmt(p*100,1)+"%":`~1 in ${fmt(Math.round(1/p),0)}`;
+const oneInP=p=>p<=0?"-":p>=.5?fmt(p*100,1)+"%":`~1 in ${fmt(Math.round(1/p),0)}`;
 function calcAll(){const mb=Math.max(0,+S.mb||0);
   const effAny=mb*(S.surge?2:1),effWhich=Math.max(1,mb*(S.surge?2:1));
   return {mb,effAny,effWhich,q:anyMod(effAny),sh:shares(effWhich),n:panItems(S.cap)}}
@@ -38,13 +38,13 @@ function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge"
   const trend=k=>{const a=sh[k]||0,b=more[k]||0;if(!(a>0))return "";
     const r=b/a,cls=r>1.01?"up":r<0.99?"dn":"fl";
     const pct=Math.round(Math.abs(r-1)*100);
-    const why=cls==="up"?`More Modifier Boost makes ${k} more common (about +${pct}% at +25% boost) — boost pushes the roll toward rarer modifiers`
-      :cls==="dn"?`More Modifier Boost makes ${k} rarer (about −${pct}% at +25% boost) — the rarer ones take its place`
+    const why=cls==="up"?`More Modifier Boost makes ${k} more common (about +${pct}% at +25% boost), boost pushes the roll toward rarer modifiers`
+      :cls==="dn"?`More Modifier Boost makes ${k} rarer (about −${pct}% at +25% boost), the rarer ones take its place`
       :`${k} barely changes with more Modifier Boost`;
     return `<span class="tr ${cls}" title="${esc(why)}" aria-label="${esc(why)}">${cls==="up"?"▲":cls==="dn"?"▼":"–"}</span>`};
   const order=ORDER;
   $("tbl").innerHTML=`<table class="o"><thead><tr><th>Modifier</th><th>Share of modified</th><th>Base share</th><th>Per ore</th><th>Per pan</th><th>Sell ×</th></tr></thead><tbody>${order.map(k=>{const on=k!=="Lunar"||S.night;const s=on?(sh[k]||0):0;const po=q*s/100;
-    return `<tr class="${on?"":"off"}"><td><span class="mn"><b>${k}</b><span>${k==="Lunar"&&!S.night?"Night only":"Museum: "+esc(MUSE[k]||"")}</span></span></td><td data-l="Share" class="${s>BASE[k]*1.05?"up":""}">${on?fmt(s,s<0.1?4:2)+"%"+trend(k):"—"}</td><td data-l="Base">${fmt(BASE[k],4)}%</td><td data-l="Per ore">${on?oneInP(po):"—"}</td><td data-l="Per pan">${on?oneInP(1-Math.pow(1-po,n)):"—"}</td><td data-l="Sell">${PRICE[k]}×</td></tr>`}).join("")}</tbody></table>`}
+    return `<tr class="${on?"":"off"}"><td><span class="mn"><b>${k}</b><span>${k==="Lunar"&&!S.night?"Night only":"Museum: "+esc(MUSE[k]||"")}</span></span></td><td data-l="Share" class="${s>BASE[k]*1.05?"up":""}">${on?fmt(s,s<0.1?4:2)+"%"+trend(k):"-"}</td><td data-l="Base">${fmt(BASE[k],4)}%</td><td data-l="Per ore">${on?oneInP(po):"-"}</td><td data-l="Per pan">${on?oneInP(1-Math.pow(1-po,n)):"-"}</td><td data-l="Sell">${PRICE[k]}×</td></tr>`}).join("")}</tbody></table>`}
 ["mb","luck","cap"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
 ["mag","surge","night"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();render()}));
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;S.mb=Math.round(t["Modifier Boost"]||0);S.luck=Math.round(t.Luck||0);S.cap=Math.round(t.Capacity)||S.cap;save();render()};

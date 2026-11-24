@@ -14,7 +14,7 @@ const ZBY=Object.fromEntries(Object.keys(ZONES).map(z=>[z.toLowerCase(),z]));
 // zones where a Volcanic Eruption doubles mineral size
 const EV=((P.x2&&P.x2.events)||[]).find(e=>e.n==="Volcanic Eruption");
 const ERUPT=new Set(EV?EV.fx.filter(t=>/^\s{2}/.test(t)).map(t=>t.trim()):["Volcanic Sands","Windswept Beach","Volcanic Springs","Magma Furnace","Infernal Heart"]);
-const kg=v=>!isFinite(v)?"—":v>=1000?fmt(v,0)+" kg":v>=100?fmt(v,1)+" kg":fmt(v,2)+" kg";
+const kg=v=>!isFinite(v)?"-":v>=1000?fmt(v,0)+" kg":v>=100?fmt(v,1)+" kg":fmt(v,2)+" kg";
 const oneIn=p=>p>=.5?fmt(p*100,0)+"% of them":"1 in "+fmt(Math.round(1/p),0);
 
 ["sb","cap"].forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});

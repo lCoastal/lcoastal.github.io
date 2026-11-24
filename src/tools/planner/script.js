@@ -109,7 +109,7 @@ function renderTotals(){
   document.getElementById("totH").textContent="Museum total";
   const t=totals(S);
   const rows=STATS.map(s=>({s,v:t[s]}));
-  document.getElementById("tot").innerHTML=rows.map(({s,v})=>`<div class="trow ${Math.abs(v)<1e-9?"zero":""} ${s==="Luck"||s==="Size Boost"?"lead":""}"><span class="k">${s}</span><span class="v">${Math.abs(v)<1e-9?"—":fxT(v)}</span></div>`).join("");
+  document.getElementById("tot").innerHTML=rows.map(({s,v})=>`<div class="trow ${Math.abs(v)<1e-9?"zero":""} ${s==="Luck"||s==="Size Boost"?"lead":""}"><span class="k">${s}</span><span class="v">${Math.abs(v)<1e-9?"-":fxT(v)}</span></div>`).join("");
   const n=ORDER.reduce((a,r)=>a+S[r].filter(x=>x.m).length,0);
   document.getElementById("filled").textContent=`${n} of 18 displays filled.`;
 }
@@ -254,7 +254,7 @@ document.getElementById("saveform").addEventListener("submit",e=>{
 function loadoutHTML(name,b){
   const t=totals(b),when=new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
   const bands=ORDER.map(r=>`<section class="band" style="--rc:var(--c-${r.toLowerCase()})"><div class="bh"><h2>${r}</h2><span>${SLOTS[r]} display${SLOTS[r]>1?"s":""}</span></div><div class="slots">${b[r].map(s=>`<div class="slot"><div class="mn">${s.m?esc(s.m):'<i>Empty</i>'}</div><div class="mu">${s.u&&s.u!=="None"?esc(s.u):"No mutation"}</div><div class="gives">${s.m||s.u!=="None"?gainHTML(slotGain(r,s)):""}</div></div>`).join("")}</div></section>`).join("");
-  const trows=STATS.map(s=>`<div class="trow ${Math.abs(t[s])<1e-9?"zero":""}"><span>${s}</span><span class="v">${Math.abs(t[s])<1e-9?"—":fxT(t[s])}</span></div>`).join("");
+  const trows=STATS.map(s=>`<div class="trow ${Math.abs(t[s])<1e-9?"zero":""}"><span>${s}</span><span class="v">${Math.abs(t[s])<1e-9?"-":fxT(t[s])}</span></div>`).join("");
   const css=`:root{--bg:#eef0f2;--panel:#fff;--fg:#1d2228;--muted:#5d6670;--line:#d6dbe0;--pos:#0f7c6b;--neg:#b3402f;--c-common:#7a8591;--c-uncommon:#3d8a3f;--c-rare:#2d6fc0;--c-epic:#8a3fc0;--c-legendary:#c98a10;--c-mythic:#c2304a;--c-exotic:#d24ab8;--fd:"Chakra Petch","Segoe UI",system-ui,sans-serif;--fb:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;--fm:"IBM Plex Mono",ui-monospace,Consolas,monospace}
 @media (prefers-color-scheme:dark){:root{--bg:#14181c;--panel:#1c2126;--fg:#e6e9ec;--muted:#98a2ad;--line:#2d343b;--pos:#3cc2a8;--neg:#ef7a66;--c-common:#a3adb8;--c-uncommon:#6cc46e;--c-rare:#68a6f0;--c-epic:#b880ee;--c-legendary:#f2b53a;--c-mythic:#f0687f;--c-exotic:#f17ad6;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--fb)}

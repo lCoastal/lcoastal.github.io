@@ -222,7 +222,7 @@ function renderParts(){const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(
   const sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
   const row=(x,txt,neg)=>`<div class="pt${x.key&&S.only===x.key?" on":""}"${x.key?` role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"`:""}><b>${esc(x.label)}${x.sub?` <small>${esc(x.sub)}</small>`:""}</b><span class="lk2" style="color:${neg?"var(--neg,#c53030)":"var(--accent)"}">${txt}</span></div>`;
   const lv=brkLvl();
-  const cards=lv===1?D.stats.map(({s,flatT,mult,xm,total,fo1})=>`<div class="bks bksemi"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b></div><div class="sem"><div><small>Flat points</small><b>${tv(s,flatT)}</b></div><div><small>Multiplier</small><b>${fo1?"—":"×"+mxf(mult)}</b></div>${xm!==1?`<div><small>Events &amp; tools</small><b>×${fmt(xm,2)}</b></div>`:""}<div class="semt"><small>Total</small><b style="color:${statHex(s)}">${tv(s,total)}</b></div></div></div>`).join(""):D.stats.map(({s,flatT,mult,xm,total,F,M,X,fo1})=>{
+  const cards=lv===1?D.stats.map(({s,flatT,mult,xm,total,fo1})=>`<div class="bks bksemi"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b></div><div class="sem"><div><small>Flat points</small><b>${tv(s,flatT)}</b></div><div><small>Multiplier</small><b>${fo1?"-":"×"+mxf(mult)}</b></div>${xm!==1?`<div><small>Events &amp; tools</small><b>×${fmt(xm,2)}</b></div>`:""}<div class="semt"><small>Total</small><b style="color:${statHex(s)}">${tv(s,total)}</b></div></div></div>`).join(""):D.stats.map(({s,flatT,mult,xm,total,F,M,X,fo1})=>{
     const formula=fo1||(mult===1&&xm===1)?"":`${tv(s,flatT)} × ${mxf(mult)}${xm!==1?` × ${fmt(xm,2)}`:""} = `;
     return `<div class="bks"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b><span>${formula}<em>${tv(s,total)}</em></span></div>
       <div class="bksub"><span>Flat points</span><span>${tv(s,flatT)}</span></div>${F.length?F.map(o=>row(o.x,sv(s,o.v),o.v<0)).join(""):'<p class="bkn">None</p>'}
@@ -514,7 +514,7 @@ function render(){renderSpread();if(typeof fillProg==="function"&&$("progSum"))f
   const r=compute(effState());
   const f=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
   $("out").innerHTML=`<table class="out"><tr><th>Stat</th><th>Gear</th><th>Boost pile</th><th>Total</th><th class="bkc" title="Show this stat in the detailed breakdown">Breakdown</th></tr>${STATS.map(s=>{const show=r.base[s]||r.tot[s]||s==="Luck";if(!show)return "";const on=!(S.brkHide||[]).includes(s);
-    return `<tr class="${s==="Luck"?"big":""}"><td>${s}</td><td>${f(s,r.base[s]+r.flat[s])}</td><td>${["Toughness","Inventory Size"].includes(s)?"—":"×"+fmt(1+r.pile[s],2)}</td><td class="tot">${f(s,r.tot[s])}</td><td class="bkc"><button type="button" class="sw2" role="switch" data-bstat="${esc(s)}" aria-checked="${on}" aria-label="Show ${esc(s)} in the detailed breakdown" title="${on?"Shown":"Hidden"} in the detailed breakdown"></button></td></tr>`}).join("")}</table>
+    return `<tr class="${s==="Luck"?"big":""}"><td>${s}</td><td>${f(s,r.base[s]+r.flat[s])}</td><td>${["Toughness","Inventory Size"].includes(s)?"-":"×"+fmt(1+r.pile[s],2)}</td><td class="tot">${f(s,r.tot[s])}</td><td class="bkc"><button type="button" class="sw2" role="switch" data-bstat="${esc(s)}" aria-checked="${on}" aria-label="Show ${esc(s)} in the detailed breakdown" title="${on?"Shown":"Hidden"} in the detailed breakdown"></button></td></tr>`}).join("")}</table>
     <p class="hint" style="margin-top:8px">${[r.ev>1?`Events multiply final luck by ×${r.ev}.`:"",r.luckMult>1?`Your trinket multiplies final luck by ×${fmt(r.luckMult,2)}.`:"",r.mt.n?`Museum: ${r.mt.n} display${r.mt.n===1?"":"s"} counted.`:"No museum counted.",...r.notes].filter(Boolean).join(" ")}</p>`;
   const mtS=musTotals(S);$("musTxt").textContent=S.mus==="none"?"":mtS.n?Object.entries(mtS.t).filter(([,v])=>v).map(([k,v])=>`${k} ${v<0?"−":"+"}${fmt(Math.abs(v),3)}×`).join(", "):"That museum board is empty. Fill it in on the Museum Planner page.";
 }
@@ -700,7 +700,7 @@ function previewHtml(k,it,mode){
   else{const nx=compute(withItem(k,it?it.n:""));const rows=deltaRows(cur,nx);dl=`<div class="pvt">${curName(k)===(it?it.n:"")?"Already equipped":"Your totals if you pick this"}</div>`+(rows.length?`<div class="pvs">${rows.map(([s,x,y])=>`<div><span>${s}</span><span class="mono">${fv(s,x)} → <b class="${y>x?"up":"dn"}">${fv(s,y)}</b> <span class="${y>x?"up":"dn"}">(${sgn(s,y-x)})</span></span></div>`).join("")}</div>`:`<span class="muted">No change.</span>`)}
   return head+(st?`<div class="pvt">Item stats${sub}</div><div class="pvs">${st}</div>`:"")+dl}
 function paintPicks(){document.querySelectorAll("[data-pick]").forEach(b=>{const k=b.dataset.pick;const n=curName(k);const it=n&&itemsFor(k).find(i=>i.n===n);
-  b.innerHTML=`${it&&it.img?`<img src="${it.img}" alt="">`:""}<span class="pn ${n?"":"nil"}">${n?esc(n):k==="pan"?"— no pan —":k==="shovel"?"— no shovel —":"— empty —"}</span>${it&&it.r?`<span class="rr" style="--rc:${rc(it.r)}">${it.r}</span>`:""}<span class="car" aria-hidden="true">▾</span>`})}
+  b.innerHTML=`${it&&it.img?`<img src="${it.img}" alt="">`:""}<span class="pn ${n?"":"nil"}">${n?esc(n):k==="pan"?"No pan":k==="shovel"?"No shovel":"Empty"}</span>${it&&it.r?`<span class="rr" style="--rc:${rc(it.r)}">${it.r}</span>`:""}<span class="car" aria-hidden="true">▾</span>`})}
 // open / navigate / pick
 const pk=$("picker"),pkQ=$("pkQ"),pkList=$("pkList"),pkPv=$("pkPv"),tip=$("tip");let pkKey=null,pkBtn=null,pkItems=[],pkSel=0;
 function openPicker(btn){pkKey=btn.dataset.pick;pkBtn=btn;tip.hidden=true;pkQ.value="";pk.hidden=false;place();listPicker();
@@ -753,7 +753,7 @@ const boostTxt=m=>m&&m.mu?m.mu.b.map(([s,v])=>`${s} ${v<0?"−":"+"}${Math.abs(v
 function musEditor(){const ed=$("musEd");$("musCopy").hidden=S.mus==="custom";if(S.mus!=="custom"){ed.innerHTML="";return}
   if(!S.museumBoard)S.museumBoard=blankBoard();const bd=S.museumBoard;
   ed.innerHTML=MORDER.map(r=>{const opts=P.mins.filter(m=>m.r===r&&m.mu);return `<div class="mrow" style="--rc:${rc(r)}"><span class="rl">${r}</span><div class="mslots">${(bd[r]||[]).map((sl,i)=>`<div class="msl">
-    <select data-mm="${r}|${i}" aria-label="${r} display ${i+1}"><option value="">— empty —</option><option value="Any"${sl.m==="Any"?" selected":""}>Anything (only the modifier counts)</option>${opts.map(m=>`<option value="${esc(m.n)}"${m.n===sl.m?" selected":""}>${esc(m.n)}, ${esc(boostTxt(m))}</option>`).join("")}</select>
+    <select data-mm="${r}|${i}" aria-label="${r} display ${i+1}"><option value="">Empty</option><option value="Any"${sl.m==="Any"?" selected":""}>Anything (only the modifier counts)</option>${opts.map(m=>`<option value="${esc(m.n)}"${m.n===sl.m?" selected":""}>${esc(m.n)}, ${esc(boostTxt(m))}</option>`).join("")}</select>
     <select data-mu="${r}|${i}" aria-label="${r} display ${i+1} modifier">${P.mods.map(md=>`<option value="${esc(md[0])}"${md[0]===(sl.u||"None")?" selected":""}>${md[0]==="None"?"No modifier":esc(md[0])}</option>`).join("")}</select></div>`).join("")}</div></div>`}).join("")}
 $("musCopy").onclick=()=>{const src=S.mus==="custom"?null:musBoard();const bd=blankBoard();if(src)MORDER.forEach(r=>(src[r]||[]).forEach((sl,i)=>{if(bd[r][i]&&sl)bd[r][i]={m:sl.m||null,u:sl.u||"None"}}));
   if(S.mus!=="custom"||!S.museumBoard)S.museumBoard=bd;S.mus="custom";save();fillMus();musEditor();render()};
@@ -1038,11 +1038,11 @@ window.ptMusRows=()=>MORDER.map(r=>[r,MSLOTS[r]]);
 let BF_LAST=null;
 function showBf(){const R=BF_LAST;if(!R){$("bfOut").innerHTML="";return}const st=R.st,t=R.tot||compute(st).tot;
   const g=Math.exp((R.sc!=null?R.sc:bfScore(st,R.goal))-R.beforeSc)-1;const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";
-  const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"—"}</td><td class="was">${now===was?"":(was||"—")}</td></tr>`;
+  const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"-"}</td><td class="was">${now===was?"":(was||"-")}</td></tr>`;
   const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":`, ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
   const rows=[row("Pan",esc(st.pan)+(st.panEn?`, ${esc(st.panEn)}`:""),esc(S.pan)+(S.panEn?`, ${esc(S.panEn)}`:"")),row("Shovel",esc(st.shovel)+(st.shEn?`, ${esc(st.shEn)}`:""),esc(S.shovel)+(S.shEn?`, ${esc(S.shEn)}`:"")),row("Trinket",esc(st.trinket||""),esc(S.trinket||""))]
     .concat(SLOTDEF.map(([k,l])=>row(l,it(st.slots[k]),it(S.slots[k]))));
-  let mus="";if(R.museum){const b=st.museumBoard||{};mus=`<h3 class="bfh">Museum</h3><div class="bfmus">${MORDER.map(r=>`<div><span class="lab" style="color:${rc(r)}">${r}</span> ${(b[r]||[]).filter(Boolean).map(x=>`${esc(x.m)}${x.u&&x.u!=="None"?` <span class="hint">(${esc(x.u)})</span>`:""}`).join(", ")||"—"}</div>`).join("")}</div>`}
+  let mus="";if(R.museum){const b=st.museumBoard||{};mus=`<h3 class="bfh">Museum</h3><div class="bfmus">${MORDER.map(r=>`<div><span class="lab" style="color:${rc(r)}">${r}</span> ${(b[r]||[]).filter(Boolean).map(x=>`${esc(x.m)}${x.u&&x.u!=="None"?` <span class="hint">(${esc(x.u)})</span>`:""}`).join(", ")||"-"}</div>`).join("")}</div>`}
   const capL=.565*t.Luck/Math.max(1,t.Capacity);
   $("bfOut").innerHTML=`<div class="bfsum"><div><span class="lab">Luck</span><b>${fmt(t.Luck,0)}</b> <span class="hint">was ${fmt(R.before.Luck,0)}</span></div><div><span class="lab">Capacity</span><b>${fmt(t.Capacity,0)}</b> <span class="hint">was ${fmt(R.before.Capacity,0)}</span></div><div><span class="lab">${R.goal==="luck"?"Luck":"Rare finds per pan"}</span><b class="${g>0.0005?"pos":""}">${g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found"}</b></div></div>
     ${R.goal==="luck"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck (0.565 × luck ÷ capacity).</p>`}
