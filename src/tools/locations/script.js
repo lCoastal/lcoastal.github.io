@@ -19,8 +19,8 @@ if(!cur||!BY[cur.toLowerCase()])cur=LOCS[0].n;
 const side=document.getElementById("side"),mp=document.getElementById("mpick");
 let h="",o="",last="";
 LOCS.forEach(l=>{if(l.rg!==last){h+=`<div class="rg">${esc(l.rg)}</div>`;if(last)o+="</optgroup>";o+=`<optgroup label="${esc(l.rg)}">`;last=l.rg}
-  h+=`<button type="button" class="lk" data-location="${esc(l.n)}" data-go="${esc(l.n)}"><span>${esc(l.n)}</span><span class="tp" title="Toughness${(REQ[l.n]||{}).luck?" · recommended luck":""}">${l.t==="None"?"no req.":"T"+esc(l.t)}${(REQ[l.n]||{}).luck?" · "+((REQ[l.n].luck>=1000)?REQ[l.n].luck/1000+"k":REQ[l.n].luck):""}</span></button>`;
-  o+=`<option value="${esc(l.n)}">${esc(l.n)} · ${l.t==="None"?"no toughness needed":"Toughness "+esc(l.t)}</option>`});
+  h+=`<button type="button" class="lk" data-location="${esc(l.n)}" data-go="${esc(l.n)}"><span>${esc(l.n)}</span><span class="tp" title="Toughness${(REQ[l.n]||{}).luck?", recommended luck":""}">${l.t==="None"?"no req.":"T"+esc(l.t)}${(REQ[l.n]||{}).luck?", "+((REQ[l.n].luck>=1000)?REQ[l.n].luck/1000+"k":REQ[l.n].luck):""}</span></button>`;
+  o+=`<option value="${esc(l.n)}">${esc(l.n)}, ${l.t==="None"?"no toughness needed":"Toughness "+esc(l.t)}</option>`});
 side.innerHTML=h;mp.innerHTML=o+"</optgroup>";
 side.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b&&!(e.ctrlKey||e.metaKey)){openLocation(b.dataset.go);const d=document.getElementById("detail");if(d&&d.getBoundingClientRect().top<0)d.scrollIntoView({block:"start"})}});
 mp.addEventListener("change",()=>openLocation(mp.value));
@@ -43,7 +43,7 @@ function openLocation(name){
     ${reqHtml(l)}
     <dl class="facts">
       <dt>NPCs</dt><dd>${esc(l.npc)}</dd>
-      <dt>Minerals</dt><dd>${ms.length} in total${counts.length?" · "+counts.map(([r,n])=>`<span style="color:${rc(r)};font-weight:600">${n} ${r}</span>`).join(" · "):""}</dd>
+      <dt>Minerals</dt><dd>${ms.length} in total${counts.length?", "+counts.map(([r,n])=>`<span style="color:${rc(r)};font-weight:600">${n} ${r}</span>`).join(", "):""}</dd>
     </dl></section>
   <section class="card"><div class="mh"><h3>Minerals found here</h3><span>Ctrl+click a mineral to open its page</span></div>
     ${ms.length?`<div class="tiles">${ms.map(({m})=>`<div class="tile" style="--rc:${rc(m.r)}" data-mineral="${esc(m.n)}" title="${esc(m.n)}"><div class="ic"><img src="${m.ic}" alt="" width="36" height="36" loading="lazy"></div><div class="t"><b>${esc(m.n)}</b><span>${esc(m.r)}</span></div></div>`).join("")}</div>`:'<p class="hint">No minerals are listed for this location.</p>'}</section>`;
@@ -61,6 +61,6 @@ openLocation(cur);
   sel.onchange=upd;below.onchange=upd;upd();
   btn.onclick=async()=>{const v=+sel.value;const list=pick();
     const head=v===0?"Locations with no toughness requirement":below.checked?`Locations you can dig with toughness ${v}`:`Toughness ${v} locations`;
-    const txt=`**${head}** (${list.length})\n`+list.map(l=>`• ${l.n}${l.rg&&l.rg!==l.n?` (${l.rg})`:""}${below.checked&&tv(l)!==v?` · toughness ${l.t==="None"?"none":l.t}`:""}`).join("\n");
+    const txt=`**${head}** (${list.length})\n`+list.map(l=>`• ${l.n}${l.rg&&l.rg!==l.n?` (${l.rg})`:""}${below.checked&&tv(l)!==v?`, toughness ${l.t==="None"?"none":l.t}`:""}`).join("\n");
     let ok=false;try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
     btn.textContent=ok?"Copied!":"Couldn't copy";btn.classList.toggle("ok",ok);setTimeout(()=>{btn.textContent="Copy list";btn.classList.remove("ok")},1500)}}

@@ -14,10 +14,10 @@
 .rq{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid color-mix(in srgb,var(--warn) 50%,var(--line));color:var(--warn)}
 .qlink{font:inherit;font-size:12px;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 #p-trn:not([hidden]){display:flex}
-.grp{font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:6px 0 0}
+.grp{font:700 12px var(--f-body);color:var(--muted);margin:6px 0 0}
 table.sl{border-collapse:collapse;font-size:13.5px}
 table.sl td,table.sl th{padding:4px 14px 4px 0;text-align:left;border-bottom:1px dashed var(--line)}
-table.sl th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
+table.sl th{font:600 11px var(--f-body);color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .filters input{flex:1;min-width:180px}
 /* Meteor Shards are pink in game */

@@ -14,7 +14,7 @@ function whereInfo(n){const m=MIN[n.toLowerCase()];if(!m||!m.ch||!m.ch.length)re
 function where(n){const w=whereInfo(n);if(!w)return "";const b=w.best;
   const odds=`<span class="mono">~1 in ${isFinite(oneIn(b[2]))?oneIn(b[2]).toLocaleString("en-US"):"?"}</span>`;
   if(w.voidOnly)return `<span title="Only drops in The Void, whose loot pool keeps changing.">Only in <span class="lk" data-location="The Void">The Void</span> ${odds}</span>`;
-  return `<span class="lk" data-location="${esc(baseLoc(b[0]))}">${esc(b[0])}</span> ${odds}${w.ch.length>1?` <span class="muted">· +${w.ch.length-1} more</span>`:""}${w.hasVoid?` <span class="vx" title="${VOID_TIP}" tabindex="0" aria-label="${VOID_TIP}">Void excluded</span>`:""}`}
+  return `<span class="lk" data-location="${esc(baseLoc(b[0]))}">${esc(b[0])}</span> ${odds}${w.ch.length>1?` <span class="muted">+${w.ch.length-1} more</span>`:""}${w.hasVoid?` <span class="vx" title="${VOID_TIP}" tabindex="0" aria-label="${VOID_TIP}">Void excluded</span>`:""}`}
 function addGoal(name,crafts){const x=EQ[String(name).toLowerCase()];if(!x)return false;const star=crafts===2?6:5;const g=S.goals.find(g=>g.n===x.n&&g.star===star);if(g)g.c++;else S.goals.push({n:x.n,c:1,star});save();render();return true}
 window.reloadChecklist=()=>{load();render()};
 window.addGoal=addGoal;
@@ -62,7 +62,7 @@ function pie(rows,mode){const on=S.pie!==false;const btn=$("pieBtn");btn.setAttr
   const tot=parts.reduce((s,x)=>s+x.v,0);let a=0;
   const segs=parts.map((x,i)=>{const sh=x.v/tot;const a0=a,a1=a+Math.max(sh*2*Math.PI,0.0001);a=a1;const full=sh>0.9999;
     const d=full?`M95 10A85 85 0 1 1 94.99 10Z M95 46A49 49 0 1 0 95.01 46Z`:arc(95,95,85,49,a0,a1);
-    return `<path d="${d}" fill="${PAL[x.ci%PAL.length]}" fill-rule="evenodd" data-pi="${i}"><title>${esc(x.n)}: ${x.left} left · ${pctTxt(sh*100)}%</title></path>`}).join("");
+    return `<path d="${d}" fill="${PAL[x.ci%PAL.length]}" fill-rule="evenodd" data-pi="${i}"><title>${esc(x.n)}: ${x.left} left, ${pctTxt(sh*100)}%</title></path>`}).join("");
   el.innerHTML=`<svg viewBox="0 0 190 190" role="img" aria-label="${esc(parts.map((x,i)=>`${x.n} ${pctTxt(x.v/tot*100)}%`).join(", "))}">${segs}<text x="95" y="93" text-anchor="middle" class="ctr">${fmt(parts.reduce((s,x)=>s+x.left,0),0)}</text><text x="95" y="109" text-anchor="middle" class="ctr2">items left</text></svg>
     <ul class="leg">${parts.map((x,i)=>`<li data-pi="${i}"><i style="background:${PAL[x.ci%PAL.length]}"></i><span>${esc(x.n)}</span><span class="mono">${fmt(x.left,0)} left</span><b>${pctTxt(x.v/tot*100)}%</b></li>`).join("")}</ul>
     <p class="muted" style="margin:0;font-size:12.5px;grid-column:1/-1">${mode==="effort"?"Slices show how much of the remaining effort each material is.":"Slices show how many of each material are left."}</p>`}
@@ -89,14 +89,14 @@ function render(){
         <span class="seg" role="group" aria-label="Star level"><button type="button" data-star="${i}" data-s="5" aria-pressed="${g.star!==6}">5★</button><button type="button" data-star="${i}" data-s="6" aria-pressed="${g.star===6}">6★</button></span>
         <span class="muted" style="font-size:12.5px">${g.c*(g.star===6?2:1)} craft${g.c*(g.star===6?2:1)===1?"":"s"}</span></div></div>`}).join("")
     +S.extra.map((e,i)=>{const m=MIN[e.n.toLowerCase()];return `<div class="goal"><div class="icon">${m&&m.ic?`<img src="${m.ic}" alt="" width="36" height="36">`:""}</div>
-      <div class="nm" data-mineral="${esc(e.n)}"><b>${esc(e.n)}</b><span class="rr" style="--rc:${rc(m?m.r:"common")}">${m?m.r:""} · extra material</span></div>
+      <div class="nm" data-mineral="${esc(e.n)}"><b>${esc(e.n)}</b><span class="rr" style="--rc:${rc(m?m.r:"common")}">${m?m.r:""}, extra material</span></div>
       <button type="button" class="x" data-rmx="${i}" aria-label="Remove ${esc(e.n)}">Remove</button>
       <div class="ctl"><span class="step"><button type="button" data-dx="${i}" data-v="-1" aria-label="One fewer">−</button><input type="number" min="1" value="${e.q}" data-cx="${i}" aria-label="How many ${esc(e.n)}"><button type="button" data-dx="${i}" data-v="1" aria-label="One more">+</button></span></div></div>`}).join("")
     :'<p class="muted" style="margin:0">Nothing added yet. Add an item above, or open any item on the Equipment page and press “Add to crafting checklist”.</p>';
   const {rows,tot,got,done,cost,usedBy}=calc();summary();
   const vis=rows.filter(r=>!S.hide||r.left);
   $("mats").innerHTML=rows.length?`<table class="mat"><thead><tr><th>Material</th><th style="text-align:right">Need</th><th style="text-align:right">Have</th><th style="text-align:right">Left</th><th>Best place to farm</th></tr></thead><tbody>
-    ${vis.map(r=>`<tr class="${r.left?"":"done"}"><td><div class="mn" data-mineral="${esc(r.n)}" title="Ctrl+click to open ${esc(r.n)}">${r.m&&r.m.ic?`<img src="${r.m.ic}" alt="" width="30" height="30" loading="lazy">`:""}<span><b>${esc(r.n)}</b><span class="rr" style="--rc:${rc(r.m?r.m.r:"common")}">${r.m?r.m.r:""}</span> <span class="used">· ${[...usedBy[r.n]].filter(u=>u!=="extra").join(", ")||"extra"}</span></span></div></td>
+    ${vis.map(r=>`<tr class="${r.left?"":"done"}"><td><div class="mn" data-mineral="${esc(r.n)}" title="Ctrl+click to open ${esc(r.n)}">${r.m&&r.m.ic?`<img src="${r.m.ic}" alt="" width="30" height="30" loading="lazy">`:""}<span><b>${esc(r.n)}</b><span class="rr" style="--rc:${rc(r.m?r.m.r:"common")}">${r.m?r.m.r:""}</span> <span class="used">${[...usedBy[r.n]].filter(u=>u!=="extra").join(", ")||"extra"}</span></span></div></td>
       <td class="n" data-l="Need">${fmt(r.q,0)}</td><td class="n" data-l="Have"><input type="number" min="0" value="${r.have}" data-have="${esc(r.n)}" aria-label="How many ${esc(r.n)} you have"></td>
       <td class="n st ${r.left?"no":"ok"}" data-l="Left">${r.left?fmt(r.left,0):"✓ done"}</td><td class="w"><div class="where"${(whereInfo(r.n)||{}).hasVoid?` title="${VOID_TIP}"`:""}>${where(r.n)}</div></td></tr>`).join("")}</tbody></table>${vis.length<rows.length?`<p class="muted" style="font-size:12.5px;margin:8px 0 0">${rows.length-vis.length} finished material${rows.length-vis.length===1?"":"s"} hidden.</p>`:""}`
     :'<div class="empty">Your materials will show up here.</div>';
@@ -121,7 +121,7 @@ $("toImg").onclick=()=>{const {rows,tot,got,done,cost}=calc();if(!S.goals.length
   const mode=S.pm||"effort";const wt=rows.reduce((s,r)=>s+r.q*effort(r.n),0),wg=rows.reduce((s,r)=>s+Math.min(r.q,r.have)*effort(r.n),0);const pct=mode==="effort"?(wt?wg/wt*100:0):(tot?got/tot*100:0);
   const sub=[`Progress ${pctTxt(pct)}% ${mode==="effort"?"by effort":"by item count"}`,`${done} / ${rows.length} materials ready`,`${fmt(got,0)} / ${fmt(tot,0)} items collected`];if(cost)sub.push(`$${fmt(cost,0)} in crafting fees`);
   const goals=S.goals.map(g=>{const x=EQ[g.n.toLowerCase()];const cr=g.c*(g.star===6?2:1);return {cells:[{t:g.n,b:true,ic:x&&P.eimg[x.img],sub:x?x.r+" "+x.slot:"",subcol:x?(RHEX[x.r]||"#98a2ad"):"#98a2ad"},{t:"×"+g.c,mono:true},{t:g.star+"★",mono:true,col:"#f2b53a"},{t:cr+" craft"+(cr===1?"":"s"),col:"#98a2ad"}]}})
-    .concat(S.extra.map(e=>{const m=MIN[e.n.toLowerCase()];return {cells:[{t:e.n,b:true,ic:m&&m.ic,sub:(m?m.r+" · ":"")+"extra material",subcol:m?(RHEX[m.r]||"#98a2ad"):"#98a2ad"},{t:"×"+e.q,mono:true},{t:"—",col:"#98a2ad"},{t:"",col:"#98a2ad"}]}}));
+    .concat(S.extra.map(e=>{const m=MIN[e.n.toLowerCase()];return {cells:[{t:e.n,b:true,ic:m&&m.ic,sub:(m?m.r+", ":"")+"extra material",subcol:m?(RHEX[m.r]||"#98a2ad"):"#98a2ad"},{t:"×"+e.q,mono:true},{t:"—",col:"#98a2ad"},{t:"",col:"#98a2ad"}]}}));
   const vis=rows.filter(r=>!S.hide||r.left);
   const mats=vis.map(r=>{const w=whereInfo(r.n);const o=w?oneIn(w.best[2]):NaN;const place=!w?"—":(w.voidOnly?"Only in The Void":w.best[0]);
     return {cells:[{t:r.n,b:true,ic:r.m&&r.m.ic,sub:r.m?r.m.r:"",subcol:r.m?(RHEX[r.m.r]||"#98a2ad"):"#98a2ad"},{t:fmt(r.q,0),mono:true},{t:fmt(r.have,0),mono:true},{t:r.left?fmt(r.left,0):"✓ done",mono:!!r.left,b:!r.left,fs:r.left?14:13.5,col:r.left?"#e6e9ec":"#3cc2a8"},{t:place,wrap:true,sub:w&&isFinite(o)?"~1 in "+o.toLocaleString("en-US"):"",col:w?"#e6e9ec":"#98a2ad"}]}});

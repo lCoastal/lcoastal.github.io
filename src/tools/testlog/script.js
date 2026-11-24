@@ -118,7 +118,7 @@ function tiles(){
     ["Modifier Boost tested","1.1× – 16.6×",""],["Logged pans",n0(pans),"in sessions that counted pans"]]
     .map(([l,v,s])=>`<div class="tile"><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`).join("");
   const nm=id=>{const x=S.find(s=>s.id===id);return x?`<a href="#${id}" data-go="${id}">${esc(x.title)}</a>`:""};
-  if(false)$("find").innerHTML=FIND.map(([t,ids])=>`<li>${esc(t)} <span class="src">— from: ${ids.map(nm).join(" · ")}</span></li>`).join("");
+  if(false)$("find").innerHTML=FIND.map(([t,ids])=>`<li>${esc(t)} <span class="src">— from: ${ids.map(nm).join(", ")}</span></li>`).join("");
   if(false)$("open").innerHTML=OPEN.map(t=>`<li>${esc(t)}</li>`).join("");
 }
 function hi(t,q){t=esc(t);if(!q)return t;const i=t.toLowerCase().indexOf(q);return i<0?t:t.slice(0,i)+"<mark>"+t.slice(i,i+q.length)+"</mark>"+t.slice(i+q.length)}

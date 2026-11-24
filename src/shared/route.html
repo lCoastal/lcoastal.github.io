@@ -11,7 +11,7 @@
 .rt-sum b{display:block;font-family:var(--f-mono);font-size:1.2rem;font-weight:500}
 .rt-sum .hint{font-size:12.5px;color:var(--muted)}
 .rt-stops{display:flex;flex-direction:column;gap:10px}
-.rt-stop{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.rt-stop{background:var(--panel);border:1px solid color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .rt-stop.fin{opacity:.6;border-left-color:var(--line)}
 .rt-sh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
 .rt-sh h3{margin:0;font-family:var(--f-display);font-size:1.15rem;display:flex;align-items:center;gap:10px}
@@ -22,8 +22,8 @@
 .rt-items{display:flex;flex-direction:column;gap:6px}
 .rt-t{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--sunk)}
 .rt-t.nock{grid-template-columns:minmax(0,1fr) auto}
-.rt-only{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:999px;background:var(--warn);color:var(--bg);margin-left:6px;vertical-align:1px}
-.rt-rec,.rt-extra,.rt-time{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px;cursor:help}
+.rt-only{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--warn);color:var(--bg);margin-left:6px;vertical-align:1px}
+.rt-rec,.rt-extra,.rt-time{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px;cursor:help}
 .rt-only{cursor:help}
 .rt-rec{background:var(--accent);color:var(--bg)}
 .rt-extra{border:1px solid var(--line);color:var(--muted)}
@@ -40,7 +40,7 @@
 .rt-tips{margin:0;padding-left:18px;font-size:13px;display:flex;flex-direction:column;gap:3px}
 .rt-tips b{font-weight:600}
 .rt-swap{font-size:13px;padding:7px 10px;border-radius:8px;border:1px dashed var(--accent);background:color-mix(in srgb,var(--accent) 8%,transparent)}
-.rt-rr{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--rc)}
+.rt-rr{font-size:11px;font-weight:600;color:var(--rc)}
 .rt-issues{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:13px}
 @media (max-width:520px){.rt-t{grid-template-columns:auto minmax(0,1fr)}.rt-t.nock{grid-template-columns:minmax(0,1fr)}.rt-odd{grid-column:-2;text-align:left}}
 </style>
@@ -203,14 +203,14 @@ function stopsHTML(R,opts={}){const zs=R.zones;let k=0;
     if(st.stats&&slow&&left.length>1&&eAll([{p:slow.cands[Z.z],c:slow.c}])>Z.pans*.7)tips.push(`<b>Most of the wait is ${esc(slow.m.n)}.</b> The others usually come well before it.`);
     const need=t=>opts.tick?"":t.c>0?`Need ${fmt(t.c,0)}`:"Done";
     const row=(t,req)=>{const p=t.cands[Z.z];const g=!t.c;const T2=opts.tick?"label":"div";
-      return `<${T2} class="rt-t${g?" got":""}${req?"":" opt"}${opts.tick?"":" nock"}">${opts.tick?`<input type="checkbox" data-got="${esc(KEY(t))}"${g?" checked":""}>`:""}<span class="rt-tn">${t.m.ic?`<img src="${t.m.ic}" alt="">`:""}<span><span data-mineral="${esc(t.m.n)}">${esc(t.m.n)}</span>${t.u&&t.u!=="None"?` · <b>${esc(t.u)}</b>`:""}${tag(t,Z,req)}${t.lunar?`<span class="rt-time" title="${esc("Time-gated: Lunar only rolls at night.\nPan here after dark, or it won't drop at all.")}">Night only</span>`:""}<small><span class="rt-rr" style="--rc:${rc(t.m.r)}">${esc(t.m.r)}</span>${need(t)?" · "+need(t):""}${req?"":" · optional here"}${opts.kg&&t.m.mu&&t.m.mu.kg?` · full boost at ${t.m.mu.kg} kg`:""}</small></span></span><span class="rt-odd">${st.stats?`${capTxt(t.m,Z.z)}<small>best luck cap · ${oneIn(p)} at your luck</small>`:`<small>${baseOdds(p)}</small>`}</span></${T2}>`};
+      return `<${T2} class="rt-t${g?" got":""}${req?"":" opt"}${opts.tick?"":" nock"}">${opts.tick?`<input type="checkbox" data-got="${esc(KEY(t))}"${g?" checked":""}>`:""}<span class="rt-tn">${t.m.ic?`<img src="${t.m.ic}" alt="">`:""}<span><span data-mineral="${esc(t.m.n)}">${esc(t.m.n)}</span>${t.u&&t.u!=="None"?`, <b>${esc(t.u)}</b>`:""}${tag(t,Z,req)}${t.lunar?`<span class="rt-time" title="${esc("Time-gated: Lunar only rolls at night.\nPan here after dark, or it won't drop at all.")}">Night only</span>`:""}<small><span class="rt-rr" style="--rc:${rc(t.m.r)}">${esc(t.m.r)}</span>${need(t)?", "+need(t):""}${req?"":", optional here"}${opts.kg&&t.m.mu&&t.m.mu.kg?`, full boost at ${t.m.mu.kg} kg`:""}</small></span></span><span class="rt-odd">${st.stats?`${capTxt(t.m,Z.z)}<small>best luck cap, ${oneIn(p)} at your luck</small>`:`<small>${baseOdds(p)}</small>`}</span></${T2}>`};
     return `<article class="rt-stop${fin?" fin":""}"><div class="rt-sh"><h3><span class="rt-num">${fin?"✓":k}</span><span data-location="${esc(b)}" class="lk">${esc(Z.z)}</span></h3>
       <div class="rt-est">${fin?"Done":st.stats?`Expected pans<b>${big(Z.pans)}</b>${dur(Z.pans)}`:`Items here<b>${left.length}</b>`}</div></div>
       <div class="rt-items">${Z.ts.map(t=>row(t,true)).join("")}${extra.map(t=>row(t,false)).join("")}</div>
       ${tips.length&&!fin?`<ul class="rt-tips">${tips.map(x=>`<li>${x}</li>`).join("")}</ul>`:""}
       ${fin?"":`<div class="rt-swap"><b>Move on</b> once you have ${left.map(t=>(t.c>1?fmt(t.c,0)+"× ":"")+esc(t.m.n)).join(", ")}${next?`, then go to <b>${esc(next.z)}</b>`:". That's the last stop"}.${extra.length?` Items marked optional can wait for a later stop.`:""}</div>`}</article>`}).join("")}
 function specialHTML(R){return (R.special||[]).map(it=>{const [tag,how,showWhere]=SPECIAL[it.u];const zs=[...new Set((it.m.ch||[]).map(c=>baseLoc(c[0])))];
-  return `<div class="rt-t nock" style="grid-template-columns:minmax(0,1fr)"><span class="rt-tn">${it.m.ic?`<img src="${it.m.ic}" alt="">`:""}<span><span data-mineral="${esc(it.m.n)}">${esc(it.m.n)}</span> · <b>${esc(it.u)}</b><span class="rt-time" title="${esc(`${it.u} can't come from normal panning, so it isn't on the route.`)}">${esc(tag)}</span>
+  return `<div class="rt-t nock" style="grid-template-columns:minmax(0,1fr)"><span class="rt-tn">${it.m.ic?`<img src="${it.m.ic}" alt="">`:""}<span><span data-mineral="${esc(it.m.n)}">${esc(it.m.n)}</span>, <b>${esc(it.u)}</b><span class="rt-time" title="${esc(`${it.u} can't come from normal panning, so it isn't on the route.`)}">${esc(tag)}</span>
     <small style="font-size:13px;color:var(--fg);margin-top:3px">${esc(how.replace(/\{n\}/g,it.m.n))}${showWhere&&zs.length?` <span class="muted">${esc(it.m.n)} drops in ${esc(zs.join(", "))}.</span>`:""}</small></span></span></div>`}).join("")}
 function sumHTML(R,doneLbl){const open=R.zones.filter(z=>z.open);const total=open.reduce((s,z)=>s+z.pans,0);
   const lk=R.locked&&R.locked.length?`<div style="grid-column:1/-1;border-color:var(--neg);background:color-mix(in srgb,var(--neg) 8%,transparent)"><span class="lab" style="color:var(--neg)">Not doable yet</span><span style="display:block;font-size:13.5px;margin-top:2px">${R.locked.length} item${R.locked.length>1?"s":""} only drop${R.locked.length>1?"":"s"} in areas past ${esc(st.far)}: ${R.locked.map(t=>esc(t.m.n)).join(", ")}. You can farm the rest now; see the list below for what to unlock.</span></div>`:"";

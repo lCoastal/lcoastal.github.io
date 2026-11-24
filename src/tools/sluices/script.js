@@ -48,7 +48,7 @@ function table(rows,ev){
     ${CFG.passive?`<td class="ps">${passHtml(x.passive)}</td>`:""}
     ${CFG.upg?`<td class="n" data-l="Upg.">${u?u.points+" pts":'<span class="none">—</span>'}</td>`:""}
     <td class="lc">${locHtml(x.location)}</td></tr>`}).join("");
-  return `<section class="grp${ev?" ev":""}"><div class="gh"><b>${ev?"Limited-time "+KIND:"Shop "+KIND}</b><span>${rows.length} ${rows.length===1?"item":"items"}${ev?" · event currency or past events":" · in the order you unlock them"}</span></div>
+  return `<section class="grp${ev?" ev":""}"><div class="gh"><b>${ev?"Limited-time "+KIND:"Shop "+KIND}</b><span>${rows.length} ${rows.length===1?"item":"items"}${ev?", event currency or past events":", in the order you unlock them"}</span></div>
     <div class="tw"><table class="gear"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div></section>`}
 
 function render(){
@@ -91,7 +91,7 @@ function openItem(i){
       <button type="button" class="close" id="pclose">Close</button></div>
     ${x.description&&x.description!=="..."?`<p class="desc">${esc(x.description)}</p>`:""}
     <div>${tgHtml(x.name)}</div>
-    <div class="psec"><h3>Stats${prev?` <span style="text-transform:none;letter-spacing:0;font-weight:400">· change from ${esc(prev.name)}</span>`:""}</h3>
+    <div class="psec"><h3>Stats${prev?` <span style="text-transform:none;letter-spacing:0;font-weight:400">change from ${esc(prev.name)}</span>`:""}</h3>
       <div class="stats">${CFG.stats.map(([k,l])=>{const v=x.s[k],p=prev&&prev.s[k];const d=v!=null&&p!=null?+(v-p).toFixed(3):null;
         return `<div class="st"><span>${l}</span><b>${fmt(v)}</b>${d==null?"":`<small class="${d>0?"up":d<0?"dn":""}">${d>0?"+":d<0?"−":"±"}${fmt(Math.abs(d))}${p?` (${d>=0?"+":"−"}${fmt(Math.abs(d/p*100))}%)`:""}</small>`}</div>`}).join("")}</div></div>
     ${CFG.passive?`<div class="psec"><h3>Passive</h3>${x.passive?`<ul class="pas">${x.passive.split(/,\s*(?![^(]*\))/).map(t=>`<li>${passHtml(t)}</li>`).join("")}</ul>`:'<span class="none">No passive</span>'}</div>`:""}

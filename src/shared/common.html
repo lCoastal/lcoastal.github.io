@@ -23,7 +23,7 @@ h1{font-family:var(--f-display);font-size:2rem;line-height:1.1;margin:0}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .card h2{font-family:var(--f-display);font-size:1.15rem;margin:0}
-.lab{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.lab{font:600 12px var(--f-body);color:var(--muted)}
 input,select,button{font:inherit;color:inherit}
 input[type=search],input[type=text],input[type=number],select{padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--sunk);min-width:0}
 .btn{font:600 13px var(--f-body);padding:7px 12px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer}
@@ -35,7 +35,7 @@ input[type=search],input[type=text],input[type=number],select{padding:7px 10px;b
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 .lk{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;cursor:pointer}
-.rr{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--rc)}
+.rr{font-size:11px;font-weight:600;color:var(--rc)}
 /* favourite + owned toggles (shared across the toolkit) */
 .tg{display:inline-flex;gap:4px}
 .tg button{width:30px;height:30px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;font-size:15px;line-height:1}
@@ -136,7 +136,7 @@ async function ptTableImage(o){const F='"IBM Plex Sans","Segoe UI",system-ui,san
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   const TX=o.tic&&IMG[o.tic]?PAD+50:PAD;if(TX>PAD)c.drawImage(IMG[o.tic],PAD,PAD-4,42,42);c.fillStyle=o.tcol||"#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(fit(o.title,W-PAD*2-mw-20-(TX-PAD)),TX,PAD+30);
-  let y=PAD+52;if(o.sub&&o.sub.length){c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(o.sub.join(" · "),W-PAD*2),PAD,PAD+58);y=PAD+82}
+  let y=PAD+52;if(o.sub&&o.sub.length){c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(o.sub.join(", "),W-PAD*2),PAD,PAD+58);y=PAD+82}
   if(PIE){if(PIE.h){c.fillStyle="#e6e9ec";c.font=`700 19px ${FD}`;c.fillText(PIE.h,PAD,y+26);y+=40}
     const bodyH=Math.max(PR*2+20,PIE.parts.length*LROW+10),cx0=PAD+PR+10,cy0=y+bodyH/2,tot=PIE.parts.reduce((t,x)=>t+x.v,0)||1;let a=-Math.PI/2;
     PIE.parts.forEach(x=>{const a1=a+x.v/tot*Math.PI*2;c.beginPath();c.arc(cx0,cy0,PR,a,a1);c.arc(cx0,cy0,PR*.58,a1,a,true);c.closePath();c.fillStyle=x.col;c.fill();if(PIE.parts.length>1){c.strokeStyle="#14181c";c.lineWidth=2;c.stroke()}a=a1});
@@ -238,16 +238,16 @@ function ptMineralStats(name,you){const mins=P.mins||[];const m=mins.find(x=>x.n
 // both are read straight from what the page shows. parts=[{h, el}] in order; head = the .head element (picture, name, details)
 function ptPageRead(head,parts){const T=e=>(e?e.textContent:"").replace(/\s+/g," ").trim();
   const img=head&&head.querySelector("img"),hb=head&&head.querySelector("b"),hs=head&&head.querySelector("span");
-  const out={title:T(hb)||document.title,tic:img?img.src:"",sub:T(hs)?T(hs).split(" · "):[],secs:[]};
+  const out={title:T(hb)||document.title,tic:img?img.src:"",sub:T(hs)?T(hs).split(/, |, /):[],secs:[]};
   parts.forEach(({h,el})=>{if(!el||el.hidden||!el.innerHTML.trim())return;const tb=el.querySelector("table");
     if(tb){const ths=[...tb.querySelectorAll("tr:first-child th")].filter(th=>T(th)||!th.classList.contains("hide-s"));const n=ths.length;
       const rows=[...tb.querySelectorAll("tr")].filter(r=>r.querySelector("td")).map(r=>[...r.querySelectorAll("td")].slice(0,n).map((td,i)=>{const im=td.querySelector("img");return {t:T(td),ic:i===0&&im?im.src:"",mono:i>0,b:i===0}}));
-      out.secs.push({h,cols:ths.map((th,i)=>({h:T(th),w:i===0?.34:.66/Math.max(1,n-1),al:i?"r":""})),rows:rows.map(c=>({cells:c})),text:rows.map(c=>c.map(x=>x.t).join(" · "))});return}
+      out.secs.push({h,cols:ths.map((th,i)=>({h:T(th),w:i===0?.34:.66/Math.max(1,n-1),al:i?"r":""})),rows:rows.map(c=>({cells:c})),text:rows.map(c=>c.map(x=>x.t).join(", "))});return}
     const tiles=[...el.children].filter(d=>d.querySelector("b")).map(d=>({l:T(d.querySelector(".lab,span")),v:T(d.querySelector("b")),s:T(d.querySelector("small"))}));
     if(tiles.length)out.secs.push({h,cols:[{h:"",w:.36},{h:"",w:.26,al:"r"},{h:"",w:.38}],rows:tiles.map(t=>({cells:[{t:t.l,b:true},{t:t.v,mono:true},{t:t.s,col:"#98a2ad"}]})),text:tiles.map(t=>`${t.l}: ${t.v}${t.s?" ("+t.s+")":""}`)})});
   return out}
 function ptPageButtons(box,name,read,note){const mk=(lab,fn)=>{const b=document.createElement("button");b.type="button";b.className="btn";b.textContent=lab;b.onclick=fn;box.appendChild(b)};
-  mk("Copy as text",async()=>{const r=read();const t=[`**${r.title}**`+(r.sub.length?" ("+r.sub.join(" · ")+")":"")].concat(...r.secs.map(s=>(s.h?["",s.h+":"]:[""]).concat(s.text.map(x=>"• "+x)))).concat(r.chart?["",r.chart.h+":"].concat(r.chart.bars.map(b=>"• "+b.l+": "+b.t)):[]).join("\n");
+  mk("Copy as text",async()=>{const r=read();const t=[`**${r.title}**`+(r.sub.length?" ("+r.sub.join(", ")+")":"")].concat(...r.secs.map(s=>(s.h?["",s.h+":"]:[""]).concat(s.text.map(x=>"• "+x)))).concat(r.chart?["",r.chart.h+":"].concat(r.chart.bars.map(b=>"• "+b.l+": "+b.t)):[]).join("\n");
     let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(_){}}
     ptToast(ok?"Copied":"Couldn't copy")});
   mk("Save as image",()=>{const r=read();ptSaveImg(typeof name==="function"?name():name,()=>ptTableImage({title:r.title,tic:r.tic,sub:r.sub,sections:r.secs.map(s=>({h:s.h,cols:s.cols,rows:s.rows})),chart:r.chart,note}))})}
@@ -266,5 +266,5 @@ function ptMuseumView(board,o){o=o||{};board=board||{};const MI={};P.mins.forEac
       const u=sl.u&&sl.u!=="None"?`<i class="pt-mmod">${esc(sl.u)}</i>`:"";
       if(sl.m==="Any")return `<div class="pt-mslot"><span class="pt-many" aria-hidden="true">?</span><div><b>Any ${esc(r)}</b><span>Any mineral, for its modifier${u?" ":""}${u}</span></div></div>`;
       const m=MI[String(sl.m).toLowerCase()];if(!m)return `<div class="pt-mslot"><div><b>${esc(sl.m)}</b>${u}</div></div>`;
-      return `<div class="pt-mslot" data-mineral="${esc(m.n)}" title="Ctrl+click to open ${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<div><b>${esc(m.n)}</b><span>${m.mu&&m.mu.b?m.mu.b.map(([st,v])=>`${esc(st)} ${eff(v)}`).join(", "):""}${u?" · "+u:""}${m.mu&&m.mu.kg?` · ${m.mu.kg} kg`:""}</span></div>${o.skip?`<button type="button" class="pt-mskip" data-skip="${esc(m.n)}" title="Leave ${esc(m.n)} out for now, e.g. if you can't get it yet or it's limited-time. The next best mineral takes its place.">Skip</button>`:""}</div>`}).join("")}</div></div>`}).join("")}</div>`}
+      return `<div class="pt-mslot" data-mineral="${esc(m.n)}" title="Ctrl+click to open ${esc(m.n)}">${m.ic?`<img src="${m.ic}" alt="" loading="lazy">`:""}<div><b>${esc(m.n)}</b><span>${m.mu&&m.mu.b?m.mu.b.map(([st,v])=>`${esc(st)} ${eff(v)}`).join(", "):""}${u?", "+u:""}${m.mu&&m.mu.kg?`, ${m.mu.kg} kg`:""}</span></div>${o.skip?`<button type="button" class="pt-mskip" data-skip="${esc(m.n)}" title="Leave ${esc(m.n)} out for now, e.g. if you can't get it yet or it's limited-time. The next best mineral takes its place.">Skip</button>`:""}</div>`}).join("")}</div></div>`}).join("")}</div>`}
 </script>

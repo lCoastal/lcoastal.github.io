@@ -45,7 +45,7 @@ async function potImage(){const list=shownPots();if(!list.length)return null;
   const title=cur==="money"?"Potions you buy with money":cur==="shards"?"Potions you buy with shards":"All potions";
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(title,PAD,PAD+30);
   const q=$("pq").value.trim();const sub=[`${list.length} potion${list.length===1?"":"s"}`];if(q)sub.push(`matching "${q}"`);
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(" · "),PAD,PAD+58);
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(", "),PAD,PAD+58);
   let y=PAD+92;
   groups.forEach(g=>{c.fillStyle="#98a2ad";c.font=`700 12px ${F}`;c.fillText(g.w.toUpperCase(),PAD,y+18);y+=34;
     for(let i=0;i<g.cards.length;i+=COLS){const row=g.cards.slice(i,i+COLS);const rh=Math.max(...row.map(x=>x.h));
@@ -76,7 +76,7 @@ $("trns").innerHTML=TRN.map(t=>`<div class="it"><b>${esc(t.n)}</b><p>${statText(
   ${t.req?`<p><span class="rq">Needs ${esc(t.req)}</span></p>`:""}
   <p class="hint" style="font-size:13px"><span class="lab" style="margin-right:6px">How to get</span>${esc(t.how)}</p>
   ${t.cost?`<p class="cost">${costHTML(t.cost)}</p>`:""}
-  <p class="src"><span class="lk" data-location="${esc(t.where)}">${esc(t.where)}</span>${t.quest?` · <button type="button" class="qlink" data-quest="${esc(t.quest)}">${esc(t.quest)} quest</button>`:""}</p></div>`).join("")||'<p class="hint">No trinkets found.</p>';
+  <p class="src"><span class="lk" data-location="${esc(t.where)}">${esc(t.where)}</span>${t.quest?`, <button type="button" class="qlink" data-quest="${esc(t.quest)}">${esc(t.quest)} quest</button>`:""}</p></div>`).join("")||'<p class="hint">No trinkets found.</p>';
 document.addEventListener("click",e=>{const q=e.target.closest("[data-quest]");if(q){try{window.parent.ptCallTool("quests","ptOpenItem",q.dataset.quest)}catch(err){}}});
 $("tots").innerHTML=TOT.map(t=>`<div class="it"><b>${esc(t.n)}</b><p>${statText(t.d)}</p>${t.cost?`<p class="cost">${costHTML(t.cost)}</p>`:""}${t.where&&t.where!==t.cost?`<p class="src">${esc(t.where)}</p>`:""}</div>`).join("");
 $("slots").innerHTML=`<tr><th>Level</th><th>Rune slots</th></tr>`+X.runeSlots.map(([l,s])=>`<tr><td>${l}</td><td>${s}</td></tr>`).join("");

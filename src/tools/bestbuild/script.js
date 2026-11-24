@@ -31,7 +31,7 @@ function drawForm(){
   $("mastery").value=S.mastery;$("events").value=S.events;
   document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));$("pane-find").hidden=S.tab!=="find";$("pane-as").hidden=S.tab!=="as";
   const off=[!S.perfect&&"no perfect digs",S.perfect&&!S.streak&&"no full streak",!S.sun&&"no Sun Blessing",!S.nomad&&"Nomad not stacked",S.night?"night":"day"].filter(Boolean);
-  $("asSum").innerHTML=`Assuming: ${esc(off.join(", "))} · <button type="button" class="lnk" data-tab="as">change</button>`;
+  $("asSum").innerHTML=`Assuming: ${esc(off.join(", "))}, <button type="button" class="lnk" data-tab="as">change</button>`;
   const m=minObj();$("mq").value=S.min;const zs=m?zonesOf(m):[];
   if(m&&!zs.includes(S.zone)){S.zone=zs.slice().sort((a,b)=>(effFn(b,m)||(()=>0))(1000)-(effFn(a,m)||(()=>0))(1000))[0]||""}
   $("zone").innerHTML=zs.length?zs.map(z=>`<option${z===S.zone?" selected":""}>${esc(z)}</option>`).join(""):'<option value="">Pick a mineral first</option>'}
@@ -68,9 +68,9 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
   let head="";if(L.goal==="min"){const now=L.info.per(t.Luck,t.Capacity),was=L.info.per(R.before.Luck,R.before.Capacity);
     head=`<div><span class="lab">${esc(L.info.m.n)} in ${esc(L.zone)}</span><b class="pos">${oneInT(now.p)}</b><span class="hint">now ${oneInT(was.p)}</span></div><div><span class="lab">Luck cap</span><b>${now.cap?fmt(now.cap,0):"None"}</b><span class="hint">${now.cap?"pan with this cap on":"pan at your own luck"}</span></div>`}
   else head=`<div><span class="lab">${L.goal==="luck"?"Luck":"Rare finds per pan"}</span><b class="${g>0.0005?"pos":""}">${gTxt}</b><span class="hint">vs your current build</span></div>`;
-  const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":` · ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
+  const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":`, ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
   const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"—"}</td><td class="was">${now===was?"":(was||"—")}</td></tr>`;
-  const tl=(p,e)=>esc(p||"")+(e?` · ${esc(e)}`:"");
+  const tl=(p,e)=>esc(p||"")+(e?`, ${esc(e)}`:"");
   const rows=[row("Pan",tl(st.pan,st.panEn),tl(b.pan,b.panEn)),row("Shovel",tl(st.shovel,st.shEn),tl(b.shovel,b.shEn)),row("Trinket",esc(st.trinket||""),esc(b.trinket||""))].concat(cw.ptSlotDefs().map(([k,l])=>row(l,it(st.slots[k]),it(b.slots[k]))));
   let mus="";if(R.museum)mus=`<h3 class="sec">Museum</h3>${ptMuseumView(st.museumBoard,{empty:"Nothing here helps"})}`;
   const capL=.565*t.Luck/Math.max(1,t.Capacity);

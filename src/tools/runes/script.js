@@ -46,17 +46,17 @@ async function runeImage(){const W=1100,PAD=40,F='"IBM Plex Sans","Segoe UI",sys
   const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText("Rune loadout",PAD,PAD+30);
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(`Level ${S.lvl} · ${picks.length} of ${max} slot${max>1?"s":""} used`,PAD,PAD+58);
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(`Level ${S.lvl}, ${picks.length} of ${max} slot${max>1?"s":""} used`,PAD,PAD+58);
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   const y=PAD+90;cards.forEach((x,i)=>{const cx=PAD+i*(CW+16);const locked=i>=max;
-    if(!x){c.setLineDash([5,4]);c.strokeStyle="#2d343b";rr(cx,y,CW,ch,12);c.stroke();c.setLineDash([]);c.fillStyle="#5d6670";c.font=`600 11px ${F}`;c.fillText(`SLOT ${i+1}`,cx+14,y+26);c.font=`italic 14px ${F}`;c.fillText(locked?`Unlocks at level ${SLOTS[i]?SLOTS[i][0]:"?"}`:"Empty",cx+14,y+50);return}
+    if(!x){c.setLineDash([5,4]);c.strokeStyle="#2d343b";rr(cx,y,CW,ch,12);c.stroke();c.setLineDash([]);c.fillStyle="#5d6670";c.font=`600 11px ${F}`;c.fillText(`Slot ${i+1}`,cx+14,y+26);c.font=`italic 14px ${F}`;c.fillText(locked?`Unlocks at level ${SLOTS[i]?SLOTS[i][0]:"?"}`:"Empty",cx+14,y+50);return}
     const col=KHEX[x.r.k[0]]||"#3cc2a8";c.fillStyle="#1c2126";rr(cx,y,CW,ch,12);c.fill();c.strokeStyle=col;c.lineWidth=1.5;rr(cx,y,CW,ch,12);c.stroke();c.lineWidth=1;c.fillStyle=col;rr(cx,y,CW,5,3);c.fill();
-    c.fillStyle="#98a2ad";c.font=`600 11px ${F}`;c.fillText(`SLOT ${i+1} · ${x.r.k[0].toUpperCase()}`,cx+14,y+26);
+    c.fillStyle="#98a2ad";c.font=`600 11px ${F}`;c.fillText(`Slot ${i+1}, ${x.r.k[0].toUpperCase()}`,cx+14,y+26);
     if(icons[i])c.drawImage(icons[i],cx+14,y+36,36,36);
     {const nx=cx+14+(icons[i]?44:0),room=cx+CW-12-nx;let fs=19;c.font=`700 ${fs}px ${FD}`;while(fs>12&&c.measureText(x.r.n).width>room){fs--;c.font=`700 ${fs}px ${FD}`}c.fillStyle=col;c.fillText(x.r.n,nx,y+61)}
     let ty=y+96;c.fillStyle="#e6e9ec";c.font=`13px ${F}`;x.d.forEach(l=>{c.fillText(l,cx+14,ty);ty+=18});
     ty+=8;c.fillStyle="#98a2ad";c.font=`12px ${F}`;x.w.forEach(l=>{c.fillText(l,cx+14,ty);ty+=16})});
-  if(false){let sx=PAD,sy=y+ch+24;c.font=`600 13px ${F}`;c.fillStyle="#98a2ad";c.fillText("WHAT IT ADDS",PAD,sy);sy+=12;c.font=`13px ${F}`;
+  if(false){let sx=PAD,sy=y+ch+24;c.font=`600 13px ${F}`;c.fillStyle="#98a2ad";c.fillText("What it adds",PAD,sy);sy+=12;c.font=`13px ${F}`;
     sm.forEach(t=>{const w=c.measureText(t).width+24;if(sx+w>W-PAD){sx=PAD;sy+=32}c.fillStyle="rgba(60,194,168,.12)";rr(sx,sy,w,26,13);c.fill();c.strokeStyle="rgba(60,194,168,.5)";rr(sx,sy,w,26,13);c.stroke();c.fillStyle="#3cc2a8";c.fillText(t,sx+12,sy+17.5);sx+=w+8})}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 $("toImg").onclick=async()=>{if(!S.sel.length){toast("Pick at least one rune first");return}let blob=null;try{blob=await runeImage()}catch(e){}if(!blob){toast("Couldn't draw the image");return}

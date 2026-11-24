@@ -34,10 +34,10 @@
 .verdict .ic{font-size:22px;line-height:1}
 .verdict b{display:block;font-family:var(--f-display);font-size:1.15rem}
 .verdict span{font-size:13px;color:var(--muted)}
-h3.sec{margin:14px 0 6px;font:700 12px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h3.sec{margin:14px 0 6px;font:700 12px/1 var(--f-body);color:var(--muted)}
 .swaps{display:flex;flex-direction:column;gap:6px}
-.sw{display:grid;grid-template-columns:90px minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:center;padding:7px 10px;border:1px solid var(--line);border-left:4px solid var(--rc);border-radius:8px;background:var(--panel)}
-.sw .rr{font:700 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--rc)}
+.sw{display:grid;grid-template-columns:90px minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:center;padding:7px 10px;border:1px solid color-mix(in srgb,var(--rc) 55%,var(--line));border-radius:8px;background:var(--panel)}
+.sw .rr{font:700 11px var(--f-body);color:var(--rc)}
 .mn{display:flex;align-items:center;gap:7px;min-width:0}
 .mn img{width:28px;height:28px;object-fit:contain;flex:none}
 .mn>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -46,7 +46,7 @@ h3.sec{margin:14px 0 6px;font:700 12px/1 var(--f-body);letter-spacing:.08em;text
 .sw .old{opacity:.7}
 @media (max-width:560px){.sw{grid-template-columns:1fr 18px 1fr}.sw .rr{grid-column:1/-1}}
 table.t{width:100%;border-collapse:collapse;font-size:13.5px}
-table.t th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.t th{font:600 11px var(--f-body);color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
 table.t th:first-child,table.t td:first-child{text-align:left}
 table.t td{padding:6px 8px;border-bottom:1px dashed var(--line);text-align:right;font-family:var(--f-mono)}
 table.t td:first-child{font-family:var(--f-body)}
@@ -58,7 +58,7 @@ table.t tr:last-child td{border-bottom:0}
 .trade{padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);display:flex;flex-direction:column;gap:4px}
 .trade .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .trade .top .ar{color:var(--muted)}
-.trade .top .rr{font:700 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--rc);min-width:80px}
+.trade .top .rr{font:700 11px var(--f-body);color:var(--rc);min-width:80px}
 .trade .fx{font-family:var(--f-mono);font-size:12.5px}
 .busy{display:flex;align-items:center;gap:10px;color:var(--muted)}
 .spin{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--accent);animation:sp 0.8s linear infinite}

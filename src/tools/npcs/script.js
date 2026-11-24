@@ -15,7 +15,7 @@ function render(){const q=$("q").value.trim().toLowerCase(),rg=$("rg").value;$("
   $("list").innerHTML=regs.map(r=>{const rs=rows.filter(n=>n.regs[0]===r||(rg&&n.regs.includes(r)));if(!rs.length)return "";
     return `<h2 class="rg">${esc(r)}</h2><div class="grid">${rs.map(n=>{const qs=QBY[norm(n.n)]||[];const ro=role(n);
       return `<article class="n"><b>${esc(n.n)}</b><div class="tags">${qs.length?`<span class="q">${qs.length} quest${qs.length>1?"s":""}</span>`:""}${ro.map(x=>`<span class="s">${x}</span>`).join("")}${n.regs.length>1?`<span>Also in ${esc(n.regs.filter(x=>x!==r).join(", "))}</span>`:""}</div>
-        ${n.d?`<p>${esc(n.d)}</p>`:""}${qs.length?`<ul class="ql">${qs.map(x=>`<li><button type="button" data-quest="${esc(x.n)}">${esc(x.n)}</button>${/blueprint/i.test(x.rw)?" · blueprint":""}</li>`).join("")}</ul>`:""}</article>`}).join("")}</div>`}).join("")||'<div class="empty">No NPCs match.</div>'}
+        ${n.d?`<p>${esc(n.d)}</p>`:""}${qs.length?`<ul class="ql">${qs.map(x=>`<li><button type="button" data-quest="${esc(x.n)}">${esc(x.n)}</button>${/blueprint/i.test(x.rw)?", blueprint":""}</li>`).join("")}</ul>`:""}</article>`}).join("")}</div>`}).join("")||'<div class="empty">No NPCs match.</div>'}
 $("q").oninput=render;$("rg").onchange=render;$("onlyQ").onclick=()=>{onlyQ=!onlyQ;render()};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-quest]");if(!b)return;try{window.parent.ptCallTool("quests","ptOpenItem",b.dataset.quest)}catch(err){}});
 window.ptOpenItem=name=>{$("q").value=name;$("rg").value="";render()};

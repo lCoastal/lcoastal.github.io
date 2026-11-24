@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 let S={cap:"",want:"",dv:"rows"};try{Object.assign(S,JSON.parse(localStorage.getItem("ps-s")||"{}"))}catch(e){}
 const youPush=ptYouLink(S,{cap:"cap"},()=>{$("cap").value=S.cap;render()});
 const save=()=>{try{localStorage.setItem("ps-s",JSON.stringify(S))}catch(e){}youPush()};
-ptPageButtons($("acts"),()=>"Pan size "+(S.cap||""),()=>{const r=ptPageRead(null,[{h:"Minerals per pan",el:$("sum")},{h:"Capacity you need for "+(S.want||"")+" minerals",el:$("need")}]);r.title="Pan size";if(CHART&&!$("distCard").hidden)r.chart=CHART;r.sub=[+S.cap>0?"Capacity "+Number(S.cap).toLocaleString("en-US"):"Any capacity"];return r},"Estimates from a fitted model, so real results can differ.");
+ptPageButtons($("acts"),()=>"Pan size "+(S.cap||""),()=>{const r=ptPageRead(null,[{h:"Minerals per pan",el:$("sum")},{h:"Capacity you need for "+(S.want||"")+" minerals",el:$("need")}]);r.title="Pan size";if(CHART&&!$("distCard").hidden)r.chart=CHART;r.sub=[+S.cap>0?"Capacity "+Number(S.cap).toLocaleString("en-US"):"Any capacity"];return r},"Estimates from a fitted model, so actual results can differ.");
 // fewest = ½√C, average = 0.678·C^0.565 (shared panItems), most ≈ 2.5√C
 const lo=C=>Math.floor(.5*Math.sqrt(C)),hi=C=>2.5*Math.sqrt(C);
 // how common each pan size is: share of logged full pans (14,306 pans, capacity 5,600-10,500) by minerals ÷ √capacity,

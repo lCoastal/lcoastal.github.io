@@ -21,7 +21,7 @@ D.equip.forEach((x) =>
   D.gear[k].forEach((x) => add(x.name, t, x.location, D.gear.img[x.image], () => callTool(k, "ptOpenItem", x.name))),
 );
 D.locs.forEach((l) =>
-  add(l.n, "Location", l.rg + (l.t !== "None" ? " · toughness " + l.t : ""), "", () => ptOpen("location", l.n)),
+  add(l.n, "Location", l.rg + (l.t !== "None" ? ", toughness " + l.t : ""), "", () => ptOpen("location", l.n)),
 );
 ((D.codes["Active Codes"] || {}).rows || []).forEach((r) =>
   add(r[0], "Code", "active code", "", () => show("codes")),
@@ -67,7 +67,7 @@ D.locs.forEach((l) =>
 );
 const X2 = D.x2 || {};
 (X2.quests || []).forEach((q) =>
-  add(q.n, "Quest", (q.npc ? q.npc + " · " : "") + q.loc, "", () => callTool("quests", "ptOpenItem", q.n)),
+  add(q.n, "Quest", (q.npc ? q.npc + ", " : "") + q.loc, "", () => callTool("quests", "ptOpenItem", q.n)),
 );
 {
   const seen = new Set();

@@ -24,11 +24,11 @@ body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15
 .chip.dirb{display:inline-flex;gap:5px;align-items:center}
 section{display:flex;flex-direction:column;gap:8px}
 .rh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;border-bottom:2px solid var(--rc);padding-bottom:4px}
-.rh h2{font-family:var(--f-display);font-size:1.1rem;margin:0;color:var(--rc);letter-spacing:.04em;text-transform:uppercase}
+.rh h2{font-family:var(--f-display);font-size:1.1rem;margin:0;color:var(--rc)}
 .rh span{font-size:13px;color:var(--muted)}
 .tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px}
 table{width:100%;border-collapse:collapse;font-size:14px}
-th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:600 11px var(--f-body);color:var(--muted);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
 td{padding:7px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 tr:last-child td{border-bottom:0}
 td.n{font-weight:600;white-space:nowrap}
@@ -39,7 +39,7 @@ td.w,th.w{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabula
 .b span{white-space:nowrap}
 .b em{font-style:normal;font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--accent)}
 .b .neg em{color:var(--neg)}
-.top td.n::after{content:"most";margin-left:8px;font:600 10px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--bg);background:var(--rc);padding:1px 6px;border-radius:4px;vertical-align:2px}
+.top td.n::after{content:"most";margin-left:8px;font:600 10px var(--f-body);color:var(--bg);background:var(--rc);padding:1px 6px;border-radius:4px;vertical-align:2px}
 .empty{color:var(--muted);font-size:14px;padding:4px 0}
 .foot{color:var(--muted);font-size:12.5px;max-width:65ch}
 .note{color:var(--muted);font-size:12.5px;margin:0;max-width:65ch}

@@ -100,7 +100,7 @@ async function routeImage(R){const W=1200,PAD=40,F='"IBM Plex Sans","Segoe UI",s
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText("My route",PAD,PAD+30);
   const open=zs.filter(z=>z.open),tot=open.reduce((s,z)=>s+z.pans,0);
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(`${open.length} stop${open.length===1?"":"s"} left · ${R.T.filter(t=>t.c>0).length} items to collect${RT.st.stats&&tot?` · about ${RT.big(tot)} pans${RT.dur(tot)?" ("+RT.dur(tot)+")":""}`:""}`,PAD,PAD+58);
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(`${open.length} stop${open.length===1?"":"s"} left, ${R.T.filter(t=>t.c>0).length} items to collect${RT.st.stats&&tot?`, about ${RT.big(tot)} pans${RT.dur(tot)?" ("+RT.dur(tot)+")":""}`:""}`,PAD,PAD+58);
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   let y=PAD+90,k=0;
   for(const {Z,items} of rows){const h=70+items.length*ROW+(Z.open?34:0);const done=!Z.open;if(!done||R.frozen)k++;
@@ -108,14 +108,14 @@ async function routeImage(R){const W=1200,PAD=40,F='"IBM Plex Sans","Segoe UI",s
     c.fillStyle=done?"#5d6670":"#3cc2a8";rr(PAD,y,5,h,3);c.fill();
     c.beginPath();c.arc(PAD+36,y+34,15,0,Math.PI*2);c.fillStyle=done?"#5d6670":"#3cc2a8";c.fill();c.fillStyle="#14181c";c.font=`700 15px ${F}`;const nt=done?"✓":String(k);c.fillText(nt,PAD+36-c.measureText(nt).width/2,y+39);
     c.fillStyle="#e6e9ec";c.font=`700 21px ${FD}`;c.fillText(fit(Z.z,W-PAD*2-300),PAD+62,y+41);
-    c.font=`13px ${F}`;c.fillStyle="#98a2ad";const est=done?"Done":RT.st.stats?`Expected pans  ${RT.big(Z.pans)}${RT.dur(Z.pans)?"  ·  "+RT.dur(Z.pans):""}`:`${items.filter(i=>i.req&&i.t.c>0).length} items here`;c.fillText(est,W-PAD-20-c.measureText(est).width,y+39);
+    c.font=`13px ${F}`;c.fillStyle="#98a2ad";const est=done?"Done":RT.st.stats?`Expected pans  ${RT.big(Z.pans)}${RT.dur(Z.pans)?"   "+RT.dur(Z.pans):""}`:`${items.filter(i=>i.req&&i.t.c>0).length} items here`;c.fillText(est,W-PAD-20-c.measureText(est).width,y+39);
     let iy=y+62;
     for(const {t,req} of items){const p=t.cands[Z.z];const w=where(t);let tag="",tc="";
-      if(w.length<=1){tag="ONLY ON THIS STOP";tc="#f2b53a"}else{const b=w.reduce((a,o)=>!a||t.cands[o.z]>t.cands[a.z]?o:a,null);if(b.z===Z.z){tag="RECOMMENDED";tc="#3cc2a8"}else{tag="EXTRA";tc="#98a2ad"}}
+      if(w.length<=1){tag="Only on this stop";tc="#f2b53a"}else{const b=w.reduce((a,o)=>!a||t.cands[o.z]>t.cands[a.z]?o:a,null);if(b.z===Z.z){tag="Recommended";tc="#3cc2a8"}else{tag="Extra";tc="#98a2ad"}}
       c.fillStyle=req?"#171b1f":"#191d21";rr(PAD+22,iy,W-PAD*2-44,ROW-6,8);c.fill();if(!req){c.setLineDash([4,3]);c.strokeStyle="#2d343b";rr(PAD+22,iy,W-PAD*2-44,ROW-6,8);c.stroke();c.setLineDash([])}
       const im=await img(t.m.ic);if(im)c.drawImage(im,PAD+30,iy+4,26,26);
-      c.globalAlpha=done||!t.c?.55:1;c.fillStyle="#e6e9ec";c.font=`600 15px ${F}`;let nm=t.m.n+(t.u&&t.u!=="None"?" · "+t.u:"");if(!t.c)nm="✓ "+nm;c.fillText(fit(nm,430),PAD+66,iy+22);
-      let tx=PAD+66+Math.min(430,c.measureText(nm).width)+12;c.font=`700 10.5px ${F}`;const tw=c.measureText(tag).width+14;c.strokeStyle=tc;c.fillStyle=tc;rr(tx,iy+9,tw,18,9);if(tag==="RECOMMENDED"){c.fill();c.fillStyle="#14181c"}else c.stroke();c.fillText(tag,tx+7,iy+22);
+      c.globalAlpha=done||!t.c?.55:1;c.fillStyle="#e6e9ec";c.font=`600 15px ${F}`;let nm=t.m.n+(t.u&&t.u!=="None"?", "+t.u:"");if(!t.c)nm="✓ "+nm;c.fillText(fit(nm,430),PAD+66,iy+22);
+      let tx=PAD+66+Math.min(430,c.measureText(nm).width)+12;c.font=`700 10.5px ${F}`;const tw=c.measureText(tag).width+14;c.strokeStyle=tc;c.fillStyle=tc;rr(tx,iy+9,tw,18,9);if(tag==="Recommended"){c.fill();c.fillStyle="#14181c"}else c.stroke();c.fillText(tag,tx+7,iy+22);
       if(!req){c.fillStyle="#98a2ad";c.font=`12px ${F}`;c.fillText("optional here",tx+tw+10,iy+22)}
       c.fillStyle="#b9c2cb";c.font=`13px ${FM}`;const od=RT.oneIn(p);c.fillText(od,W-PAD-36-c.measureText(od).width,iy+22);c.globalAlpha=done?.55:1;
       iy+=ROW}

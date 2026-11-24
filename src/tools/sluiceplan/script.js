@@ -15,7 +15,7 @@ $("sl").innerHTML=SL.map(s=>`<option${s.name===S.sl?" selected":""}>${esc(s.name
 function render(){const R=rows(),pts=U[S.sl].points,u=used();
   $("pts").className="pts"+(u>pts?" over":"");$("pts").innerHTML=`${u} / ${pts} <small>points used</small>`;
   $("ups").innerHTML=R.map((r,i)=>{const t=S.t[key(r)]||0;const m=MIN[r.mat.toLowerCase()];const left=pts-u+t*r.pc;const maxNow=Math.min(r.max,Math.floor(left/r.pc));
-    return `<div class="up"><div><b>${esc(r.stat)}</b><span class="c">$${fmt(r.cost,0)} per tier · ${r.pc} pt${r.pc>1?"s":""}${r.perk?"":" per tier"}</span><br><span class="mat" data-mineral="${esc(r.mat)}" title="Ctrl+click to open ${esc(r.mat)}">${m&&m.ic?`<img src="${m.ic}" alt="">`:""}${esc(r.mat)}</span></div>
+    return `<div class="up"><div><b>${esc(r.stat)}</b><span class="c">$${fmt(r.cost,0)} per tier, ${r.pc} pt${r.pc>1?"s":""}${r.perk?"":" per tier"}</span><br><span class="mat" data-mineral="${esc(r.mat)}" title="Ctrl+click to open ${esc(r.mat)}">${m&&m.ic?`<img src="${m.ic}" alt="">`:""}${esc(r.mat)}</span></div>
       ${r.perk?`<label class="sw rng"><input type="checkbox" data-perk="${i}"${t?" checked":""}${!t&&maxNow<1?" disabled":""}> ${t?"Unlocked":"Unlock"}${!t&&maxNow<1?" (not enough points)":""}</label><div class="gain">${t?"on":""}</div>`
       :`<div class="rng"><input type="range" min="0" max="${r.max}" value="${t}" data-tier="${i}" aria-label="${esc(r.stat)} tiers"><output>${t} / ${r.max}</output></div><div class="gain">${t?"+"+fmt(r.per*t,2):""}</div>`}</div>`}).join("");
   const s=P.gear.sluices.find(x=>x.name===S.sl);const base={Luck:n(s.luck),Capacity:n(s.capacity),Efficiency:n(s.efficiency),Toughness:n(s.toughness),"Size Boost":0};

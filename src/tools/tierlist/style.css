@@ -35,7 +35,7 @@
 .pool{display:flex;flex-wrap:wrap;gap:4px;padding:8px;border:1px dashed var(--line);border-radius:10px;min-height:84px;align-content:flex-start}
 .hint2{font-size:13px;color:var(--muted);margin:0}
 .chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.lab{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.lab{font-size:11px;font-weight:600;color:var(--muted)}
 .pooltop{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
 .pooltop input{flex:1 1 220px;min-width:0}
 .cnt{font-size:12.5px;color:var(--muted)}

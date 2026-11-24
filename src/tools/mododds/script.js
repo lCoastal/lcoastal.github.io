@@ -61,7 +61,7 @@ async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
   c.font=`600 13px ${F}`;const mbt="Made by @__coastal";const mw=c.measureText(mbt).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mbt,mx+20,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(`${fmt(mb,0)}% Modifier Boost`,PAD,PAD+30);
   const sub=[`Luck ${fmt(+S.luck||0,0)}`,`Capacity ${fmt(+S.cap||1,0)}`,`about ${fmt(n,1)} ores per pan`];if(S.surge)sub.push("Modifier Surge");if(S.night)sub.push("Night");
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(" · "),PAD,PAD+58);
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(", "),PAD,PAD+58);
   let y=PAD+82;const sums=[{lab:"Ores with a modifier",v:fmt(q*100,1)+"%",bar:q},{lab:"Effective boost",v:fmt(effAny,0),s:fmt(effWhich,0)+" for which modifier"},{lab:"Perfect per pan",v:oneInP(1-Math.pow(1-q*sh.Perfect/100,n)),s:`about ${fmt(n,1)} ores per pan`}];
   const bw=(W-PAD*2-24)/3;sums.forEach((b,i)=>{const x=PAD+i*(bw+12);c.fillStyle="#1c2126";rr(x,y,bw,SUMH,10);c.fill();c.strokeStyle="#2c333a";rr(x,y,bw,SUMH,10);c.stroke();
     c.fillStyle="#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(b.lab.toUpperCase(),x+14,y+24);c.fillStyle="#e6e9ec";c.font=`500 21px ${FM}`;c.fillText(b.v,x+14,y+52);
@@ -75,7 +75,7 @@ async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
     c.fillStyle="#e6e9ec";c.font=`600 15px ${F}`;c.fillText(r.k,PAD+12,mid-2);c.fillStyle="#98a2ad";c.font=`11.5px ${F}`;c.fillText(fit("Museum: "+(MUSE[r.k]||""),nameW-12),PAD+12,mid+14);
     const vals=[fmt(r.s,r.s<0.1?4:2)+"%",fmt(BASE[r.k],4)+"%",oneInP(r.po),oneInP(r.pp),PRICE[r.k]+"×"];
     vals.forEach((v,i)=>{const x=cx(i+1);c.font=`14px ${FM}`;c.fillStyle=i===0&&r.s>BASE[r.k]*1.05?"#3cc2a8":"#e6e9ec";c.fillText(v,x-c.measureText(v).width,mid+5)})});
-  y+=rows.length*RH+28;{const et="Estimates from a fitted model: enchants, events and weather aren't counted, so real odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
+  y+=rows.length*RH+28;{const et="Estimates from a fitted model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptModImage=modImage;
 $("toImg").onclick=async()=>{let blob=null;try{blob=await modImage()}catch(e){console.error(e)}if(!blob){toast("Couldn't draw the image");return}

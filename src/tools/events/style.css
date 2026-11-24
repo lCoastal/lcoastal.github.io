@@ -16,7 +16,7 @@
 .e b{font-family:var(--f-display);font-size:1.05rem}
 .e p{margin:0;font-size:13px;color:var(--muted)}
 .e ul{margin:0;padding-left:18px;font-size:13.5px}
-.e .lk2{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.e .lk2{font-size:12px;font-weight:600}
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .filters input{flex:1;min-width:180px}
-.grp{font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:4px 0 0}
+.grp{font:700 12px var(--f-body);color:var(--muted);margin:4px 0 0}

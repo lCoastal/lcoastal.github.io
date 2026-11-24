@@ -8,10 +8,10 @@
 .col .ex{font-size:11.5px;color:var(--muted);font-family:var(--f-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .col select{width:100%;min-width:0}
 .col.used{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
-h3.sec{margin:16px 0 6px;font:700 12px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+h3.sec{margin:16px 0 6px;font:700 12px/1 var(--f-body);color:var(--muted)}
 h3.sec:first-child{margin-top:4px}
 table.t{width:100%;border-collapse:collapse;font-size:13.5px}
-table.t th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.t th{font:600 11px var(--f-body);color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 table.t th:first-child,table.t td:first-child{text-align:left}
 table.t td{padding:5px 8px;border-bottom:1px dashed var(--line);text-align:right;font-family:var(--f-mono);white-space:nowrap}
 table.t td:first-child{font-family:var(--f-body)}

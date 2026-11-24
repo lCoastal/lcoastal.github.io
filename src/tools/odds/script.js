@@ -105,7 +105,7 @@ async function oddsImage(){const L=Math.max(1,effLuck()),pp=perPan(),pph=+S.pph>
   let title,tcol="#e6e9ec",rows,sums;
   if(S.by==="loc"){title=S.loc;const all=shares(S.loc,L).filter(s=>!S.hideR.includes(s.m.r)).sort((a,b)=>ORD.indexOf(a.m.r)-ORD.indexOf(b.m.r)||a.p-b.p);
     rows=all.map(s=>({name:s.m.n,sub:s.m.r,col:HEX[s.m.r],ic:s.m.ic,...calc(s)}));
-    sums=["Exotic","Mythic","Legendary"].filter(r=>!S.hideR.includes(r)&&all.some(x=>x.m.r===r)).map(r=>{const e=all.filter(x=>x.m.r===r).reduce((t,x)=>t+x.eff,0);return {lab:"Any "+r+" · per pan",col:HEX[r],v:cell(1-Math.pow(1-e,pp))}})}
+    sums=["Exotic","Mythic","Legendary"].filter(r=>!S.hideR.includes(r)&&all.some(x=>x.m.r===r)).map(r=>{const e=all.filter(x=>x.m.r===r).reduce((t,x)=>t+x.eff,0);return {lab:"Any "+r+", per pan",col:HEX[r],v:cell(1-Math.pow(1-e,pp))}})}
   else{const m=MIN[S.min.toLowerCase()];title=m.n;tcol=HEX[m.r]||tcol;
     const list=(m.ch||[]).map(c=>c[0]).filter(l=>LOC[l]).map(l=>({l,s:shares(l,L).find(x=>x.m===m)})).filter(x=>x.s).sort((a,b)=>/Void/.test(a.l)-/Void/.test(b.l)||b.s.eff-a.s.eff);
     rows=list.map(x=>({name:x.l,sub:/Void/.test(x.l)?"Loot pool changes":"",col:"#98a2ad",ic:null,...calc(x.s)}));
@@ -121,7 +121,7 @@ async function oddsImage(){const L=Math.max(1,effLuck()),pp=perPan(),pph=+S.pph>
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   c.fillStyle=tcol;c.font=`700 34px ${FD}`;c.fillText(fit(title,W-PAD*2-mw-20),PAD,PAD+30);
   const sub=[`Luck ${fmt(L,0)}`,`Capacity ${fmt(+S.cap||1,0)}`,`about ${fmt(pp,1)} minerals per pan`];if(pph)sub.push(`${fmt(+S.pph,0)} pans per hour`);
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(" · "),PAD,PAD+58);
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(", "),PAD,PAD+58);
   let y=PAD+82;
   if(sums.length){const bw=(W-PAD*2-12*(sums.length-1))/sums.length;sums.forEach((b,i)=>{const x=PAD+i*(bw+12);c.fillStyle="#1c2126";rr(x,y,bw,SUMH,10);c.fill();c.strokeStyle="#2c333a";c.lineWidth=1;rr(x,y,bw,SUMH,10);c.stroke();
       c.fillStyle=b.col;c.font=`600 11.5px ${F}`;c.fillText(b.lab.toUpperCase(),x+14,y+24);c.fillStyle="#e6e9ec";c.font=b.txt?`600 19px ${F}`:`500 21px ${FM}`;c.fillText(fit(b.v[0],bw-28),x+14,y+52);
@@ -139,7 +139,7 @@ async function oddsImage(){const L=Math.max(1,effLuck()),pp=perPan(),pph=+S.pph>
     const vals=[cell(r.s.base),cell(r.s.eff),cell(r.p)];if(pph)vals.push([isFinite(r.pans)?hrs(r.pans):"—",""]);
     vals.forEach((v,i)=>{const x=cx(i+1);c.font=`14px ${FM}`;c.fillStyle=i===1&&r.s.eff>r.s.base?"#3cc2a8":"#e6e9ec";c.fillText(v[0],x-c.measureText(v[0]).width,v[1]?mid-3:mid+5);
       if(v[1]){c.font=`11.5px ${F}`;c.fillStyle="#98a2ad";c.fillText(v[1],x-c.measureText(v[1]).width,mid+14)}})});
-  y+=Math.max(1,rows.length)*RH+28;{const et="Estimates from a fitted luck model: enchants, events and weather aren't counted, so real odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
+  y+=Math.max(1,rows.length)*RH+28;{const et="Estimates from a fitted luck model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptOddsImage=oddsImage;
 $("toImg").onclick=async()=>{let blob=null;try{blob=await oddsImage()}catch(e){console.error(e)}if(!blob){toast("Couldn't draw the image");return}

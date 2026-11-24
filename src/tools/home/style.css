@@ -1,8 +1,8 @@
 .wrap{max-width:1100px;margin:0 auto;padding:26px 18px 40px;display:flex;flex-direction:column;gap:16px}
-.jobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
-.job{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--fg);font:inherit;cursor:pointer;transition:border-color .15s,transform .15s}
-.job:hover,.job:focus-visible{border-color:var(--accent);transform:translateY(-1px)}
-.job b{font:700 1.15rem var(--f-display)}
+.jobs{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:hidden}
+.job{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:14px;row-gap:2px;align-items:center;text-align:left;padding:12px 16px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--fg);font:inherit;cursor:pointer}.job:last-child{border-bottom:0}.job .ji{grid-row:span 2}
+.job:hover,.job:focus-visible{background:var(--sunk)}
+.job b{font:700 1.02rem var(--f-display)}
 .job span:last-child{color:var(--muted);font-size:13.5px;line-height:1.45}
 .ji{width:44px;height:44px;border-radius:10px;background:var(--sunk);display:grid;place-items:center}
 .ji img{width:36px;height:36px;object-fit:contain}

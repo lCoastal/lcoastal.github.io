@@ -111,7 +111,7 @@ window.ptMuseumImage = (() => {
     c.fillText(fitText(c, name, W - PAD * 2 - 200), PAD, PAD + 30);
     c.fillStyle = "#98a2ad";
     c.font = `14px ${F}`;
-    c.fillText(`${filledCount(b)} of 18 displays filled · values at max-boost weight`, PAD, PAD + 58);
+    c.fillText(`${filledCount(b)} of 18 displays filled, values at max-boost weight`, PAD, PAD + 58);
     let y = HEAD;
     for (const r of ORDER) {
       const col = IMGC[r];

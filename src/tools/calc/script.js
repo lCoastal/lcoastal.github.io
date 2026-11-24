@@ -17,7 +17,7 @@ const save=()=>{try{localStorage.setItem("pcalc",JSON.stringify(S))}catch(e){}};
 const own=n=>!!(Store.get(n)||{}).own;
 // tool selects
 function fillSel(el,items,cur,blank){const list=items.filter(x=>!S.owned||own(x.name||x.n)||(x.name||x.n)===cur);
-  el.innerHTML=(blank?`<option value="">${blank}</option>`:"")+list.map(x=>{const n=x.name||x.n;return `<option value="${esc(n)}"${n===cur?" selected":""}>${esc(n)}${x.r?" · "+x.r:""}</option>`}).join("")}
+  el.innerHTML=(blank?`<option value="">${blank}</option>`:"")+list.map(x=>{const n=x.name||x.n;return `<option value="${esc(n)}"${n===cur?" selected":""}>${esc(n)}${x.r?", "+x.r:""}</option>`}).join("")}
 function buildSlots(){
   $("slots").innerHTML=SLOTDEF.map(([k,l,slot])=>{const v=S.slots[k]||{};return `<div class="slot"><span class="sl">${l}</span>
     <button type="button" class="pick it" data-pick="${k}" aria-haspopup="listbox" aria-label="${l}"></button>
@@ -49,7 +49,7 @@ const PERM=["trader","lighthouse","ancient","spirits"];
 // Tomb Mastery levels 1–5: flat luck (in-game panel; each level also adds 3s of tomb time)
 const TOMB=[0,50,100,200,350,500];
 // limited-time consumables: kept apart from potions. Values from the wiki's Relics page.
-const CONS=[{n:"Luck Booster",fx:"2× luck · 15 min",p:{Luck:1}},{n:"Candy Corn",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Gingerbread Cookie",fx:"+0.5× luck · 10 min",p:{Luck:.5}},{n:"Ghost Gummy",fx:"+0.5× strength · 10 min",p:{"Dig Strength":.5,"Shake Strength":.5}}];
+const CONS=[{n:"Luck Booster",fx:"2× luck, 15 min",p:{Luck:1}},{n:"Candy Corn",fx:"+0.5× luck, 10 min",p:{Luck:.5}},{n:"Gingerbread Cookie",fx:"+0.5× luck, 10 min",p:{Luck:.5}},{n:"Ghost Gummy",fx:"+0.5× strength, 10 min",p:{"Dig Strength":.5,"Shake Strength":.5}}];
 // Sun Blessing (Pharaoh's Pan / Shovel passive): one charge meter, counted once, and only with both pieces on
 const sunGear=S=>{const pan=G.pans.find(x=>x.name===S.pan),sh=G.shovels.find(x=>x.name===S.shovel);const has=x=>x&&/Sun Blessing/i.test((x.passive||"")+" "+(x.description||""));return [has(pan)?S.pan:"",has(sh)?S.shovel:""].filter(Boolean)};
 // the bar only fills with both Pharaoh pieces on (pan and shovel)
@@ -170,10 +170,10 @@ function brkSources(B){const L=[];const sunB=sunOn(B);const lab=k=>{if(BLAB[k])r
   if(TRROLL[B.trinket]||B.trinket==="Nomad's Compass"||B.trinket==="Senet Die")L.push({key:"pan:",label:"Trinket: "+(B.trinket==="Nomad's Compass"?"Nomad's Compass (×1.9, Assuming 6 deposits stacked)":B.trinket==="Senet Die"?"Senet Die (Assuming ×1.33)":`${B.trinket} (Assuming the ${B.trkMax?"max":"average"} roll)`),cut:t=>{t.trinket=""}});
   if(B.trinket==="Embalmer's Salt")L.push({key:"pan:",label:"Trinket: Embalmer's Salt (Assuming it's maxed)",cut:t=>{t.trinket=""}});
   if(sunOn(B)){const g=sunGear(B);L.push({key:g[0]===B.shovel&&g.length===1?"shovel:":"pan:",label:"Sun Blessing (Assuming it's charged)",cut:t=>{t.noSun=true}})}
-  SLOTDEF.forEach(([k,l])=>{const v=(B.slots||{})[k];if(v&&v.n)L.push({key:"slot:"+k,label:`${l}: ${v.n}`,sub:[v.l==="0"?"0★":v.l==="5"?"5★":"6★",v.m&&v.m!=="None"?v.m:"",(v.q??100)<100?(v.q??100)+"%":""].filter(Boolean).join(" · "),cut:t=>{t.slots=Object.assign({},t.slots);delete t.slots[k]}})});
+  SLOTDEF.forEach(([k,l])=>{const v=(B.slots||{})[k];if(v&&v.n)L.push({key:"slot:"+k,label:`${l}: ${v.n}`,sub:[v.l==="0"?"0★":v.l==="5"?"5★":"6★",v.m&&v.m!=="None"?v.m:"",(v.q??100)<100?(v.q??100)+"%":""].filter(Boolean).join(", "),cut:t=>{t.slots=Object.assign({},t.slots);delete t.slots[k]}})});
   const bd=B.mus!=="none"?musBoard(B):null;
   if(bd)MORDER.forEach(r=>(bd[r]||[]).forEach((sl,i)=>{if(!sl||!sl.m)return;const u=sl.u||"None";
-    L.push({key:"group:museum",label:`Museum: ${sl.m==="Any"?"Any "+r:sl.m}`,sub:[sl.m==="Any"?"":r,u==="None"?"":u].filter(Boolean).join(" · "),cut:t=>{const b2=JSON.parse(JSON.stringify(musBoard(t)||{}));if(b2[r]&&b2[r][i])b2[r][i]={m:null,u:"None"};t.mus="custom";t.museumBoard=b2}})}));
+    L.push({key:"group:museum",label:`Museum: ${sl.m==="Any"?"Any "+r:sl.m}`,sub:[sl.m==="Any"?"":r,u==="None"?"":u].filter(Boolean).join(", "),cut:t=>{const b2=JSON.parse(JSON.stringify(musBoard(t)||{}));if(b2[r]&&b2[r][i])b2[r][i]={m:null,u:"None"};t.mus="custom";t.museumBoard=b2}})}));
   Object.entries(B.b||{}).forEach(([k,v])=>{if(!v||k==="meteor"||k==="weather"||k==="trader"||runeCovers(B,k))return;L.push({key:"group:boosts",label:lab(k),sub:/Totem$/.test(k)&&TMB(B)!==1?`incl. the shovel's +${fmt((TMB(B)-1)*100,0)}% totem bonus`:"",cut:t=>{t.b=Object.assign({},t.b,{[k]:false})}})});
   (B.pots||[]).forEach(n=>L.push({key:"group:boosts",label:"Potion: "+n,cut:t=>{t.pots=(t.pots||[]).filter(x=>x!==n)}}));
   (B.cons||[]).forEach(n=>L.push({key:"group:boosts",label:"Consumable: "+n,cut:t=>{t.cons=(t.cons||[]).filter(x=>x!==n)}}));
@@ -267,7 +267,7 @@ $("cpBrk").onclick=async()=>{const B=clone(S);(S.isoOff||[]).forEach(g=>Object.a
   const E="\u001b[",col=(c,t,b)=>`${E}${b?"1;":""}${c}m${t}${E}0m`,gray=t=>col(30,t),
     tv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1),sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
   const W=46,VW=11,pad=(t,w)=>{t=String(t);return t.length>w?t.slice(0,w-1)+"…":t+" ".repeat(w-t.length)},rpad=(t,w)=>{t=String(t);return " ".repeat(Math.max(0,w-t.length))+t};
-  const L=[col(37,String(S.bname||"").trim()||"My Prospecting stats",true)];const gear=[B.pan&&"Pan: "+B.pan+(B.panEn?" ("+B.panEn+")":""),B.shovel&&"Shovel: "+B.shovel+(B.shEn?" ("+B.shEn+")":"")].filter(Boolean).join(" · ");if(gear)L.push(gear);
+  const L=[col(37,String(S.bname||"").trim()||"My Prospecting stats",true)];const gear=[B.pan&&"Pan: "+B.pan+(B.panEn?" ("+B.panEn+")":""),B.shovel&&"Shovel: "+B.shovel+(B.shEn?" ("+B.shEn+")":"")].filter(Boolean).join(", ");if(gear)L.push(gear);
   const lbl=x=>x.label+(x.sub?` (${x.sub})`:"");
   const line=(lab,val,good)=>"    "+pad(lab,W-5)+" "+col(good?32:31,rpad(val,VW));
   const head=(lab,val)=>"  "+gray(pad(lab.toUpperCase(),W-2))+col(37,rpad(val,VW),true);
@@ -394,14 +394,14 @@ function upCandidates(){
   Object.values(bestMut).forEach(c=>add(c));
   // potions and limited consumables you don't have on yet. Halloween and Christmas treats only show with "Include event gear".
   ((P.x2||{}).potions||[]).forEach(po=>{if((base.pots||[]).includes(po.n))return;const st=clone(base);st.pots=[...(base.pots||[]),po.n];
-    const m=/\$/.test(po.cost||"")?uMoney(po.cost):0;add({kind:"Potion",name:po.n,where:[po.fx,po.where].filter(Boolean).join(" · "),money:m,other:m?"":String(po.cost||"").replace(/Meteor Shards/i,"shards"),pans:0,limited:false,state:st,apply:()=>{S.pots=[...(S.pots||[]),po.n]}})});
+    const m=/\$/.test(po.cost||"")?uMoney(po.cost):0;add({kind:"Potion",name:po.n,where:[po.fx,po.where].filter(Boolean).join(", "),money:m,other:m?"":String(po.cost||"").replace(/Meteor Shards/i,"shards"),pans:0,limited:false,state:st,apply:()=>{S.pots=[...(S.pots||[]),po.n]}})});
   // luck trinkets, Beach Umbrella and Mass Reactor at both the average and the max roll
   [["Beach Umbrella",false],["Beach Umbrella",true],["Mass Reactor",false],["Mass Reactor",true],["Nomad's Compass",false],["Senet Die",false]].forEach(([n,mx])=>{
     if(base.trinket===n&&(!TRROLL[n]||!!base.trkMax===mx))return;const st=clone(base);st.trinket=n;st.trkMax=mx;
     add({kind:"Trinket",name:TRLAB(n,mx),replaces:base.trinket?TRLAB(base.trinket,!!base.trkMax):"",where:n==="Nomad's Compass"?"6 deposits stacked: ×1.9 total luck":n==="Senet Die"?"counted as ×1.33 luck":"",money:0,pans:0,limited:false,state:st,apply:()=>{S.trinket=n;S.trkMax=mx}})});
   if(base.trinket!=="Embalmer's Salt"){const st=clone(base);st.trinket="Embalmer's Salt";add({kind:"Trinket",name:"Embalmer's Salt",replaces:base.trinket||"",where:"maxed out: +100% Sell Boost",money:0,pans:0,limited:false,state:st,apply:()=>{S.trinket="Embalmer's Salt"}})}
   // totems and the XP Cookie (the cookie only comes from Cookie Time and the Christmas shop, so it counts as event)
-  [["luckTotem","Luck Totem","2× luck · 300 Meteor Shards"],["strTotem","Strength Totem","2× dig and shake strength · 180 Meteor Shards"],["lumTotem","Luminant Totem","1.5× capacity, +50% speeds · 600 Meteor Shards"],["cookie","XP Cookie","+1× most stats · 1 min",true]].forEach(([k,n,fx,ev])=>{
+  [["luckTotem","Luck Totem","2× luck, 300 Meteor Shards"],["strTotem","Strength Totem","2× dig and shake strength, 180 Meteor Shards"],["lumTotem","Luminant Totem","1.5× capacity, +50% speeds, 600 Meteor Shards"],["cookie","XP Cookie","+1× most stats, 1 min",true]].forEach(([k,n,fx,ev])=>{
     if((base.b||{})[k])return;const st=clone(base);st.b=Object.assign({},st.b,{[k]:true});add({kind:ev?"Consumable":"Totem",name:n,where:fx,money:0,pans:0,limited:!!ev,state:st,apply:()=>{S.b[k]=true}})});
   const CEV={"Candy Corn":1,"Ghost Gummy":1,"Gingerbread Cookie":1};
   CONS.forEach(c=>{if((base.cons||[]).includes(c.n))return;const st=clone(base);st.cons=[...(base.cons||[]),c.n];
@@ -423,7 +423,7 @@ function upCandidates(){
         const g=uScore(compute(t2).tot,w)-s0;if(g>1e-9&&(!bestM||g>bestM.g))bestM={m,g,st:t2,b2}});
       if(!bestM)return;const pn=pansFor(bestM.m.n),was=row[wi].m;
       add({kind:`Museum (${r})`,name:bestM.m.n,replaces:was?(was==="Any"?"Any "+r:was):"",rarity:r,money:0,pans:pn==null?0:pn,unknown:pn==null,limited:false,state:bestM.st,
-        apply:()=>{S.mus="custom";S.museumBoard=bestM.b2},where:[pn==null?"not panned":"",base.mus!=="custom"?"Try it copies your museum into a custom one":""].filter(Boolean).join(" · ")})})}
+        apply:()=>{S.mus="custom";S.museumBoard=bestM.b2},where:[pn==null?"not panned":"",base.mus!=="custom"?"Try it copies your museum into a custom one":""].filter(Boolean).join(", ")})})}
   // museum modifiers: for every display, the best modifier for this goal. Effort = pans to find the mineral ÷ the chance it
   // rolls that modifier at your Modifier Boost and luck (same model as Modifier Odds and the farm routes)
   if(mb){const T=compute(base).tot,mbx=Math.max(0,T["Modifier Boost"]||0),lk=T.Luck||0;
@@ -438,7 +438,7 @@ function upCandidates(){
           bestU={...bestU,b2:b3,st:t3,any:true,pn:isFinite(fa)&&bestU.ch>0?fa/bestU.ch:bestU.pn}}}
       const nm=bestU.any||sl.m==="Any"?`Any ${r}`:sl.m;
       add({kind:`Museum modifier (${r})`,name:`${bestU.u} ${nm}`,replaces:(bestU.any?sl.m+", ":"")+(curU==="None"?"no modifier":curU),rarity:r,money:0,pans:bestU.pn==null?0:bestU.pn,unknown:bestU.pn==null,limited:false,state:bestU.st,
-        apply:()=>{S.mus="custom";S.museumBoard=bestU.b2},where:[bestU.ch>0?`${bestU.u} on ~1 in ${fmt(1/bestU.ch,0)} ores`:"",base.mus!=="custom"?"Try it copies your museum into a custom one":""].filter(Boolean).join(" · ")})}))}
+        apply:()=>{S.mus="custom";S.museumBoard=bestU.b2},where:[bestU.ch>0?`${bestU.u} on ~1 in ${fmt(1/bestU.ch,0)} ores`:"",base.mus!=="custom"?"Try it copies your museum into a custom one":""].filter(Boolean).join(", ")})}))}
   const effort=c=>Math.max(1,(c.pans||0)+(c.money||0)/1000)*(c.unknown?20:1);
   out.forEach(c=>{c.effort=effort(c);c.value=c.gain/c.effort});
   const keep=S.upEvent?out:out.filter(c=>!c.limited);
@@ -462,7 +462,7 @@ const upRow=(c,i,btns)=>{const gains=Object.entries(c.d).sort((a,b)=>Math.abs(b[
       .map(([s,v])=>`<span class="${v<0?"neg":"gain"}">${esc(s)} <b>${fv2(s,v)}</b></span>`).join("");
     const money=c.money?uMoneyTxt(c.money):c.other||(c.limited?"event":"");
     const grind=c.pans?uPansTxt(c.pans):"";
-    const meta=c.kind+(c.replaces?" (instead of "+c.replaces+")":"")+(c.where?" · "+c.where:"")+(c.recipe?" · "+c.recipe:"")+(c.unknown?" · some materials aren't panned":"");
+    const meta=c.kind+(c.replaces?" (instead of "+c.replaces+")":"")+(c.where?", "+c.where:"")+(c.recipe?", "+c.recipe:"")+(c.unknown?", some materials aren't panned":"");
     return `<div class="upi${btns.length>1?" pth":""}">${btns.length>1?`<span class="upnum">${i+1}</span>`:""}<span class="upn"><b>${esc(c.name)}</b><span class="uph" title="${esc(meta)}">${esc(meta)}</span><span class="upg">${gains}</span></span>
       <span class="upm">${esc(money)}</span><span class="upp">${esc(grind)}</span><span class="upb">${btns.join("")}</span></div>`};
 // boosts multiply (gear + flat points), so a goal stat at 0 from gear can't be raised by museum, totems or cookies
@@ -516,7 +516,7 @@ function render(){renderSpread();if(typeof fillProg==="function"&&$("progSum"))f
   $("out").innerHTML=`<table class="out"><tr><th>Stat</th><th>Gear</th><th>Boost pile</th><th>Total</th><th class="bkc" title="Show this stat in the detailed breakdown">Breakdown</th></tr>${STATS.map(s=>{const show=r.base[s]||r.tot[s]||s==="Luck";if(!show)return "";const on=!(S.brkHide||[]).includes(s);
     return `<tr class="${s==="Luck"?"big":""}"><td>${s}</td><td>${f(s,r.base[s]+r.flat[s])}</td><td>${["Toughness","Inventory Size"].includes(s)?"—":"×"+fmt(1+r.pile[s],2)}</td><td class="tot">${f(s,r.tot[s])}</td><td class="bkc"><button type="button" class="sw2" role="switch" data-bstat="${esc(s)}" aria-checked="${on}" aria-label="Show ${esc(s)} in the detailed breakdown" title="${on?"Shown":"Hidden"} in the detailed breakdown"></button></td></tr>`}).join("")}</table>
     <p class="hint" style="margin-top:8px">${[r.ev>1?`Events multiply final luck by ×${r.ev}.`:"",r.luckMult>1?`Your trinket multiplies final luck by ×${fmt(r.luckMult,2)}.`:"",r.mt.n?`Museum: ${r.mt.n} display${r.mt.n===1?"":"s"} counted.`:"No museum counted.",...r.notes].filter(Boolean).join(" ")}</p>`;
-  const mtS=musTotals(S);$("musTxt").textContent=S.mus==="none"?"":mtS.n?Object.entries(mtS.t).filter(([,v])=>v).map(([k,v])=>`${k} ${v<0?"−":"+"}${fmt(Math.abs(v),3)}×`).join(" · "):"That museum board is empty. Fill it in on the Museum Planner page.";
+  const mtS=musTotals(S);$("musTxt").textContent=S.mus==="none"?"":mtS.n?Object.entries(mtS.t).filter(([,v])=>v).map(([k,v])=>`${k} ${v<0?"−":"+"}${fmt(Math.abs(v),3)}×`).join(", "):"That museum board is empty. Fill it in on the Museum Planner page.";
 }
 // ---- save the build as an image: gear, boosts, then the stats table (what "Your stats" shows) ----
 // build name: used as the image title and file name, and as the first line of the Discord copies
@@ -525,7 +525,7 @@ $("bName").value=S.bname||"";$("bName").addEventListener("input",()=>{S.bname=$(
 const RHX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
 const MUTHX={Silver:"#a9b4be",Gold:"#d9a520",Diamond:"#5fc8e8",Granite:"#8d8d86",Overclocked:"#e0602f",Festive:"#d23c3c",Sunforged:"#ffc457",Prismatic:"#c05bd8"};
 // copy the stat panel as text, ready to paste into Discord
-$("cpStats").onclick=async()=>{const st=effState(),t=compute(st).tot;const gear=[S.pan&&"Pan: "+S.pan,S.shovel&&"Shovel: "+S.shovel].filter(Boolean).join(" · ");
+$("cpStats").onclick=async()=>{const st=effState(),t=compute(st).tot;const gear=[S.pan&&"Pan: "+S.pan,S.shovel&&"Shovel: "+S.shovel].filter(Boolean).join(", ");
   const hid=new Set(S.brkHide||[]),lines=SHOW.filter(s=>t[s]&&!hid.has(s)).map(s=>`**${s}:** ${fv(s,t[s])}`);
   if(!lines.length){ptToast("Nothing to copy yet. Pick some gear first.");return}
   const txt=discordCompactAnsi(["**"+(String(S.bname||"").trim()||"My Prospecting stats")+"**",gear,...lines].filter(Boolean));let ok=false;
@@ -591,9 +591,9 @@ async function buildImage(st,r){
   // header
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   c.fillStyle=TX;c.font=`700 34px ${FD}`;c.fillText(fit(bTitle(),IW-mw-24),PAD,PAD+30);
-  c.font=`600 15px ${F}`;{let xx=PAD;stats.forEach((k,i)=>{const t1=fv(k,r.tot[k]||0)+" ",t2=k.toLowerCase(),sep=i<stats.length-1?"  ·  ":"";const w=c.measureText(t1+t2+sep).width;if(xx+w>PAD+IW){return}
+  c.font=`600 15px ${F}`;{let xx=PAD;stats.forEach((k,i)=>{const t1=fv(k,r.tot[k]||0)+" ",t2=k.toLowerCase(),sep=i<stats.length-1?"   ":"";const w=c.measureText(t1+t2+sep).width;if(xx+w>PAD+IW){return}
     c.fillStyle=statHex(k);c.fillText(t1,xx,PAD+54);xx+=c.measureText(t1).width;c.fillStyle=MU;c.fillText(t2+sep,xx,PAD+54);xx+=c.measureText(t2+sep).width})}
-  let y=PAD+62;if(sub.length){c.font=`14px ${F}`;c.fillStyle=MU;c.fillText(fit(sub.join(" · "),IW),PAD,PAD+78);y=PAD+88}
+  let y=PAD+62;if(sub.length){c.font=`14px ${F}`;c.fillStyle=MU;c.fillText(fit(sub.join(", "),IW),PAD,PAD+78);y=PAD+88}
   // hero: pan, shovel, museum
   const hw=(IW-GAP*2)/3;
   const tool=(x,kind,it,en,lines,edge)=>{card(x,y,hw,HERO,edge);label(kind,x+20,y+30,edge);
@@ -624,14 +624,14 @@ async function buildImage(st,r){
       img(g.ic,x+20,y+16,72,true);const tx=x+108,tw=tw2-128;label(g.slot,tx,y+30);
       c.font=`700 19px ${FD}`;c.fillStyle=RHX[g.r]||TX;c.fillText(fit(g.n,tw),tx,y+56);
       c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(g.r,tx,y+82);let xx=tx+c.measureText(g.r+"   ").width;xx=stars(g,xx,y+82,13);
-      c.font=`13px ${F}`;c.fillStyle=MU;c.fillText("  ·  ",xx,y+82);xx+=c.measureText("  ·  ").width;mutTxt(g,xx,y+82,13,x+tw2-20-xx-60);
+      c.font=`13px ${F}`;c.fillStyle=MU;c.fillText("   ",xx,y+82);xx+=c.measureText("   ").width;mutTxt(g,xx,y+82,13,x+tw2-20-xx-60);
       c.textAlign="right";c.font=`600 13px ${FM}`;c.fillStyle=g.q>=100?TX:MU;c.fillText(g.q+"% quality",x+tw2-20,y+82);c.textAlign="left"});
     y+=TOPH+12}
   if(rings.length){sec(`Rings (${rings.length} of 8)`,y);y+=SECH;const rw=(IW-12*(RC-1))/RC;
     rings.forEach((g,i)=>{const x=PAD+(i%RC)*(rw+12),yy=y+Math.floor(i/RC)*(RH+12);card(x,yy,rw,RH,RHX[g.r]);
       img(g.ic,x+18,yy+18,60,true);label(g.slot,x+86,yy+30);c.textAlign="right";c.font=`600 12.5px ${FM}`;c.fillStyle=g.q>=100?TX:MU;c.fillText(g.q+"%",x+rw-16,yy+30);c.textAlign="left";
       c.font=`700 16px ${FD}`;c.fillStyle=RHX[g.r]||TX;c.fillText(fit(g.n,rw-104),x+86,yy+56);
-      const xx=stars(g,x+86,yy+80,13);c.font=`13px ${F}`;c.fillStyle=MU;c.fillText("  ·  ",xx,yy+80);mutTxt(g,xx+c.measureText("  ·  ").width,yy+80,13,x+rw-16-xx-30)});
+      const xx=stars(g,x+86,yy+80,13);c.font=`13px ${F}`;c.fillStyle=MU;c.fillText("   ",xx,yy+80);mutTxt(g,xx+c.measureText("   ").width,yy+80,13,x+rw-16-xx-30)});
     y+=ringRowsN*(RH+12)}
   // museum: all 18 slots, by rarity. "ANY" = no mineral bonus, only the modifier counts
   if(MROWS.length){sec(`Museum (${mt.n} of 18 filled)`,y);y+=SECH;card(PAD,y,IW,MROWS.length*MRH+8);
@@ -692,7 +692,7 @@ function deltaRows(a,b){return SHOW.map(s=>[s,a.tot[s],b.tot[s]]).filter(([s,x,y
 function previewHtml(k,it,mode){
   const cur=compute(S);
   const head=it?`<div class="pvh">${it.img?`<img src="${it.img}" alt="">`:`<span class="icon"></span>`}<div><b>${esc(it.n)}</b>${it.r?`<span class="rr" style="--rc:${rc(it.r)}">${it.r} ${it.x.slot}</span>`:""}</div></div>`:`<div class="pvh"><div><b>Empty slot</b><span class="muted">Nothing equipped</span></div></div>`;
-  const v=S.slots[k]||{};const sub=it&&it.kind==="eq"?` <span style="text-transform:none;letter-spacing:0;font-weight:400">· ${v.l==="0"?"no stars":v.l==="5"?"5★":"6★"}, ${(v.m&&v.m!=="None")?v.m:"no mutation"}, ${v.q??100}% quality</span>`:"";
+  const v=S.slots[k]||{};const sub=it&&it.kind==="eq"?` <span style="text-transform:none;letter-spacing:0;font-weight:400">${v.l==="0"?"no stars":v.l==="5"?"5★":"6★"}, ${(v.m&&v.m!=="None")?v.m:"no mutation"}, ${v.q??100}% quality</span>`:"";
   const st=itemStats(k,it).map(([n,val])=>n==="Passive"?`<div><span>Passive</span><span style="text-align:right">${esc(val)}</span></div>`:`<div><span>${esc(n)}</span><span class="mono ${val<0?"dn":""}">${PCT.has(n)||(it.kind==="eq"&&it.x.st.find(z=>z[0]===n&&z[5]))?(val>0?"+":"")+fmt(val,1)+"%":(val>0&&it.kind==="eq"?"+":"")+fmt(val,2)}</span></div>`).join("");
   let dl;
   if(mode==="current"){const without=compute(withItem(k,""));dl=deltaRows(without,cur);dl=dl.length?`<div class="pvt">What it adds to your totals</div><div class="pvs">${dl.map(([s,x,y])=>`<div><span>${s}</span><span class="mono ${y>x?"up":"dn"}">${sgn(s,y-x)}</span></div>`).join("")}</div>`:""}
@@ -753,7 +753,7 @@ const boostTxt=m=>m&&m.mu?m.mu.b.map(([s,v])=>`${s} ${v<0?"−":"+"}${Math.abs(v
 function musEditor(){const ed=$("musEd");$("musCopy").hidden=S.mus==="custom";if(S.mus!=="custom"){ed.innerHTML="";return}
   if(!S.museumBoard)S.museumBoard=blankBoard();const bd=S.museumBoard;
   ed.innerHTML=MORDER.map(r=>{const opts=P.mins.filter(m=>m.r===r&&m.mu);return `<div class="mrow" style="--rc:${rc(r)}"><span class="rl">${r}</span><div class="mslots">${(bd[r]||[]).map((sl,i)=>`<div class="msl">
-    <select data-mm="${r}|${i}" aria-label="${r} display ${i+1}"><option value="">— empty —</option><option value="Any"${sl.m==="Any"?" selected":""}>Anything (only the modifier counts)</option>${opts.map(m=>`<option value="${esc(m.n)}"${m.n===sl.m?" selected":""}>${esc(m.n)} · ${esc(boostTxt(m))}</option>`).join("")}</select>
+    <select data-mm="${r}|${i}" aria-label="${r} display ${i+1}"><option value="">— empty —</option><option value="Any"${sl.m==="Any"?" selected":""}>Anything (only the modifier counts)</option>${opts.map(m=>`<option value="${esc(m.n)}"${m.n===sl.m?" selected":""}>${esc(m.n)}, ${esc(boostTxt(m))}</option>`).join("")}</select>
     <select data-mu="${r}|${i}" aria-label="${r} display ${i+1} modifier">${P.mods.map(md=>`<option value="${esc(md[0])}"${md[0]===(sl.u||"None")?" selected":""}>${md[0]==="None"?"No modifier":esc(md[0])}</option>`).join("")}</select></div>`).join("")}</div></div>`}).join("")}
 $("musCopy").onclick=()=>{const src=S.mus==="custom"?null:musBoard();const bd=blankBoard();if(src)MORDER.forEach(r=>(src[r]||[]).forEach((sl,i)=>{if(bd[r][i]&&sl)bd[r][i]={m:sl.m||null,u:sl.u||"None"}}));
   if(S.mus!=="custom"||!S.museumBoard)S.museumBoard=bd;S.mus="custom";save();fillMus();musEditor();render()};
@@ -833,7 +833,7 @@ window.ptLoadState=st=>{const missed=[];
   const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.textContent=(st.from?`Loaded “${st.from}” from Build Sheets`:"Loaded from Build Sheets")+(missed.length?`. Couldn't match ${missed.join(", ")}, so ${missed.length===1?"it was":"they were"} left empty.`:"")+(st.extraRings?`. The build lists ${st.extraRings} more ring${st.extraRings===1?"":"s"} than the 8 slots, so only the first 8 were used.`:"");Object.assign(t.style,{position:"fixed",left:"50%",bottom:"20px",transform:"translateX(-50%)",background:"var(--fg)",color:"var(--bg)",padding:"8px 14px",borderRadius:"8px",zIndex:60,fontSize:"13.5px"});document.body.appendChild(t);setTimeout(()=>t.remove(),missed.length||st.extraRings?6000:2400)};
 function fillPots(){const PO=((P.x2||{}).potions||[]);S.pots=(S.pots||[]).filter(n=>PO.some(p=>p.n===n));
   const mp=moneyPots().filter(p=>!S.pots.includes(p.n)).length;
-  $("potAdd").innerHTML=`<option value="">Add a potion…</option>${mp?`<option value="__money">＋ Every money potion (${mp})</option>`:""}`+PO.filter(p=>!S.pots.includes(p.n)).map(p=>`<option value="${esc(p.n)}">${esc(p.n)} · ${esc(p.fx)}</option>`).join("");
+  $("potAdd").innerHTML=`<option value="">Add a potion…</option>${mp?`<option value="__money">＋ Every money potion (${mp})</option>`:""}`+PO.filter(p=>!S.pots.includes(p.n)).map(p=>`<option value="${esc(p.n)}">${esc(p.n)}, ${esc(p.fx)}</option>`).join("");
   $("potSum").textContent=S.pots.length?`${S.pots.length} potion${S.pots.length===1?"":"s"} active (click to ${$("potBox").open?"hide":"show"})`:"No potions active";$("potBox").hidden=!S.pots.length;
   $("potList").innerHTML=S.pots.map(n=>`<span class="bchip">${esc(n)}<button type="button" data-rmpot="${esc(n)}" aria-label="Remove ${esc(n)}">×</button></span>`).join("")}
 function toast(t){document.querySelectorAll(".ctoast").forEach(x=>x.remove());const d=document.createElement("div");d.className="ctoast";d.setAttribute("role","status");d.textContent=t;d.style.cssText="position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40";document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
@@ -847,7 +847,7 @@ const BOOSTS=[["Totems",[["b","luckTotem","Luck Totem (+1× luck)"],["b","strTot
   ["Daily and sluices",[["b","daily","Daily login luck (2× luck)"],["b","dailyStr","Daily login strength (2× dig strength)"],["b","empower","Empowering sluice (1.4× luck and capacity)"],["b","egg","Easter Sluice, Egg Hunter (1.5×)"],["b","cookie","XP Cookie"]]],
   ["Runes",[["b","sun","Sunblessed / Abyssal rune (+0.2× luck)"],["b","solo","Solitude rune (+0.2× luck)"],["b","purity","Purity rune (+1× luck, no modifiers)"],["b","vet","Veteran rune (+0.25× luck when mastered)"]]],
   ["Events and time",[["b","meteor","Meteor Shower (×2 luck)"],["b","weather","Weather event (×1.5 luck)"],["b","night","Night (counts Night Luck)"]]],
-  ["Limited consumables",CONS.map(c=>["c",c.n,`${c.n} · ${c.fx}`])],
+  ["Limited consumables",CONS.map(c=>["c",c.n,`${c.n}, ${c.fx}`])],
   ["Other",[["n","friends","Friends online",1,"online"],["n","flatLuck","Other flat luck",100,"luck"],["n","flatDig","Flat dig strength",10,"strength"]]]];
 const bOn=([k,key])=>k==="b"?!!S.b[key]:k==="c"?(S.cons||[]).includes(key):key==="friendTotem"?(+S.n.friendTotem>=0):(+S.n[key]>0);
 function fillBoosts(){S.cons=(S.cons||[]).filter(n=>CONS.some(c=>c.n===n));
@@ -856,7 +856,7 @@ function fillBoosts(){S.cons=(S.cons||[]).filter(n=>CONS.some(c=>c.n===n));
   $("bList").innerHTML=on.map(x=>{const lab=x[0]==="c"?x[1]:x[2].replace(/\s*\(.*$/,"");return `<span class="bchip">${esc(lab)}${x[0]==="n"?`<input type="number" min="${x[1]==="friendTotem"?0:0}" data-n="${x[1]}" value="${esc(S.n[x[1]])}" aria-label="${esc(x[2])}" title="${esc(x[4])}">`:""}<button type="button" data-rmb="${x[0]}:${esc(x[1])}" aria-label="Remove ${esc(lab)}">×</button></span>`}).join("")||'<span class="hint">None on. Add totems, daily boosts, runes, events and more from the list.</span>';
   fillProg()}
 function fillProg(){const b=S.b,n=S.n;const P_=[b.trader!==false&&"Trader",b.lighthouse&&"Lighthouse",b.ancient&&"Ancient",b.spirits&&"Spirits",+n.dredge>0&&`${n.dredge} Dredge quests`,+n.xp>0&&`${n.xp} Experience`,+n.tomb>0&&`Tomb Mastery ${n.tomb}`,+n.mastery>0&&`Mastery +${n.mastery}×`].filter(Boolean);
-  $("progSum").textContent=P_.length?P_.join(" · "):"Nothing set yet: quest luck, Dredge quests, Experience, masteries"}
+  $("progSum").textContent=P_.length?P_.join(", "):"Nothing set yet: quest luck, Dredge quests, Experience, masteries"}
 document.addEventListener("change",e=>{if(e.target.id!=="bAdd"||!e.target.value)return;const [k,...r]=e.target.value.split(":");const key=r.join(":");const x=BOOSTS.flatMap(([,l])=>l).find(y=>y[0]===k&&y[1]===key);
   if(k==="b")S.b[key]=true;else if(k==="c")S.cons=[...(S.cons||[]),key];else if(x)S.n[key]=x[3];if(key==="sun"||key==="solo"||key==="purity"||key==="vet")syncRuneFlags();save();all()});
 document.addEventListener("click",e=>{const r=e.target.closest("[data-rmb]");if(!r)return;const [k,...rr]=r.dataset.rmb.split(":");const key=rr.join(":");
@@ -963,7 +963,7 @@ async function bfEngine(c,scoreTot,onProg){
     if(!best||cur>best.sc+1e-12)best={sc:cur,st};
   }
   // why this build: for each part, the best thing you could put there instead and how much worse it is
-  const fin=best.st,sc=best.sc,why=[];const pct=v=>(Math.exp(v-sc)-1)*100;const lab=(p,e)=>p+(e?" · "+e:"");
+  const fin=best.st,sc=best.sc,why=[];const pct=v=>(Math.exp(v-sc)-1)*100;const lab=(p,e)=>p+(e?", "+e:"");
   if(c.tools){
     {let bb=null;for(const p of pans){if(p.name===fin.pan)continue;for(const e of ["",...EN.pan.map(x=>x.n)]){const v=score(Object.assign({},fin,{pan:p.name,panEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Pan",pick:lab(fin.pan,fin.panEn),alt:bb.t,pct:pct(bb.v)})}
     {let bb=null;for(const e of ["",...EN.pan.map(x=>x.n)]){if(e===fin.panEn)continue;const v=score(Object.assign({},fin,{panEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Pan enchant",pick:fin.panEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}
@@ -1002,7 +1002,7 @@ async function bfEngine(c,scoreTot,onProg){
 // finder results as spreadsheet rows (shared with the Best Build tool)
 window.ptFinderRows=(R,extra)=>{const it=v=>v&&v.n?v.n+(v.m&&v.m!=="None"?` (${v.m})`:""):"";const st=R.st,b=R.base||S;const out=[...(extra||[])];
   out.push(["Luck",Math.round(R.tot.Luck),"now",Math.round(R.before.Luck)],["Capacity",Math.round(R.tot.Capacity),"now",Math.round(R.before.Capacity)],[],["Part","Best build","Now"]);
-  out.push(["Pan",[st.pan,st.panEn].filter(Boolean).join(" · "),[b.pan,b.panEn].filter(Boolean).join(" · ")],["Shovel",[st.shovel,st.shEn].filter(Boolean).join(" · "),[b.shovel,b.shEn].filter(Boolean).join(" · ")],["Trinket",st.trinket||"",b.trinket||""]);
+  out.push(["Pan",[st.pan,st.panEn].filter(Boolean).join(", "),[b.pan,b.panEn].filter(Boolean).join(", ")],["Shovel",[st.shovel,st.shEn].filter(Boolean).join(", "),[b.shovel,b.shEn].filter(Boolean).join(", ")],["Trinket",st.trinket||"",b.trinket||""]);
   SLOTDEF.forEach(([k,l])=>out.push([l,it(st.slots[k]),it(b.slots&&b.slots[k])]));
   if(R.museum){out.push([],["Museum","Mineral","Modifier"]);MORDER.forEach(r=>((st.museumBoard||{})[r]||[]).forEach((x,i)=>{if(x&&x.m)out.push([`${r} ${i+1}`,x.m,x.u||""])}))}
   if(R.why&&R.why.length){out.push([],["Why","Picked","Best alternative","% worse if swapped"]);R.why.forEach(w=>out.push([w.part,w.pick,w.alt+(w.note?` (${w.note})`:""),Math.round(-w.pct*10)/10]))}
@@ -1012,8 +1012,8 @@ window.ptFinderRows=(R,extra)=>{const it=v=>v&&v.n?v.n+(v.m&&v.m!=="None"?` (${v
 window.ptWhyHTML=R=>{if(!R||!R.why)return "";const f=v=>v>-0.05?"about the same":fmt(-v,-v<10?1:0)+"% worse";
   return `<details class="bfwhy" open><summary><b>Why this build</b></summary><table class="bfwt"><tr><th></th><th>Picked</th><th>Best alternative</th><th>If you swapped it</th></tr>${R.why.map(w=>`<tr><td>${esc(w.part)}</td><td>${esc(w.pick)}</td><td>${esc(w.alt)}${w.note?` <span class="hint">(${esc(w.note)})</span>`:""}</td><td class="${w.pct>-1?"near":""}">${f(w.pct)}</td></tr>`).join("")}</table>
   <p class="hint">Anything marked "about the same" or under 1% is a near tie: use whichever you have.</p></details>
-  <details class="bfwhy"><summary><b>What this assumes</b></summary><ul class="bfas">${R.assume.map(a=>`<li>${esc(a)}</li>`).join("")}</ul><p class="hint">How it's worked out: <button type="button" class="lnk" data-opentool="mechanics">How It Works</button> · <button type="button" class="lnk" data-opentool="formulas">Formulas</button></p></details>`};
-window.ptWhyCSS=`.bfwhy{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}.bfwhy summary{cursor:pointer}.bfwt{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.bfwt th{text-align:left;font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}.bfwt td{padding:5px 6px;border-bottom:1px dashed var(--line);vertical-align:top}.bfwt td:first-child{color:var(--muted);white-space:nowrap}.bfwt td:last-child{white-space:nowrap;font-family:var(--f-mono)}.bfwt td.near{color:var(--warn,#9a5b00)}.bfas{margin:6px 0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}`;
+  <details class="bfwhy"><summary><b>What this assumes</b></summary><ul class="bfas">${R.assume.map(a=>`<li>${esc(a)}</li>`).join("")}</ul><p class="hint">How it's worked out: <button type="button" class="lnk" data-opentool="mechanics">How It Works</button>, <button type="button" class="lnk" data-opentool="formulas">Formulas</button></p></details>`};
+window.ptWhyCSS=`.bfwhy{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}.bfwhy summary{cursor:pointer}.bfwt{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.bfwt th{text-align:left;font:600 11px var(--f-body);color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}.bfwt td{padding:5px 6px;border-bottom:1px dashed var(--line);vertical-align:top}.bfwt td:first-child{color:var(--muted);white-space:nowrap}.bfwt td:last-child{white-space:nowrap;font-family:var(--f-mono)}.bfwt td.near{color:var(--warn,#9a5b00)}.bfas{margin:6px 0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}`;
 async function runBf(){const c=bfCfg();if(!c.muts.length){ptToast("Pick at least one mutation");return}
   const btn=$("bfRun");btn.disabled=true;const prog=$("bfProg");const goal=c.goal;
   const sf=goal==="luck"?t=>Math.log(Math.max(1e-9,t.Luck)):t=>Math.log(Math.max(1e-9,t.Luck))+.565*Math.log(Math.max(1e-9,t.Capacity));
@@ -1039,8 +1039,8 @@ let BF_LAST=null;
 function showBf(){const R=BF_LAST;if(!R){$("bfOut").innerHTML="";return}const st=R.st,t=R.tot||compute(st).tot;
   const g=Math.exp((R.sc!=null?R.sc:bfScore(st,R.goal))-R.beforeSc)-1;const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";
   const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"—"}</td><td class="was">${now===was?"":(was||"—")}</td></tr>`;
-  const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":` · ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
-  const rows=[row("Pan",esc(st.pan)+(st.panEn?` · ${esc(st.panEn)}`:""),esc(S.pan)+(S.panEn?` · ${esc(S.panEn)}`:"")),row("Shovel",esc(st.shovel)+(st.shEn?` · ${esc(st.shEn)}`:""),esc(S.shovel)+(S.shEn?` · ${esc(S.shEn)}`:"")),row("Trinket",esc(st.trinket||""),esc(S.trinket||""))]
+  const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":`, ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
+  const rows=[row("Pan",esc(st.pan)+(st.panEn?`, ${esc(st.panEn)}`:""),esc(S.pan)+(S.panEn?`, ${esc(S.panEn)}`:"")),row("Shovel",esc(st.shovel)+(st.shEn?`, ${esc(st.shEn)}`:""),esc(S.shovel)+(S.shEn?`, ${esc(S.shEn)}`:"")),row("Trinket",esc(st.trinket||""),esc(S.trinket||""))]
     .concat(SLOTDEF.map(([k,l])=>row(l,it(st.slots[k]),it(S.slots[k]))));
   let mus="";if(R.museum){const b=st.museumBoard||{};mus=`<h3 class="bfh">Museum</h3><div class="bfmus">${MORDER.map(r=>`<div><span class="lab" style="color:${rc(r)}">${r}</span> ${(b[r]||[]).filter(Boolean).map(x=>`${esc(x.m)}${x.u&&x.u!=="None"?` <span class="hint">(${esc(x.u)})</span>`:""}`).join(", ")||"—"}</div>`).join("")}</div>`}
   const capL=.565*t.Luck/Math.max(1,t.Capacity);

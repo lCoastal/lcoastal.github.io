@@ -25,12 +25,12 @@ function totals(l){const t={};SLOTS.forEach(([k])=>{const v=l.slots[k];if(!v||!v
 const ORDER=["Luck","Capacity","Size Boost","Sell Boost","Modifier Boost","Dig Strength","Dig Speed","Shake Strength","Shake Speed","Walk Speed","Inventory Size","Jump Power"];
 const sortStats=o=>Object.keys(o).sort((a,b)=>(ORDER.indexOf(a)+99)%99-(ORDER.indexOf(b)+99)%99||a.localeCompare(b));
 const valT=(a,p)=>(a<0?"−":"+")+fmt(Math.abs(a),2)+(p?"%":"");
-const starT=v=>(v.l==="5"?"5★":"6★")+((v.q??100)!==100?` · ${v.q}%`:"");
+const starT=v=>(v.l==="5"?"5★":"6★")+((v.q??100)!==100?`, ${v.q}%`:"");
 function tile(l,k,label,kind,big){const own=owned(l,k);const v=l.slots[k];const x=v&&v.n?EB[v.n]:null;
   if(!own)return `<div class="tile lock${big?" big":""}" aria-label="${esc(label)} (not unlocked)"><span class="tk">${esc(label)}</span><span class="plus">🔒</span><span class="tag">Not unlocked</span></div>`;
   if(!x)return `<button type="button" class="tile empty${big?" big":""}" data-slot="${k}" aria-label="Pick a ${kind.toLowerCase()} for ${esc(label)}"><span class="tk">${esc(label)}</span><span class="plus">+</span><span class="tag">Empty</span></button>`;
   const mu=v.m&&v.m!=="None"?v.m:"";const img=IMG(x.n);
-  return `<button type="button" class="tile${big?" big":""}" data-slot="${k}" data-tipk="${k}" data-equip="${esc(x.n)}" style="--tc:${RHEX[x.r]||"#3a444d"};--mc:${MCOL[mu]||"#fff"}" aria-label="${esc(label)}: ${esc(x.n)}"><span class="tk">${esc(label)}</span><span class="st">${v.l==="5"?"5★":"6★"} · ${v.q??100}%</span>${img?`<img src="${img}" alt="">`:""}<span class="meta">${mu?`<span class="mu">${esc(mu)}</span>`:""}<span class="tn">${esc(x.n)}</span><span class="tag" style="color:${RHEX[x.r]}">${x.r}</span></span></button>`}
+  return `<button type="button" class="tile${big?" big":""}" data-slot="${k}" data-tipk="${k}" data-equip="${esc(x.n)}" style="--tc:${RHEX[x.r]||"#3a444d"};--mc:${MCOL[mu]||"#fff"}" aria-label="${esc(label)}: ${esc(x.n)}"><span class="tk">${esc(label)}</span><span class="st">${v.l==="5"?"5★":"6★"}, ${v.q??100}%</span>${img?`<img src="${img}" alt="">`:""}<span class="meta">${mu?`<span class="mu">${esc(mu)}</span>`:""}<span class="tn">${esc(x.n)}</span><span class="tag" style="color:${RHEX[x.r]}">${x.r}</span></span></button>`}
 function render(){const l=L();
   $("sel").innerHTML=D.list.map(x=>`<option value="${x.id}"${x.id===l.id?" selected":""}>${esc(x.name||"Untitled loadout")}</option>`).join("");
   if(document.activeElement!==$("name"))$("name").value=l.name;if(document.activeElement!==$("notes"))$("notes").value=l.notes||"";
@@ -43,7 +43,7 @@ function render(){const l=L();
   renderCmp()}
 // ---- hover card with the item's stats ----
 const tip=$("tip");
-function tipHTML(v){const x=EB[v.n];const mu=v.m&&v.m!=="None"?v.m:"";return `<b style="color:${RHEX[x.r]}">${mu?`<span style="color:${MCOL[mu]}">${esc(mu)}</span> `:""}${esc(x.n)}</b><small>${x.r} ${esc(x.slot)} · ${starT(v)}${ONE_ONLY.has(x.n)?" · only 1 can be worn":""}</small>${itemStats(v).map(([n,a,p])=>`<div class="ln"><span style="color:${statHex(n)}">${esc(n)}</span><span>${valT(a,p)}</span></div>`).join("")}`}
+function tipHTML(v){const x=EB[v.n];const mu=v.m&&v.m!=="None"?v.m:"";return `<b style="color:${RHEX[x.r]}">${mu?`<span style="color:${MCOL[mu]}">${esc(mu)}</span> `:""}${esc(x.n)}</b><small>${x.r} ${esc(x.slot)}, ${starT(v)}${ONE_ONLY.has(x.n)?", only 1 can be worn":""}</small>${itemStats(v).map(([n,a,p])=>`<div class="ln"><span style="color:${statHex(n)}">${esc(n)}</span><span>${valT(a,p)}</span></div>`).join("")}`}
 // in the picker, show an option's stats at the stars, quality and mutation picked above
 const pickV=n=>({n,l:$("pkL").value,q:Math.max(0,Math.min(100,+$("pkP").value||0)),m:$("pkM").value});
 document.addEventListener("mouseover",e=>{const o=e.target.closest("[data-tipn]");if(o){tip.innerHTML=tipHTML(pickV(o.dataset.tipn));tip.style.display="block";return}
@@ -64,7 +64,7 @@ function drawPick(){const l=L();const q=$("pkQ").value.trim().toLowerCase();
   const RO=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
   const items=EQ.filter(x=>x.slot===PK.kind&&(!q||(x.n+" "+x.st.map(s=>s[0]).join(" ")).toLowerCase().includes(q))).sort((a,b)=>RO.indexOf(a.r)-RO.indexOf(b.r)||a.n.localeCompare(b.n));
   $("pkList").innerHTML=items.map(x=>{const blocked=ONE_ONLY.has(x.n)&&used.has(x.n);const img=IMG(x.n);
-    return `<button type="button" class="pi" data-pick="${esc(x.n)}" data-tipn="${esc(x.n)}" data-equip="${esc(x.n)}" style="--rc:${rc(x.r)}" aria-pressed="${PK.sel===x.n}"${blocked?` disabled title="Only 1 can be worn and it's already in another slot"`:""}>${img?`<img src="${img}" alt="">`:""}<span><b>${esc(x.n)}</b><small>${x.r}${x.ev?" · limited":""}${blocked?" · already worn":""}</small></span></button>`}).join("")||'<p class="hint">Nothing matches.</p>'}
+    return `<button type="button" class="pi" data-pick="${esc(x.n)}" data-tipn="${esc(x.n)}" data-equip="${esc(x.n)}" style="--rc:${rc(x.r)}" aria-pressed="${PK.sel===x.n}"${blocked?` disabled title="Only 1 can be worn and it's already in another slot"`:""}>${img?`<img src="${img}" alt="">`:""}<span><b>${esc(x.n)}</b><small>${x.r}${x.ev?", limited":""}${blocked?", already worn":""}</small></span></button>`}).join("")||'<p class="hint">Nothing matches.</p>'}
 function closePick(){$("ov").hidden=true;PK=null;tip.style.display="none"}
 function setSlot(patch){const l=L();l.slots[PK.k]=Object.assign({},l.slots[PK.k]||{},patch);save();render()}
 $("pkQ").oninput=drawPick;$("pkX").onclick=closePick;$("ov").addEventListener("click",e=>{if(e.target===$("ov"))closePick()});
@@ -132,7 +132,7 @@ async function loadImage(){const l=L();const F='"IBM Plex Sans","Segoe UI",syste
     c.fillStyle="#98a2ad";c.font=`700 10px ${F}`;c.fillText(label.toUpperCase(),x+9,y+16);
     if(!own){c.fillStyle="#5d6670";c.font=`12px ${F}`;c.fillText("Not unlocked",x+9,y+h-12);return}
     if(!it){c.fillStyle="#5d6670";c.font=`12px ${F}`;c.fillText("Empty",x+9,y+h-12);return}
-    c.fillStyle="#ffd36b";c.font=`700 11px ${F}`;const stt=(v.l==="5"?"5★":"6★")+" · "+(v.q??100)+"%";c.fillText(stt,x+w-9-c.measureText(stt).width,y+16);
+    c.fillStyle="#ffd36b";c.font=`700 11px ${F}`;const stt=(v.l==="5"?"5★":"6★")+", "+(v.q??100)+"%";c.fillText(stt,x+w-9-c.measureText(stt).width,y+16);
     const mu=v.m&&v.m!=="None"?v.m:"";const ic=icons[k];
     if(big){if(ic)c.drawImage(ic,x+12,y+(h-84)/2+6,84,84);const tx=x+(ic?108:12);let ty=y+h/2-6;
       if(mu){c.fillStyle=MCOL[mu];c.font=`700 11px ${F}`;c.fillText(mu.toUpperCase(),tx,ty-16)}
@@ -141,14 +141,14 @@ async function loadImage(){const l=L();const F='"IBM Plex Sans","Segoe UI",syste
       c.fillStyle=col;c.font=`600 11px ${F}`;c.fillText(it.r,x+(w-c.measureText(it.r).width)/2,ty+15);
       if(mu){c.fillStyle=MCOL[mu];c.font=`700 10px ${F}`;const mt=mu.toUpperCase();c.fillText(mt,x+(w-c.measureText(mt).width)/2,ty-15)}}};
   const px=PAD+14,BW=(LW-GAP)/2;drawTile("neck","Necklace",px,y0+14,BW,150,true);drawTile("charm","Charm",px+BW+GAP,y0+14,BW,150,true);
-  c.fillStyle="#98a2ad";c.font=`700 12px ${F}`;c.fillText("RINGS",px,y0+14+150+26);
+  c.fillStyle="#98a2ad";c.font=`700 12px ${F}`;c.fillText("Rings",px,y0+14+150+26);
   SLOTS.slice(2).forEach(([k,lab],i)=>{const cx=px+(i%4)*(TS+GAP),cy=y0+14+150+40+Math.floor(i/4)*(TS+GAP);drawTile(k,lab,cx,cy,TS,TS,false)});
   const sx=PAD+LW+28+GAP,SW=W-PAD-sx;c.fillStyle="#1c2126";rr(sx,y0,SW,Math.max(panelH,sumH),14);c.fill();c.strokeStyle="#2d343b";rr(sx,y0,SW,Math.max(panelH,sumH),14);c.stroke();
-  c.fillStyle="#98a2ad";c.font=`700 12px ${F}`;c.fillText("TOTAL STATS",sx+16,y0+28);
+  c.fillStyle="#98a2ad";c.font=`700 12px ${F}`;c.fillText("Total stats",sx+16,y0+28);
   if(!ks.length){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText("Nothing equipped",sx+16,y0+60)}
   ks.forEach((n,i)=>{const yy=y0+52+i*34;c.fillStyle=statHex(n);c.font=`600 14px ${F}`;c.fillText(n,sx+16,yy+14);const vt=valT(t[n].v,t[n].p);c.fillStyle="#e6e9ec";c.font=`500 14px ${FM}`;c.fillText(vt,sx+SW-16-c.measureText(vt).width,yy+14);if(i<ks.length-1){c.strokeStyle="#262d34";c.beginPath();c.moveTo(sx+16,yy+26);c.lineTo(sx+SW-16,yy+26);c.stroke()}});
   if(notes.length){let y=y0+Math.max(panelH,sumH)+20;c.fillStyle="#1c2126";rr(PAD,y,W-PAD*2,notes.length*20+44,12);c.fill();c.strokeStyle="#2d343b";rr(PAD,y,W-PAD*2,notes.length*20+44,12);c.stroke();
-    c.fillStyle="#98a2ad";c.font=`700 12px ${F}`;c.fillText("NOTES",PAD+14,y+22);c.fillStyle="#e6e9ec";c.font=`14px ${F}`;notes.forEach((ln,i)=>c.fillText(ln,PAD+14,y+44+i*20))}
+    c.fillStyle="#98a2ad";c.font=`700 12px ${F}`;c.fillText("Notes",PAD+14,y+22);c.fillStyle="#e6e9ec";c.font=`14px ${F}`;notes.forEach((ln,i)=>c.fillText(ln,PAD+14,y+44+i*20))}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptLoadoutImage=loadImage;
 $("bImg").onclick=async()=>{let blob=null;try{blob=await loadImage()}catch(e){console.error(e)}if(!blob){toast("Couldn't draw the image");return}

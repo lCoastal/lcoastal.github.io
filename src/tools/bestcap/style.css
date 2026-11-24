@@ -1,6 +1,6 @@
 
 /* Layout: search + filters on top, then every mineral with each zone it drops in and the luck cap that finds it most often */
-.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-left:4px solid var(--neg);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
+.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
 .disc b{font-weight:700}
 .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .bar input[type=search]{flex:1 1 240px;min-width:0}
@@ -16,7 +16,7 @@
 .rlink{border:0;background:none;color:var(--accent);font:600 12.5px var(--f-body);cursor:pointer;padding:5px 4px}
 .rlink:disabled{color:var(--muted);opacity:.5;cursor:default}
 table.o{width:100%;border-collapse:collapse;font-size:13.5px}
-table.o th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.o th{font:600 11px var(--f-body);color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
 table.o td{padding:8px 10px;border-bottom:1px dashed var(--line);vertical-align:middle}
 table.o tr.first td{border-top:1px solid var(--line)}
 table.o tbody tr:first-child td{border-top:0}
@@ -48,14 +48,14 @@ td.bl small{display:block;font-size:11.5px;color:var(--muted);font-family:var(--
   table.o td.mcell{grid-column:1/3}
   table.o td.mcell:empty{display:none}
   table.o td.zcell{grid-column:1/3}
-  table.o td[data-l]::before{content:attr(data-l);display:block;font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+  table.o td[data-l]::before{content:attr(data-l);display:block;font:600 10.5px var(--f-body);color:var(--muted);margin-bottom:2px}
 }
 .fx{margin-top:12px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--sunk);display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--muted)}
-.fx h3{margin:0;font:600 12px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--fg)}
+.fx h3{margin:0;font:600 12px var(--f-body);color:var(--fg)}
 .fx p{margin:0}
 .fx code{font-family:var(--f-mono);font-size:13px;color:var(--fg);background:none;padding:0;overflow-wrap:anywhere}
 .fx .row{display:grid;grid-template-columns:150px 1fr;gap:4px 12px;align-items:baseline}
 @media (max-width:600px){.fx .row{grid-template-columns:1fr}}
 
 .ench{display:inline-block;margin-left:4px;padding:0 7px;border-radius:999px;border:1px solid var(--line);font:600 11px/1.6 var(--f-body);color:var(--muted);vertical-align:1px;white-space:nowrap}
-.ltd{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:1px 7px;margin-left:4px;white-space:nowrap}
+.ltd{font:600 10.5px var(--f-body);color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:1px 7px;margin-left:4px;white-space:nowrap}

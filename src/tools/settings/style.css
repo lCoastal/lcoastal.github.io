@@ -16,7 +16,7 @@
 .seg button:first-child{border-left:0}
 .seg[aria-disabled="true"]{opacity:.45;pointer-events:none}
 .note{font-size:12.5px;color:var(--muted);margin:0}
-.beta{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 8px;vertical-align:middle;margin-left:6px}
+.beta{font:600 10.5px var(--f-body);color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 8px;vertical-align:middle;margin-left:6px}
 #thm button,#imgm button{font-family:var(--f-body);min-width:58px}
 .sws{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;flex:none;max-width:100%}
 .swb{width:30px;height:30px;border-radius:50%;border:2px solid var(--panel);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0;background:linear-gradient(135deg,var(--l) 0 50%,var(--d) 50% 100%)}

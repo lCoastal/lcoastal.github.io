@@ -15,7 +15,7 @@ function tick(){const now=new Date();const secH=now.getUTCMinutes()*60+now.getUT
   // Saturday update: the update goes live at 10:00 New York time and Admin Abuse starts 15 minutes before
   const U=nextUpdate(now),aa=U.aa,up=U.up,live=now>=aa&&now<new Date(up.getTime()+3600e3);
   const wd=d=>d.toLocaleDateString([], {weekday:"long"});
-  h+=`<div class="tm" style="--tc:var(--c-exotic)"><span class="lab">Saturday update</span><b>Admin Abuse ${clock(aa)} · Update ${clock(up)}</b><span class="st ${live?"open":"shut"}">${live?(now<up?"Admin Abuse is on now":"Update is out"):"AA "+rel(aa-now)}</span><span class="cd">${live?(now<up?mmss((up-now)/1000):"Live"):mmss((aa-now)/1000)}</span><small>${live&&now<up?"Until the update":"Until Admin Abuse, "+wd(aa)+" your time"}. Only on weeks with an update.</small><span id="aaSlot"></span></div>`;
+  h+=`<div class="tm" style="--tc:var(--c-exotic)"><span class="lab">Saturday update</span><b>Admin Abuse ${clock(aa)}, Update ${clock(up)}</b><span class="st ${live?"open":"shut"}">${live?(now<up?"Admin Abuse is on now":"Update is out"):"AA "+rel(aa-now)}</span><span class="cd">${live?(now<up?mmss((up-now)/1000):"Live"):mmss((aa-now)/1000)}</span><small>${live&&now<up?"Until the update":"Until Admin Abuse, "+wd(aa)+" your time"}. Only on weeks with an update.</small><span id="aaSlot"></span></div>`;
   $("timers").innerHTML=h;$("aaSlot").replaceWith(AAW)}
 // one copy button that's moved into the card on every tick, not rebuilt, so it stays put and keeps its hover/focus
 const CPAA=document.createElement("button");CPAA.type="button";CPAA.className="btn sm";CPAA.id="cpAA";CPAA.textContent="Copy for Discord";// it sits in the site's own action group from the start, so the shared code doesn't move it around every tick

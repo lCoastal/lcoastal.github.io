@@ -60,7 +60,7 @@ function drawBoard(el,st,side){
   el.innerHTML="";const bands=[];const other=CMP?brd(side==="A"?"B":"A"):null;
   ORDER.forEach(r=>{
     const band=document.createElement("section");band.className="band";band.style.setProperty("--rc",rc(r));
-    band.innerHTML=`<div class="bh"><h2>${r}</h2><span>${SLOTS[r]} display${SLOTS[r]>1?"s":""} · mutation +${r4(MULT[r])}× per stat</span></div>`;
+    band.innerHTML=`<div class="bh"><h2>${r}</h2><span>${SLOTS[r]} display${SLOTS[r]>1?"s":""}, mutation +${r4(MULT[r])}× per stat</span></div>`;
     const sl=document.createElement("div");sl.className="slots";
     st[r].forEach((slot,i)=>{
       const c=document.createElement("div");const o=other&&other[r][i];
@@ -166,7 +166,7 @@ scrim.addEventListener("click",e=>{if(e.target===scrim)closePicker()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!scrim.hidden)closePicker()});
 function drawPicker(){
   const {r,i,kind}=P;const BS=brd(P.side);const cur=BS[r][i];
-  document.getElementById("ptitle").textContent=(kind==="m"?`${r} mineral`:`Mutation on ${r}`)+` · display ${i+1}`;
+  document.getElementById("ptitle").textContent=(kind==="m"?`${r} mineral`:`Mutation on ${r}`)+`, display ${i+1}`;
   const sorts=document.getElementById("sorts");
   if(kind==="m"){
     sorts.hidden=false;
@@ -226,14 +226,14 @@ const saveL=()=>{try{localStorage.setItem("mp-loadouts",JSON.stringify(L))}catch
 const validBoard=b=>b&&ORDER.every(r=>Array.isArray(b[r])&&b[r].length===SLOTS[r]&&b[r].every(s=>s&&(s.m===null||BY[s.m]&&BY[s.m][1]===r)&&MOD[s.u||"None"]));
 const clone=o=>JSON.parse(JSON.stringify(o));
 const filledCount=b=>ORDER.reduce((a,r)=>a+b[r].filter(x=>x.m).length,0);
-function headline(b){const t=totals(b);const top=STATS.filter(s=>t[s]>1e-9).sort((a,c)=>t[c]-t[a]).slice(0,3);return top.length?top.map(s=>s+" "+fxT(t[s])).join(" · "):"Empty board"}
+function headline(b){const t=totals(b);const top=STATS.filter(s=>t[s]>1e-9).sort((a,c)=>t[c]-t[a]).slice(0,3);return top.length?top.map(s=>s+" "+fxT(t[s])).join(", "):"Empty board"}
 function renderSaved(){if(CMP){drawHead("A");drawHead("B")}
   const el=document.getElementById("savedlist");
   if(!L.length){el.innerHTML='<p class="emptylo">No saved loadouts yet. Fill the board below, give it a name and press Save loadout. Saved loadouts stay in this browser; download one to keep a copy or move it to another device.</p>';return}
   el.innerHTML="";
   L.forEach((o,k)=>{
     const row=document.createElement("div");row.className="lo"+(o.name===activeName?" active":"");
-    row.innerHTML=`<div class="info"><b>${esc(o.name)}</b><span>${filledCount(o.board)}/18 displays · ${esc(headline(o.board))}</span></div><div class="acts"><button type="button" class="btn sm" id="lo-load-${k}">Load</button><button type="button" class="btn sm" id="lo-dl-${k}">Download</button><button type="button" class="btn sm ${armDelete===k?"warn":""}" id="lo-del-${k}">${armDelete===k?"Confirm delete":"Delete"}</button></div>`;
+    row.innerHTML=`<div class="info"><b>${esc(o.name)}</b><span>${filledCount(o.board)}/18 displays, ${esc(headline(o.board))}</span></div><div class="acts"><button type="button" class="btn sm" id="lo-load-${k}">Load</button><button type="button" class="btn sm" id="lo-dl-${k}">Download</button><button type="button" class="btn sm ${armDelete===k?"warn":""}" id="lo-del-${k}">${armDelete===k?"Confirm delete":"Delete"}</button></div>`;
     el.appendChild(row);
     row.querySelector(`#lo-load-${k}`).onclick=()=>{S=clone(o.board);activeName=o.name;document.getElementById("lname").value=o.name;armDelete=null;save();renderBoard();renderSaved();toast(`Loaded “${o.name}”`)};
     row.querySelector(`#lo-dl-${k}`).onclick=()=>downloadLoadout(o.name,o.board);
@@ -259,11 +259,11 @@ function loadoutHTML(name,b){
 @media (prefers-color-scheme:dark){:root{--bg:#14181c;--panel:#1c2126;--fg:#e6e9ec;--muted:#98a2ad;--line:#2d343b;--pos:#3cc2a8;--neg:#ef7a66;--c-common:#a3adb8;--c-uncommon:#6cc46e;--c-rare:#68a6f0;--c-epic:#b880ee;--c-legendary:#f2b53a;--c-mythic:#f0687f;--c-exotic:#f17ad6;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--fb)}
 .wrap{max-width:1100px;margin:0 auto;padding:28px 16px 48px;display:flex;flex-direction:column;gap:18px}
-.eyebrow{font:600 11px var(--fb);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.eyebrow{font:600 11px var(--fb);color:var(--muted)}
 h1{font:700 2.1rem/1.1 var(--fd);margin:4px 0 0}.sub{color:var(--muted);margin:6px 0 0}
 .grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}@media(max-width:820px){.grid{grid-template-columns:1fr}.tot{order:-1}}
 .board{display:flex;flex-direction:column;gap:14px;min-width:0}.band{display:flex;flex-direction:column;gap:8px}
-.bh{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--rc);padding-bottom:3px}.bh h2{font:700 1.05rem var(--fd);margin:0;color:var(--rc);text-transform:uppercase;letter-spacing:.04em}.bh span{font-size:12px;color:var(--muted)}
+.bh{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--rc);padding-bottom:3px}.bh h2{font:700 1.05rem var(--fd);margin:0;color:var(--rc)}.bh span{font-size:12px;color:var(--muted)}
 .slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}@media(max-width:600px){.slots{grid-template-columns:1fr}}
 .slot{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--rc);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:3px}
 .mn{font-weight:600}.mn i{color:var(--muted);font-weight:400}.mu{font-size:12.5px;color:var(--muted)}
@@ -274,10 +274,10 @@ h1{font:700 2.1rem/1.1 var(--fd);margin:4px 0 0}.sub{color:var(--muted);margin:6
   const data=JSON.stringify({app:"prospecting-museum-planner",v:1,name,board:b}).replace(/</g,"\\u003c");
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(name)} · Museum Loadout</title>
+<title>${esc(name)}, Museum Loadout</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>${css}</style></head><body><div class="wrap">
-<header><div class="eyebrow">Prospecting museum loadout</div><h1>${esc(name)}</h1><p class="sub">${filledCount(b)} of 18 displays filled · saved ${esc(when)}</p></header>
+<header><div class="eyebrow">Prospecting museum loadout</div><h1>${esc(name)}</h1><p class="sub">${filledCount(b)} of 18 displays filled, saved ${esc(when)}</p></header>
 <div class="grid"><div class="board">${bands}</div><aside class="tot"><h2>Museum total</h2>${trows}</aside></div>
 <p class="foot">Values assume each mineral is at or above its max-boost weight. Import this file back into the Prospecting Museum Planner to edit it.</p>
 </div><script type="application/json" id="loadout-data">${data}<\/script></body></html>`;
@@ -310,12 +310,12 @@ async function boardImage(name,b){
   const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(fitText(c,name,W-PAD*2-200),PAD,PAD+30);
-  c.fillStyle="#98a2ad";c.font=`14px ${F}`;c.fillText(`${filledCount(b)} of 18 displays filled · values at max-boost weight`,PAD,PAD+58);
+  c.fillStyle="#98a2ad";c.font=`14px ${F}`;c.fillText(`${filledCount(b)} of 18 displays filled, values at max-boost weight`,PAD,PAD+58);
   let y=HEAD;
   for(const r of ORDER){const col=IMGC[r];
     c.fillStyle="#1c2126";rr(c,PAD,y,W-PAD*2,ROWH,10);c.fill();c.strokeStyle=col;c.lineWidth=1.5;rr(c,PAD,y,W-PAD*2,ROWH,10);c.stroke();
     c.fillStyle=col;rr(c,PAD,y,6,ROWH,3);c.fill();
-    c.fillStyle=col;c.font=`700 15px ${F}`;c.fillText(r.toUpperCase(),PAD+20,y+ROWH/2+5);
+    c.fillStyle=col;c.font=`700 15px ${F}`;c.fillText(r,PAD+20,y+ROWH/2+5);
     for(let i=0;i<3;i++){const x=PAD+150+i*COLW;const sl=b[r][i];
       if(i<b[r].length){c.strokeStyle="#2d343b";c.lineWidth=1;c.beginPath();c.moveTo(x,y+12);c.lineTo(x,y+ROWH-12);c.stroke()}
       if(!sl){continue}
@@ -355,7 +355,7 @@ async function compareImage(nA,nB){
   let x=PAD;c.fillStyle="#e6e9ec";c.fillText(tA,x,PAD+32);x+=c.measureText(tA).width+14;c.fillStyle="#3cc2a8";c.font=`700 24px ${FD}`;c.fillText("vs",x,PAD+30);x+=c.measureText("vs").width+14;c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(tB,x,PAD+32);
   let up=0,dn=0;rows.forEach(k=>{const d=tb[k]-ta[k];if(d>1e-9)up++;else if(d<-1e-9)dn++});
   let nd=0;ORDER.forEach(r=>S[r].forEach((a,i)=>{const b=SB[r][i];if(a.m!==b.m||(a.u||"None")!==(b.u||"None"))nd++}));
-  c.fillStyle="#98a2ad";c.font=`14px ${F}`;c.fillText(`Museum comparison · ${nB} is better in ${up} stat${up===1?"":"s"}, worse in ${dn} · ${nd} display${nd===1?"":"s"} differ · values at max-boost weight`.slice(0,150),PAD,PAD+60);
+  c.fillStyle="#98a2ad";c.font=`14px ${F}`;c.fillText(`Museum comparison, ${nB} is better in ${up} stat${up===1?"":"s"}, worse in ${dn}, ${nd} display${nd===1?"":"s"} differ, values at max-boost weight`.slice(0,150),PAD,PAD+60);
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   // stat differences
   let y=HEAD;c.fillStyle="#98a2ad";c.font=`600 13px ${F}`;c.fillText("STAT DIFFERENCES  ("+nB.toUpperCase().slice(0,30)+" − "+nA.toUpperCase().slice(0,30)+")",PAD,y);y+=14;
@@ -381,11 +381,11 @@ async function compareImage(nA,nB){
       for(let n=0;n<idx.length;n++){const i=idx[n],sl=st[r][i],sx=xx+n*(SW+8),sy=y+28;
         c.fillStyle="#1c2126";rr(c,sx,sy,SW,SH,10);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,sx,sy,SW,SH,10);c.stroke();
         c.fillStyle=col;rr(c,sx,sy,SW,4,2);c.fill();
-        if(!sl.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText(sl.u&&sl.u!=="None"?"Any · "+sl.u:"Empty",sx+14,sy+SH/2+5);continue}
+        if(!sl.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText(sl.u&&sl.u!=="None"?"Any, "+sl.u:"Empty",sx+14,sy+SH/2+5);continue}
         let tx=sx+12;const ic=ICONS[sl.m];if(ic){const im=await loadImg(ic);if(im){c.drawImage(im,sx+10,sy+15,48,48)}tx=sx+66}
         c.fillStyle="#e6e9ec";c.font=`700 15px ${FD}`;c.fillText(fitText(c,minLabel(r,sl.m),SW-(tx-sx)-8),tx,sy+28);
         const md=sl.u&&sl.u!=="None"?sl.u:"None";c.fillStyle=md!=="None"?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(md.toUpperCase(),tx,sy+46);
-        const g=mineralGain(sl.m),gt=Object.entries(g).sort((a,b)=>STATS.indexOf(a[0])-STATS.indexOf(b[0])).map(([k,v])=>`${SHORT[k]||k} ${v<0?"−":"+"}${r4(Math.abs(v))}`).join(" · ");
+        const g=mineralGain(sl.m),gt=Object.entries(g).sort((a,b)=>STATS.indexOf(a[0])-STATS.indexOf(b[0])).map(([k,v])=>`${SHORT[k]||k} ${v<0?"−":"+"}${r4(Math.abs(v))}`).join(", ");
         c.fillStyle="#b9c2cb";c.font=`11.5px ${FM}`;c.fillText(fitText(c,gt,SW-(tx-sx)-8),tx,sy+64)}}
     y+=BAND}
   // separator between the two museums

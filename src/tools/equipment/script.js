@@ -77,7 +77,7 @@ function bpQuests(x){const m=String(x.bp||"").match(/[“"]([^”"]+)[”"]/);if
 function bpSection(x){if(!x.bp)return "";const qs=bpQuests(x);
   return `<div class="psec" id="bpq"><h3><span>Blueprint</span>${qs.length?`<button type="button" class="btn" data-qopen="${esc(qs[0].n.replace(/\s*\[\d+\]$/,""))}" style="font-size:12px;padding:4px 10px">Open in Quest Tracker</button>`:""}</h3>
     <p style="margin:0;font-size:13.5px">${esc(x.bp)}.</p>${!qs.length&&/^Quest/.test(x.bp)?`<p class="muted" style="margin:0;font-size:12.5px">The quest's steps aren't in the Quest Tracker yet.</p>`:""}
-    ${qs.map(q=>`<div class="bpq"><div class="bpqh"><b>${esc(q.n)}</b><span>${esc(q.npc||"")}${q.loc?` · <span class="lk" data-location="${esc(q.loc)}">${esc(q.loc)}</span>`:""}</span></div>
+    ${qs.map(q=>`<div class="bpq"><div class="bpqh"><b>${esc(q.n)}</b><span>${esc(q.npc||"")}${q.loc?`, <span class="lk" data-location="${esc(q.loc)}">${esc(q.loc)}</span>`:""}</span></div>
       ${q.steps&&q.steps.length?`<ol>${q.steps.map(t=>`<li>${esc(t)}</li>`).join("")}</ol>`:""}
       ${q.rw?`<div class="bprw"><span class="lab">Rewards</span> ${esc(q.rw)}</div>`:""}</div>`).join("")}</div>`}
 const bpTag=x=>x.bp?`<span class="bp" title="${esc(x.bp)}">${BPI}Blueprint</span>`:"";
@@ -85,7 +85,7 @@ $("q").oninput=()=>{st.q=$("q").value.trim().toLowerCase();render()};
 $("sort").onchange=()=>{st.sort=$("sort").value;st.rev=false;save();render()};
 $("dir").onclick=()=>{st.rev=!st.rev;save();render()};
 const priceHtml=x=>x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):`${fmt(x.price)}<small>${esc(x.cur)}</small>`;
-const matHtml=([q,n,kg],big)=>{const m=MIN[n.toLowerCase()];return `<span data-mineral="${esc(n)}" title="${esc(n)}${kg?" (+"+esc(kg)+")":""} · Ctrl+click to open">${m&&m.ic?`<img src="${m.ic}" alt="" width="18" height="18" loading="lazy">`:""}<span class="q">${q}×</span>${esc(n)}${kg?` <span class="muted">+${esc(kg)}</span>`:""}</span>`};
+const matHtml=([q,n,kg],big)=>{const m=MIN[n.toLowerCase()];return `<span data-mineral="${esc(n)}" title="${esc(n)}${kg?" (+"+esc(kg)+")":""}, Ctrl+click to open">${m&&m.ic?`<img src="${m.ic}" alt="" width="18" height="18" loading="lazy">`:""}<span class="q">${q}×</span>${esc(n)}${kg?` <span class="muted">+${esc(kg)}</span>`:""}</span>`};
 const sName=n=>KCOL[n]?`<span class="sk" style="color:var(--k-${KCOL[n]})">${esc(n)}</span>`:esc(n);
 const stHtml=(x,hl)=>st.lvls.length===1?statsAt(x,st.lvl).map(r=>`<span class="${r[1]<0?"neg":""}${hl&&r[0].toLowerCase().includes(hl)?" hl":""}">${sName(r[0])} <em>${svr(r)}</em></span>`).join(""):multiHtml(x,hl);
 // one row per stat, one column per picked level; Sunforged can add Luck and Sell Boost rows the item doesn't normally have
@@ -115,7 +115,7 @@ function render(){
   $("list").innerHTML=groups.some(g=>g[1].length)?groups.map(([r,rs,gc,skip])=>`<section class="grp${skip==="r"?"":" neutral"}" style="--rc:${gc}">${r?`<div class="gh"><b>${r}</b><span>${rs.length} ${rs.length===1?"item":"items"}</span></div>`:""}
     <table class="eq ${st.lvls.length>2?"many":st.lvls.length>1?"two":"one"}"><colgroup><col class="c-ic"><col class="c-nm"${st.lvls.length>1?` style="width:${st.lvls.length>2?15:18}%"`:""}><col class="c-st"${st.lvls.length>1?` style="width:auto"`:""}><col class="c-rc"${st.lvls.length>1?` style="width:210px"`:""}><col class="c-pr"><col class="c-t"></colgroup><thead><tr><th aria-label="Icon"></th><th>Name</th><th>${st.lvls.length===1?`Stats (${LVLN[st.lvl]})`:"Stats"}</th><th>Recipe</th><th style="text-align:center">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
     ${rs.map(x=>`<tr tabindex="0" data-open="${x.i}"${skip==="r"?` style="--rc:${rc(x.r)};--nc:${rc(x.r)}"`:` class="plain" style="--rc:var(--line);--nc:${rc(x.r)}"`}><td class="ic"><div class="icon">${x.img?`<img src="${x.img}" alt="" width="36" height="36" loading="lazy">`:""}</div></td>
-      <td><div class="nm"><b>${esc(x.n)}</b><span>${skip==="slot"?"":x.slot}${skip==="r"?"":(skip==="slot"?"":" · ")+"<span style=\"color:"+rc(x.r)+"\">"+x.r+"</span>"}${x.ev?" · limited-time":""}</span>${ONE_ONLY.has(x.n)?`<span class="tags">${oneTag(x)}${bpTag(x)}</span>`:bpTag(x)}</div></td>
+      <td><div class="nm"><b>${esc(x.n)}</b><span>${skip==="slot"?"":x.slot}${skip==="r"?"":(skip==="slot"?"":", ")+"<span style=\"color:"+rc(x.r)+"\">"+x.r+"</span>"}${x.ev?", limited-time":""}</span>${ONE_ONLY.has(x.n)?`<span class="tags">${oneTag(x)}${bpTag(x)}</span>`:bpTag(x)}</div></td>
       <td class="sts-c"><div class="sts">${stHtml(x,hl)}</div></td>
       <td class="rec-c"><div class="rec">${x.rec.map(m=>matHtml(m)).join("")}</div></td>
       <td class="pr">${priceHtml(x)}</td><td class="t"><span class="tg">${tgHtml(x.n)}<button type="button" class="hidebtn" data-hide="${esc(x.n)}" title="Hide ${esc(x.n)}" aria-label="Hide ${esc(x.n)}"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path stroke="currentColor" stroke-width="1.5" d="M2.5 13.5l11-11"/></svg></button></span></td></tr>`).join("")}</tbody></table></section>`).join(""):'<div class="empty">Nothing matches these filters.</div>';
@@ -142,7 +142,7 @@ function showEquip(i){
   page.style.setProperty("--gc",rc(x.r));
   const others=E.filter(y=>y.slot===x.slot&&y!==x);
   page.innerHTML=`<div class="ph"><div class="icon">${x.img?`<img src="${window.ptBig?ptBig(x.img):x.img}" alt="" width="120" height="120">`:""}</div>
-      <div><span class="rr" style="--rc:${rc(x.r)}">${x.r} ${x.slot}${x.ev?" · limited-time":""}</span><h2 id="pname">${esc(x.n)}</h2>${oneTag(x)}</div>
+      <div><span class="rr" style="--rc:${rc(x.r)}">${x.r} ${x.slot}${x.ev?", limited-time":""}</span><h2 id="pname">${esc(x.n)}</h2>${oneTag(x)}</div>
       <div class="pv">${x.price==null?"—":x.cur==="$"?"$"+fmt(x.price):fmt(x.price)+" "+esc(x.cur)}<small>craft cost</small></div>
       <button type="button" class="btn" id="pclose">Close</button></div>
     ${x.d?`<p class="desc">${esc(x.d)}</p>`:""}
@@ -194,9 +194,9 @@ async function equipImage(){
   const lvl=st.lvls.map(l=>LVLN[l]).join(", ");
   // lay out each row first so we know the picture height
   const recLay=x=>{m.font=`13px ${F}`;const lines=[[]];let lx=0;const av=CW[3]-24;x.rec.forEach(([q,n,kg])=>{const t=`${q}× ${n}${kg?" +"+kg:""}`;const w=22+m.measureText(t).width+14;if(lx+w>av&&lines[lines.length-1].length){lines.push([]);lx=0}lines[lines.length-1].push({t,n,w});lx+=w});return lines};
-  const tagsOf=x=>[...(ONE_ONLY.has(x.n)?[["ONLY 1 CAN BE WORN","#f0a35a"]]:[]),...(x.bp&&st.bpTag?[["BLUEPRINT","#7fb2ff"]]:[])];
+  const tagsOf=x=>[...(ONE_ONLY.has(x.n)?[["ONLY 1 CAN BE WORN","#f0a35a"]]:[]),...(x.bp&&st.bpTag?[["Blueprint","#7fb2ff"]]:[])];
   const G=groups.map(([title,rows,gc,skip])=>({title,skip,col:title==="Limited-time"?"#f0955f":skip==="r"?RHX[title]||"#3a424b":"#3a424b",rows:rows.map(x=>{const S=NL===1?statsAt(x,st.lvl):multiRows(x),R=recLay(x),T=tagsOf(x);
-    const subTxt=[skip==="slot"?"":x.slot,skip==="r"?"":x.r,x.ev?"limited-time":""].filter(Boolean).join(" · ");
+    const subTxt=[skip==="slot"?"":x.slot,skip==="r"?"":x.r,x.ev?"limited-time":""].filter(Boolean).join(", ");
     const nameH=24+(subTxt?18:0)+(T.length?24:0);const h=Math.max(70,(S.length+(NL>1?1:0))*21+18,R.length*26+18,nameH+18);return {x,S,R,T,subTxt,h}})}));
   const HEAD=96,GH=40,TH=30,GGAP=14;
   const H=PAD+HEAD+G.reduce((a,g)=>a+GH+TH+g.rows.reduce((b,r)=>b+r.h,0)+GGAP,0)-GGAP+PAD;
@@ -210,7 +210,7 @@ async function equipImage(){
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-2;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText("Equipment",PAD,PAD+30);
   const n=G.reduce((a,g)=>a+g.rows.length,0);const sub=[`${n} item${n===1?"":"s"}`,`stats at ${lvl}, 100% quality`];if(st.slots.length)sub.push(st.slots.join(", ")+"s");if(st.stats.length)sub.push("with "+st.stats.join(st.match==="any"?" or ":" + "));if(st.rars.length)sub.push(st.rars.join(", "));if(st.q)sub.push(`search “${st.q}”`);if(st.fav)sub.push("favourites");if(st.own)sub.push("owned");
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(" · "),IW),PAD,PAD+60);
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(", "),IW),PAD,PAD+60);
   let y=PAD+HEAD;
   G.forEach((g,gi)=>{const gh=GH+TH+g.rows.reduce((a,r)=>a+r.h,0);
     c.fillStyle="#191d22";rr(PAD,y,IW,gh,8);c.fill();c.save();rr(PAD,y,IW,gh,8);c.clip();c.fillStyle=g.col;c.fillRect(PAD,y,5,gh);c.fillStyle="#1e2329";c.fillRect(PAD+5,y,IW,GH);c.restore();

@@ -12,12 +12,12 @@
 <div class="wrap">
   <header>
     <h1>Test Data Check</h1>
-    <p class="lede">Drop in a file of minerals you've panned and it works out the real drop rates, modifier split and weights, then compares them with what the toolkit expects.<br>Nothing leaves your device: the file is read right here in your browser.</p>
+    <p class="lede">Drop in a file of minerals you've panned and it works out your actual drop rates, modifier split and weights, then compares them with what the toolkit expects.<br>Nothing leaves your device: the file is read right here in your browser.</p>
   </header>
   <p class="disc" role="note"><b>Heads up:</b> this only tells you something when the file is big. A few hundred rows will look wrong by chance; a few thousand per mineral is where the drop rates settle down. Rarities you barely saw are marked as thin data.</p>
 
   <section class="card">
-    <h2>1 · Your file</h2>
+    <h2>1, Your file</h2>
     <div class="drop" id="drop">
       <input type="file" id="file" accept=".txt,.csv,.tsv,.log,text/plain" hidden>
       <button type="button" class="btn pri" id="pick">Choose a file</button>
@@ -28,7 +28,7 @@
   </section>
 
   <section class="card" id="mapCard" hidden>
-    <h2>2 · Which column is what</h2>
+    <h2>2, Which column is what</h2>
     <div class="row">
       <label class="fld"><span class="lab">Separator</span><select id="sep"><option value="auto">Work it out</option><option value="|">Bar |</option><option value=",">Comma ,</option><option value="&#9;">Tab</option><option value=";">Semicolon ;</option></select></label>
       <label class="ck"><input type="checkbox" id="hasHead" checked> First line is a header</label>
@@ -41,7 +41,7 @@
   </section>
 
   <section class="card" id="outCard" hidden>
-    <div class="row" style="justify-content:space-between"><h2 style="margin:0">3 · What it found</h2><button type="button" class="btn" id="copyOut">Copy as text</button></div>
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">3, What it found</h2><button type="button" class="btn" id="copyOut">Copy as text</button></div>
     <div class="big" id="sum"></div>
     <div id="out"></div>
   </section>
@@ -57,7 +57,7 @@
     </ul>
   </section>
 
-  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a> · Last edited 20/11/26 · Made by @__coastal</p>
+  <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a>, Last edited 20/11/26, Made by @__coastal</p>
 </div>
 <script data-file="script.js"></script>
 </body>

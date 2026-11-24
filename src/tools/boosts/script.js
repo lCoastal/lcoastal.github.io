@@ -84,7 +84,7 @@ function render(){
   rarOrder().forEach(r=>{
     const {rows,best,val}=rarityRows(r);
     const sec=document.createElement("section");sec.style.setProperty("--rc",rc(r));
-    sec.innerHTML=`<div class="rh"><h2>${r}</h2><span>${SLOTS[r]} museum slot${SLOTS[r]>1?"s":""} · ${rows.length} mineral${rows.length===1?"":"s"}</span></div>`;
+    sec.innerHTML=`<div class="rh"><h2>${r}</h2><span>${SLOTS[r]} museum slot${SLOTS[r]>1?"s":""}, ${rows.length} mineral${rows.length===1?"":"s"}</span></div>`;
     if(!rows.length&&pickOn)return;
     if(!rows.length){const p=document.createElement("p");p.className="empty";p.textContent=stat==="All"?(zone?`No ${r} minerals drop in ${zone}.`:"No matches."):`No ${r} mineral${zone?" from "+zone:""} boosts ${stat}.`;sec.appendChild(p);list.appendChild(sec);return}
     const tw=document.createElement("div");tw.className="tw";
@@ -95,7 +95,7 @@ function render(){
 // ---- save as image: what's shown (search, stat and sort included), rarities in two balanced columns, mutations underneath ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 const IMGC={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6"};
-const autoTitle=()=>(stat==="All"?"Mineral max boosts":"Max "+stat+" boosts")+(zone?" · "+zone:"")+(pickOn?" · my picks":"");
+const autoTitle=()=>(stat==="All"?"Mineral max boosts":"Max "+stat+" boosts")+(zone?", "+zone:"")+(pickOn?", my picks":"");
 const imgTitle=()=>nameCustom||autoTitle();
 async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
   const W=1700,PAD=40,GAP=30,CW=(W-PAD*2-GAP)/2;
@@ -122,30 +122,30 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
   c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(imgTitle(),PAD,PAD+30);
   const n=secs.reduce((t,s)=>t+s.rows.length,0);const sub=[`${n} mineral${n===1?"":"s"}`];if(zone)sub.push(`that drop in ${zone}`);if(q)sub.push(`matching "${q}"`);if(pickOn)sub.push("your picks");if(stat!=="All")sub.push(rev?"weakest first":"strongest first, best in each rarity marked");
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(" · "),PAD,PAD+58);
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(", "),PAD,PAD+58);
   const icons={};await Promise.all(secs.flatMap(s=>s.rows.map(o=>img(ICONS[o.d[0]]).then(i=>icons[o.d[0]]=i))));
   cols.forEach((list,ci)=>{const x0=PAD+ci*(CW+GAP);let y=HEAD;
     list.forEach(s=>{const col=IMGC[s.r];
-      c.font=`700 19px ${FD}`;c.fillStyle=col;c.fillText(s.r.toUpperCase(),x0,y+24);
-      const meta=`${SLOTS[s.r]} museum slot${SLOTS[s.r]>1?"s":""} · ${s.rows.length} mineral${s.rows.length===1?"":"s"}`;c.font=`13px ${F}`;c.fillStyle="#98a2ad";c.fillText(meta,x0+CW-c.measureText(meta).width,y+24);
+      c.font=`700 19px ${FD}`;c.fillStyle=col;c.fillText(s.r,x0,y+24);
+      const meta=`${SLOTS[s.r]} museum slot${SLOTS[s.r]>1?"s":""}, ${s.rows.length} mineral${s.rows.length===1?"":"s"}`;c.font=`13px ${F}`;c.fillStyle="#98a2ad";c.fillText(meta,x0+CW-c.measureText(meta).width,y+24);
       c.fillStyle=col;c.fillRect(x0,y+34,CW,2);y+=44;
       const th=s.h-44-24;c.fillStyle="#1c2126";rr(x0,y,CW,th,8);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(x0,y,CW,th,8);c.stroke();
-      c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";c.fillText("MINERAL",x0+12,y+18);c.fillText("MAX BOOST",x0+12+250,y+18);const mt="MAX BOOST AT";c.fillText(mt,x0+CW-12-c.measureText(mt).width,y+18);
+      c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";c.fillText("Mineral",x0+12,y+18);c.fillText("Max boost",x0+12+250,y+18);const mt="MAX BOOST AT";c.fillText(mt,x0+CW-12-c.measureText(mt).width,y+18);
       y+=28;
       s.rows.forEach((o,i)=>{c.strokeStyle="#2d343b";c.beginPath();c.moveTo(x0,y);c.lineTo(x0+CW,y);c.stroke();
         const mid=y+20;let tx=x0+12;const ic=icons[o.d[0]];if(ic){c.drawImage(ic,tx,mid-12,24,24);tx+=32}
         c.fillStyle="#e6e9ec";c.font=`600 14px ${F}`;const nm=fit(o.d[0],250-(tx-x0)-(o.top?52:8));c.fillText(nm,tx,mid+5);
-        if(o.top){const bx=tx+c.measureText(nm).width+8;c.font=`600 10px ${F}`;const bw=c.measureText("MOST").width+12;c.fillStyle=col;rr(bx,mid-8,bw,16,4);c.fill();c.fillStyle="#14181c";c.fillText("MOST",bx+6,mid+3.5)}
+        if(o.top){const bx=tx+c.measureText(nm).width+8;c.font=`600 10px ${F}`;const bw=c.measureText("Most").width+12;c.fillStyle=col;rr(bx,mid-8,bw,16,4);c.fill();c.fillStyle="#14181c";c.fillText("Most",bx+6,mid+3.5)}
         o.ls.forEach((ln,li)=>{let bx=x0+12+250;const ly=mid+5+li*19;ln.forEach(([st,v])=>{c.font=`13px ${F}`;c.fillStyle="#cfd6dd";c.fillText(st,bx,ly);bx+=c.measureText(st+" ").width;c.font=`500 13px ${FM}`;c.fillStyle=v<0?"#ef7a66":"#3cc2a8";const vt=fmt(v);c.fillText(vt,bx,ly);bx+=c.measureText(vt).width+16})});
         c.font=`500 13px ${FM}`;c.fillStyle="#b9c2cb";const kg=o.d[2]+" kg";c.fillText(kg,x0+CW-12-c.measureText(kg).width,mid+5);
         y+=o.h});
       y+=24})});
   if(MH){let y=HEAD+bestH+16;const x0=PAD,MW=W-PAD*2;
-    c.font=`700 19px ${FD}`;c.fillStyle="#e6e9ec";c.fillText("MUTATIONS",x0,y+24);const meta="bonus per stat, by mineral rarity · added on top of the mineral's own boost, whatever its weight";c.font=`13px ${F}`;c.fillStyle="#98a2ad";c.fillText(meta,x0+MW-c.measureText(meta).width,y+24);
+    c.font=`700 19px ${FD}`;c.fillStyle="#e6e9ec";c.fillText("Mutations",x0,y+24);const meta="bonus per stat, by mineral rarity, added on top of the mineral's own boost, whatever its weight";c.font=`13px ${F}`;c.fillStyle="#98a2ad";c.fillText(meta,x0+MW-c.measureText(meta).width,y+24);
     c.fillStyle="#3cc2a8";c.fillRect(x0,y+34,MW,2);y+=44;
     const th=MH-44-10;c.fillStyle="#1c2126";rr(x0,y,MW,th,8);c.fill();c.strokeStyle="#2d343b";rr(x0,y,MW,th,8);c.stroke();
     const R=[...ORDER].reverse();const cx=i=>x0+12+150+300+92*(i+1)-12;
-    c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";c.fillText("MODIFIER",x0+12,y+18);c.fillText("BOOSTS",x0+12+150,y+18);R.forEach((r,i)=>{c.fillStyle=IMGC[r];const t=r.toUpperCase();c.fillText(t,cx(i)-c.measureText(t).width,y+18)});c.fillStyle="#98a2ad";c.fillText("HOW TO GET",x0+12+150+300+7*92+12,y+18);
+    c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";c.fillText("Modifier",x0+12,y+18);c.fillText("Boosts",x0+12+150,y+18);R.forEach((r,i)=>{c.fillStyle=IMGC[r];const t=r.toUpperCase();c.fillText(t,cx(i)-c.measureText(t).width,y+18)});c.fillStyle="#98a2ad";c.fillText("How to get",x0+12+150+300+7*92+12,y+18);
     y+=28;const f4=v=>"+"+(+v.toFixed(4))+"×";
     mrows.forEach(({m,h,rh})=>{c.strokeStyle="#2d343b";c.beginPath();c.moveTo(x0,y);c.lineTo(x0+MW,y);c.stroke();const mid=y+18;
       c.fillStyle="#e6e9ec";c.font=`600 14px ${F}`;c.fillText(m[0],x0+12,mid+5);c.font=`13px ${F}`;c.fillStyle="#cfd6dd";c.fillText(fit(m[1],290),x0+12+150,mid+5);
@@ -154,6 +154,6 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptBoostsImage=boostsImage;
 imgB.onclick=async()=>{let blob=null;try{blob=await boostsImage()}catch(e){console.error(e)}if(!blob){toast("Nothing to save. Change the search, zone or stat filter.");return}
-  const nm=imgTitle().replace(/ · /g," - ").replace(/[\\/:*?"<>|]+/g," ").trim()+".png";
+  const nm=imgTitle().replace(/, /g," - ").replace(/[\\/:*?"<>|]+/g," ").trim()+".png";
   try{await window.parent.ptSave(nm,blob);toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}};
 render();

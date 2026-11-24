@@ -1,4 +1,4 @@
-.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-left:4px solid var(--neg);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
+.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
 .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end}
 .fld{display:flex;flex-direction:column;gap:4px;min-width:0}
 .fld input{width:100%;box-sizing:border-box}
@@ -24,7 +24,7 @@
 .cols2 h2{margin:0 0 6px}
 .tw{overflow-x:auto}
 table.t{width:100%;border-collapse:collapse;font-size:13.5px}
-table.t th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.t th{font:600 11px var(--f-body);color:var(--muted);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 table.t th:first-child,table.t td:first-child{text-align:left}
 table.t td{padding:5px 8px;border-bottom:1px dashed var(--line);text-align:right;font-family:var(--f-mono);white-space:nowrap}
 table.t td:first-child{font-family:var(--f-body)}
@@ -44,11 +44,11 @@ table.t tr:last-child td{border-bottom:0}
 .chart .grid{stroke:var(--line);opacity:.6}
 .tops{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
 .tops div{background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:7px 11px}
-.tops span{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tops span{display:block;font-size:11.5px;color:var(--muted)}
 .tops b{font-family:var(--f-mono);font-weight:500;font-size:1.05rem}
 .tops small{display:block;color:var(--muted);font-size:11.5px}
 table.z{width:100%;border-collapse:collapse;font-size:13.5px}
-table.z th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:right;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.z th{font:600 11px var(--f-body);color:var(--muted);text-align:right;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
 table.z th:first-child,table.z td:first-child{text-align:left}
 table.z td{padding:6px 10px;border-bottom:1px dashed var(--line);text-align:right;font-family:var(--f-mono);white-space:nowrap}
 table.z tr:last-child td{border-bottom:0}

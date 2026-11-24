@@ -1,6 +1,6 @@
 
 /* Layout: your stats, the three things the Dredge Master wants, then the plan (fewest stops that still finish fast) */
-.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-left:4px solid var(--neg);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
+.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
 .disc b{font-weight:700}
 .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end}
 .fld{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -14,7 +14,7 @@
 .wrow .ok{grid-column:2/4;font-size:12px;color:var(--muted);margin-top:-4px}
 .wrow .ok.bad{color:var(--neg)}
 .stops{display:flex;flex-direction:column;gap:10px}
-.stop{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:9px;background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.stop{border:1px solid color-mix(in srgb,var(--accent) 55%,var(--line));border-radius:9px;background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
 .stop .sh{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}
 .stop .sh b{font-family:var(--f-display);font-size:1.1rem}
 .stop .num{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--bg);font:700 13px var(--f-body);margin-right:8px}

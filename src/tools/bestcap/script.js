@@ -100,7 +100,7 @@ function render(){
   let mins=[...by.keys()];
   mins.sort(S.sort==="az"?(a,b)=>a.n.localeCompare(b.n):(a,b)=>ORD.indexOf(a.r)-ORD.indexOf(b.r)||a.n.localeCompare(b.n));
   const rows=[...by.values()].flat();const zones=new Set(rows.map(z=>z.r.loc));
-  VIEW_BEST=best;$("count").textContent=rows.length?(best?`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"}, each in its best zone`:`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"} across ${fmt(zones.size,0)} zones`):"";if(rows.length&&S.desert===false)$("count").textContent+=" · desert and Pharaoh's Tomb left out";
+  VIEW_BEST=best;$("count").textContent=rows.length?(best?`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"}, each in its best zone`:`Showing ${fmt(mins.length,0)} mineral${mins.length===1?"":"s"} across ${fmt(zones.size,0)} zones`):"";if(rows.length&&S.desert===false)$("count").textContent+=", desert and Pharaoh's Tomb left out";
   VIEW={mins,by};
   const shown=mins.slice(0,LIMIT);
   $("rows").innerHTML=rows.length?shown.map(m=>{const zs=by.get(m);
@@ -154,7 +154,7 @@ async function capImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-ser
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(fit(title,W-PAD*2-mw-20),PAD,PAD+30);
   const shownR=ORD.filter(r=>!S.hideR.includes(r)&&ROWS.some(x=>x.m.r===r));
   const sub=[`Your luck ${fmt(L,0)}`,`${fmt(VIEW.mins.length,0)} mineral${VIEW.mins.length===1?"":"s"}`];if(VIEW_BEST&&S.q.trim())sub.push("best zone only");if(S.hideR.length)sub.push(shownR.join(", ")||"no rarities");if(S.desert===false)sub.push("no desert");
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(" · "),W-PAD*2),PAD,PAD+58);
+  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(", "),W-PAD*2),PAD,PAD+58);
   const cols=[["Mineral",0],["Zone",250],["Best luck cap",520],["Best luck",670],["Chance per mineral",850],["Compared to your luck",1030]];const X=v=>PAD+12+v;
   let y=HEAD;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach(([t,x])=>c.fillText(t.toUpperCase(),X(x),y+20));
   y+=30;c.strokeStyle="#2c333a";c.lineWidth=1;c.beginPath();c.moveTo(PAD,y);c.lineTo(W-PAD,y);c.stroke();
@@ -174,7 +174,7 @@ async function capImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-ser
     c.fillStyle=gc;c.font=`14px ${F}`;c.fillText(fit(gt,W-PAD-X(1030)),X(1030),mid+5)});
   y+=list.length*RH;
   if(extra){c.fillStyle="#98a2ad";c.font=`italic 13px ${F}`;c.fillText(`…and ${fmt(total-list.length,0)} more. Search or filter to fit them in one image.`,PAD+12,y+22);y+=extra}
-  {const et="Estimates from a fitted luck model, so real drops can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y+10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
+  {const et="Estimates from a fitted luck model, so actual drops can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y+10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptCapImage=capImage;
 $("toImg").onclick=async()=>{let blob=null;try{blob=await capImage()}catch(e){console.error(e)}if(!blob){toast(VIEW.mins.length?"Couldn't draw the image":"Nothing to save. Change the search or filters.");return}

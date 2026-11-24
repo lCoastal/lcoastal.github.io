@@ -67,7 +67,7 @@ function render(){
     ${x.look?`<p class="look">${esc(x.look)}</p>`:""}</article>`};
   if(!rows.length){$("list").innerHTML='<div class="empty">No mutations match.</div>';return}
   $("list").innerHTML=S.sort==="rare"&&!S.kind
-    ?(S.rev?[...KINDS].reverse():KINDS).map(k=>{const g=rows.filter(x=>x.kind===k);return g.length?`<p class="grp">${k} · ${esc(KIND_NOTE[k])}</p><div class="grid">${g.map(card).join("")}</div>`:""}).join("")
+    ?(S.rev?[...KINDS].reverse():KINDS).map(k=>{const g=rows.filter(x=>x.kind===k);return g.length?`<p class="grp">${k}, ${esc(KIND_NOTE[k])}</p><div class="grid">${g.map(card).join("")}</div>`:""}).join("")
     :`<div class="grid">${rows.map(card).join("")}</div>`;
 }
 // mineral picker with pictures: pick from the list, or keep typing
@@ -85,7 +85,7 @@ $("toImg").onclick=()=>{const rows=shownMuts();if(!rows.length){ptToast("No muta
   const cols=[{h:"Mutation",w:.17},{h:"Sells for",w:.09,al:"r"},m?{h:`${fmt(kg,2)} kg ${m.n}`,w:.13,al:"r"}:null,{h:"Chance",w:.12,al:"r"},{h:`Museum (${S.rar})`,w:m?.22:.26},{h:"How to get",w:m?.27:.36}].filter(Boolean);
   const row=x=>{const mv=MULT[S.rar]*x.f;return {cells:[{t:x.n,b:true,col:x.c,dot:x.c,sub:x.kind},{t:fmt(x.sell,2)+"×",mono:true}].concat(m?[{t:money(per*kg*x.sell),mono:true}]:[]).concat([{t:x.one?"~1 in "+fmt(x.one,0):"—",mono:true},x.stats.length?{chips:x.stats.map(st=>({t:`${st} +${+(mv).toFixed(4)}×`,col:statHex(st)}))}:{t:"No museum boost",col:"#98a2ad",fs:12.5},{t:x.how,wrap:true,fs:12.5}])}};
   const grouped=S.sort==="rare"&&!S.kind;
-  const list=grouped?(S.rev?[...KINDS].reverse():KINDS).flatMap(k=>{const g=rows.filter(x=>x.kind===k);return g.length?[{group:k+" · "+KIND_NOTE[k]}].concat(g.map(row)):[]}):rows.map(row);
+  const list=grouped?(S.rev?[...KINDS].reverse():KINDS).flatMap(k=>{const g=rows.filter(x=>x.kind===k);return g.length?[{group:k+", "+KIND_NOTE[k]}].concat(g.map(row)):[]}):rows.map(row);
   const sub=[`${rows.length} mutation${rows.length===1?"":"s"}`];if(S.kind)sub.push(S.kind);if(q)sub.push(`matching "${q}"`);sub.push(`museum values for ${S.rar}`);if(m)sub.push(`${fmt(kg,2)} kg ${m.n} sells for ${money(per*kg)} with no mutation`);
   ptSaveImg(m?`${m.n} mutations`:"Mineral mutations",()=>ptTableImage({title:m?`Mutations on ${m.n}`:"Mineral mutations",tic:m&&m.ic,sub,sections:[{cols,rows:list}]}))};
 window.ptFind=n=>{$("q").value=n;S.kind="";render()};

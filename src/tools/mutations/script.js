@@ -13,7 +13,7 @@ document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.cl
 document.querySelector(".tabs").addEventListener("keydown",e=>{const i=TABS.findIndex(t=>t[0]===tab);if(e.key==="ArrowRight"||e.key==="ArrowLeft"){const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length][0];setTab(n);$("tab-"+n).focus()}});
 window.ptOpenTab=t=>setTab(t);
 // gear mutations
-$("mcards").innerHTML=X.muts.map(m=>`<div class="mc" style="--mc:${MC[m.n]||"var(--accent)"}"><b>${esc(m.n)}</b><span class="x">×${m.x}</span><small>${Object.entries(m.a).map(([k,v])=>`+${v}${PCTS.has(k)?"%":""} ${esc(k)}`).join(", ")||"all stats"}${m.ev?` · ${esc(m.ev)}`:""}</small></div>`).join("");
+$("mcards").innerHTML=X.muts.map(m=>`<div class="mc" style="--mc:${MC[m.n]||"var(--accent)"}"><b>${esc(m.n)}</b><span class="x">×${m.x}</span><small>${Object.entries(m.a).map(([k,v])=>`+${v}${PCTS.has(k)?"%":""} ${esc(k)}`).join(", ")||"all stats"}${m.ev?`, ${esc(m.ev)}`:""}</small></div>`).join("");
 const order=["Prismatic","Overclocked","Granite","Diamond","Gold","Silver","None"];
 // the table above follows one rule: each catalyst has a 25% chance to roll a mutation (Silver 50, Gold 20, Diamond 9,
 // Granite 4.5, Overclocked 4.5, Prismatic 2 out of 90) and you keep the best one rolled. That gives the custom column.
@@ -54,7 +54,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-cf]");if(!
 cats();
 $("imgCat").onclick=()=>{const rows=catRows();if(!rows.length){ptToast("Nothing to save, no items match");return}
   const f=[CF.slot&&CF.slot+"s",CF.er.length&&CF.er.join("/")+" items",CF.m&&"needs "+CF.m,CF.q&&`"${CF.q}"`].filter(Boolean);
-  return ptSaveImg("Equipment catalysts",()=>ptTableImage({title:"Which catalyst each item needs",tic:"",sub:[f.length?f.join(" · "):"All equipment",rows.length+" items"],
+  return ptSaveImg("Equipment catalysts",()=>ptTableImage({title:"Which catalyst each item needs",tic:"",sub:[f.length?f.join(", "):"All equipment",rows.length+" items"],
     sections:[{cols:[{h:"Equipment",w:.42},{h:"Rarity",w:.26},{h:"Catalyst",w:.32}],
       rows:rows.map(x=>({cells:[{t:x.e,b:true},{t:(x.er+" "+x.slot).trim(),col:RDK[x.er]||"#98a2ad"},{t:x.c,b:true}]}))}],
     note:"Put the catalyst into the Mutation Forge at Frozen Peak to reroll the item's mutation."}))};

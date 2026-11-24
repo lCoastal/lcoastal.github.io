@@ -49,7 +49,7 @@ function parse(){const sv=$("sep").value,sep=sv==="auto"?detectSep(RAW):sv;
   if(!parse.touched){const f=cells[0]||[],s=cells[1]||[];$("hasHead").checked=f.some((c,i)=>isNaN(num(c))&&!isNaN(num(s[i])))||f.some(c=>GUESS.some(g=>g[1].test(c)))}
   const hh=$("hasHead").checked;HEAD=hh?cells[0]:[];ROWS=hh?cells.slice(1):cells;
   if(MAP.length!==w)guess(w);drawMap(w);
-  $("fileInfo").textContent=ROWS.length.toLocaleString()+" rows · "+w+" columns · separator "+(sep==="\t"?"Tab":sep)}
+  $("fileInfo").textContent=ROWS.length.toLocaleString()+" rows, "+w+" columns, separator "+(sep==="\t"?"Tab":sep)}
 function guess(w){MAP=Array(w).fill("");const used=new Set();
   for(let i=0;i<w;i++){const h=HEAD[i]||"";for(const[k,re]of GUESS){if(!used.has(k)&&re.test(h)&&!(k==="mod"&&/boost/i.test(h))&&!(k==="cap"&&/luck/i.test(h))){MAP[i]=k;used.add(k);break}}}
   // no header: look at the values
@@ -73,7 +73,7 @@ function guess(w){MAP=Array(w).fill("");const used=new Set();
   take("cap",x=>x.int&&x.med>=50&&x.d<=Math.max(3,x.n*.01),(a,b)=>a.d-b.d);
   if(!used.has("luck"))take("luck",x=>x.med>=500&&x.d<=x.n*.2&&MAP.indexOf("cap")!==x.i)}
 function drawMap(w){let h='<div class="cols">';
-  for(let i=0;i<w;i++){const ex=ROWS.slice(0,3).map(r=>r[i]||"").filter(Boolean).join(" · ");
+  for(let i=0;i<w;i++){const ex=ROWS.slice(0,3).map(r=>r[i]||"").filter(Boolean).join(", ");
     h+=`<label class="col${MAP[i]?" used":""}"><b>${esc(HEAD[i]||"Column "+(i+1))}</b><span class="ex">${esc(ex||"(empty)")}</span><select data-i="${i}">${FIELDS.map(([k,l])=>`<option value="${k}"${MAP[i]===k?" selected":""}>${l}</option>`).join("")}</select></label>`}
   $("map").innerHTML=h+"</div>";$("mapCard").hidden=false;
   const has=MAP.includes("name");$("run").disabled=!has;$("runInfo").textContent=has?"":"Pick which column is the mineral first."}
@@ -84,7 +84,7 @@ function load(t){RAW=t||"";parse.touched=false;MAP=[];$("outCard").hidden=true;i
 $("pick").onclick=()=>$("file").click();
 const PREV=200000;let FROMFILE=false;
 const readFile=f=>{if(!f)return;const r=new FileReader();r.onload=()=>{const t=String(r.result);FROMFILE=t.length>PREV;$("paste").value=FROMFILE?t.slice(0,t.lastIndexOf("\n",PREV)):t;load(t);
-  if(FROMFILE)$("fileInfo").textContent+=" · whole file used, the box above only shows the start"};r.readAsText(f)};
+  if(FROMFILE)$("fileInfo").textContent+=", whole file used, the box above only shows the start"};r.readAsText(f)};
 $("file").onchange=e=>readFile(e.target.files[0]);
 const dz=$("drop");["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("on")}));
 ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("on")}));
@@ -106,7 +106,7 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
       const bk=new Map();rs.forEach(r=>{const l=isFinite(r.luck)&&r.luck>0?r.luck:L,k=Math.round(Math.log(Math.max(1,l))/.02);bk.set(k,(bk.get(k)||0)+1)});
       const ex={};bk.forEach((n,k)=>{const d=dropShares(z,Math.exp(k*.02));for(const m in d)ex[m]=(ex[m]||0)+d[m]*n/rs.length});const cnt={};rs.forEach(r=>{const n=MIN[r.name.toLowerCase()].n;cnt[n]=(cnt[n]||0)+1});const N=rs.length;
       const names=[...new Set([...Object.keys(ex),...Object.keys(cnt)])].sort((a,b)=>(ex[b]||0)-(ex[a]||0)||(cnt[b]||0)-(cnt[a]||0));
-      h+=`<p class="note"><b>${esc(z)}</b> · ${N.toLocaleString()} rows · luck ${ls.length?(mn(ls)===mx(ls)?Math.round(L).toLocaleString():Math.round(mn(ls)).toLocaleString()+" – "+Math.round(mx(ls)).toLocaleString()+" (each row's own luck used)"):"not given (1 used)"}</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Your rate</th><th>Toolkit</th><th>Ratio</th></tr>`;
+      h+=`<p class="note"><b>${esc(z)}</b>, ${N.toLocaleString()} rows, luck ${ls.length?(mn(ls)===mx(ls)?Math.round(L).toLocaleString():Math.round(mn(ls)).toLocaleString()+" – "+Math.round(mx(ls)).toLocaleString()+" (each row's own luck used)"):"not given (1 used)"}</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Your rate</th><th>Toolkit</th><th>Ratio</th></tr>`;
       txt.push(`${z} (${N} rows, luck ${Math.round(L)})`);
       names.forEach(n=>{const c=cnt[n]||0,o=c/N,e=ex[n],m=MIN[n.toLowerCase()],r=e>0?o/e:NaN,thin=e>0?e*N<10:c<10;
         const cls=!isFinite(r)?"off":thin?"":Math.abs(r-1)<.15?"ok":Math.abs(r-1)>.35?"off":"";
@@ -121,7 +121,7 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
     const byCap=new Map();per.forEach(o=>{const c=isFinite(o.cap)?o.cap:NaN,k=isFinite(c)?c:"?";let g=byCap.get(k);if(!g){g=[];byCap.set(k,g)}g.push(o.n)});
     const all=[...per.values()].map(o=>o.n);
     if(all.length){const avg=a=>a.reduce((x,y)=>x+y,0)/a.length;
-      h+=`<h3 class="sec">Items per pan</h3><p class="note">${all.length.toLocaleString()} pans · ${avg(all).toFixed(2)} items per pan on average. The first and last pan may be cut off by when logging started or stopped.</p><div class="tw"><table class="t"><tr><th>Capacity</th><th>Pans</th><th>Average</th><th>Fewest – most</th><th>Toolkit</th><th>Ratio</th></tr>`;
+      h+=`<h3 class="sec">Items per pan</h3><p class="note">${all.length.toLocaleString()} pans, ${avg(all).toFixed(2)} items per pan on average. The first and last pan may be cut off by when logging started or stopped.</p><div class="tw"><table class="t"><tr><th>Capacity</th><th>Pans</th><th>Average</th><th>Fewest – most</th><th>Toolkit</th><th>Ratio</th></tr>`;
       txt.push("","ITEMS PER PAN",`${all.length} pans, average ${avg(all).toFixed(2)}`);
       [...byCap.entries()].sort((a,b)=>b[1].length-a[1].length).forEach(([c,a])=>{const m=avg(a),e=c==="?"?NaN:panItems(c),r=m/e,thin=a.length<20;
         const cls=!isFinite(r)||thin?"":Math.abs(r-1)<.03?"ok":Math.abs(r-1)>.1?"off":"";
@@ -133,7 +133,7 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
     const cnt={};let any=0,norm=0;rows.forEach(r=>{if(isNone(r.mod))return;any++;cnt[r.mod]=(cnt[r.mod]||0)+1;if(NORMAL.has(r.mod))norm++});
     const mbs=rows.map(r=>r.mb).filter(isFinite),ls=rows.map(r=>r.luck).filter(isFinite),MB=mbs.length?med(mbs):NaN,LK=ls.length?med(ls):0;
     const sh=isFinite(MB)?modShares(MB,!!cnt.Lunar,LK):null;
-    h+=`<h3 class="sec">Modifiers</h3><p class="note">${pct(any/N,1)} of your minerals had a modifier, ${pct(norm/N,1)} a normal panning one. The toolkit expects ${pct(isFinite(MB)?anyMod(MB*100):NAT_MOD,0)} for normal ones${isFinite(MB)?` · Modifier Boost ${MB.toFixed(2)}×`:" · add the Modifier Boost column to compare the split"}.</p>`;
+    h+=`<h3 class="sec">Modifiers</h3><p class="note">${pct(any/N,1)} of your minerals had a modifier, ${pct(norm/N,1)} a normal panning one. The toolkit expects ${pct(isFinite(MB)?anyMod(MB*100):NAT_MOD,0)} for normal ones${isFinite(MB)?`, Modifier Boost ${MB.toFixed(2)}×`:", add the Modifier Boost column to compare the split"}.</p>`;
     txt.push("","MODIFIERS",`any: ${pct(any/N,1)}, normal: ${pct(norm/N,1)} (toolkit ${pct(isFinite(MB)?anyMod(MB*100):NAT_MOD,0)})${isFinite(MB)?", modifier boost "+MB.toFixed(2)+"x":""}`);
     h+='<div class="tw"><table class="t"><tr><th>Modifier</th><th>Seen</th><th>Share of normal</th><th>Toolkit</th><th>Ratio</th></tr>';
     const keys=[...MODW.map(x=>x[0]).reverse().filter(k=>cnt[k]||(sh&&sh[k]!=null)),...Object.keys(cnt).filter(k=>!NORMAL.has(k)).sort((a,b)=>cnt[b]-cnt[a])];
@@ -161,7 +161,7 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
       h+="</table></div>"}}
   const uk=Object.keys(unknown);if(uk.length)h+=`<p class="note">Names the toolkit doesn't know, left out of drop rates and weights: ${esc(uk.slice(0,20).join(", "))}${uk.length>20?" …":""}</p>`;
   if(!h)h='<p class="note">Map at least one of Zone, Modifier, Weight or Pan number to get a comparison.</p>';
-  $("sum").innerHTML=sumBits.join(" · ");$("out").innerHTML=h;$("outCard").hidden=false;LAST=txt.join("\n");
+  $("sum").innerHTML=sumBits.join(", ");$("out").innerHTML=h;$("outCard").hidden=false;LAST=txt.join("\n");
   $("outCard").scrollIntoView({behavior:"smooth",block:"start"})}
 $("zoneAll").insertAdjacentHTML("beforeend",ZONES.slice().sort().map(z=>`<option>${esc(z)}</option>`).join(""));
 $("run").onclick=run;

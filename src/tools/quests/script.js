@@ -14,7 +14,7 @@ const isDone=q=>{const s=st(q);return s.d||(q.steps.length>0&&q.steps.every((_,k
 function render(){const t=$("q").value.trim().toLowerCase();
   ["hideDone","onlyBp","onlyBuff"].forEach((id,k)=>$(id).setAttribute("aria-pressed",String([F.hide,F.bp,F.buff][k])));
   const rows=Q.filter(q=>(!F.loc||q.loc===F.loc)&&(!F.hide||!isDone(q))&&(!F.bp||/blueprint/i.test(q.rw))&&(!F.buff||q.buff)&&(!t||(q.n+" "+q.npc+" "+q.steps.join(" ")+" "+q.rw+" "+q.buff+" "+q.loc).toLowerCase().includes(t)));
-  $("count").textContent=`${rows.length} quests · ${Q.filter(isDone).length} of ${Q.length} finished`;
+  $("count").textContent=`${rows.length} quests, ${Q.filter(isDone).length} of ${Q.length} finished`;
   $("list").innerHTML=LOCS.map(l=>{const rs=rows.filter(q=>q.loc===l);if(!rs.length)return "";const all=Q.filter(q=>q.loc===l),dn=all.filter(isDone).length;
     return `<section class="loc"><div class="lh"><h2>${esc(l)}</h2><span class="lbar">${dn} / ${all.length} done<span class="bar"><i style="width:${all.length?dn/all.length*100:0}%"></i></span></span></div><div class="qs">${rs.map(q=>{const s=st(q),done=isDone(q);
       const rw=q.rw?q.rw.split(/\s*•\s*/).filter(Boolean).map(r=>`<span class="${/blueprint/i.test(r)?"bp":""}">${esc(r)}</span>`).join(""):"";

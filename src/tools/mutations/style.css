@@ -3,7 +3,7 @@
 .tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:0}
 .tw{overflow-x:auto}
 table.t{width:100%;border-collapse:collapse;font-size:13.5px}
-table.t th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.t th{font:600 11px var(--f-body);color:var(--muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
 table.t td{padding:8px 10px;border-bottom:1px dashed var(--line);vertical-align:middle}
 table.t tr:last-child td{border-bottom:0}
 table.t .r{text-align:right;font-family:var(--f-mono);white-space:nowrap}
@@ -29,7 +29,7 @@ table.t .nm{font-weight:600;font-size:14px;white-space:nowrap}
 .mat img{width:22px;height:22px;object-fit:contain}
 .top{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center}
 .tr{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.cfr{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}.cfr .lab{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:104px}.cfr .chips{display:flex;flex-wrap:wrap;gap:6px}
+.cfr{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}.cfr .lab{font-size:11px;font-weight:600;color:var(--muted);min-width:104px}.cfr .chips{display:flex;flex-wrap:wrap;gap:6px}
 .seg button+button{border-left:1px solid var(--line)}
 .top h2{margin:0}
 .hb{font:600 12px var(--f-body);padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--sunk);color:var(--muted);cursor:pointer;white-space:nowrap}
@@ -44,7 +44,7 @@ table.t .nm{font-weight:600;font-size:14px;white-space:nowrap}
   table.t.cards tr{display:flex;flex-wrap:wrap;gap:6px 12px;padding:10px 0;border-bottom:1px solid var(--line)}
   table.t.cards td{display:block;border:0;padding:0}
   table.t.cards td.full{flex:1 1 100%}
-  table.t.cards td[data-l]::before{content:attr(data-l)" ";font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  table.t.cards td[data-l]::before{content:attr(data-l)" ";font:600 10.5px var(--f-body);color:var(--muted)}
 #cats tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
 #cats td.nm{grid-column:1/-1;font-weight:600;display:flex;align-items:center;gap:6px;min-width:0}
 #cats td:nth-child(3){justify-self:end;text-align:right}

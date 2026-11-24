@@ -8,7 +8,7 @@
 .iso{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
 .ck{display:inline-flex;align-items:center;gap:7px;cursor:pointer}
 .ck input{width:16px;height:16px;accent-color:var(--accent)}
-.lab{font:600 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.lab{font:600 11px var(--f-body);color:var(--muted)}
 .lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
 .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .sum{display:flex;flex-wrap:wrap;gap:22px;margin:2px 0 6px}
@@ -16,12 +16,12 @@
 .sum b{font:700 20px var(--f-mono)}
 .sum b.pos{color:var(--accent)}
 .bt{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
-.bt th{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}
+.bt th{font:600 11px var(--f-body);color:var(--muted);text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}
 .bt td{padding:6px 8px;border-bottom:1px dashed var(--line);vertical-align:top}
 .bt td:first-child{color:var(--muted);white-space:nowrap;width:1%}
 .bt tr.chg td:nth-child(2){color:var(--accent);font-weight:600}
 .bt td.was{color:var(--muted);text-decoration:line-through}
-.sec{margin:14px 0 6px;font:700 12px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sec{margin:14px 0 6px;font:700 12px/1 var(--f-body);color:var(--muted)}
 .foot{color:var(--muted);font-size:12px;margin:4px 0 0}
 .fld .ac{flex:none;width:100%}
 
