@@ -20,7 +20,7 @@ function render(){
   {const g=x=>Math.pow(1+1000/x,.565)-1,L2=Math.max(1,+S.luck||1);$("capG").innerHTML=capGraph(c,g);
    $("capVs").innerHTML=`At <b>${Math.round(c).toLocaleString()}</b> capacity, the next +1,000 gives <b>${(g(c)*100).toFixed(c<3000?1:2)}%</b> more minerals per pan. With <b>${Math.round(L2).toLocaleString()}</b> luck, 1 capacity is worth about <b>${(.565*L2/c).toFixed(.565*L2/c<10?2:0)}</b> luck, and 1 luck about <b>${(c/(.565*L2)).toFixed(c/(.565*L2)<10?2:0)}</b> capacity.`}
   const B=Math.max(0,+S.bw||0),SB=Math.max(0,+S.sb||0)/100,M=(S.mag?1.5:1)*zoneSize(S.wz),wm=wtModel(Math.max(1,+S.wcap||1)),base=B*(1+SB)*M,kg=v=>v>=100?v.toFixed(1)+" kg":v.toFixed(2)+" kg";
-  $("wOut").innerHTML=B>0?`Lightest <b>${kg(base*.75)}</b>, half come out heavier than <b>${kg(base*wm.q(.5))}</b>, heaviest <b>${kg(base*15.5)}</b>`:"";
+  $("wOut").innerHTML=B>0?`Lightest <b>${kg(base*.75)}</b>, half come out heavier than <b>${kg(base*wm.q(.5))}</b>, heaviest <b>${kg(base*WT_MAX)}</b> (usually ${kg(base*WT_TOP)})`:"";
   const {s,list,tot}=modShares((+S.mbp||0)/100,S.night,L),mx=Math.max(...Object.values(s));
   $("modT").innerHTML="<tr><th>Modifier</th><th>With no boost</th><th>At your boost</th><th class='bw'></th></tr>"+[...list].reverse().map(([k,w])=>`<tr><td>${k}</td><td>${p(w/tot)}</td><td>${p(s[k])}</td><td class="bw"><div class="bar" style="width:${(s[k]/mx*100).toFixed(1)}%"></div></td></tr>`).join("")+`<tr><td colspan="4" style="font-family:var(--f-body);text-align:left;color:var(--muted)">Shares are of modified minerals. Of everything you pan, multiply by the share that gets a modifier (about ${p(1-Math.pow(.937,(+S.mbp||0)/100))} at your boost).</td></tr>`;
 }

@@ -69,3 +69,5 @@ table.z tr{cursor:pointer}
 .tip b{font-size:13px}
 .tip span{color:var(--muted)}
 .tip .kg{font-family:var(--f-mono);color:var(--fg)}
+table.zf tr.on td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+table.zf td:nth-child(n+2),table.zf th:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}

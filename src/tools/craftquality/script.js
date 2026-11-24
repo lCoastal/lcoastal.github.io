@@ -22,7 +22,7 @@ function ensureOres(){const r=REC[S.item]||[];const o=S.ores[S.item]=S.ores[S.it
   r.forEach(([mat,n])=>{const a=o[mat]=o[mat]||[];while(a.length<n)a.push({w:"",u:"None"});if(a.length>n)a.length=n});
   Object.keys(o).forEach(k=>{if(!r.some(x=>x[0]===k))delete o[k]});
   return o}
-const maxW=mat=>{const bw=BW[mat];if(!bw)return null;const sb=+S.sb||0;return 15.5*bw*(1+sb/100)*zoneSize(S.wz)};
+const maxW=mat=>{const bw=BW[mat];if(!bw)return null;const sb=+S.sb||0;return WT_MAX*bw*(1+sb/100)*zoneSize(S.wz)};
 const w5=(mw,qs,m)=>(mw+4*qs)/m; // weight one ore needs to hit Q=5 at modifier multiplier m
 
 function compute(){const r=REC[S.item]||[];const o=ensureOres();

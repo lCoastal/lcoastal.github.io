@@ -50,7 +50,7 @@ function mineral(m,sb,cap,model,M){
   const base=m.bw*(1+sb/100);
   $("head").innerHTML=`${m.ic?`<img src="${m.ic}" alt="">`:""}<div><b class="mlink" data-mineral="${esc(m.n)}" title="Open ${esc(m.n)}" style="color:${rc(m.r)}">${esc(m.n)}</b><br><span>${esc(m.r)}, base weight ${m.bw} kg, Size Boost ${fmt(sb,1)}%, ${cap?fmt(cap,0)+" capacity":"capacity not set (4,000 used)"}${S.mag?", Solar Magnifier":""}</span></div>`;
   const tile=(l,v,s)=>`<div><span class="lab">${l}</span><b>${v}</b>${s?`<small>${s}</small>`:""}</div>`;
-  $("sum").innerHTML=tile("Lightest (est.)",kg(base*WT_MIN*M),"")+tile("Typical",kg(base*model.q(.5)*M),"half come out heavier")+tile("Average",kg(base*model.mean*M),"")+tile("Heaviest (est.)",kg(base*WT_MAX*M),"best guess from test logs");
+  $("sum").innerHTML=tile("Lightest (est.)",kg(base*WT_MIN*M),"")+tile("Typical",kg(base*model.q(.5)*M),"half come out heavier")+tile("Average",kg(base*model.mean*M),"")+tile("Heaviest (est.)",kg(base*WT_MAX*M),"usually "+kg(base*WT_TOP*M)+"; 17× seen at times");
   // eruption max only for minerals that drop nowhere else
   const zs=[...new Set((m.ch||[]).map(c=>baseLoc(c[0])))],onlyEr=zs.length&&zs.every(z=>ERUPT.has(z));
   if(onlyEr)$("sum").lastElementChild.querySelector("small").textContent=kg(base*WT_MAX*2*M)+" in a Volcanic Eruption";
@@ -78,10 +78,21 @@ chartEl.addEventListener("mousemove",e=>{const r=e.target.closest(".pb"),tip=$("
   const cr=chartEl.getBoundingClientRect(),tw=tip.offsetWidth;let lx=e.clientX-cr.left+12;if(lx+tw>cr.width)lx=e.clientX-cr.left-tw-12;tip.style.left=Math.max(0,lx)+"px";tip.style.top=(e.clientY-cr.top-10)+"px"});
 chartEl.addEventListener("mouseleave",()=>{const tip=$("tip");if(tip)tip.hidden=true;chartEl.querySelectorAll(".pb.on").forEach(x=>x.classList.remove("on"))});
 chartEl.addEventListener("click",e=>e.target.dispatchEvent(new MouseEvent("mousemove",{clientX:e.clientX,clientY:e.clientY,bubbles:true})));
+// every zone's factor, with what it does to the lightest, usual heaviest and heaviest roll
+function zoneTable(sb,M0){
+  const m=BY[String(S.min).trim().toLowerCase()],base=m?m.bw*(1+sb/100)*M0:0;
+  const zs=Object.keys(ZONE_SIZE).sort((a,b)=>ZONE_SIZE[a]-ZONE_SIZE[b]||a.localeCompare(b));
+  $("zfnote").textContent=(m?`Heaviest ${m.n} in each zone with your Size Boost${S.mag?" and the Solar Magnifier":""}. `:"")+"Every weight in a zone is multiplied by its factor. Rolls are × base weight × (1 + Size Boost). Zones not listed count as 1. Click a zone to use it above.";
+  $("zftbl").innerHTML=`<table class="z zf"><thead><tr><th>Zone</th><th>Factor</th><th>Lightest roll</th><th>Usual top</th><th>Heaviest roll</th>${m?`<th>Heaviest ${esc(m.n)}</th>`:""}<th>Minerals logged</th></tr></thead><tbody>${zs.map(z=>{const f=ZONE_SIZE[z],n=ZONE_SIZE_N[z];
+    return `<tr data-z="${esc(z)}"${z===S.wz?' class="on"':""} title="Use ${esc(z)} above"><td>${esc(z)}</td><td><b>×${f.toFixed(2)}</b></td><td>${(WT_MIN*f).toFixed(2)}×</td><td>${(WT_TOP*f).toFixed(2)}×</td><td>${(WT_MAX*f).toFixed(2)}×</td>${m?`<td class="hv">${kg(base*WT_MAX*f)}</td>`:""}<td>${n?fmt(n,0):"older log"}</td></tr>`}).join("")}</tbody></table>`;
+}
+$("zftbl").addEventListener("click",e=>{const r=e.target.closest("[data-z]");if(!r)return;S.wz=r.dataset.z;$("wz").innerHTML=zoneSizeOpts(S.wz);save();render();$("wz").scrollIntoView({behavior:"smooth",block:"center"})});
+ptPageButtons($("zfacts"),()=>"Zone weight factors",()=>ptPageRead($("zfh"),[{h:"",el:$("zftbl")}]),"Measured from a 3.2M-mineral GalaxisHub log.");
 function render(){
   const q=String(S.min).trim().toLowerCase(),m=BY[q],z=!m&&ZBY[q],sb=Math.max(0,+S.sb||0),cap=+S.cap||0,M=(S.mag?1.5:1)*(z?zoneSize(z):zoneSize(S.wz)),model=wtModel(cap||4000);
   $("out").hidden=!m;$("zout").hidden=!!m;
   if(m)mineral(m,sb,cap,model,M);else zone(z||null,sb,cap,model,M);
+  zoneTable(sb,S.mag?1.5:1);
 }
 render();
 window.ptOpenFor=(kind,name)=>{if(kind!=="mineral")return;S.min=name;$("min").value=name;save();render();try{AC.sync()}catch(e){}};

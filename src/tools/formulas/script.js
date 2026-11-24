@@ -11,30 +11,24 @@ max ≈ 2.5 × √C`,
 "min = fewest minerals a full pan can give, max = most, C = capacity. Most pans sit in the lower part of that range."],
 ["Weight","Lightest and heaviest weight",
 `Wmin = 0.75 × B × (1 + S) × Z
-Wmax = 15.5 × B × (1 + S) × Z`,
-"Estimated from the lightest and heaviest rolls in our test logs, not confirmed. Wmin = lightest weight (kg), Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = Size Boost as a number (1,476% = 14.76), Z = the zone's size factor (see below). With the Solar Magnifier multiply by 1.5."],
+Wmax = 17 × B × (1 + S) × Z`,
+"Estimated from the lightest and heaviest rolls in our test logs, not confirmed. Most of the time the heaviest is 15.5 × B × (1 + S) × Z; 17 shows up only in stretches where about a quarter of minerals come out 1.1× heavier. Wmin = lightest weight (kg), Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = Size Boost as a number (1,476% = 14.76), Z = the zone's size factor (see below). With the Solar Magnifier multiply by 1.5."],
 ["Weight","Maximum weight at a Size Boost",
-`Wmax = 15.5 × B × (1 + S) × Z`,
-"Best guess, from the heaviest rolls in our test logs. Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = your Size Boost as a number (1,476% = 14.76), Z = the zone's size factor. With the Solar Magnifier multiply by 1.5."],
+`Wmax = 17 × B × (1 + S) × Z`,
+"Best guess, from the heaviest rolls in our test logs (usually 15.5 instead of 17). Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = your Size Boost as a number (1,476% = 14.76), Z = the zone's size factor. With the Solar Magnifier multiply by 1.5."],
 ["Weight","Minimum Size Boost for a weight",
-`S = W ÷ (15.5 × B × Z) − 1`,
+`S = W ÷ (17 × B × Z) − 1`,
 "S = Size Boost you need, as a number (×100 for %, so 18.35 = 1,835%), W = the weight you want (kg), B = the mineral's base weight (kg), Z = the zone's size factor. With the Solar Magnifier use W ÷ 1.5 instead of W."],
 ["Weight","Zone size factor",
-`Z = 0.80  Rubble Creek
-Z = 0.89  Rubble Creek Deposits
-Z = 0.93  Fortune River
-Z = 0.96  Magma Furnace, Volcanic Sands
-Z = 0.97  Azuralite Oasis, Sunset Beach
-Z ≈ 1.00  Lifespring Oasis, Sandstone Stream, Volcanic Springs, Frostbite River, Meteor Falls
-Z = 1.02  Crystal Cavern River, Starfall River, Frostbite Waterfall
-Z = 1.03  Rotwood Swamp
-Z = 1.04  Fungal Marsh, Deeproot Spring
-Z = 1.05  Enchanted Ruins
-Z = 1.06  Frozen Peak, Overgrown Grotto
-Z = 1.07  Astral Caverns
-Z = 1.12  Infernal Heart, Abyssal Depth, Windswept Beach
+`Z = 0.80  Rubble Creek Sands
+Z = 0.88  Rubble Creek Deposits
+Z = 0.92  Fortune River
+Z = 0.96  Azuralite Oasis, Magma Furnace, Sunset Beach, Volcanic Sands, Windswept Beach
+Z = 1.00  Crystal Cavern River, Fortune River Delta, Frostbite River, Frostbite Waterfall, Lifespring Oasis, Meteor Falls, Mystic Floodplains, Sandstone Stream, Starfall River, Volcanic Springs
+Z = 1.04  Astral Caverns, Deeproot Spring, Enchanted Ruins, Frozen Peak, Fungal Marsh, Overgrown Grotto, Rotwood Swamp
+Z = 1.12  Abyssal Depth, Infernal Heart
 Z = 1.20  Timelocked Sanctuary`,
-"Z = how much a zone multiplies every weight. Measured on 650,000 minerals in 26 zones; zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones)."],
+"Z = how much a zone multiplies every weight. Measured on 3.2 million minerals in 24 zones: a zone's lightest mineral is exactly 0.75 × its factor. Azuralite Oasis, Crystal Cavern River, Overgrown Grotto and Volcanic Springs are from an older, smaller log. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones)."],
 ["Luck","Luck from a luck cap",
 `L = 0.56 × cap`,
 "L = the luck a capped session actually pans at, cap = the cap you set. Measured on 326,000 capped minerals in 17 zones: every cap from 100 to 10,000 landed between 0.54 and 0.60. A cap only helps for minerals that get rarer with more luck; Best Luck Cap works out which."],

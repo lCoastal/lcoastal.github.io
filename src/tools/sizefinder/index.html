@@ -14,7 +14,7 @@
     <h1>Size Boost Finder</h1>
     <p class="lede">Pick a mineral and the weight you want, and it tells you the Size Boost you need: the least that makes it possible at all, and a recommended one where your chances are actually decent.</p>
   </header>
-  <p class="disc" role="note"><b>Heads up:</b> the minimum is a best guess: it assumes the heaviest roll is 15.5 × base weight, the highest seen in our test logs, which isn't confirmed. The chances come from a fitted model, so they're an estimate, especially at very low or very high capacity.</p>
+  <p class="disc" role="note"><b>Heads up:</b> the minimum is a best guess: it assumes the heaviest roll is 17 × base weight, the highest seen in our test logs, which isn't confirmed. The chances come from a fitted model, so they're an estimate, especially at very low or very high capacity.</p>
   <section class="card">
     <div class="inputs">
       <label class="fld"><span class="lab">Mineral</span><input type="text" id="min" placeholder="e.g. Gold" autocomplete="off"></label>
@@ -41,8 +41,8 @@
   </section>
   <section class="card"><h2>How it works</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-      <li>A mineral's weight is <b>base weight × (1 + Size Boost) × a roll between 0.75 and 15.5</b>, ×1.5 with the Solar Magnifier. How the rolls spread is shown on Weight Range.</li>
-      <li><b>Minimum:</b> the Size Boost where even the heaviest roll (k = 15.5, the highest seen in test logs, not confirmed) only just reaches your weight: Size Boost = weight ÷ (15.5 × base × magnifier) − 1. At the minimum it's possible, but almost never happens.</li>
+      <li>A mineral's weight is <b>base weight × (1 + Size Boost) × zone factor × a roll between 0.75 and 17</b> (usually no more than 15.5), ×1.5 with the Solar Magnifier. How the rolls spread is shown on Weight Range.</li>
+      <li><b>Minimum:</b> the Size Boost where even the heaviest roll (k = 17, the highest seen in test logs, not confirmed) only just reaches your weight: Size Boost = weight ÷ (17 × base × magnifier) − 1. At the minimum it's possible, but almost never happens.</li>
       <li><b>Recommended:</b> the Size Boost where at least the share you picked of that mineral comes out at your weight or heavier. More capacity makes heavy rolls more common, so it lowers the recommended boost but not the minimum.</li>
       <li>The chance is per mineral of that kind you pan, not per pan.</li>
     </ul>
