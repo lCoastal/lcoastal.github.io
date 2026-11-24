@@ -263,7 +263,7 @@ function ptFrameInit() {
     var groups = new Map();
     for (var i = 0; i < els.length; i++) {
       var e = els[i];
-      if (e.closest(".sheet,.pt-noacts")) continue;
+      if (e.closest(".sheet,.pt-noacts") || e.classList.contains("pt-more")) continue;
       var k = e.dataset.pta || ptKind(e);
       if (!k) continue;
       e.dataset.pta = k;
