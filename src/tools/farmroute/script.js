@@ -37,7 +37,6 @@ function render(){
 // S.cl: saved custom routes [{id,name,mods:[...],picks:{Mineral:[modifier,...]},got:{},lock}], S.cc: the open one
 const CMODS=["None",...RT.MODS.filter(u=>u!=="None")];const modName=u=>u==="None"?"Any":u;
 const cid=()=>"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
-const CN_A=["Shiny","Lucky","Molten","Frozen","Glowing","Ancient","Golden","Radiant","Hidden","Swift","Prismatic","Stormy","Crystal","Royal","Sunlit","Moonlit"],CN_B=["Run","Haul","Route","Trip","Hunt","Loop","Grind","Sweep","Circuit","Trek"];
 const cname=()=>"";
 const newList=()=>({id:cid(),name:cname(),mods:["None"],picks:{},got:{}});
 function curList(){if(!Array.isArray(S.cl)||!S.cl.length){S.cl=[newList()];S.cc=S.cl[0].id}let L=S.cl.find(x=>x.id===S.cc);if(!L){L=S.cl[0];S.cc=L.id}return L}

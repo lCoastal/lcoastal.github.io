@@ -60,9 +60,7 @@ document.addEventListener("click",e=>{const k=e.target.closest("[data-skip]");if
 const plain=()=>Object.fromEntries(ORDER.map(r=>[r,last.board[r].map(sl=>({m:sl.m||null,u:sl.m?sl.u||"None":"None"}))]));
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 // loadout name: what the user typed, or a random name (never an automatic "Best ...")
-const N_ADJ=["Shiny","Lucky","Molten","Frozen","Glowing","Ancient","Mythic","Dusty","Golden","Cursed","Radiant","Hidden","Mighty","Swift","Heavy","Prismatic","Stormy","Crystal","Rusty","Royal","Sunlit","Moonlit","Gleaming","Rugged","Sparkling"];
-const N_NOUN=["Pan","Shovel","Nugget","Geode","Vein","Sluice","Prospector","Digger","Ore","Haul","Dredge","Quarry","Relic","Totem","Lode","Cavern","Spade","Pebble","Treasure","Strike","Miner","Gemstone","Riverbed","Deposit","Jackpot"];
-const pick1=a=>a[Math.floor(Math.random()*a.length)];let autoName="";
+let autoName="";
 const loName=()=>$("lname").value.trim()||autoName;
 $("saveLo").onclick=()=>{if(!Object.values(plain()).some(r=>r.some(s=>s.m))){toast("Pick at least one goal first");return}let r=false;try{r=window.parent.ptSaveLoadout(loName(),plain())}catch(e){}
   toast(r?`${r==="updated"?"Updated":"Saved"} “${loName()}” in the Museum Planner's saved loadouts`:"Couldn't save the loadout")};

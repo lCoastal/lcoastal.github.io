@@ -10,7 +10,6 @@ const PCT=new Set(["Shake Speed","Size Boost","Modifier Boost","Sell Boost","Dig
 // slots: necklace, charm, 6 normal rings, then rings 7 and 8 (unlocked together with Robux)
 const SLOTS=[["neck","Necklace","Necklace"],["charm","Charm","Charm"],...Array.from({length:6},(_,i)=>["r"+i,"Ring "+(i+1),"Ring"]),["r6","Ring 7","Ring"],["r7","Ring 8","Ring"]];
 const blank=n=>({id:"l"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:n||randomName(),notes:"",nRings:6,robux:false,slots:{}});
-const ADJ=["Lucky","Molten","Frozen","Glowing","Ancient","Swift","Golden","Radiant","Mighty","Prismatic","Stormy","Crystal","Royal","Shiny","Cosmic","Hidden"],NOUN=["Hoard","Kit","Setup","Arsenal","Haul","Rig","Stash","Toolkit","Loadout","Gearset"];
 function randomName(){return ""}
 let D={list:[],cur:null,cmp:null};try{Object.assign(D,JSON.parse(localStorage.getItem("pt-eqload")||"{}"))}catch(e){}
 if(!Array.isArray(D.list)||!D.list.length){D.list=[blank()];D.cur=D.list[0].id}

@@ -1,8 +1,5 @@
 
 // Random names: one adjective + one noun, drawn fresh on every page load
-const NAME_ADJ=["Shiny","Lucky","Molten","Frozen","Glowing","Ancient","Mythic","Dusty","Golden","Cursed","Radiant","Hidden","Mighty","Swift","Heavy","Prismatic","Stormy","Crystal","Rusty","Royal","Sunlit","Moonlit","Gleaming","Rugged","Sparkling"];
-const NAME_NOUN=["Pan","Shovel","Nugget","Geode","Vein","Sluice","Prospector","Digger","Ore","Haul","Dredge","Quarry","Relic","Totem","Lode","Cavern","Spade","Pebble","Treasure","Strike","Miner","Gemstone","Riverbed","Deposit","Jackpot"];
-const pickOne=a=>a[Math.floor(Math.random()*a.length)];
 const randomName=()=>"";
 const PAGE_NAME=randomName();
 const ORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
