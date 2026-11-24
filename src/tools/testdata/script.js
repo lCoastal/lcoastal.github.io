@@ -96,7 +96,13 @@ $("paste").addEventListener("paste",e=>{const t=e.clipboardData&&e.clipboardData
 function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"":r[i]||""};
   const ZAL={"abyssal depths":"Abyssal Depth","the magma furnace":"Magma Furnace","rubble creek":"Rubble Creek Sands"};const zn=z=>ZAL[String(z).trim().toLowerCase()]||z;
   const rows=ROWS.map(r=>({name:g(r,"name"),zone:zn(g(r,"zone")),mod:g(r,"mod"),w:num(g(r,"weight")),sb:num(g(r,"size")),luck:num(g(r,"luck")),mb:num(g(r,"mb")),cap:num(g(r,"cap")),pan:g(r,"pan")})).filter(r=>r.name);
-  const known=rows.filter(r=>MIN[r.name.toLowerCase()]),unknown={};rows.forEach(r=>{if(!MIN[r.name.toLowerCase()])unknown[r.name]=(unknown[r.name]||0)+1});
+  const named=rows.filter(r=>MIN[r.name.toLowerCase()]),unknown={};rows.forEach(r=>{if(!MIN[r.name.toLowerCase()])unknown[r.name]=(unknown[r.name]||0)+1});
+  // minerals that can't drop in the zone they were logged in didn't come from panning there
+  // (usually taken out of storage or the museum, traded, or a chest), so they stay out of drop rates and weights
+  const ZSEL=$("zoneAll").value,canDrop={},stray={};
+  const known=named.filter(r=>{const z=col("zone")>=0?zoneOf(r.zone):ZSEL;if(!z)return true;
+    if(!canDrop[z]){canDrop[z]=new Set(fullList(z).map(x=>x.m.n));Object.keys(LOC).forEach(k=>{if(baseLoc(k)===z)LOC[k].forEach(x=>canDrop[z].add(x.m.n))})}if(!canDrop[z].size)return true;
+    const n=MIN[r.name.toLowerCase()].n;if(canDrop[z].has(n))return true;const k=n+" in "+z;stray[k]=(stray[k]||0)+1;return false});
   let h="",txt=[];const sumBits=[`<b>${rows.length.toLocaleString()}</b> rows`];
   // ---- drop rates
   const ZALL=$("zoneAll").value;if(col("zone")>=0||ZALL){const byZ={},noZ={};known.forEach(r=>{const z=col("zone")>=0?zoneOf(r.zone):ZALL;if(z)(byZ[z]=byZ[z]||[]).push(r);else if(r.zone)noZ[r.zone]=(noZ[r.zone]||0)+1});
@@ -162,6 +168,9 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
         h+=`<tr><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}${esc(n)}${rs.length<10?' <span class="thin">thin data</span>':""}</span></td>${hasZ?`<td>${esc(zn||"–")}${zn?` <span class="thin">×${zoneSize(zn).toFixed(2)}</span>`:""}</td>`:""}<td>${rs.length.toLocaleString()}</td><td>${m.bw}</td><td>${lo.toFixed(2)}</td><td>${isFinite(smin)?smin.toFixed(2):"–"}</td><td class="${cs}">${pc(ps)}</td><td>${hi.toFixed(2)}</td><td>${isFinite(smax)?smax.toFixed(2):"–"}</td><td class="${cb}">${pc(pb)}</td></tr>`;
         txt.push(`  ${n}${hasZ?` in ${zn||"unknown zone"}`:""}: ${rs.length} seen, base ${m.bw}, lightest ${lo.toFixed(2)} kg (${pc(ps)} of smallest possible), heaviest ${hi.toFixed(2)} kg (${pc(pb)} of biggest possible)`)});
       h+="</table></div>"}}
+  const sk=Object.entries(stray).sort((a,b)=>b[1]-a[1]),sn=sk.reduce((t,x)=>t+x[1],0);
+  if(sn){h+=`<p class="note"><b>${sn.toLocaleString()}</b> mineral${sn===1?"":"s"} can't drop in the zone ${sn===1?"it was":"they were"} logged in, so ${sn===1?"it's":"they're"} left out of drop rates and weights. They usually come from taking minerals out of storage or the museum, trades or chests, not panning: ${esc(sk.slice(0,8).map(([k,c])=>k+" ×"+c.toLocaleString()).join(", "))}${sk.length>8?", …":""}.</p>`;
+    txt.push("",`LEFT OUT (can't drop in the zone they were logged in): ${sn}`,...sk.map(([k,c])=>`  ${k}: ${c}`))}
   const uk=Object.keys(unknown);if(uk.length)h+=`<p class="note">Names the toolkit doesn't know, left out of drop rates and weights: ${esc(uk.slice(0,20).join(", "))}${uk.length>20?" …":""}</p>`;
   if(!h)h='<p class="note">Map at least one of Zone, Modifier, Weight or Pan number to get a comparison.</p>';
   $("sum").innerHTML=sumBits.join(", ");$("out").innerHTML=h;$("outCard").hidden=false;LAST=txt.join("\n");
