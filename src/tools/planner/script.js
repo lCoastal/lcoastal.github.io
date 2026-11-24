@@ -3,7 +3,7 @@
 const NAME_ADJ=["Shiny","Lucky","Molten","Frozen","Glowing","Ancient","Mythic","Dusty","Golden","Cursed","Radiant","Hidden","Mighty","Swift","Heavy","Prismatic","Stormy","Crystal","Rusty","Royal","Sunlit","Moonlit","Gleaming","Rugged","Sparkling"];
 const NAME_NOUN=["Pan","Shovel","Nugget","Geode","Vein","Sluice","Prospector","Digger","Ore","Haul","Dredge","Quarry","Relic","Totem","Lode","Cavern","Spade","Pebble","Treasure","Strike","Miner","Gemstone","Riverbed","Deposit","Jackpot"];
 const pickOne=a=>a[Math.floor(Math.random()*a.length)];
-const randomName=()=>pickOne(NAME_ADJ)+" "+pickOne(NAME_NOUN);
+const randomName=()=>"";
 const PAGE_NAME=randomName();
 const ORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
 const SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
@@ -430,4 +430,4 @@ document.getElementById("copy").onclick=()=>{
 function fallback(txt){const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Setup copied")}catch(e){toast("Copy not available here")}ta.remove()}
 let tt;function toast(m){let el=document.querySelector(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el)}el.textContent=m;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,1600)}
 
-renderBoard();renderSaved();document.getElementById("lname").placeholder="Name this board, e.g. "+PAGE_NAME;
+renderBoard();renderSaved();document.getElementById("lname").placeholder="Name this board";

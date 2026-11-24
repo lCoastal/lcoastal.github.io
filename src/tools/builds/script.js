@@ -3,7 +3,7 @@
 const NAME_ADJ=["Shiny","Lucky","Molten","Frozen","Glowing","Ancient","Mythic","Dusty","Golden","Cursed","Radiant","Hidden","Mighty","Swift","Heavy","Prismatic","Stormy","Crystal","Rusty","Royal","Sunlit","Moonlit","Gleaming","Rugged","Sparkling"];
 const NAME_NOUN=["Pan","Shovel","Nugget","Geode","Vein","Sluice","Prospector","Digger","Ore","Haul","Dredge","Quarry","Relic","Totem","Lode","Cavern","Spade","Pebble","Treasure","Strike","Miner","Gemstone","Riverbed","Deposit","Jackpot"];
 const pickOne=a=>a[Math.floor(Math.random()*a.length)];
-const randomName=()=>pickOne(NAME_ADJ)+" "+pickOne(NAME_NOUN);
+const randomName=()=>"";
 const PAGE_NAME=randomName();
 const ORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];
 const SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
@@ -149,10 +149,10 @@ function ringSlots(b,v){const list=b.split6&&v===6?(b.rings6||[]):(b.rings||[]);
   return out.slice(0,v)}
 function ringGrid(b,v,rs){const got=ringSlots(b,v);let h=`<div class="rings8"${rs?` data-rs="${rs}"`:""}>`;
   for(let i=0;i<8;i++){
-    if(i>=v){h+=`<div class="rs lock"><span class="lk">🔒</span><small>Slot ${i+1}</small><span class="lt">Locked</span></div>`;continue}
+    if(i>=v){h+=`<div class="rs lock"><small>Slot ${i+1}</small><span class="lt">Locked</span></div>`;continue}
     const g=got[i];if(!g){h+=`<div class="rs empty"><small>Slot ${i+1}</small><span class="lt">Any ring</span></div>`;continue}
     const e=g.x;const real=findItem("Equipment",e.name);const u=real?picOf("Equipment",real):"";const alts=String(e.name).split("|").map(t=>t.trim()).filter(Boolean);
-    h+=`<div class="rs">${u?`<img src="${u}" alt="">`:`<span class="ph">💍</span>`}<small>Slot ${i+1}</small><b>${e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:""}${esc(alts[0]||"")}</b>${g.first&&e.note?`<span class="lt">${escCL(e.note)}</span>`:""}</div>`}
+    h+=`<div class="rs">${u?`<img src="${u}" alt="">`:`<span class="ph"></span>`}<small>Slot ${i+1}</small><b>${e.mut?`<span class="mu" style="color:${EC(e.mut)}">${esc(e.mut)}</span>`:""}${esc(alts[0]||"")}</b>${g.first&&e.note?`<span class="lt">${escCL(e.note)}</span>`:""}</div>`}
   return h+`</div>`}
 function ringGrids(b){if(!(b.rings||[]).some(x=>x.name)&&!(b.rings6||[]).some(x=>x.name))return "";
   return `<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:6px"><h3 style="margin:0;font:700 11px/1 inherit;color:#97a3b0">Rings</h3>${has6(b)?`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`:""}</div>`+(has6(b)?ringGrid(b,8,"8")+ringGrid(b,6,"6"):ringGrid(b,8,""))}
@@ -207,7 +207,7 @@ const addChip=(on,part,t)=>on?`<button type="button" class="edadd" data-ed="${pa
 function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const b=withAny(tidy(b0));
   const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
   let h=`<div class="sheet" data-rings="${has6(b)?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${escC(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${escC(b.subtitle)}</p>`:""}</div></div>`;
-  if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
+  if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><span>${esc(b.warning)}</span></div>`;
   if(!notes.length&&!b.warning)h+=addChip(edit,"info",b.subtitle?"Add a warning or notes":"Add a subtitle, warning or notes");
   const q=[];if(b.pan.name)q.push(quickChip("Pan","Pan",b.pan.name));if(b.shovel.name)q.push(quickChip("Shovel","Shovel",b.shovel.name));if(b.charm.name)q.push(quickChip("Charm","Equipment",b.charm.name));if(b.neck.name)q.push(quickChip("Necklace","Equipment",b.neck.name));
   const SX={};const h0=h;h="";
@@ -225,8 +225,8 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   const cards=[];
   const tag=(h0,part)=>edit?h0.replace('<div class="gc"',`<div class="gc" data-ed="${part}"`):h0;
   const ph=(part,t,ico)=>edit?`<div class="gc edgh" data-ed="${part}"><span class="ph">${ico}</span><div class="gt"><small>${t}</small><b>+ Add ${t.toLowerCase()}</b></div></div>`:"";
-  if(b.charm.name||b.charm.note)cards.push(tag(gearCard({t:"Charm",ico:"🔗"},"Equipment",b.charm,an(b,"charm")),"charm"));else if(edit)cards.push(ph("charm","Charm","🔗"));
-  if(b.neck.name||b.neck.note)cards.push(tag(gearCard({t:"Necklace",ico:"📿"},"Equipment",b.neck,an(b,"neck")),"neck"));else if(edit)cards.push(ph("neck","Necklace","📿"));
+  if(b.charm.name||b.charm.note)cards.push(tag(gearCard({t:"Charm"},"Equipment",b.charm,an(b,"charm")),"charm"));else if(edit)cards.push(ph("charm","Charm",""));
+  if(b.neck.name||b.neck.note)cards.push(tag(gearCard({t:"Necklace"},"Equipment",b.neck,an(b,"neck")),"neck"));else if(edit)cards.push(ph("neck","Necklace",""));
   h+=`<div class="blk"><h3><span class="n">2</span>Equipment</h3>${an(b,"equip")}`;
   h+=cards.length?`<div class="gear">${cards.join("")}</div>`:"";
   {const rg=ringGrids(b);h+=rg?(edit?`<div data-ed="rings">${rg}</div>`:rg):addChip(edit,"rings","Add rings");h+=an(b,"rings")+an(b,"rings6")}
@@ -239,8 +239,8 @@ function sheetHTML(b0,edit){if(viewMode==="text")return textHTML(b0,edit);const 
   h+=`</div>`;SX.equip=h;h="";
   // pan + shovel
   const tc=[];
-  if(!(b.pan.name||b.pan.enchant||b.pan.trinket)){if(edit)tc.push(ph("pan","Pan","🥘"))}else tc.push(tag(gearCard({t:"Pan",ico:"🥘"},"Pan",b.pan,`${b.pan.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.pan.enchant)}</span>`:""}${b.pan.trinket?`<span class="ex"><i>Trinket</i> ${esc(b.pan.trinket)}</span>`:""}${an(b,"pan")}`),"pan"));
-  if(b.shovel.name||b.shovel.enchant)tc.push(tag(gearCard({t:"Shovel",ico:"⛏"},"Shovel",b.shovel,(b.shovel.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.shovel.enchant)}</span>`:"")+an(b,"shovel")),"shovel"));else if(edit)tc.push(ph("shovel","Shovel","⛏"));
+  if(!(b.pan.name||b.pan.enchant||b.pan.trinket)){if(edit)tc.push(ph("pan","Pan",""))}else tc.push(tag(gearCard({t:"Pan"},"Pan",b.pan,`${b.pan.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.pan.enchant)}</span>`:""}${b.pan.trinket?`<span class="ex"><i>Trinket</i> ${esc(b.pan.trinket)}</span>`:""}${an(b,"pan")}`),"pan"));
+  if(b.shovel.name||b.shovel.enchant)tc.push(tag(gearCard({t:"Shovel"},"Shovel",b.shovel,(b.shovel.enchant?`<span class="ex"><i>Enchant</i> ${esc(b.shovel.enchant)}</span>`:"")+an(b,"shovel")),"shovel"));else if(edit)tc.push(ph("shovel","Shovel",""));
   if(tc.length)h+=`<div class="blk"><h3><span class="n">3</span>Pan &amp; shovel</h3>${an(b,"tools")}<div class="gear">${tc.join("")}</div></div>`;
   SX.tools=h;h=h0+joinSecs(b,SX,edit);
   if(b.author)h+=`<p class="author"${edA(edit,"info")}>${esc(b.author)}</p>`;
@@ -255,7 +255,7 @@ function slotText(s,r,mod){if(!s.m.length)return '<span class="dim">any mineral<
 function textHTML(b0,edit){const b=withAny(tidy(b0));const notes=b.notes.split("\n").map(s=>s.trim()).filter(Boolean);
   const modT=m=>!m||m==="None"||m==="Any"?"<b>any</b>":`<b style="color:${MC(m)}">${esc(m)}</b>`;
   let h=`<div class="sheet" data-rings="${b.split6?viewRings:""}"><div class="bh"${edA(edit,"info")}>${b.pic?`<img class="bpic" src="${b.pic}" alt="">`:""}<div class="bht"><h1>${escC(b.name)||"Untitled build"}</h1>${b.subtitle?`<p class="sub">${escC(b.subtitle)}</p>`:""}</div></div>`;
-  if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><b>⚠</b><span>${esc(b.warning)}</span></div>`;
+  if(b.warning)h+=`<div class="warnbox"${edA(edit,"info")}><span>${esc(b.warning)}</span></div>`;
   if(!notes.length&&!b.warning)h+=addChip(edit,"info",b.subtitle?"Add a warning or notes":"Add a subtitle, warning or notes");
   if(b.split6)h+=`<div class="rtoggle" role="group" aria-label="Ring slots shown"><span>Ring slots:</span><button type="button" data-rings="8" aria-pressed="${viewRings==="8"}">8 rings</button><button type="button" data-rings="6" aria-pressed="${viewRings==="6"}">6 rings</button></div>`;
   h+=`<div class="tx">`;
@@ -442,7 +442,7 @@ function renderEditor(){
   const b=getB();const ed=document.getElementById("editor");
   const modList=Object.keys(MODS);
   let h=`<section class="card" data-part="info"><h2>Build info</h2>
-  <label class="field"><span>Title</span><input class="inp" autocomplete="off" id="f-name" value="${esc(b.name)}" placeholder="e.g. ${esc(randomName())}"></label>
+  <label class="field"><span>Title</span><input class="inp" autocomplete="off" id="f-name" value="${esc(b.name)}"></label>
   <div class="row"><label class="field"><span>Subtitle</span><input class="inp" autocomplete="off" id="f-subtitle" maxlength="120" value="${esc(b.subtitle)}" placeholder="e.g. ${esc(SUB_EX[Math.floor(Math.random()*SUB_EX.length)])}"></label>
   <label class="field"><span>Warning (shown in red)</span><input class="inp" autocomplete="off" id="f-warning" maxlength="200" value="${esc(b.warning)}" placeholder="e.g. Needs modification for Fungal Marsh"></label></div>
   <label class="field"><span>Notes, one bullet per line <small style="font-weight:400;color:var(--muted)">start a line with words in capitals to style it, and mix them: RED, GREEN, BLUE… (or #ff8800), BIG, HUGE, SMALL, BOLD, ITALIC, UNDERLINE, STRIKE, OUTLINE, HIGHLIGHT, GLOW, CAPS, FADED. E.g. RED BIG BOLD Don't sell this</small></span><textarea class="inp" id="f-notes" maxlength="1500" placeholder="This is a one-tap build.&#10;Use with Luck, Strength and Luminant totems.">${esc(b.notes)}</textarea></label>
@@ -808,7 +808,7 @@ document.addEventListener("mousedown",e=>{const li=e.target.closest&&e.target.cl
 document.addEventListener("focusout",e=>{if(e.target===SGI)setTimeout(()=>{if(document.activeElement!==SGI)sgClose()},120)});
 window.addEventListener("scroll",e=>{if(!SGI||!SGX||SGX.contains(e.target))return;const rc=SGI.getBoundingClientRect();SGX.style.top=(rc.bottom+scrollY+4)+"px";SGX.style.left=Math.max(8,Math.min(rc.left+scrollX,window.innerWidth-SGX.offsetWidth-8+scrollX))+"px"},true);
 window.ptSetRunes=names=>{const b=getB();b.runeSlots=Array.from({length:5},(_,i)=>(names||[])[i]||"");syncRunes(b);touch();renderEditor();toast(`Added ${names.length} rune${names.length===1?"":"s"} to “${b.name||"this build"}”`)};
-window.ptAddBuild=src=>{const nb=Object.assign(blankBuild(randomName()),JSON.parse(JSON.stringify(src)),{id:uid(),updated:Date.now()});if(!nb.name)nb.name=randomName();B.push(nb);cur=nb.id;armDel=false;persist();renderAll();toast(`Added “${nb.name}” from the Stat Calculator`)};
+window.ptAddBuild=src=>{const nb=Object.assign(blankBuild(randomName()),JSON.parse(JSON.stringify(src)),{id:uid(),updated:Date.now()});B.push(nb);cur=nb.id;armDel=false;persist();renderAll();toast(`Added “${nb.name}” from the Stat Calculator`)};
 window.ptAddBuildText=txt=>{const {b}=fromText(String(txt||""),blankBuild());window.ptAddBuild(b)};
 window.ptListBuilds=()=>B.map(b=>({id:b.id,name:plainC(b.name)||"Untitled build"}));
 // "Non Euclidean or Rhythmic" / "Abyssal/Sunblessed": the first one is what gets counted

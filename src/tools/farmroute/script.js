@@ -12,7 +12,7 @@ function parse(txt){const out=[],bad=[];
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;d.style.cssText="position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:40";document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 let LAST=null;
 // lock: freeze the stops, their order and what goes where, so ticking items doesn't reshuffle the route
-function drawLock(){const on=!!(S.mode==="custom"?curList().lock:S.lock);const b=$("lockBtn");b.setAttribute("aria-pressed",String(on));b.innerHTML=on?"🔒 Route locked":"🔓 Lock route";
+function drawLock(){const on=!!(S.mode==="custom"?curList().lock:S.lock);const b=$("lockBtn");b.setAttribute("aria-pressed",String(on));b.innerHTML=on?"Route locked":"Lock route";
   b.title=on?"Click to unlock. The route will re-plan around what you still need.":"Keep the stops, their order and what you collect where exactly as they are now, even as you tick items off.";
   b.style.cssText=on?"background:var(--accent);border-color:var(--accent);color:var(--bg)":"";
   $("lockNote").hidden=!on;$("lockNote").textContent="Locked: stops stay in place as you tick items off. Odds still update if you change your stats. Unlock to re-plan."}
@@ -38,7 +38,7 @@ function render(){
 const CMODS=["None",...RT.MODS.filter(u=>u!=="None")];const modName=u=>u==="None"?"Any":u;
 const cid=()=>"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const CN_A=["Shiny","Lucky","Molten","Frozen","Glowing","Ancient","Golden","Radiant","Hidden","Swift","Prismatic","Stormy","Crystal","Royal","Sunlit","Moonlit"],CN_B=["Run","Haul","Route","Trip","Hunt","Loop","Grind","Sweep","Circuit","Trek"];
-const cname=()=>CN_A[Math.random()*CN_A.length|0]+" "+CN_B[Math.random()*CN_B.length|0];
+const cname=()=>"";
 const newList=()=>({id:cid(),name:cname(),mods:["None"],picks:{},got:{}});
 function curList(){if(!Array.isArray(S.cl)||!S.cl.length){S.cl=[newList()];S.cc=S.cl[0].id}let L=S.cl.find(x=>x.id===S.cc);if(!L){L=S.cl[0];S.cc=L.id}return L}
 const RORD=RT.RARS;

@@ -569,7 +569,7 @@ function ptDeclutter() {
         var parts = a.querySelectorAll(":scope > div");
         var d = document.createElement("details");
         d.className = "pt-warn";
-        d.innerHTML = "<summary>⚠ Odds here use an estimated luck formula<span>Why?</span></summary><p></p>";
+        d.innerHTML = "<summary>Odds here use an estimated luck formula<span>Why?</span></summary><p></p>";
         d.querySelector("p").innerHTML = parts[1] ? parts[1].innerHTML : "";
         a.replaceWith(d);
       });

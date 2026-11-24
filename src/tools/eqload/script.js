@@ -11,7 +11,7 @@ const PCT=new Set(["Shake Speed","Size Boost","Modifier Boost","Sell Boost","Dig
 const SLOTS=[["neck","Necklace","Necklace"],["charm","Charm","Charm"],...Array.from({length:6},(_,i)=>["r"+i,"Ring "+(i+1),"Ring"]),["r6","Ring 7","Ring"],["r7","Ring 8","Ring"]];
 const blank=n=>({id:"l"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:n||randomName(),notes:"",nRings:6,robux:false,slots:{}});
 const ADJ=["Lucky","Molten","Frozen","Glowing","Ancient","Swift","Golden","Radiant","Mighty","Prismatic","Stormy","Crystal","Royal","Shiny","Cosmic","Hidden"],NOUN=["Hoard","Kit","Setup","Arsenal","Haul","Rig","Stash","Toolkit","Loadout","Gearset"];
-function randomName(){return ADJ[Math.random()*ADJ.length|0]+" "+NOUN[Math.random()*NOUN.length|0]}
+function randomName(){return ""}
 let D={list:[],cur:null,cmp:null};try{Object.assign(D,JSON.parse(localStorage.getItem("pt-eqload")||"{}"))}catch(e){}
 if(!Array.isArray(D.list)||!D.list.length){D.list=[blank()];D.cur=D.list[0].id}
 if(!D.list.some(l=>l.id===D.cur))D.cur=D.list[0].id;
@@ -27,7 +27,7 @@ const sortStats=o=>Object.keys(o).sort((a,b)=>(ORDER.indexOf(a)+99)%99-(ORDER.in
 const valT=(a,p)=>(a<0?"−":"+")+fmt(Math.abs(a),2)+(p?"%":"");
 const starT=v=>(v.l==="5"?"5★":"6★")+((v.q??100)!==100?`, ${v.q}%`:"");
 function tile(l,k,label,kind,big){const own=owned(l,k);const v=l.slots[k];const x=v&&v.n?EB[v.n]:null;
-  if(!own)return `<div class="tile lock${big?" big":""}" aria-label="${esc(label)} (not unlocked)"><span class="tk">${esc(label)}</span><span class="plus">🔒</span><span class="tag">Not unlocked</span></div>`;
+  if(!own)return `<div class="tile lock${big?" big":""}" aria-label="${esc(label)} (not unlocked)"><span class="tk">${esc(label)}</span><span class="tag">Not unlocked</span></div>`;
   if(!x)return `<button type="button" class="tile empty${big?" big":""}" data-slot="${k}" aria-label="Pick a ${kind.toLowerCase()} for ${esc(label)}"><span class="tk">${esc(label)}</span><span class="plus">+</span><span class="tag">Empty</span></button>`;
   const mu=v.m&&v.m!=="None"?v.m:"";const img=IMG(x.n);
   return `<button type="button" class="tile${big?" big":""}" data-slot="${k}" data-tipk="${k}" data-equip="${esc(x.n)}" style="--tc:${RHEX[x.r]||"#3a444d"};--mc:${MCOL[mu]||"#fff"}" aria-label="${esc(label)}: ${esc(x.n)}"><span class="tk">${esc(label)}</span><span class="st">${v.l==="5"?"5★":"6★"}, ${v.q??100}%</span>${img?`<img src="${img}" alt="">`:""}<span class="meta">${mu?`<span class="mu">${esc(mu)}</span>`:""}<span class="tn">${esc(x.n)}</span><span class="tag" style="color:${RHEX[x.r]}">${x.r}</span></span></button>`}
@@ -81,7 +81,7 @@ let armDel=false,delT=null;
 $("bDel").onclick=()=>{if(!armDel){armDel=true;$("bDel").textContent="Click again to delete";clearTimeout(delT);delT=setTimeout(()=>{armDel=false;$("bDel").textContent="Delete"},3000);return}
   armDel=false;$("bDel").textContent="Delete";const gone=L().name;D.list=D.list.filter(l=>l.id!==D.cur);if(!D.list.length)D.list=[blank()];D.cur=D.list[0].id;if(!D.list.some(l=>l.id===D.cmp))D.cmp=null;save();render();toast(`Deleted "${gone}"`)};
 $("name").oninput=()=>{L().name=$("name").value;save();const o=$("sel").querySelector(`option[value="${D.cur}"]`);if(o)o.textContent=$("name").value||"Untitled loadout";renderCmp()};
-$("name").addEventListener("blur",()=>{if(!L().name.trim()){L().name=randomName();save();render()}});
+
 $("notes").oninput=()=>{L().notes=$("notes").value;save()};
 $("nRings").oninput=()=>{L().nRings=Math.max(0,Math.min(6,+$("nRings").value||0));save();render()};
 $("oRobux").onchange=()=>{L().robux=$("oRobux").checked;save();render()};
