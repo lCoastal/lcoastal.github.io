@@ -87,7 +87,7 @@ function zoneTable(sb,M0){
     return `<tr data-z="${esc(z)}"${z===S.wz?' class="on"':""} title="Use ${esc(z)} above"><td>${esc(z)}</td><td><b>×${f.toFixed(2)}</b></td><td>${(WT_MIN*f).toFixed(2)}×</td><td>${(WT_TOP*f).toFixed(2)}×</td><td>${(WT_MAX*f).toFixed(2)}×</td>${m?`<td class="hv">${kg(base*WT_MAX*f)}</td>`:""}<td>${n?fmt(n,0):"older log"}</td></tr>`}).join("")}</tbody></table>`;
 }
 $("zftbl").addEventListener("click",e=>{const r=e.target.closest("[data-z]");if(!r)return;S.wz=r.dataset.z;$("wz").innerHTML=zoneSizeOpts(S.wz);save();render();$("wz").scrollIntoView({behavior:"smooth",block:"center"})});
-ptPageButtons($("zfacts"),()=>"Zone weight factors",()=>ptPageRead($("zfh"),[{h:"",el:$("zftbl")}]),"Measured from a 3.2M-mineral GalaxisHub log.");
+ptPageButtons($("zfacts"),()=>"Zone weight factors",()=>ptPageRead($("zfh"),[{h:"",el:$("zftbl")}]),"Measured from a 2.57M-mineral GalaxisHub log.");
 function render(){
   const q=String(S.min).trim().toLowerCase(),m=BY[q],z=!m&&ZBY[q],sb=Math.max(0,+S.sb||0),cap=+S.cap||0,M=(S.mag?1.5:1)*(z?zoneSize(z):zoneSize(S.wz)),model=wtModel(cap||4000);
   $("out").hidden=!m;$("zout").hidden=!!m;

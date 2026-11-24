@@ -28,7 +28,7 @@ Z = 1.00  Crystal Cavern River, Fortune River Delta, Frostbite River, Frostbite 
 Z = 1.04  Astral Caverns, Deeproot Spring, Enchanted Ruins, Frozen Peak, Fungal Marsh, Overgrown Grotto, Rotwood Swamp
 Z = 1.12  Abyssal Depth, Infernal Heart
 Z = 1.20  Timelocked Sanctuary`,
-"Z = how much a zone multiplies every weight. Measured on 3.2 million minerals in 24 zones: a zone's lightest mineral is exactly 0.75 × its factor. Azuralite Oasis, Crystal Cavern River, Overgrown Grotto and Volcanic Springs are from an older, smaller log. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones)."],
+"Z = how much a zone multiplies every weight. Measured on 2.57 million minerals in 24 zones: a zone's lightest mineral is exactly 0.75 × its factor. Azuralite Oasis, Crystal Cavern River, Overgrown Grotto and Volcanic Springs are from an older, smaller log. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones)."],
 ["Luck","Luck from a luck cap",
 `L = 0.56 × cap`,
 "L = the luck a capped session actually pans at, cap = the cap you set. Measured on 326,000 capped minerals in 17 zones: every cap from 100 to 10,000 landed between 0.54 and 0.60. A cap only helps for minerals that get rarer with more luck; Best Luck Cap works out which."],

@@ -3,9 +3,9 @@ const $=id=>document.getElementById(id);
 // Each session: when, where, setup, how much was logged, what was tested, what it showed, what changed on the site.
 const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables",kg:"Weights"};
 const S=[
-{id:"galaxis3-2411",date:"24/11/26",title:"Heaviest roll and zone factors, re-checked on 3.2M minerals",zone:"24 zones, mostly Mystic Floodplains",topics:["kg"],kind:"wt",
+{id:"galaxis3-2411",date:"24/11/26",title:"Heaviest roll and zone factors, re-checked on 2.57M minerals",zone:"24 zones, mostly Mystic Floodplains",topics:["kg"],kind:"wt",
  setup:{Luck:"10,000 – 100,000+",Capacity:"6,692 – 8,638",["Size Boost"]:"14.3× and 14.8×",Zones:"24 zones; 961,000 of the minerals from Mystic Floodplains"},
- amount:{Minerals:3171000},
+ amount:{Minerals:2567732},
  tested:["Whether any weight goes past 15.5 × base × (1 + Size Boost) × zone factor","Each zone's factor, measured from its lightest mineral","Whether the spread of weights between the lightest and heaviest still fits"],
  found:["About 1.4% of minerals went past 15.5, and none past 17.05. Every zone tops out at 17.0 once its factor is taken out","It comes and goes: some 10-minute stretches have none past 15.5, others 1–4.6%. In those stretches the lightest is still 0.75, so it isn't everything getting heavier: it fits about a quarter of minerals coming out 1.1× heavier (15.5 × 1.1 = 17.05). It doesn't depend on the mutation","Zone factors land on steps: 0.80 Rubble Creek Sands, 0.88 Rubble Creek Deposits, 0.92 Fortune River, 0.96 Magma Furnace, Sunset Beach, Volcanic Sands and Windswept Beach, 1.00 for nine zones, 1.04 Astral Caverns, Deeproot Spring, Enchanted Ruins, Frozen Peak, Fungal Marsh and Rotwood Swamp, 1.12 Abyssal Depth and Infernal Heart, 1.20 Timelocked Sanctuary","Windswept Beach came out at 0.96, not the 1.12 the older log gave","The typical, average and top-10% weights still match the fitted spread within about 1% at every capacity"],
  changed:["Heaviest possible weight is now 17 × base × (1 + Size Boost) × zone factor (was 15.5), with a thin tail between 15.5 and 17: Weight Range, Size Boost Finder, 5-Star Crafter, Mechanics, Formulas and Test Data Check","Zone factors updated to the steps above","Weight Range has a table of every zone's factor"]},
