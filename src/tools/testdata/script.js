@@ -143,21 +143,24 @@ function run(){const col=k=>MAP.indexOf(k),g=(r,k)=>{const i=col(k);return i<0?"
       txt.push(`  ${k}: ${c}${isN?`, ${pct(o)} vs ${sh?pct(e):"–"}, ${fx(r)}`:" (event/other)"}`)});
     h+="</table></div>";sumBits.push(`<b>${pct(any/N,1)}</b> modified`)}
   // ---- weights: game range is 0.75 to 17 × base weight × (1 + Size Boost) × the zone's size factor
-  if(col("weight")>=0){const WMIN=.75,WMAX=17,by={};known.forEach(r=>{const m=MIN[r.name.toLowerCase()];if(!(m.bw>0)||!(r.w>0))return;(by[m.n]=by[m.n]||[]).push(r)});
+  if(col("weight")>=0){const WMIN=.75,WMAX=17,by={},hasZ=col("zone")>=0||!!ZALL,zk=r=>(col("zone")>=0?zoneOf(r.zone):ZALL)||"";known.forEach(r=>{const m=MIN[r.name.toLowerCase()];if(!(m.bw>0)||!(r.w>0))return;const k=m.n+"\u0001"+zk(r);(by[k]=by[k]||[]).push(r)});
     const flat=Object.values(by).flat(),all=flat.map(r=>r.w/MIN[r.name.toLowerCase()].bw);
     if(all.length){const sbs=flat.map(r=>r.sb).filter(isFinite),hasS=sbs.length>0,S=hasS?med(sbs):NaN;
-      const q=r=>r.w/(MIN[r.name.toLowerCase()].bw*(1+r.sb)*zoneSize(r.zone));
+      const q=r=>r.w/(MIN[r.name.toLowerCase()].bw*(1+r.sb)*zoneSize(zk(r)));
       const allQ=hasS?flat.filter(r=>isFinite(r.sb)).map(q):[];let out=0;allQ.forEach(x=>{if(x<WMIN*.995||x>WMAX*1.005)out++});
       const pc=x=>isFinite(x)?(x*100).toFixed(1)+"%":"–";
-      h+=`<h3 class="sec">Weights</h3><p class="note">The game rolls weights from <b>0.75 × base × (1 + Size Boost)</b> up to <b>17 × base × (1 + Size Boost)</b>, times the zone's size factor (×0.80 to ×1.20) when the file has a Zone column.${hasS?` Size Boost ${S.toFixed(2)}×. ${out?`<b>${out.toLocaleString()}</b> minerals fell outside that range: a base weight is probably off.`:"Every mineral fell inside that range."}`:" Add the Size Boost column to compare against it."}<br>Smallest and biggest show how close your lightest and heaviest got to the limits: 100% means it hit the limit.</p><div class="tw"><table class="t"><tr><th>Mineral</th><th>Seen</th><th>Base</th><th>Lightest kg</th><th>Smallest possible</th><th>Smallest</th><th>Heaviest kg</th><th>Biggest possible</th><th>Biggest</th></tr>`;
+      h+=`<h3 class="sec">Weights</h3><p class="note">The game rolls weights from <b>0.75 × base × (1 + Size Boost)</b> up to <b>17 × base × (1 + Size Boost)</b>, times the zone's size factor (×0.80 to ×1.20) when the file has a Zone column. Each row is one mineral in one zone. Its lightest and heaviest are the ones closest to their limits, each measured against its own Size Boost and zone, so the possible column matches the percentage.${hasS?` Size Boost ${S.toFixed(2)}×. ${out?`<b>${out.toLocaleString()}</b> minerals fell outside that range: a base weight is probably off.`:"Every mineral fell inside that range."}`:" Add the Size Boost column to compare against it."}<br>Smallest and biggest show how close your lightest and heaviest got to the limits: 100% means it hit the limit.</p><div class="tw"><table class="t"><tr><th>Mineral</th>${hasZ?"<th>Zone</th>":""}<th>Seen</th><th>Base</th><th>Lightest kg</th><th>Smallest possible</th><th>Smallest</th><th>Heaviest kg</th><th>Biggest possible</th><th>Biggest</th></tr>`;
       txt.push("","WEIGHTS (range 0.75 to 17 x base x (1 + size boost) x zone factor)"+(hasS?`, size boost ${S.toFixed(2)}x, ${out} outside`:""));
-      Object.entries(by).sort((a,b)=>b[1].length-a[1].length).forEach(([n,rs])=>{const m=MIN[n.toLowerCase()],ws=rs.map(r=>r.w),lo=mn(ws),hi=mx(ws);
-        const qs=hasS?rs.filter(r=>isFinite(r.sb)).map(q):[],ql=qs.length?mn(qs):NaN,qh=qs.length?mx(qs):NaN;
-        const smin=hasS?WMIN*m.bw*(1+S):NaN,smax=hasS?WMAX*m.bw*(1+S):NaN,ps=ql/WMIN,pb=qh/WMAX;
+      const tot={};Object.entries(by).forEach(([k,rs])=>{const n=k.split("\u0001")[0];tot[n]=(tot[n]||0)+rs.length});
+      Object.entries(by).sort((a,b)=>{const[na,za]=a[0].split("\u0001"),[nb,zb]=b[0].split("\u0001");return tot[nb]-tot[na]||na.localeCompare(nb)||b[1].length-a[1].length||za.localeCompare(zb)}).forEach(([k,rs])=>{const[n,zn]=k.split("\u0001"),m=MIN[n.toLowerCase()],ws=rs.map(r=>r.w);
+        // compare each mineral with the limits for its own Size Boost and zone; show the one closest to each limit
+        const rq=hasS?rs.filter(r=>isFinite(r.sb)):[];let rl=null,rh=null;rq.forEach(r=>{const v=q(r);if(!rl||v<rl.v)rl={r,v};if(!rh||v>rh.v)rh={r,v}});
+        const ql=rl?rl.v:NaN,qh=rh?rh.v:NaN,lim=(r,k)=>k*m.bw*(1+r.sb)*zoneSize(zk(r));
+        const smin=rl?lim(rl.r,WMIN):NaN,smax=rh?lim(rh.r,WMAX):NaN,ps=ql/WMIN,pb=qh/WMAX,lo=rl?rl.r.w:mn(ws),hi=rh?rh.r.w:mx(ws);
         // smallest: 100% = hit the floor, above = never got that light; biggest: 100% = hit the ceiling
         const cs=!isFinite(ps)?"":ps<.995?"off":ps<=1.05?"ok":"",cb=!isFinite(pb)?"":pb>1.005?"off":pb>=.95?"ok":"";
-        h+=`<tr><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}${esc(n)}${rs.length<10?' <span class="thin">thin data</span>':""}</span></td><td>${rs.length.toLocaleString()}</td><td>${m.bw}</td><td>${lo.toFixed(2)}</td><td>${isFinite(smin)?smin.toFixed(2):"–"}</td><td class="${cs}">${pc(ps)}</td><td>${hi.toFixed(2)}</td><td>${isFinite(smax)?smax.toFixed(2):"–"}</td><td class="${cb}">${pc(pb)}</td></tr>`;
-        txt.push(`  ${n}: ${rs.length} seen, base ${m.bw}, lightest ${lo.toFixed(2)} kg (${pc(ps)} of smallest possible), heaviest ${hi.toFixed(2)} kg (${pc(pb)} of biggest possible)`)});
+        h+=`<tr><td><span class="mn">${m.ic?`<img src="${m.ic}" alt="">`:""}${esc(n)}${rs.length<10?' <span class="thin">thin data</span>':""}</span></td>${hasZ?`<td>${esc(zn||"–")}${zn?` <span class="thin">×${zoneSize(zn).toFixed(2)}</span>`:""}</td>`:""}<td>${rs.length.toLocaleString()}</td><td>${m.bw}</td><td>${lo.toFixed(2)}</td><td>${isFinite(smin)?smin.toFixed(2):"–"}</td><td class="${cs}">${pc(ps)}</td><td>${hi.toFixed(2)}</td><td>${isFinite(smax)?smax.toFixed(2):"–"}</td><td class="${cb}">${pc(pb)}</td></tr>`;
+        txt.push(`  ${n}${hasZ?` in ${zn||"unknown zone"}`:""}: ${rs.length} seen, base ${m.bw}, lightest ${lo.toFixed(2)} kg (${pc(ps)} of smallest possible), heaviest ${hi.toFixed(2)} kg (${pc(pb)} of biggest possible)`)});
       h+="</table></div>"}}
   const uk=Object.keys(unknown);if(uk.length)h+=`<p class="note">Names the toolkit doesn't know, left out of drop rates and weights: ${esc(uk.slice(0,20).join(", "))}${uk.length>20?" …":""}</p>`;
   if(!h)h='<p class="note">Map at least one of Zone, Modifier, Weight or Pan number to get a comparison.</p>';
