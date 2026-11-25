@@ -251,12 +251,8 @@ window.ptMuseumImage = (() => {
     c.lineWidth = 1;
     rr(c, mx, my, mw, 26, 13);
     c.stroke();
-    c.fillStyle = "#14b8a6";
-    c.beginPath();
-    c.arc(mx + 12, my + 13, 3, 0, Math.PI * 2);
-    c.fill();
     c.fillStyle = "#2dd4bf";
-    c.fillText(mb, mx + 20, my + 17.5);
+    c.fillText(mb, mx + 14, my + 17.5);
     return await new Promise((res) => cv.toBlob(res, "image/png"));
   }
   return boardImage;
