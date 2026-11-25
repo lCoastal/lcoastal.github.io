@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Rolls per Minute</title>
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Rolls per Minute</h1>
+    <p class="lede">How many minerals and luck rolls a build gets per pan and per minute, and which stat would speed it up most.</p>
+  </header>
+  <section class="card">
+    <div class="acts" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end"><button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button></div>
+    <div class="grid">
+      <label class="fld"><span class="lab">Luck</span><input type="number" id="luck" min="0" inputmode="decimal" placeholder="e.g. 120000"></label>
+      <label class="fld"><span class="lab">Capacity</span><input type="number" id="cap" min="1" inputmode="decimal" placeholder="e.g. 20000"></label>
+      <label class="fld"><span class="lab">Dig Strength</span><input type="number" id="dstr" min="0" inputmode="decimal" placeholder="e.g. 2700"></label>
+      <label class="fld"><span class="lab">Dig Speed (%)</span><input type="number" id="dspd" min="0" inputmode="decimal" placeholder="e.g. 400"></label>
+      <label class="fld"><span class="lab">Shake Strength</span><input type="number" id="sstr" min="0" inputmode="decimal" placeholder="e.g. 900"></label>
+      <label class="fld"><span class="lab">Shake Speed (%)</span><input type="number" id="sspd" min="0" inputmode="decimal" placeholder="e.g. 1200"></label>
+    </div>
+    <details class="more"><summary>Delays</summary>
+      <div class="grid">
+        <label class="fld"><span class="lab">Extra time per dig (s)</span><input type="number" id="dly" min="0" step="0.05" inputmode="decimal" placeholder="0"></label>
+        <label class="fld"><span class="lab">Fixed time per pan (s)</span><input type="number" id="fix" min="0" step="0.05" inputmode="decimal" placeholder="1.15"></label>
+      </div>
+      <p class="hint">0 extra per dig is a perfect setup with no ping. Macros add some: one community test came out about 0.3 s slower per dig. The fixed time covers walking into the water and the pan settling; 1.15 s is the community's figure.</p>
+    </details>
+  </section>
+  <section class="card" id="out" hidden>
+    <div class="acts" id="acts" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end"></div>
+    <h2 id="oh">Your build</h2>
+    <div class="tiles" id="tiles"></div>
+    <div class="tw" id="steps"></div>
+    <p class="hint" id="warn"></p>
+  </section>
+  <section class="card" id="gainCard" hidden>
+    <h2>What speeds it up most</h2>
+    <p class="hint">Rolls per minute if you raised one stat by 10%, everything else the same.</p>
+    <div class="tw" id="gain"></div>
+  </section>
+  <section class="card" id="speedCard">
+    <h2>Dig and shake speed at a glance</h2>
+    <p class="hint">Time for one dig and shakes per second at each speed, with no ping or macro delay.</p>
+    <div class="tw" id="speedTab"></div>
+  </section>
+  <section class="card"><h2>How it works</h2>
+    <div class="fbox">
+      <div class="row"><span>Minerals per pan</span><code>0.678 × Capacity<sup>0.565</sup></code></div>
+      <div class="row"><span>Digs per pan</span><code>Capacity ÷ Dig Strength, rounded up</code></div>
+      <div class="row"><span>Time per dig</span><code>143.9 × Dig Speed<sup>−0.9324</sup> seconds</code></div>
+      <div class="row"><span>Shakes per pan</span><code>Capacity ÷ Shake Strength, rounded up</code></div>
+      <div class="row"><span>Shakes per second</span><code>23.514 × Shake Speed ÷ (442.88 + Shake Speed)</code></div>
+      <div class="row"><span>Time per pan</span><code>digs × time per dig + shakes ÷ shakes per second + 1.15 s</code></div>
+      <div class="row"><span>Rolls per pan</span><code>Luck × minerals per pan</code></div>
+      <div class="row"><span>Rolls per minute</span><code>rolls per pan × 60 ÷ time per pan</code></div>
+    </div>
+    <ul class="hint" style="margin:10px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li>Speeds are in percent, as the Stat Calculator shows them (100% is base speed).</li>
+      <li>Time per dig is from Patel's dig test (159% to 603% Dig Speed, within 5% of every point). Above about 600% it hasn't been tested. Shakes per second is from a community test at 6 shakes per pan; pans that need many more shakes may be slower.</li>
+      <li>Minerals per pan is fitted from our test logs; the community's own fit (0.688 × Capacity<sup>0.563</sup>) is within 1% of it.</li>
+      <li>Rolls is a score for comparing builds, not a real count: luck doesn't raise rare odds in a straight line, and each zone has a luck cap. For how many pans a mineral takes, use Luck Odds or Compare Builds.</li>
+      <li>No ping, no walking between deposits, no selling. Real play is slower; the order of builds stays the same.</li>
+    </ul>
+  </section>
+  <p class="foot">Last edited 25/11/26, Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>

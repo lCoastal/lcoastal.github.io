@@ -27,7 +27,8 @@ Z = 0.96  Azuralite Oasis, Magma Furnace, Sunset Beach, Volcanic Sands, Windswep
 Z = 1.00  Crystal Cavern River, Fortune River Delta, Frostbite River, Frostbite Waterfall, Lifespring Oasis, Meteor Falls, Mystic Floodplains, Sandstone Stream, Starfall River, Volcanic Springs
 Z = 1.04  Astral Caverns, Deeproot Spring, Enchanted Ruins, Frozen Peak, Fungal Marsh, Overgrown Grotto, Rotwood Swamp
 Z = 1.12  Abyssal Depth, Infernal Heart
-Z = 1.20  Timelocked Sanctuary`,
+Z = 1.20  Timelocked Sanctuary
+Z = 1?    Not measured yet: Haunted Creek, North Pole, Seashell Beach, The Void, Tomb Vein I, II and III`,
 "Z = how much a zone multiplies every weight. Measured on 2.57 million minerals in 24 zones: a zone's lightest mineral is exactly 0.75 × its factor. Azuralite Oasis, Crystal Cavern River, Overgrown Grotto and Volcanic Springs are from an older, smaller log. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones)."],
 ["Luck","Luck from a luck cap",
 `L = 0.56 × cap`,

@@ -13,6 +13,7 @@ const PT_RESET = {
   weightrange: { keys: ["wr-s"] },
   sizefinder: { keys: ["sf-s"] },
   pansize: { keys: ["ps-s"] },
+  rpm: { keys: ["rpm-s"] },
   farmroute: { keys: ["pfr-s"], keep: { "pfr-s": ["cl", "cc"] }, what: "inputs and ticks (saved lists stay)" },
   minmuts: { keys: ["pmm-s", "pt-sellcalc"] },
   runes: { keys: ["pr-s"] },
