@@ -584,12 +584,12 @@ async function buildImage(st,r){
   const rr=(x,y,w,h,rad)=>{c.beginPath();c.moveTo(x+rad,y);c.arcTo(x+w,y,x+w,y+h,rad);c.arcTo(x+w,y+h,x,y+h,rad);c.arcTo(x,y+h,x,y,rad);c.arcTo(x,y,x+w,y,rad);c.closePath()};
   const fit=(t,w)=>{t=String(t);if(c.measureText(t).width<=w)return t;while(t.length>1&&c.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"};
   const card=(x,y,w,h,edge)=>{c.fillStyle=CARD;rr(x,y,w,h,14);c.fill();c.strokeStyle=LINE;c.lineWidth=1;rr(x+.5,y+.5,w-1,h-1,14);c.stroke();if(edge){c.save();rr(x,y,w,h,14);c.clip();c.fillStyle=edge;c.fillRect(x,y,4,h);c.restore()}};
-  const label=(t,x,y,col)=>{c.fillStyle=col||MU;c.font=`700 11.5px ${F}`;let xx=x;for(const ch of t.toUpperCase()){c.fillText(ch,xx,y);xx+=c.measureText(ch).width+1.3}};
+  const label=(t,x,y,col)=>{c.fillStyle=col||MU;c.font=`700 11.5px ${F}`;let xx=x;for(const ch of t){c.fillText(ch,xx,y);xx+=c.measureText(ch).width+1.3}};
   const img=(src,x,y,s,tile)=>{if(tile){c.fillStyle="#12161a";rr(x,y,s,s,10);c.fill()}const i=IMG[src];if(!i)return;const k=Math.min((s-(tile?8:0))/i.width,(s-(tile?8:0))/i.height),w=i.width*k,h=i.height*k;c.drawImage(i,x+(s-w)/2,y+(s-h)/2,w,h)};
   const sec=(t,y)=>{c.fillStyle=TX;c.font=`700 20px ${FD}`;c.fillText(t,PAD,y+26)};
   c.fillStyle=BG;c.fillRect(0,0,W,H);
   // header
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   c.fillStyle=TX;c.font=`700 34px ${FD}`;c.fillText(fit(bTitle(),IW-mw-24),PAD,PAD+30);
   c.font=`600 15px ${F}`;{let xx=PAD;stats.forEach((k,i)=>{const t1=fv(k,r.tot[k]||0)+" ",t2=k.toLowerCase(),sep=i<stats.length-1?"   ":"";const w=c.measureText(t1+t2+sep).width;if(xx+w>PAD+IW){return}
     c.fillStyle=statHex(k);c.fillText(t1,xx,PAD+54);xx+=c.measureText(t1).width;c.fillStyle=MU;c.fillText(t2+sep,xx,PAD+54);xx+=c.measureText(t2+sep).width})}

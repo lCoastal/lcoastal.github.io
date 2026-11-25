@@ -119,7 +119,7 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
   const fit=(t,w)=>{if(c.measureText(t).width<=w)return t;while(t.length>1&&c.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"};
   const img=src=>new Promise(res=>{if(!src)return res(null);const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src});
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(imgTitle(),PAD,PAD+30);
   const n=secs.reduce((t,s)=>t+s.rows.length,0);const sub=[`${n} mineral${n===1?"":"s"}`];if(zone)sub.push(`that drop in ${zone}`);if(q)sub.push(`matching "${q}"`);if(pickOn)sub.push("your picks");if(stat!=="All")sub.push(rev?"weakest first":"strongest first, best in each rarity marked");
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(", "),PAD,PAD+58);
@@ -145,7 +145,7 @@ async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-
     c.fillStyle="#3cc2a8";c.fillRect(x0,y+34,MW,2);y+=44;
     const th=MH-44-10;c.fillStyle="#1c2126";rr(x0,y,MW,th,8);c.fill();c.strokeStyle="#2d343b";rr(x0,y,MW,th,8);c.stroke();
     const R=[...ORDER].reverse();const cx=i=>x0+12+150+300+92*(i+1)-12;
-    c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";c.fillText("Modifier",x0+12,y+18);c.fillText("Boosts",x0+12+150,y+18);R.forEach((r,i)=>{c.fillStyle=IMGC[r];const t=r.toUpperCase();c.fillText(t,cx(i)-c.measureText(t).width,y+18)});c.fillStyle="#98a2ad";c.fillText("How to get",x0+12+150+300+7*92+12,y+18);
+    c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";c.fillText("Modifier",x0+12,y+18);c.fillText("Boosts",x0+12+150,y+18);R.forEach((r,i)=>{c.fillStyle=IMGC[r];const t=r;c.fillText(t,cx(i)-c.measureText(t).width,y+18)});c.fillStyle="#98a2ad";c.fillText("How to get",x0+12+150+300+7*92+12,y+18);
     y+=28;const f4=v=>"+"+(+v.toFixed(4))+"×";
     mrows.forEach(({m,h,rh})=>{c.strokeStyle="#2d343b";c.beginPath();c.moveTo(x0,y);c.lineTo(x0+MW,y);c.stroke();const mid=y+18;
       c.fillStyle="#e6e9ec";c.font=`600 14px ${F}`;c.fillText(m[0],x0+12,mid+5);c.font=`13px ${F}`;c.fillStyle="#cfd6dd";c.fillText(fit(m[1],290),x0+12+150,mid+5);

@@ -194,11 +194,11 @@ async function equipImage(){
   const lvl=st.lvls.map(l=>LVLN[l]).join(", ");
   // lay out each row first so we know the picture height
   const recLay=x=>{m.font=`13px ${F}`;const lines=[[]];let lx=0;const av=CW[3]-24;x.rec.forEach(([q,n,kg])=>{const t=`${q}× ${n}${kg?" +"+kg:""}`;const w=22+m.measureText(t).width+14;if(lx+w>av&&lines[lines.length-1].length){lines.push([]);lx=0}lines[lines.length-1].push({t,n,w});lx+=w});return lines};
-  const tagsOf=x=>[...(ONE_ONLY.has(x.n)?[["ONLY 1 CAN BE WORN","#f0a35a"]]:[]),...(x.bp&&st.bpTag?[["Blueprint","#7fb2ff"]]:[])];
+  const tagsOf=x=>[...(ONE_ONLY.has(x.n)?[["Only 1 can be worn","#f0a35a"]]:[]),...(x.bp&&st.bpTag?[["Blueprint","#7fb2ff"]]:[])];
   const G=groups.map(([title,rows,gc,skip])=>({title,skip,col:title==="Limited-time"?"#f0955f":skip==="r"?RHX[title]||"#3a424b":"#3a424b",rows:rows.map(x=>{const S=NL===1?statsAt(x,st.lvl):multiRows(x),R=recLay(x),T=tagsOf(x);
     const subTxt=[skip==="slot"?"":x.slot,skip==="r"?"":x.r,x.ev?"limited-time":""].filter(Boolean).join(", ");
     const nameH=24+(subTxt?18:0)+(T.length?24:0);const h=Math.max(70,(S.length+(NL>1?1:0))*21+18,R.length*26+18,nameH+18);return {x,S,R,T,subTxt,h}})}));
-  const HEAD=96,GH=40,TH=30,GGAP=14;
+  const HEAD=66,GH=40,TH=30,GGAP=14;
   const H=PAD+HEAD+G.reduce((a,g)=>a+GH+TH+g.rows.reduce((b,r)=>b+r.h,0)+GGAP,0)-GGAP+PAD;
   const sc=H*2>30000?1:2;const cv=document.createElement("canvas");cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
   const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
@@ -206,18 +206,16 @@ async function equipImage(){
   const srcs=new Set();G.forEach(g=>g.rows.forEach(r=>{if(r.x.img)srcs.add(r.x.img);r.x.rec.forEach(([,n])=>{const mm=MIN[n.toLowerCase()];if(mm&&mm.ic)srcs.add(mm.ic)})}));
   const IMG={};await Promise.all([...srcs].map(s=>new Promise(res=>{const i=new Image();i.onload=()=>{IMG[s]=i;res()};i.onerror=()=>res();i.src=s})));
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
-  // header: title, what the picture shows, made-by badge
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-2;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  // header: title and made-by badge
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-2;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText("Equipment",PAD,PAD+30);
-  const n=G.reduce((a,g)=>a+g.rows.length,0);const sub=[`${n} item${n===1?"":"s"}`,`stats at ${lvl}, 100% quality`];if(st.slots.length)sub.push(st.slots.join(", ")+"s");if(st.stats.length)sub.push("with "+st.stats.join(st.match==="any"?" or ":" + "));if(st.rars.length)sub.push(st.rars.join(", "));if(st.q)sub.push(`search “${st.q}”`);if(st.fav)sub.push("favourites");if(st.own)sub.push("owned");
-  c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(", "),IW),PAD,PAD+60);
   let y=PAD+HEAD;
   G.forEach((g,gi)=>{const gh=GH+TH+g.rows.reduce((a,r)=>a+r.h,0);
     c.fillStyle="#191d22";rr(PAD,y,IW,gh,8);c.fill();c.save();rr(PAD,y,IW,gh,8);c.clip();c.fillStyle=g.col;c.fillRect(PAD,y,5,gh);c.fillStyle="#1e2329";c.fillRect(PAD+5,y,IW,GH);c.restore();
     c.strokeStyle=g.col;c.lineWidth=1;rr(PAD+.5,y+.5,IW-1,gh-1,8);c.stroke();
     if(g.title){c.fillStyle=g.skip==="r"||g.title==="Limited-time"?g.col:"#e6e9ec";c.font=`700 19px ${FD}`;c.fillText(g.title,PAD+18,y+27)}
     c.fillStyle="#98a2ad";c.font=`13px ${F}`;const ct=`${g.rows.length} ${g.rows.length===1?"item":"items"}`;c.fillText(ct,W-PAD-16-c.measureText(ct).width,y+26);
-    let yy=y+GH;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";["","Name",NL===1?`Stats (${lvl})`:"Stats","Recipe","Price"].forEach((t,i)=>{const u=t.toUpperCase();c.fillText(u,i===4?CX[i]+(CW[i]-c.measureText(u).width)/2:CX[i]+12,yy+20)});
+    let yy=y+GH;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";["","Name",NL===1?`Stats (${lvl})`:"Stats","Recipe","Price"].forEach((t,i)=>{const u=t;c.fillText(u,i===4?CX[i]+(CW[i]-c.measureText(u).width)/2:CX[i]+12,yy+20)});
     yy+=TH;const line=(x0,y0,x1,y1)=>{c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke()};c.strokeStyle=g.col+"66";line(PAD+5,y+GH,W-PAD,y+GH);line(PAD+5,yy,W-PAD,yy);
     g.rows.forEach((r,k)=>{const x=r.x,rc=RHX[x.r]||"#e6e9ec";if(k%2){c.fillStyle="rgba(255,255,255,.025)";c.fillRect(PAD+5,yy,IW-5,r.h)}
       c.strokeStyle=g.col+"40";for(let i=1;i<5;i++)line(CX[i]+.5,yy,CX[i]+.5,yy+r.h);if(k)line(PAD+5,yy+.5,W-PAD,yy+.5);
@@ -233,7 +231,7 @@ async function equipImage(){
         c.font=`14px ${FM}`;c.fillStyle=v<0?"#ef7a66":"#e6e9ec";c.fillText(vtx(sn,v,p),CX[2]+12+nw,sy+15);sy+=21})}
       else{// small grid: stat name, then one right-aligned value per level
         const nameW=150,colW=(CW[2]-24-nameW)/NL,colR=i=>CX[2]+12+nameW+colW*(i+1);let sy=yy+(r.h-(r.S.length+1)*21)/2;
-        c.font=`600 10.5px ${F}`;c.fillStyle="#98a2ad";st.lvls.forEach((l,i)=>{const t=LVLS[l].toUpperCase();c.fillText(t,colR(i)-c.measureText(t).width,sy+14)});sy+=21;
+        c.font=`600 10.5px ${F}`;c.fillStyle="#98a2ad";st.lvls.forEach((l,i)=>{const t=LVLS[l];c.fillText(t,colR(i)-c.measureText(t).width,sy+14)});sy+=21;
         r.S.forEach(({n:sn,v})=>{c.font=`600 13.5px ${F}`;c.fillStyle=KHX[sn]||"#e6e9ec";c.fillText(fit(sn,nameW-8),CX[2]+12,sy+15);
           c.font=`14px ${FM}`;v.forEach((q,i)=>{const t=q?vtx(sn,q[1],q[2]):"-";c.fillStyle=!q?"#5d6670":q[1]<0?"#ef7a66":"#e6e9ec";c.fillText(t,colR(i)-c.measureText(t).width,sy+15)});sy+=21})}
       // recipe

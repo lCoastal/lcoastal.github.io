@@ -319,7 +319,7 @@ async function boardImage(name,b){
       if(!sl.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText("Empty",x+16,y+ROWH/2+5);continue}
       const ic=ICONS[sl.m];let tx=x+16;if(ic){const im=await loadImg(ic);if(im){c.fillStyle="#171b1f";rr(c,x+14,y+19,54,54,8);c.fill();c.drawImage(im,x+17,y+22,48,48)}tx=x+80}
       c.fillStyle="#e6e9ec";c.font=`700 17px ${FD}`;c.fillText(fitText(c,minLabel(r,sl.m),COLW-(tx-x)-10),tx,y+34);
-      const md=sl.u&&sl.u!=="None"?sl.u:"";const mdg=md?modGain(r,md):{};c.fillStyle=md?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(fitText(c,md?md.toUpperCase()+"  "+(()=>{const SH={"Dig Strength":"Dig Str","Shake Strength":"Shake Str","Modifier Boost":"Mod","Dig Speed":"Dig Spd","Shake Speed":"Shake Spd","Walk Speed":"Walk"};return [...new Set(Object.values(mdg))].map(v=>`+${r4(v)}× `+Object.keys(mdg).filter(k=>mdg[k]===v).map(k=>SH[k]||k).join(", ")).join("; ")})():"NO MODIFIER",COLW-(tx-x)-10),tx,y+53);
+      const md=sl.u&&sl.u!=="None"?sl.u:"";const mdg=md?modGain(r,md):{};c.fillStyle=md?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(fitText(c,md?md+"  "+(()=>{const SH={"Dig Strength":"Dig Str","Shake Strength":"Shake Str","Modifier Boost":"Mod","Dig Speed":"Dig Spd","Shake Speed":"Shake Spd","Walk Speed":"Walk"};return [...new Set(Object.values(mdg))].map(v=>`+${r4(v)}× `+Object.keys(mdg).filter(k=>mdg[k]===v).map(k=>SH[k]||k).join(", ")).join("; ")})():"NO MODIFIER",COLW-(tx-x)-10),tx,y+53);
       const g=mineralGain(sl.m);const txt=Object.entries(g).sort((a,b)=>STATS.indexOf(a[0])-STATS.indexOf(b[0])).map(([k,v])=>`${k} ${v<0?"−":"+"}${r4(Math.abs(v))}×`).join("  ");
       c.fillStyle="#b9c2cb";c.font=`12px ${FM}`;c.fillText(fitText(c,txt,COLW-(tx-x)-10),tx,y+72)}
     y+=ROWH+10}
@@ -327,7 +327,7 @@ async function boardImage(name,b){
   const cw=(W-PAD*2-30)/4;tl.forEach((k,i)=>{const x=PAD+(i%4)*(cw+10),yy=y+Math.floor(i/4)*44;c.fillStyle="#1c2126";rr(c,x,yy,cw,36,8);c.fill();c.strokeStyle="#2d343b";rr(c,x,yy,cw,36,8);c.stroke();
     c.fillStyle="#e6e9ec";c.font=`14px ${F}`;c.fillText(k,x+12,yy+23);const v=tot[k];c.fillStyle=v<0?"#ef7a66":"#3cc2a8";c.font=`600 14px ${FM}`;const t=fxT(v);c.fillText(t,x+cw-12-c.measureText(t).width,yy+23)});
   if(!tl.length){c.fillStyle="#5d6670";c.font=`14px ${F}`;c.fillText("No boosts yet",PAD,y+22)}
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 document.getElementById("imgCur").onclick=async()=>{if(CMP)return saveCompare();if(!filledCount(S)){toast("The board is empty");return}
   const n=document.getElementById("lname").value.trim()||activeName||PAGE_NAME;const blob=await boardImage(n,S);if(!blob){toast("Couldn't draw the image");return}
@@ -353,9 +353,9 @@ async function compareImage(nA,nB){
   let up=0,dn=0;rows.forEach(k=>{const d=tb[k]-ta[k];if(d>1e-9)up++;else if(d<-1e-9)dn++});
   let nd=0;ORDER.forEach(r=>S[r].forEach((a,i)=>{const b=SB[r][i];if(a.m!==b.m||(a.u||"None")!==(b.u||"None"))nd++}));
   c.fillStyle="#98a2ad";c.font=`14px ${F}`;c.fillText(`Museum comparison, ${nB} is better in ${up} stat${up===1?"":"s"}, worse in ${dn}, ${nd} display${nd===1?"":"s"} differ, values at max-boost weight`.slice(0,150),PAD,PAD+60);
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   // stat differences
-  let y=HEAD;c.fillStyle="#98a2ad";c.font=`600 13px ${F}`;c.fillText("STAT DIFFERENCES  ("+nB.toUpperCase().slice(0,30)+" − "+nA.toUpperCase().slice(0,30)+")",PAD,y);y+=14;
+  let y=HEAD;c.fillStyle="#98a2ad";c.font=`600 13px ${F}`;c.fillText("STAT DIFFERENCES  ("+nB.slice(0,30)+" − "+nA.slice(0,30)+")",PAD,y);y+=14;
   const dw=(W-PAD*2-(DCOLS-1)*10)/DCOLS;
   rows.forEach((k,i)=>{const xx=PAD+(i%DCOLS)*(dw+10),yy=y+Math.floor(i/DCOLS)*(DH+8),d=tb[k]-ta[k],z=Math.abs(d)<1e-9,col=z?"#98a2ad":d>0?"#3cc2a8":"#ef7a66";
     c.fillStyle="#1c2126";rr(c,xx,yy,dw,DH,9);c.fill();c.strokeStyle=z?"#2d343b":col;c.globalAlpha=z?1:.55;c.lineWidth=1;rr(c,xx,yy,dw,DH,9);c.stroke();c.globalAlpha=1;
@@ -373,7 +373,7 @@ async function compareImage(nA,nB){
   if(!RS.length){c.fillStyle="#5d6670";c.font=`15px ${F}`;c.fillText("Both museums are the same.",PAD,y+30);y+=BAND}
   for(const r of RS){const col=IMGC[r];const idx=[...Array(SLOTS[r]).keys()].filter(i=>!(HIDE&&sameSlot(r,i)));
     c.fillStyle=col;c.font=`700 13px ${F}`;
-    for(let j=0;j<2;j++){const xx=colX[j];c.fillText(r.toUpperCase(),xx,y+14);c.fillStyle=col;c.globalAlpha=.6;c.fillRect(xx,y+20,COL,2);c.globalAlpha=1}
+    for(let j=0;j<2;j++){const xx=colX[j];c.fillText(r,xx,y+14);c.fillStyle=col;c.globalAlpha=.6;c.fillRect(xx,y+20,COL,2);c.globalAlpha=1}
     for(let j=0;j<2;j++){const st=j?SB:S,ot=j?S:SB,xx=colX[j];
       for(let n=0;n<idx.length;n++){const i=idx[n],sl=st[r][i],sx=xx+n*(SW+8),sy=y+28;
         c.fillStyle="#1c2126";rr(c,sx,sy,SW,SH,10);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,sx,sy,SW,SH,10);c.stroke();
@@ -381,7 +381,7 @@ async function compareImage(nA,nB){
         if(!sl.m){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText(sl.u&&sl.u!=="None"?"Any, "+sl.u:"Empty",sx+14,sy+SH/2+5);continue}
         let tx=sx+12;const ic=ICONS[sl.m];if(ic){const im=await loadImg(ic);if(im){c.drawImage(im,sx+10,sy+15,48,48)}tx=sx+66}
         c.fillStyle="#e6e9ec";c.font=`700 15px ${FD}`;c.fillText(fitText(c,minLabel(r,sl.m),SW-(tx-sx)-8),tx,sy+28);
-        const md=sl.u&&sl.u!=="None"?sl.u:"None";c.fillStyle=md!=="None"?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(md.toUpperCase(),tx,sy+46);
+        const md=sl.u&&sl.u!=="None"?sl.u:"None";c.fillStyle=md!=="None"?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(md,tx,sy+46);
         const g=mineralGain(sl.m),gt=Object.entries(g).sort((a,b)=>STATS.indexOf(a[0])-STATS.indexOf(b[0])).map(([k,v])=>`${SHORT[k]||k} ${v<0?"−":"+"}${r4(Math.abs(v))}`).join(", ");
         c.fillStyle="#b9c2cb";c.font=`11.5px ${FM}`;c.fillText(fitText(c,gt,SW-(tx-sx)-8),tx,sy+64)}}
     y+=BAND}

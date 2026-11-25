@@ -100,7 +100,7 @@ async function routeImage(R){const W=1200,PAD=40,F='"IBM Plex Sans","Segoe UI",s
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText("My route",PAD,PAD+30);
   const open=zs.filter(z=>z.open),tot=open.reduce((s,z)=>s+z.pans,0);
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(`${open.length} stop${open.length===1?"":"s"} left, ${R.T.filter(t=>t.c>0).length} items to collect${RT.st.stats&&tot?`, about ${RT.big(tot)} pans${RT.dur(tot)?" ("+RT.dur(tot)+")":""}`:""}`,PAD,PAD+58);
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   let y=PAD+90,k=0;
   for(const {Z,items} of rows){const h=70+items.length*ROW+(Z.open?34:0);const done=!Z.open;if(!done||R.frozen)k++;
     c.globalAlpha=done?.55:1;c.fillStyle="#1c2126";rr(PAD,y,W-PAD*2,h,12);c.fill();c.strokeStyle="#2d343b";rr(PAD,y,W-PAD*2,h,12);c.stroke();

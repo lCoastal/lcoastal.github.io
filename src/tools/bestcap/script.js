@@ -149,21 +149,21 @@ async function capImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-ser
   const fit=(t,w)=>{if(c.measureText(t).width<=w)return t;while(t.length>1&&c.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"};
   const img=src=>new Promise(res=>{if(!src)return res(null);const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src});
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   const title=imgName();
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(fit(title,W-PAD*2-mw-20),PAD,PAD+30);
   const shownR=ORD.filter(r=>!S.hideR.includes(r)&&ROWS.some(x=>x.m.r===r));
   const sub=[`Your luck ${fmt(L,0)}`,`${fmt(VIEW.mins.length,0)} mineral${VIEW.mins.length===1?"":"s"}`];if(VIEW_BEST&&S.q.trim())sub.push("best zone only");if(S.hideR.length)sub.push(shownR.join(", ")||"no rarities");if(S.desert===false)sub.push("no desert");
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(fit(sub.join(", "),W-PAD*2),PAD,PAD+58);
   const cols=[["Mineral",0],["Zone",250],["Best luck cap",520],["Best luck",670],["Chance per mineral",850],["Compared to your luck",1030]];const X=v=>PAD+12+v;
-  let y=HEAD;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach(([t,x])=>c.fillText(t.toUpperCase(),X(x),y+20));
+  let y=HEAD;c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach(([t,x])=>c.fillText(t,X(x),y+20));
   y+=30;c.strokeStyle="#2c333a";c.lineWidth=1;c.beginPath();c.moveTo(PAD,y);c.lineTo(W-PAD,y);c.stroke();
   const icons=await Promise.all(list.map(x=>x.first?img(x.m.ic):null));
   list.forEach((x,k)=>{const top=y+k*RH,mid=top+RH/2;const {m,r,b}=x;
     if(x.first&&k){c.strokeStyle="#2c333a";c.beginPath();c.moveTo(PAD,top);c.lineTo(W-PAD,top);c.stroke()}
     else if(k){c.strokeStyle="#20262c";c.setLineDash([3,4]);c.beginPath();c.moveTo(PAD+250,top);c.lineTo(W-PAD,top);c.stroke();c.setLineDash([])}
     if(x.first){let tx=X(0);if(icons[k]){c.drawImage(icons[k],tx,mid-14,28,28);tx+=36}
-      c.fillStyle="#e6e9ec";c.font=`600 15px ${F}`;c.fillText(fit(m.n,250-(tx-X(0))-10),tx,mid-2);c.fillStyle=HEX[m.r]||"#98a2ad";c.font=`600 10.5px ${F}`;c.fillText(m.r.toUpperCase(),tx,mid+14)}
+      c.fillStyle="#e6e9ec";c.font=`600 15px ${F}`;c.fillText(fit(m.n,250-(tx-X(0))-10),tx,mid-2);c.fillStyle=HEX[m.r]||"#98a2ad";c.font=`600 10.5px ${F}`;c.fillText(m.r,tx,mid+14)}
     c.fillStyle="#cfd6dd";c.font=`14px ${F}`;c.fillText(fit(r.loc,260),X(250),mid+5);
     // cap pill
     const ct=b.cap==null?"No cap":fmt(b.cap,0);c.font=b.cap==null?`600 13px ${F}`:`600 13px ${FM}`;const pw=c.measureText(ct).width+22;

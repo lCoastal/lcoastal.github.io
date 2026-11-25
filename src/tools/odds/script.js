@@ -118,17 +118,17 @@ async function oddsImage(){const L=Math.max(1,effLuck()),pp=perPan(),pph=+S.pph>
   const fit=(t,w)=>{if(c.measureText(t).width<=w)return t;while(t.length>1&&c.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"};
   const img=src=>new Promise(res=>{if(!src)return res(null);const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src});
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   c.fillStyle=tcol;c.font=`700 34px ${FD}`;c.fillText(fit(title,W-PAD*2-mw-20),PAD,PAD+30);
   const sub=[`Luck ${fmt(L,0)}`,`Capacity ${fmt(+S.cap||1,0)}`,`about ${fmt(pp,1)} minerals per pan`];if(pph)sub.push(`${fmt(+S.pph,0)} pans per hour`);
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(", "),PAD,PAD+58);
   let y=PAD+82;
   if(sums.length){const bw=(W-PAD*2-12*(sums.length-1))/sums.length;sums.forEach((b,i)=>{const x=PAD+i*(bw+12);c.fillStyle="#1c2126";rr(x,y,bw,SUMH,10);c.fill();c.strokeStyle="#2c333a";c.lineWidth=1;rr(x,y,bw,SUMH,10);c.stroke();
-      c.fillStyle=b.col;c.font=`600 11.5px ${F}`;c.fillText(b.lab.toUpperCase(),x+14,y+24);c.fillStyle="#e6e9ec";c.font=b.txt?`600 19px ${F}`:`500 21px ${FM}`;c.fillText(fit(b.v[0],bw-28),x+14,y+52);
+      c.fillStyle=b.col;c.font=`600 11.5px ${F}`;c.fillText(b.lab,x+14,y+24);c.fillStyle="#e6e9ec";c.font=b.txt?`600 19px ${F}`:`500 21px ${FM}`;c.fillText(fit(b.v[0],bw-28),x+14,y+52);
       if(b.v[1]){c.fillStyle="#98a2ad";c.font=`12px ${F}`;c.fillText(fit(b.v[1],bw-28),x+14,y+69)}});y+=SUMH+18}
   const cols=[S.by==="loc"?"Mineral":"Location","Base chance","Per mineral","Per pan"];if(pph)cols.push("Time");
   const nameW=pph?360:420,nw=(W-PAD*2-nameW-24)/(cols.length-1);const cx=i=>PAD+12+nameW+nw*i;
-  c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach((t,i)=>{const u=t.toUpperCase();if(!i)c.fillText(u,PAD+12,y+20);else c.fillText(u,cx(i)-c.measureText(u).width,y+20)});
+  c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach((t,i)=>{const u=t;if(!i)c.fillText(u,PAD+12,y+20);else c.fillText(u,cx(i)-c.measureText(u).width,y+20)});
   y+=30;c.strokeStyle="#2c333a";c.beginPath();c.moveTo(PAD,y);c.lineTo(W-PAD,y);c.stroke();
   const icons=await Promise.all(rows.map(r=>img(r.ic)));
   if(!rows.length){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText("No rarities picked",PAD+12,y+28)}

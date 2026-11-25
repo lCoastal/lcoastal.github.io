@@ -58,18 +58,18 @@ async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
   const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
   const fit=(t,w)=>{if(c.measureText(t).width<=w)return t;while(t.length>1&&c.measureText(t+"…").width>w)t=t.slice(0,-1);return t+"…"};
   c.fillStyle="#14181c";c.fillRect(0,0,W,H);
-  c.font=`600 13px ${F}`;const mbt="Made by @__coastal";const mw=c.measureText(mbt).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();c.fillStyle="#2dd4bf";c.fillText(mbt,mx+20,my+17.5);
+  c.font=`600 13px ${F}`;const mbt="Made by @__coastal";const mw=c.measureText(mbt).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mbt,mx+14,my+17.5);
   c.fillStyle="#e6e9ec";c.font=`700 34px ${FD}`;c.fillText(`${fmt(mb,0)}% Modifier Boost`,PAD,PAD+30);
   const sub=[`Luck ${fmt(+S.luck||0,0)}`,`Capacity ${fmt(+S.cap||1,0)}`,`about ${fmt(n,1)} ores per pan`];if(S.surge)sub.push("Modifier Surge");if(S.night)sub.push("Night");
   c.fillStyle="#98a2ad";c.font=`15px ${F}`;c.fillText(sub.join(", "),PAD,PAD+58);
   let y=PAD+82;const sums=[{lab:"Ores with a modifier",v:fmt(q*100,1)+"%",bar:q},{lab:"Effective boost",v:fmt(effAny,0),s:fmt(effWhich,0)+" for which modifier"},{lab:"Perfect per pan",v:oneInP(1-Math.pow(1-q*sh.Perfect/100,n)),s:`about ${fmt(n,1)} ores per pan`}];
   const bw=(W-PAD*2-24)/3;sums.forEach((b,i)=>{const x=PAD+i*(bw+12);c.fillStyle="#1c2126";rr(x,y,bw,SUMH,10);c.fill();c.strokeStyle="#2c333a";rr(x,y,bw,SUMH,10);c.stroke();
-    c.fillStyle="#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(b.lab.toUpperCase(),x+14,y+24);c.fillStyle="#e6e9ec";c.font=`500 21px ${FM}`;c.fillText(b.v,x+14,y+52);
+    c.fillStyle="#98a2ad";c.font=`600 11.5px ${F}`;c.fillText(b.lab,x+14,y+24);c.fillStyle="#e6e9ec";c.font=`500 21px ${FM}`;c.fillText(b.v,x+14,y+52);
     if(b.bar!=null){c.fillStyle="#2c333a";rr(x+14,y+62,bw-28,7,3.5);c.fill();c.fillStyle="#3cc2a8";rr(x+14,y+62,Math.max(7,(bw-28)*b.bar),7,3.5);c.fill()}
     else if(b.s){c.fillStyle="#98a2ad";c.font=`12px ${F}`;c.fillText(fit(b.s,bw-28),x+14,y+69)}});
   y+=SUMH+18;
   const cols=["Modifier","Share of modified","Base share","Per ore","Per pan","Sell ×"];const nameW=380,nw=(W-PAD*2-nameW-24)/(cols.length-1);const cx=i=>PAD+12+nameW+nw*i;
-  c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach((t,i)=>{const u=t.toUpperCase();if(!i)c.fillText(u,PAD+12,y+20);else c.fillText(u,cx(i)-c.measureText(u).width,y+20)});
+  c.font=`600 11px ${F}`;c.fillStyle="#98a2ad";cols.forEach((t,i)=>{const u=t;if(!i)c.fillText(u,PAD+12,y+20);else c.fillText(u,cx(i)-c.measureText(u).width,y+20)});
   y+=30;c.strokeStyle="#2c333a";c.beginPath();c.moveTo(PAD,y);c.lineTo(W-PAD,y);c.stroke();
   rows.forEach((r,k)=>{const top=y+k*RH,mid=top+RH/2;if(k%2){c.fillStyle="#191d22";c.fillRect(PAD,top,W-PAD*2,RH)}
     c.fillStyle="#e6e9ec";c.font=`600 15px ${F}`;c.fillText(r.k,PAD+12,mid-2);c.fillStyle="#98a2ad";c.font=`11.5px ${F}`;c.fillText(fit("Museum: "+(MUSE[r.k]||""),nameW-12),PAD+12,mid+14);

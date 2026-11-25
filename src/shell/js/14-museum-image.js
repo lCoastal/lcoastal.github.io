@@ -127,7 +127,7 @@ window.ptMuseumImage = (() => {
       c.fill();
       c.fillStyle = col;
       c.font = `700 15px ${F}`;
-      c.fillText(r.toUpperCase(), PAD + 20, y + ROWH / 2 + 5);
+      c.fillText(r, PAD + 20, y + ROWH / 2 + 5);
       for (let i = 0; i < 3; i++) {
         const x = PAD + 150 + i * COLW;
         const sl = b[r][i];
@@ -171,7 +171,7 @@ window.ptMuseumImage = (() => {
           fitText(
             c,
             md
-              ? md.toUpperCase() +
+              ? md +
                   "  " +
                   (() => {
                     const SH = {

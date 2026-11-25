@@ -228,15 +228,15 @@ async function resultImage(o){try{await document.fonts.ready}catch(e){}
   const upN=o.ok?STATS.filter((s,i)=>o.nt[i]>o.cur[i]+1e-9).length:0,dnN=o.ok?STATS.filter((s,i)=>o.nt[i]<o.cur[i]-1e-9).length:0;
   const sub=o.ok?`${o.ch.length} swap${o.ch.length===1?"":"s"} raise ${upN} stat${upN===1?"":"s"}${dnN?` and lower ${dnN} you allowed`:" without lowering any"}`:"Nothing beats it without lowering a stat. Best trades if you're happy to lose a little:";
   c.fillText(fit(c,sub,W-PAD*2-200),PAD,PAD+72);
-  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+20,my+17.5);c.fillStyle="#14b8a6";c.beginPath();c.arc(mx+12,my+13,3,0,Math.PI*2);c.fill();
+  c.font=`600 13px ${F}`;const mb="Made by @__coastal";const mw=c.measureText(mb).width+28,mx=W-PAD-mw,my=PAD-6;c.fillStyle="rgba(20,184,166,.14)";rr(c,mx,my,mw,26,13);c.fill();c.strokeStyle="rgba(20,184,166,.6)";c.lineWidth=1;rr(c,mx,my,mw,26,13);c.stroke();c.fillStyle="#2dd4bf";c.fillText(mb,mx+14,my+17.5);
   let y=PAD+110;c.fillStyle="#98a2ad";c.font=`600 12px ${F}`;c.fillText(o.ok?"Swaps":"Best trades",PAD,y);y+=14;
   const half=(W-PAD*2-150-40)/2;
   const mineral=async(n,u,x,yy,dim)=>{if(!n){c.fillStyle="#5d6670";c.font=`italic 14px ${F}`;c.fillText("Empty",x,yy+RH/2+5);return}const m=MIN[String(n).toLowerCase()];let tx=x;
     if(m&&m.ic){const im=await loadImg(m.ic);if(im){c.globalAlpha=dim?.6:1;c.drawImage(im,x,yy+10,44,44);c.globalAlpha=1}tx=x+54}
-    c.fillStyle=dim?"#b9c2cb":"#e6e9ec";c.font=`700 16px ${FD}`;c.fillText(fit(c,n,half-60),tx,yy+30);c.fillStyle=u&&u!=="None"?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText((u||"None").toUpperCase(),tx,yy+48)};
+    c.fillStyle=dim?"#b9c2cb":"#e6e9ec";c.font=`700 16px ${FD}`;c.fillText(fit(c,n,half-60),tx,yy+30);c.fillStyle=u&&u!=="None"?"#3cc2a8":"#98a2ad";c.font=`600 11.5px ${F}`;c.fillText((u||"None"),tx,yy+48)};
   for(const t of rows){const r=t.r,col=IMGC[r],was=o.ok?t.was:t.s,now=o.ok?t.s:{m:t.op.n,u:t.op.u},h=RH+(o.ok?0:18);
     c.fillStyle="#1c2126";rr(c,PAD,y,W-PAD*2,h,10);c.fill();c.strokeStyle="#2d343b";c.lineWidth=1;rr(c,PAD,y,W-PAD*2,h,10);c.stroke();c.fillStyle=col;rr(c,PAD,y,5,h,3);c.fill();
-    c.fillStyle=col;c.font=`700 12px ${F}`;c.fillText(r.toUpperCase(),PAD+18,y+RH/2+4);
+    c.fillStyle=col;c.font=`700 12px ${F}`;c.fillText(r,PAD+18,y+RH/2+4);
     await mineral(was.m,was.u,PAD+150,y,true);c.fillStyle="#98a2ad";c.font=`20px ${F}`;c.fillText("→",PAD+150+half+4,y+RH/2+7);await mineral(now.m,now.u,PAD+150+half+40,y,false);
     if(!o.ok){let x=PAD+150;c.font=`12.5px ${FM}`;STATS.forEach((s,i)=>{const d=t.d[i];if(Math.abs(d)<1e-9)return;const txt=`${s} ${arr(d)}`;c.fillStyle=d>0?GRN:"#ef7a66";c.fillText(txt,x,y+RH+8);x+=c.measureText(txt).width+18})}
     y+=h+8}
@@ -254,7 +254,7 @@ async function resultImage(o){try{await document.fonts.ready}catch(e){}
     let lx=PAD+tw+26;c.font=`600 12px ${F}`;[["#e6e9ec","kept"],[GRN,"new"],["#ef7a66","replaced"]].forEach(([cl,lab])=>{c.fillStyle=cl;c.beginPath();c.arc(lx+4,y+11,4,0,Math.PI*2);c.fill();c.fillStyle="#98a2ad";c.fillText(lab,lx+13,y+15);lx+=13+c.measureText(lab).width+18});
     y+=34;
     for(const r of ORDER){const col=IMGC[r];
-      c.fillStyle=col;c.font=`700 11.5px ${F}`;c.fillText(r.toUpperCase(),PAD,y+12);c.globalAlpha=.55;c.fillRect(PAD,y+17,W-PAD*2,2);c.globalAlpha=1;
+      c.fillStyle=col;c.font=`700 11.5px ${F}`;c.fillText(r,PAD,y+12);c.globalAlpha=.55;c.fillRect(PAD,y+17,W-PAD*2,2);c.globalAlpha=1;
       for(let i=0;i<SLOTS[r];i++){const af=(o.after[r]||[])[i]||{m:null,u:"None"},bf=(o.before[r]||[])[i]||{m:null,u:"None"},
           changed=(bf.m||null)!==(af.m||null)||((bf.u||"None")!==(af.u||"None")),sx=PAD+i*(CW+8),sy=y+24;
         c.fillStyle="#1c2126";rr(c,sx,sy,CW,CH,10);c.fill();c.strokeStyle=changed?"rgba(60,194,168,.5)":"#2d343b";c.lineWidth=changed?1.5:1;rr(c,sx,sy,CW,CH,10);c.stroke();c.fillStyle=col;rr(c,sx,sy,CW,3,2);c.fill();
@@ -262,7 +262,7 @@ async function resultImage(o){try{await document.fonts.ready}catch(e){}
         const m=MIN[String(af.m).toLowerCase()];let tx=sx+12;if(m&&m.ic){const im=await loadImg(m.ic);if(im)c.drawImage(im,sx+10,sy+(changed?12:18),42,42);tx=sx+60}
         const ny=changed?sy+26:sy+30;
         c.fillStyle=changed?GRN:"#e6e9ec";let fs=15;c.font=`700 ${fs}px ${FD}`;while(fs>11&&c.measureText(af.m).width>CW-(tx-sx)-12){fs-=.5;c.font=`700 ${fs}px ${FD}`}c.fillText(fit(c,af.m,CW-(tx-sx)-12),tx,ny);
-        const u=af.u||"None";c.fillStyle=u!=="None"?(changed?"#7fb0a6":"#3cc2a8"):"#98a2ad";c.font=`600 11px ${F}`;c.fillText(fit(c,u.toUpperCase(),CW-(tx-sx)-12),tx,ny+16);
+        const u=af.u||"None";c.fillStyle=u!=="None"?(changed?"#7fb0a6":"#3cc2a8"):"#98a2ad";c.font=`600 11px ${F}`;c.fillText(fit(c,u,CW-(tx-sx)-12),tx,ny+16);
         if(changed){c.fillStyle="#ef7a66";c.font=`600 11.5px ${F}`;const ow="was "+(bf.m?bf.m+(bf.u&&bf.u!=="None"?" ("+bf.u+")":""):"empty");c.fillText(fit(c,ow,CW-(tx-sx)-12),tx,ny+34)}}
       y+=BAND}}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
