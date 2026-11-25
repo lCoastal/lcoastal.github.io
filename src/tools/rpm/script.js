@@ -7,7 +7,8 @@ const num=k=>{const v=parseFloat(S[k]);return isFinite(v)?v:NaN};
 // community-tested timing: seconds per dig and shakes per second, speeds in percent
 const digT=x=>143.9*Math.pow(x,-0.9324),shakeRate=x=>23.514*x/(442.88+x);
 function model(b){
-  const items=panItems(b.cap),digs=Math.ceil(b.cap/b.dstr),shakes=Math.ceil(b.cap/b.sstr);
+  // a pan never takes more digs or shakes than its capacity, however weak the shovel or pan
+  const items=panItems(b.cap),digs=Math.min(Math.ceil(b.cap),Math.ceil(b.cap/b.dstr)),shakes=Math.min(Math.ceil(b.cap),Math.ceil(b.cap/b.sstr));
   const td=digT(b.dspd)+b.dly,sr=shakeRate(b.sspd),dT=digs*td,sT=shakes/sr,T=dT+sT+b.fix;
   return {items,digs,shakes,td,sr,dT,sT,T,ppm:60/T,mpm:items*60/T,rpp:b.luck*items,rpm:b.luck*items*60/T};
 }
