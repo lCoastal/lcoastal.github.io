@@ -19,7 +19,10 @@ function read(){const b={luck:num("luck"),cap:num("cap"),dstr:num("dstr"),dspd:n
   if(!isFinite(b.dly))b.dly=0;if(!isFinite(b.fix))b.fix=1.15;if(!isFinite(b.luck))b.luck=1;return b}
 function ready(b){return b.cap>0&&b.dstr>0&&b.dspd>0&&b.sstr>0&&b.sspd>0}
 function render(){
-  const b=read(),ok=ready(b);$("out").hidden=!ok;$("gainCard").hidden=!ok;
+  const b=read(),ok=ready(b),part=!ok&&b.cap>0;$("out").hidden=!ok&&!part;$("gainCard").hidden=!ok;$("steps").hidden=!ok;
+  if(part){const items=panItems(b.cap),miss=[["dstr","Dig Strength"],["dspd","Dig Speed"],["sstr","Shake Strength"],["sspd","Shake Speed"]].filter(([k])=>!(num(k)>0)).map(x=>x[1]);
+    $("tiles").innerHTML=tile("Rolls per pan",num("luck")>0?big(b.luck*items):"–",num("luck")>0?"luck × minerals per pan":"type your luck for rolls")+tile("Minerals per pan",fmt(items,0));
+    $("warn").textContent="Add "+miss.join(", ").replace(/, ([^,]*)$/," and $1")+" for per-minute numbers.";$("warn").hidden=false}
   if(ok){const m=model(b);
     $("tiles").innerHTML=tile("Rolls per minute",big(m.rpm),num("luck")>0?"luck × minerals per minute":"type your luck for rolls")+tile("Rolls per pan",big(m.rpp))+tile("Minerals per minute",fmt(m.mpm,0))+tile("Minerals per pan",fmt(m.items,0))+tile("Pans per minute",fmt(m.ppm,2))+tile("Time per pan",sec(m.T));
     $("steps").innerHTML=`<table class="t r"><tr><th>Step</th><th>Count</th><th>Each</th><th>Total</th><th>Share</th></tr>
