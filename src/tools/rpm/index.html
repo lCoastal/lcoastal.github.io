@@ -50,22 +50,31 @@
     <div class="tw" id="speedTab"></div>
   </section>
   <section class="card"><h2>How it works</h2>
-    <div class="fbox">
-      <div class="row"><span>Minerals per pan</span><code>0.678 × Capacity<sup>0.565</sup></code></div>
-      <div class="row"><span>Digs per pan</span><code>Capacity ÷ Dig Strength, rounded up, at most Capacity</code></div>
-      <div class="row"><span>Time per dig</span><code>143.9 × Dig Speed<sup>−0.9324</sup> seconds</code></div>
-      <div class="row"><span>Shakes per pan</span><code>Capacity ÷ Shake Strength, rounded up, at most Capacity</code></div>
-      <div class="row"><span>Shakes per second</span><code>23.514 × Shake Speed ÷ (442.88 + Shake Speed)</code></div>
-      <div class="row"><span>Time per pan</span><code>digs × time per dig + shakes ÷ shakes per second + 1.15 s</code></div>
-      <div class="row"><span>Rolls per pan</span><code>Luck × minerals per pan</code></div>
-      <div class="row"><span>Rolls per minute</span><code>rolls per pan × 60 ÷ time per pan</code></div>
+    <div class="hiw">
+      <div class="grp"><h3>Per pan</h3>
+        <div class="fx"><span>Minerals per pan</span><code>0.678 × Capacity<sup>0.565</sup></code></div>
+        <div class="fx"><span>Rolls per pan</span><code>Luck × minerals per pan</code></div>
+      </div>
+      <div class="grp"><h3>Time per pan</h3>
+        <div class="fx"><span>Digs</span><code>Capacity ÷ Dig Strength</code><em>rounded up, never more than Capacity</em></div>
+        <div class="fx"><span>Time per dig</span><code>143.9 × Dig Speed<sup>−0.9324</sup> s</code></div>
+        <div class="fx"><span>Shakes</span><code>Capacity ÷ Shake Strength</code><em>rounded up, never more than Capacity</em></div>
+        <div class="fx"><span>Shakes per second</span><code>23.514 × Shake Speed ÷ (442.88 + Shake Speed)</code></div>
+        <div class="fx sum"><span>Time per pan</span><code>digs × time per dig + shakes ÷ shakes per second + 1.15 s</code></div>
+      </div>
+      <div class="grp"><h3>Per minute</h3>
+        <div class="fx"><span>Pans per minute</span><code>60 ÷ time per pan</code></div>
+        <div class="fx sum"><span>Rolls per minute</span><code>rolls per pan × pans per minute</code></div>
+      </div>
     </div>
-    <ul class="hint" style="margin:10px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
-      <li>Speeds are in percent, as the Stat Calculator shows them (100% is base speed).</li>
-      <li>Time per dig is from Patel's dig test (159% to 603% Dig Speed, within 5% of every point). Above about 600% it hasn't been tested. Shakes per second is from a community test at 6 shakes per pan; pans that need many more shakes may be slower.</li>
-      <li>Minerals per pan is fitted from our test logs; the community's own fit (0.688 × Capacity<sup>0.563</sup>) is within 1% of it.</li>
-      <li>Rolls is a score for comparing builds, not a real count: luck doesn't raise rare odds in a straight line, and each zone has a luck cap. For how many pans a mineral takes, use Luck Odds or Compare Builds.</li>
-      <li>No ping, no walking between deposits, no selling. Real play is slower; the order of builds stays the same.</li>
+    <h3 class="gk">Good to know</h3>
+    <ul class="notes">
+      <li><b>Speeds are percentages</b>, as the Stat Calculator shows them: 100% is base speed.</li>
+      <li><b>Dig time</b> is from Patel's dig test, within 5% of every point from 159% to 603% Dig Speed. Faster than about 600% hasn't been tested.</li>
+      <li><b>Shake rate</b> is from a community test at 6 shakes per pan. Pans that need many more shakes may be slower.</li>
+      <li><b>Minerals per pan</b> is fitted from our test logs. The community's own fit, 0.688 × Capacity<sup>0.563</sup>, is within 1% of it.</li>
+      <li><b>Rolls is a score</b> for comparing builds, not a real count. Luck doesn't raise rare odds in a straight line, and each zone has a luck cap. For how many pans a mineral takes, use Luck Odds or Compare Builds.</li>
+      <li><b>Best case:</b> no ping, no walking between deposits, no selling. Real play is slower, but builds stay in the same order.</li>
     </ul>
   </section>
   <p class="foot">Last edited 25/11/26, Made by @__coastal</p>

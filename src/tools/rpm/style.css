@@ -6,3 +6,16 @@
 table.r td:nth-child(n+2),table.r th:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}
 table.r tr.best td{font-weight:700}
 .grid .fld{min-width:0;display:flex;flex-direction:column;gap:4px}.grid input{width:100%;min-width:0;box-sizing:border-box}
+
+.hiw{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:4px}
+.hiw .grp{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.hiw h3,.gk{margin:0 0 4px;font-size:13px;font-weight:700;color:var(--fg)}
+.hiw .fx{display:grid;grid-template-columns:1fr;gap:3px;padding:7px 0;border-top:1px dashed var(--line)}
+.hiw h3+.fx{border-top:0}
+.hiw .fx span{font-size:12.5px;color:var(--muted)}
+.hiw .fx code{font-family:var(--f-mono);font-size:13px;background:color-mix(in srgb,var(--line) 35%,transparent);border-radius:6px;padding:5px 8px;justify-self:start;max-width:100%;white-space:normal}
+.hiw .fx em{font-style:normal;font-size:12px;color:var(--muted)}
+.hiw .fx.sum span{color:var(--fg);font-weight:600}
+.gk{margin-top:16px}
+.notes{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.notes b{color:var(--fg);font-weight:600}
