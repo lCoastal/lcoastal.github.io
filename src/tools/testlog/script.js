@@ -3,6 +3,12 @@ const $=id=>document.getElementById(id);
 // Each session: when, where, setup, how much was logged, what was tested, what it showed, what changed on the site.
 const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables",kg:"Weights"};
 const S=[
+{id:"galaxis4-2611",date:"26/11/26",title:"Weights re-checked on 1.2M more minerals, and a second eruption",zone:"17 zones, mostly Sandstone Stream and Lifespring Oasis",topics:["kg"],kind:"wt",
+ setup:{Luck:"10 – 100,000+",Capacity:"7,283",["Size Boost"]:"14.8×",["Modifier Boost"]:"1,917%"},
+ amount:{Minerals:1201982},
+ tested:["Each zone's factor, from its lightest mineral","The heaviest roll in every zone","Volcanic eruptions","Modifier chance at 1,917% Modifier Boost"],
+ found:["Every zone's factor matched the site's, and Azuralite Oasis came out at 0.96 on 29,438 minerals (it was from a much smaller log before)","The heaviest roll was 17.0 again in every zone, and 1.73% of minerals went past 15.5","A second Volcanic Eruption in Windswept Beach on 24/11 at 05:30: every mineral exactly 1.5× heavier (lightest 0.75 × 1.5, heaviest 17 × 1.5), from one minute to the next. The first was also in Windswept Beach","At 1,917% Modifier Boost 19 to 21% of minerals had no modifier in steady hours, with dips to 5 to 11% when something else was on","No minerals out of place, and 879 rows the logger couldn't read (weight and modifier UNKNOWN), left out"],
+ changed:["Azuralite Oasis counts as measured in Weight Range's zone table"]},
 {id:"galaxis3-2411",date:"24/11/26",title:"Heaviest roll and zone factors, re-checked on 2.57M minerals",zone:"24 zones, mostly Mystic Floodplains",topics:["kg"],kind:"wt",
  setup:{Luck:"10,000 – 100,000+",Capacity:"6,692 – 8,638",["Size Boost"]:"14.3× and 14.8×",Zones:"24 zones; 961,000 of the minerals from Mystic Floodplains"},
  amount:{Minerals:2567732},

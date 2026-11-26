@@ -6,7 +6,7 @@ tags: [findings, formulas, logs]
 
 # Prospecting findings
 
-Everything measured so far about Prospecting (Roblox): the formulas the toolkit at [lcoastal.github.io](https://lcoastal.github.io) uses, what the logs in this repo showed, and what's still open. Last updated 26/11/26, toolkit version 523.
+Everything measured so far about Prospecting (Roblox): the formulas the toolkit at [lcoastal.github.io](https://lcoastal.github.io) uses, what the logs in this repo showed, and what's still open. Last updated 26/11/26, toolkit version 531.
 
 **The toolkit's code is the final word.** If this file and the code disagree, the code wins: the weight model and zone factors are in [src/shared/common.html](../src/shared/common.html), the stat calculator in [src/tools/calc/script.js](../src/tools/calc/script.js), test write-ups in [src/tools/testlog/script.js](../src/tools/testlog/script.js).
 
@@ -34,8 +34,9 @@ Everything measured so far about Prospecting (Roblox): the formulas the toolkit 
 | `research/logs/2026-11-19_galaxis.tsv.xz` | GalaxisHub, 19/11 (has the Windswept Beach eruption) | 650,265 |
 | `research/logs/2026-11-20_galaxis.tsv.xz` | GalaxisHub, 20/11 | 652,655 |
 | `research/logs/2026-11-22_galaxis.tsv.xz` | GalaxisHub, 22/11 to 24/11, 24 zones | 2,567,738 |
+| `research/logs/2026-11-24_galaxis.tsv.xz` | GalaxisHub, 24/11 to 26/11, 17 zones (the same session carried on) | 1,201,982 |
 
-Columns: `Time, Pan, Mineral, Mutation, Weight (kg), Luck, Size Boost, Modifier Boost, Capacity, Zone`. `Mutation` is the mineral's modifier (Iridescent, Glowing…; `None` if it has none). Size Boost and Modifier Boost are plain numbers (14.76 = 1,476%). The item ID column was dropped to save space. Read them with [scripts/load.py](scripts/load.py).
+Columns: `Time, Pan, Mineral, Mutation, Weight (kg), Luck, Size Boost, Modifier Boost, Capacity, Zone`. `Mutation` is the mineral's modifier (Iridescent, Glowing…; `None` if it has none). Size Boost and Modifier Boost are plain numbers (14.76 = 1,476%). The item ID column was dropped to save space. A few rows have `UNKNOWN` for weight and modifier where the logger couldn't read the item; skip them. Read them with [scripts/load.py](scripts/load.py).
 
 The logs name three zones differently from the toolkit: `Rubble Creek` = Rubble Creek Sands, `Abyssal Depths` = Abyssal Depth, `The Magma Furnace` = Magma Furnace.
 
@@ -48,10 +49,11 @@ weight = base weight × (1 + Size Boost) × zone factor × k   (× 1.5 with the 
 ```
 
 - **k is between 0.75 and 15.5 most of the time.** The lightest is exactly 0.75 in every zone.
-- **k reaches 17.0 at times.** In some stretches about a quarter of minerals come out 1.1× heavier (15.5 × 1.1 = 17.05). Across 2.57M minerals about 1.4% landed between 15.5 and 17. It switches on and off by time (10-minute windows go from 0% to 4.6%), doesn't depend on the modifier, and the lightest stays 0.75 while it's on. Cause unknown.
+- **k reaches 17.0 at times.** Re-checked on the 24/11 section: 17.0 again in every zone, 1.73% past 15.5.
+   In some stretches about a quarter of minerals come out 1.1× heavier (15.5 × 1.1 = 17.05). Across 2.57M minerals about 1.4% landed between 15.5 and 17. It switches on and off by time (10-minute windows go from 0% to 4.6%), doesn't depend on the modifier, and the lightest stays 0.75 while it's on. Cause unknown.
 - **The spread depends on capacity.** 26.1% are small (k evenly between 0.75 and 1.88). A share h(cap) is skewed heavy (k = 0.75 + 14.75 × Beta(a, 1.99)). The rest are even between 0.75 and 15.5. h = 0.533 × (1 − e^−((cap − 1797) / 2266)), a = 4.24 + 0.000667 × cap. Fitted on 1,856 to 7,240 capacity and confirmed within about 1% (median, mean, top 10%) from 6,692 to 8,638 capacity.
 - **Below about 2,000 capacity minerals come out lighter than the model says.** The community's 1,001-capacity sample had a median of 0.67 kg where the model says 1.06.
-- **Volcanic eruption: everything 1.5× heavier while it lasts.** Seen once, Windswept Beach on 19/11 from 13:00 to 13:20: all 2,986 minerals, lightest and heaviest both exactly 1.5×. That eruption is why Windswept Beach was once measured at 1.12 instead of 0.96. Which zones an eruption covers is unknown.
+- **Volcanic eruption: everything 1.5× heavier while it lasts.** Seen twice, both in Windswept Beach: 19/11 from 13:00 to 13:20 (all 2,986 minerals), and 24/11 from 05:30 until you left the zone at 05:31 (7,208 minerals, switching on between one minute and the next). Lightest and heaviest both exactly 1.5×. That eruption is why Windswept Beach was once measured at 1.12 instead of 0.96. Which zones an eruption covers is unknown.
 - **Museum max boost is at 200× base weight for every mineral** (Sandsteel at 150×). So the Size Boost a museum max needs is the same for every mineral and depends only on capacity: possible at all from 1,076% Size Boost (17× roll), and at 8,000 capacity 1 in 10 reach it at 1,273%, half at 1,670%.
 
 ## Zone weight factors
@@ -63,7 +65,7 @@ Every weight in a zone is multiplied by its factor. Measured from each zone's li
 | Rubble Creek Sands | ×0.80 | 84,630 |
 | Rubble Creek Deposits | ×0.88 | 16,154 |
 | Fortune River | ×0.92 | 14,489 |
-| Azuralite Oasis | ×0.96 | older 20/11 log, nearest step |
+| Azuralite Oasis | ×0.96 | 29,438 (24/11 section) |
 | Magma Furnace | ×0.96 | 28,547 |
 | Sunset Beach | ×0.96 | 100,526 |
 | Volcanic Sands | ×0.96 | 18,912 |
@@ -119,7 +121,7 @@ The toolkit uses: chance a mineral has a modifier = 1 − 0.9369^(Modifier Boost
 | about 475 to 503% | 73% | 68.4% (650,265 at 475%, 19/11) and 74.7% (232,931 at 475%, 20/11) | 71.3% (503%) |
 | about 1,000 to 1,080% | 50% | 52.9% (419,724 at 1,081%) | 42.4% (1,012%) |
 | 1,661% | 34% | 25.5% (51,006, 18/11) | |
-| about 1,830 to 1,920% | 29% | 13.1% at 1,831%, 12.6% at 1,917% overall; about 20% in steady hours, 1% to 20% hour to hour | 4.2% (1,903%) |
+| about 1,830 to 1,920% | 29% | 13.1% at 1,831%, 12.6% at 1,917% overall; about 20% in steady hours, 1% to 20% hour to hour. The 24/11 section (1.2M at 1,917%) again 19 to 21% steady, dips to 5 to 11% | 4.2% (1,903%) |
 
 - The toolkit predicts too few modifiers at high boost. Our logs and the community test disagree on how many; our 1,916% log swings hour to hour, so something it doesn't record (Surge, the Magnifier, night) was on part of the time.
 - **The Solar Magnifier and Modifier Surge each act like doubling Modifier Boost, and they stack.** 503% with either one gave about 40 to 41% unmodified, the same as about 1,000% without. 1,012% with either gave about 1%.
@@ -163,18 +165,18 @@ Raw numbers: [community/2026-11-25_tests.md](community/2026-11-25_tests.md).
 - Modifier chance at high boost: 4% or 20% unmodified at about 1,900%? Needs a clean log.
 - What causes the ×1.1 stretches (k up to 17)?
 - Which zones a Volcanic Eruption covers, and how often.
-- Zone factors for Tomb Vein I, II and III, The Void, Haunted Creek, North Pole and Seashell Beach; re-measure Azuralite Oasis, Crystal Cavern River, Overgrown Grotto and Volcanic Springs.
+- Zone factors for Tomb Vein I, II and III, The Void, Haunted Creek, North Pole and Seashell Beach; re-measure Crystal Cavern River, Overgrown Grotto and Volcanic Springs.
 - The weight spread below about 1,800 capacity.
 - The luck model at 90k+ luck; Aurorite vs Moonstone in Fortune River Delta; Firefly Zone drop rates.
 - Dig time above about 600% Dig Speed; shakes per second when a pan needs many more than 6 shakes.
 
 ## Formulas page
 
-The toolkit's Formulas page as of version 523.
+The toolkit's Formulas page as of version 531.
 
-## Pans
+### Pans
 
-### Average minerals per pan
+#### Average minerals per pan
 
 ```
 n = 0.678 × C^0.565
@@ -182,7 +184,7 @@ n = 0.678 × C^0.565
 
 n = average minerals in a full pan, C = capacity. Luck doesn't change it.
 
-### Fewest and most minerals per pan
+#### Fewest and most minerals per pan
 
 ```
 min = ½ × √C
@@ -191,9 +193,9 @@ max ≈ 2.5 × √C
 
 min = fewest minerals a full pan can give, max = most, C = capacity. Most pans sit in the lower part of that range.
 
-## Weight
+### Weight
 
-### Lightest and heaviest weight
+#### Lightest and heaviest weight
 
 ```
 Wmin = 0.75 × B × (1 + S) × Z
@@ -202,7 +204,7 @@ Wmax = 17 × B × (1 + S) × Z
 
 Estimated from the lightest and heaviest rolls in our test logs, not confirmed. Most of the time the heaviest is 15.5 × B × (1 + S) × Z; 17 shows up only in stretches where about a quarter of minerals come out 1.1× heavier. Wmin = lightest weight (kg), Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = Size Boost as a number (1,476% = 14.76), Z = the zone's size factor (see below). With the Solar Magnifier multiply by 1.5.
 
-### Maximum weight at a Size Boost
+#### Maximum weight at a Size Boost
 
 ```
 Wmax = 17 × B × (1 + S) × Z
@@ -210,7 +212,7 @@ Wmax = 17 × B × (1 + S) × Z
 
 Best guess, from the heaviest rolls in our test logs (usually 15.5 instead of 17). Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = your Size Boost as a number (1,476% = 14.76), Z = the zone's size factor. With the Solar Magnifier multiply by 1.5.
 
-### Minimum Size Boost for a weight
+#### Minimum Size Boost for a weight
 
 ```
 S = W ÷ (17 × B × Z) − 1
@@ -218,7 +220,7 @@ S = W ÷ (17 × B × Z) − 1
 
 S = Size Boost you need, as a number (×100 for %, so 18.35 = 1,835%), W = the weight you want (kg), B = the mineral's base weight (kg), Z = the zone's size factor. With the Solar Magnifier use W ÷ 1.5 instead of W.
 
-### Zone size factor
+#### Zone size factor
 
 ```
 Z = 0.80  Rubble Creek Sands
@@ -232,11 +234,11 @@ Z = 1.20  Timelocked Sanctuary
 Z = 1?    Not measured yet: Haunted Creek, North Pole, Seashell Beach, The Void, Tomb Vein I, II and III
 ```
 
-Z = how much a zone multiplies every weight. Measured on 2.57 million minerals in 24 zones: a zone's lightest mineral is exactly 0.75 × its factor. Azuralite Oasis, Crystal Cavern River, Overgrown Grotto and Volcanic Springs are from an older, smaller log. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones).
+Z = how much a zone multiplies every weight. Measured on 2.57 million minerals in 24 zones: a zone's lightest mineral is exactly 0.75 × its factor. Azuralite Oasis was confirmed on another 1.2 million. Crystal Cavern River, Overgrown Grotto and Volcanic Springs are from an older, smaller log. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones).
 
-## Luck
+### Luck
 
-### Luck from a luck cap
+#### Luck from a luck cap
 
 ```
 L = 0.56 × cap
@@ -244,9 +246,9 @@ L = 0.56 × cap
 
 L = the luck a capped session actually pans at, cap = the cap you set. Measured on 326,000 capped minerals in 17 zones: every cap from 100 to 10,000 landed between 0.54 and 0.60. A cap only helps for minerals that get rarer with more luck; Best Luck Cap works out which.
 
-## Museum
+### Museum
 
-### Museum display boost at a weight
+#### Museum display boost at a weight
 
 ```
 boost = Bmax × (W ÷ Kmax)^0.42
@@ -254,7 +256,7 @@ boost = Bmax × (W ÷ Kmax)^0.42
 
 boost = the stat boost the display gives, Bmax = its max boost (the mineral page shows "max boost at X kg"), Kmax = that X kg, W = the piece's weight (kg). Boost caps at Bmax once W reaches Kmax, and the game shows it rounded down to 2 decimals.
 
-### Weight for a target display boost
+#### Weight for a target display boost
 
 ```
 W = Kmax × (target ÷ Bmax)^2.38
@@ -262,7 +264,7 @@ W = Kmax × (target ÷ Bmax)^2.38
 
 W = weight (kg) you need, target = the boost you want, Bmax = the display's max boost, Kmax = the weight for max boost. The boost curve above, solved for weight.
 
-### Share of max boost at a weight
+#### Share of max boost at a weight
 
 ```
 part = (W ÷ Kmax)^0.42
@@ -272,7 +274,32 @@ part = how much of the max boost you get (×100 for %), W = the piece's weight (
 
 ## Test log
 
-The toolkit's Test Log as of version 523, newest first.
+The toolkit's Test Log as of version 531, newest first.
+
+### 26/11/26: Weights re-checked on 1.2M more minerals, and a second eruption
+
+Zone: 17 zones, mostly Sandstone Stream and Lifespring Oasis
+
+Setup: Luck 10 – 100,000+; Capacity 7,283; Size Boost 14.8×; Modifier Boost 1,917%
+
+Amount: Minerals 1,201,982
+
+**Tested**
+- Each zone's factor, from its lightest mineral
+- The heaviest roll in every zone
+- Volcanic eruptions
+- Modifier chance at 1,917% Modifier Boost
+
+**Found**
+- Every zone's factor matched the site's, and Azuralite Oasis came out at 0.96 on 29,438 minerals (it was from a much smaller log before)
+- The heaviest roll was 17.0 again in every zone, and 1.73% of minerals went past 15.5
+- A second Volcanic Eruption in Windswept Beach on 24/11 at 05:30: every mineral exactly 1.5× heavier (lightest 0.75 × 1.5, heaviest 17 × 1.5), from one minute to the next. The first was also in Windswept Beach
+- At 1,917% Modifier Boost 19 to 21% of minerals had no modifier in steady hours, with dips to 5 to 11% when something else was on
+- No minerals out of place, and 879 rows the logger couldn't read (weight and modifier UNKNOWN), left out
+
+**Changed in the toolkit**
+- Azuralite Oasis counts as measured in Weight Range's zone table
+
 
 ### 24/11/26: Heaviest roll and zone factors, re-checked on 2.57M minerals
 

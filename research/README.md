@@ -31,6 +31,7 @@ GitHub's website takes files up to 25 MB, and a repo file can't be bigger than 1
 | `research/logs/2026-11-19_galaxis.tsv.xz` | repo | 19/11 | GalaxisHub | 650,265; Windswept Beach eruption 13:00 to 13:20 |
 | `research/logs/2026-11-20_galaxis.tsv.xz` | repo | 20/11 | GalaxisHub | 652,655 |
 | `research/logs/2026-11-22_galaxis.tsv.xz` | repo | 22/11 to 24/11 | GalaxisHub, 24 zones | 2,567,738 |
+| `research/logs/2026-11-24_galaxis.tsv.xz` | repo | 24/11 to 26/11 | GalaxisHub, 17 zones, the rest of the 22/11 log | 1,201,982; Windswept Beach eruption 05:30; 879 rows with UNKNOWN weight and modifier |
 
 ## Notes for analysing
 
