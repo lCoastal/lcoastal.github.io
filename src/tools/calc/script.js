@@ -1,7 +1,7 @@
 
 const $=id=>document.getElementById(id);
 const G=P.gear;const EQ=P.equip;const EQB=Object.fromEntries(EQ.map(x=>[x.n,x]));
-const STATS=["Luck","Capacity","Shake Strength","Shake Speed","Dig Strength","Dig Speed","Size Boost","Modifier Boost","Sell Boost","Inventory Size","Walk Speed","Toughness"];
+const STATS=["Luck","Capacity","Shake Strength","Shake Speed","Dig Strength","Dig Speed","Size Boost","Modifier Boost","Sell Boost","Inventory Size","Walk Speed","Jump Power","Toughness"];
 const PCT=new Set(["Shake Speed","Dig Speed","Size Boost","Modifier Boost","Sell Boost"]);
 const SLOTDEF=[["neck","Necklace","Necklace"],["charm","Charm","Charm"],...Array.from({length:8},(_,i)=>["r"+i,"Ring "+(i+1),"Ring"])];
 const MUTS=[["None",1,{}],["Silver",1.1,{}],["Gold",1.2,{}],["Diamond",1.35,{}],["Granite",1.36,{"Dig Strength":24,"Shake Strength":6}],["Overclocked",1.36,{"Dig Speed":10,"Shake Speed":10}],["Festive",1.4,{"Luck":50,"Size Boost":10}],["Sunforged",1.5,{"Luck":300,"Sell Boost":30}],["Prismatic",1.6,{}]];
@@ -84,8 +84,10 @@ function compute(S0){const S=S0||window.S;
   if(b.purity)pile.Luck+=1;
   if(b.vet)pile.Luck+=0.25;
   const RU=S.runes||[];if(RU.includes("Speed I"))flat["Walk Speed"]+=2;if(RU.includes("Mountain Climber"))flat["Walk Speed"]+=3;
+  // Bunny: +5% Modifier Boost for every point of bonus Jump Power (gear), like Summit Seeker does with Walk Speed
+  if(RU.includes("Bunny")){const jb=Math.max(0,base["Jump Power"]+flat["Jump Power"]);flat["Modifier Boost"]+=5*jb}
   if(RU.includes("Summit Seeker")){const wb=Math.max(0,base["Walk Speed"]+flat["Walk Speed"]);flat["Dig Speed"]+=5*wb;flat["Shake Speed"]+=5*wb}
-  RU.filter(n=>/Critical|Annihilation|Discovery|Explorer|Eternity|Singularity|Volcanic|Bunny|Seeker/.test(n)).forEach(n=>{const r=((P.x2||{}).runes||[]).find(x=>x.n===n);if(r)notes.push(`${n}: ${r.d}`)});
+  RU.filter(n=>/Critical|Annihilation|Discovery|Explorer|Eternity|Singularity|Volcanic|Seeker/.test(n)).forEach(n=>{const r=((P.x2||{}).runes||[]).find(x=>x.n===n);if(r)notes.push(`${n}: ${r.d}`)});
   if(S.totemKeep)totemMult=S.totemKeep; // breakdown: the shovel's totem bonus is credited to the totem lines
   if(b.luckTotem)pile.Luck+=1*totemMult;
   if(b.strTotem){pile["Dig Strength"]+=1*totemMult;pile["Shake Strength"]+=1*totemMult}
@@ -244,6 +246,7 @@ const STAT_ANSI={
   "Dig Speed":"1;36",
   "Shake Speed":"1;35",
   "Walk Speed":"1;34",
+  "Jump Power":"1;32",
   "Inventory Size":"1;37",
   "Toughness":"1;31"
 };
@@ -261,7 +264,7 @@ function discordCompactAnsi(lines){
 }
 // copy the breakdown as Discord text, at the level the slider is on.
 // Discord only colours text inside an ```ansi code block (desktop and web; the phone app shows it without colours).
-const ANSI={Luck:32,Capacity:33,"Size Boost":31,"Modifier Boost":36,"Sell Boost":33,"Dig Strength":31,"Shake Strength":35,"Dig Speed":34,"Shake Speed":35,"Walk Speed":37,"Inventory Size":37,Toughness:37};
+const ANSI={Luck:32,Capacity:33,"Size Boost":31,"Modifier Boost":36,"Sell Boost":33,"Dig Strength":31,"Shake Strength":35,"Dig Speed":34,"Shake Speed":35,"Walk Speed":37,"Jump Power":32,"Inventory Size":37,Toughness:37};
 $("cpBrk").onclick=async()=>{const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(B,strip(B,g)));const D=brkData(B),lv=brkLvl();
   if(!D.stats.length){ptToast("No stats to copy yet");return}
   const E="\u001b[",col=(c,t,b)=>`${E}${b?"1;":""}${c}m${t}${E}0m`,gray=t=>col(30,t),
@@ -681,7 +684,7 @@ const slotOf=k=>k==="pan"||k==="shovel"?null:SLOTDEF.find(d=>d[0]===k);
 const curName=k=>k==="pan"?S.pan:k==="shovel"?S.shovel:((S.slots[k]||{}).n||"");
 const itemsFor=k=>k==="pan"?G.pans.map(x=>({n:x.name,r:"",img:G.img[x.image],x,kind:"pan"})):k==="shovel"?G.shovels.map(x=>({n:x.name,r:"",img:G.img[x.image],x,kind:"shovel"})):EQ.filter(x=>x.slot===slotOf(k)[2]).map(x=>({n:x.n,r:x.r,img:P.eimg[x.img],x,kind:"eq"}));
 const withItem=(k,n)=>{const t=clone(S);if(k==="pan")t.pan=n;else if(k==="shovel")t.shovel=n;else{(t.slots[k]=t.slots[k]||{}).n=n}return t};
-const SHOW=["Luck","Capacity","Shake Strength","Shake Speed","Dig Strength","Dig Speed","Size Boost","Modifier Boost","Sell Boost","Inventory Size","Walk Speed","Toughness"];
+const SHOW=["Luck","Capacity","Shake Strength","Shake Speed","Dig Strength","Dig Speed","Size Boost","Modifier Boost","Sell Boost","Inventory Size","Walk Speed","Jump Power","Toughness"];
 const fv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
 const sgn=(s,d)=>(d>0?"+":d<0?"−":"±")+fv(s,Math.abs(d));
 function itemStats(k,it){if(!it)return [];
