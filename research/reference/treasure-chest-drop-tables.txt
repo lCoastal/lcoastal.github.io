@@ -1,0 +1,308 @@
+PROSPECTING TREASURE CHEST DROP TABLES
+========================================
+
+=======================================================
+Abyssal Depths_Treasure
+=======================================================
+Linked Deposit: Abyssal Depths
+Rewards: 4 - 9
+Total Weight: 1.31
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Mythic Summon              0.05           3.816793893%
+RandomOre                  1              76.33587786%
+Spirit Orb                 0.05           3.816793893%
+Void Shard                 0.01           0.7633587786%
+Warp Device                0.2            15.26717557%
+
+=======================================================
+Fortune River Delta_Treasure
+=======================================================
+Linked Deposit: Fortune River Delta
+Rewards: 4 - 6
+Total Weight: 1.5
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Cosmic Resonator           0.05           3.333333333%
+Luck Totem                 0.2            13.33333333%
+Rain Stone                 0.05           3.333333333%
+RandomOre                  1              66.66666667%
+Strength Totem             0.2            13.33333333%
+
+=======================================================
+Fortune River_Treasure
+=======================================================
+Linked Deposit: Fortune River
+Rewards: 4 - 6
+Total Weight: 1.45
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Luck Totem                 0.2            13.79310345%
+Rain Stone                 0.05           3.448275862%
+RandomOre                  1              68.96551724%
+Strength Totem             0.2            13.79310345%
+
+=======================================================
+Frostbite River_Treasure
+=======================================================
+Linked Deposit: Frostbite River
+Rewards: 4 - 6
+Total Weight: 1.305
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Cosmic Resonator           0.05           3.831417625%
+Luck Totem                 0.0025         0.1915708812%
+RandomOre                  1              76.62835249%
+Snow Globe                 0.05           3.831417625%
+Strength Totem             0.0025         0.1915708812%
+Warp Device                0.2            15.3256705%
+
+=======================================================
+Fungal Marsh_Treasure
+=======================================================
+Linked Deposit: Fungal Marsh
+Rewards: 5 - 7
+Total Weight: 1.85
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Luck Totem                 0.2            10.81081081%
+Luminant Totem             0.2            10.81081081%
+Mythic Summon              0.05           2.702702703%
+RandomOre                  1              54.05405405%
+Solar Magnifier            0.1            5.405405405%
+Spirit Orb                 0.1            5.405405405%
+Warp Device                0.2            10.81081081%
+
+=======================================================
+Pharaoh's Tomb_Bronze
+=======================================================
+Linked Deposit: Tomb Vein I
+Rewards: 3 - 4
+Total Weight: 1.2225
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Luck Totem                 0.075          6.134969325%
+Luminant Totem             0.04           3.27198364%
+Rain Stone                 0.025          2.044989775%
+RandomOre                  1              81.799591%
+Sand Spirit                0.0075         0.6134969325%
+Strength Totem             0.075          6.134969325%
+
+=======================================================
+Pharaoh's Tomb_Cache II
+=======================================================
+Linked Deposit: Tomb Vein II
+Rewards: 3 - 4
+Total Weight: 1.11988
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Embalmer's Ring Blueprint  0.00122        0.1089402436%
+Heart Scarab Blueprint     0.00122        0.1089402436%
+Luck Totem                 0.05           4.464764082%
+Nemes of the Pharaoh Blueprint 0.00122        0.1089402436%
+RandomOre                  1              89.29528164%
+Sand Spirit                0.015          1.339429225%
+Scarab Signet Blueprint    0.00122        0.1089402436%
+Strength Totem             0.05           4.464764082%
+
+=======================================================
+Pharaoh's Tomb_Cache III
+=======================================================
+Linked Deposit: Tomb Vein III
+Rewards: 5 - 6
+Total Weight: 1.05272
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Embalmer's Ring Blueprint  0.00193        0.1833345999%
+Heart Scarab Blueprint     0.00193        0.1833345999%
+Midas Enchant Book         0.015          1.42488031%
+Mythic Summon              0.015          1.42488031%
+Nemes of the Pharaoh Blueprint 0.00193        0.1833345999%
+RandomOre                  1              94.99202067%
+Sand Spirit                0.015          1.42488031%
+Scarab Signet Blueprint    0.00193        0.1833345999%
+
+=======================================================
+Pharaoh's Tomb_Gilded
+=======================================================
+Linked Deposit: Tomb Vein II
+Rewards: 4 - 6
+Total Weight: 1.063588
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Diamond Catalyst           0.002          0.1880427384%
+Embalmer's Ring Blueprint  0.000397       0.03732648356%
+Heart Scarab Blueprint     0.000397       0.03732648356%
+Midas Enchant Book         0.02           1.880427384%
+Mythic Summon              0.015          1.410320538%
+Nemes of the Pharaoh Blueprint 0.000397       0.03732648356%
+RandomOre                  1              94.02136918%
+Sand Spirit                0.01           0.9402136918%
+Scarab Signet Blueprint    0.000397       0.03732648356%
+Solar Magnifier            0.015          1.410320538%
+
+=======================================================
+Pharaoh's Tomb_Royal
+=======================================================
+Linked Deposit: Tomb Vein III
+Rewards: 6 - 8
+Total Weight: 1.087264
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Diamond Catalyst           0.004          0.3678959296%
+Embalmer's Ring Blueprint  0.000566       0.05205727404%
+Heart Scarab Blueprint     0.000566       0.05205727404%
+Midas Enchant Book         0.025          2.29934956%
+Mythic Summon              0.02           1.839479648%
+Nemes of the Pharaoh Blueprint 0.000566       0.05205727404%
+RandomOre                  1              91.9739824%
+Sand Spirit                0.01           0.919739824%
+Scarab Catalyst            0.001          0.0919739824%
+Scarab Signet Blueprint    0.000566       0.05205727404%
+Solar Token                0.015          1.379609736%
+Spirit Orb                 0.01           0.919739824%
+
+=======================================================
+Pharaoh's Tomb_Sarcophagus
+=======================================================
+Linked Deposit: Tomb Vein III
+Rewards: 8 - 10
+Total Weight: 1.12406
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Diamond Catalyst           0.006          0.5337793356%
+Embalmer's Ring Blueprint  0.00239        0.212622102%
+Feather of Ma'at           0.0015         0.1334448339%
+Heart Scarab Blueprint     0.00239        0.212622102%
+Midas Enchant Book         0.03           2.668896678%
+Mythic Summon              0.025          2.224080565%
+Nemes of the Pharaoh Blueprint 0.00239        0.212622102%
+RandomOre                  1              88.9632226%
+Ring of Ra Blueprint       0.001          0.0889632226%
+Scarab Catalyst            0.006          0.5337793356%
+Scarab Signet Blueprint    0.00239        0.212622102%
+Solar Token                0.02           1.779264452%
+Spirit Orb                 0.015          1.334448339%
+Starcaller                 0.01           0.889632226%
+
+=======================================================
+Rotwood Swamp_Treasure
+=======================================================
+Linked Deposit: Rotwood Swamp
+Rewards: 5 - 7
+Total Weight: 1.75
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Luck Totem                 0.2            11.42857143%
+Luminant Totem             0.2            11.42857143%
+RandomOre                  1              57.14285714%
+Solar Magnifier            0.1            5.714285714%
+Spirit Orb                 0.05           2.857142857%
+Warp Device                0.2            11.42857143%
+
+=======================================================
+Rubble Creek Deposits_Treasure
+=======================================================
+Linked Deposit: Rubble Creek Deposits
+Rewards: 4 - 6
+Total Weight: 1.45
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Luck Totem                 0.2            13.79310345%
+Rain Stone                 0.05           3.448275862%
+RandomOre                  1              68.96551724%
+Strength Totem             0.2            13.79310345%
+
+=======================================================
+Rubble Creek_Treasure
+=======================================================
+Linked Deposit: Rubble Creek
+Rewards: 4 - 6
+Total Weight: 1.45
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Luck Totem                 0.2            13.79310345%
+Rain Stone                 0.05           3.448275862%
+RandomOre                  1              68.96551724%
+Strength Totem             0.2            13.79310345%
+
+=======================================================
+Starfall River_Treasure
+=======================================================
+Linked Deposit: Starfall River
+Rewards: 5 - 7
+Total Weight: 1.66
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Luck Totem                 0.2            12.04819277%
+Luminant Totem             0.2            12.04819277%
+RandomOre                  1              60.24096386%
+Sealed Fog                 0.04           2.409638554%
+Starcaller                 0.02           1.204819277%
+Warp Device                0.2            12.04819277%
+
+=======================================================
+Sunset Beach_Treasure
+=======================================================
+Linked Deposit: Sunset Beach
+Rewards: 4 - 6
+Total Weight: 1.55
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Cosmic Resonator           0.05           3.225806452%
+Luck Totem                 0.2            12.90322581%
+RandomOre                  1              64.51612903%
+Solar Magnifier            0.05           3.225806452%
+Solar Token                0.05           3.225806452%
+Strength Totem             0.2            12.90322581%
+
+=======================================================
+Volcanic Sands_Treasure
+=======================================================
+Linked Deposit: Volcanic Sands
+Rewards: 4 - 6
+Total Weight: 1.6
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Infernal Idol              0.05           3.125%
+RandomOre                  1              62.5%
+Solar Magnifier            0.05           3.125%
+Solar Token                0.1            6.25%
+Strength Totem             0.2            12.5%
+Warp Device                0.2            12.5%
+
+=======================================================
+Windswept Beach_Treasure
+=======================================================
+Linked Deposit: Windswept Beach
+Rewards: 4 - 6
+Total Weight: 1.6
+
+Reward                     Weight         Chance
+-------------------------------------------------------
+Cosmic Resonator           0.1            6.25%
+Infernal Idol              0.1            6.25%
+RandomOre                  1              62.5%
+Strength Totem             0.2            12.5%
+Warp Device                0.2            12.5%
+
+=======================================================
+TOTAL CHEST POOLS: 18
+TOTAL REWARD ENTRIES: 122
