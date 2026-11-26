@@ -59,17 +59,21 @@ function atYours(r){const L=Math.max(1,effLuck());if(YLkey!==L){YL={};YLkey=L}if
 // best setting at your luck: no cap (your luck) vs every cap below it; on a near tie keep the higher cap / no cap
 function bestFor(r){const L=Math.max(1,effLuck());let b={cap:null,eff:atYours(r)};
   for(let i=CAPS.length-1;i>=0;i--){if(CAPS[i]>=L)continue;if(r.effs[i]>b.eff*(1+1e-6))b={cap:CAPS[i],eff:r.effs[i]}}
+  if(logUp(r))b={cap:null,eff:atYours(r)};
   b.yours=atYours(r);return b}
+// where the logs beat the model: these keep getting more common up to about this much luck (panned), though the model has them peaking near 25k
+const LOG_UP={"Enchanted Ruins|Rose Gold":100000,"Infernal Heart|Volcanic Key":97000,"Infernal Heart|Dragon Bone":97000,"Sunset Beach|Luminum":93000};
+const logUp=r=>LOG_UP[baseLoc(r.loc)+"|"+r.m.n]||0;
 // the exact luck where this mineral peaks in this zone (any number, not just the cap steps)
 const PEAK=new Map();
-function peakLuck(r){const k=r.loc+"|"+r.m.n;if(PEAK.has(k))return PEAK.get(k);const hi=1e7;
+function peakLuck(r){const k=r.loc+"|"+r.m.n;if(PEAK.has(k))return PEAK.get(k);if(logUp(r)){const res={top:true,L:logUp(r),eff:0,logs:true};PEAK.set(k,res);return res}const hi=1e7;
   const ev=L=>{const x=shares(r.loc,L).find(y=>y.m===r.m);return x?x.eff:0};
   const N=280;let bi=0,bv=-1;const pts=[];
   for(let i=0;i<=N;i++){const L=Math.pow(hi,i/N);pts.push(L);const v=ev(L);if(v>bv*(1+1e-9)){bv=v;bi=i}}
   let L=pts[bi];
   if(bi>0&&bi<N){let a=pts[bi-1],b=pts[bi+1];for(let k=0;k<40;k++){const m1=a+(b-a)/3,m2=b-(b-a)/3;if(ev(m1)<ev(m2))a=m1;else b=m2}L=(a+b)/2;bv=ev(L)}
   const res={top:bi===N,L:L<10?Math.round(L*10)/10:L<1000?Math.round(L):Math.round(L/10)*10,eff:bv};PEAK.set(k,res);return res}
-const peakCell=r=>{const p=peakLuck(r);return p.top?`<span class="hi">Higher is better</span>`:`<b>${fmt(p.L,p.L<10?1:0)}</b><small>${oneInT(p.eff)}</small>`};
+const peakCell=r=>{const p=peakLuck(r);return p.top?`<span class="hi"${p.logs?` title="Our logs show it still getting more common at about ${fmt(p.L,0)} luck"`:""}>Higher is better${p.logs?"*":""}</span>`:`<b>${fmt(p.L,p.L<10?1:0)}</b><small>${oneInT(p.eff)}</small>`};
 const times=x=>(x<10?fmt(x,2):fmt(x,0))+"×";
 // why no cap wins: some minerals only get more common with more luck, so a cap never helps them
 const noCapTxt=(r,L)=>{const p=r&&peakLuck(r);if(p&&p.top)return "Never cap your luck";if(p&&p.L>L*1.02)return "Your luck is too low, don't cap";return "Your luck is best, don't cap"};
