@@ -903,7 +903,9 @@ function renderBf(){const c=bfCfg();const on=S.showBf===true;$("showBf").checked
 // the search itself, shared by the finder card here and the Best Build tool (which passes its own scoring)
 // c: {muts, tools, trinket, museum, owned, perfect, night, useful}; scoreTot(totals, state) -> bigger is better
 async function bfEngine(c,scoreTot,onProg){
-  const ok=n=>!c.owned||own(n);
+  // skipped parts (can't get them): never picked
+  const SKI=c.skip||{item:[],en:[],min:[]},skI=new Set(SKI.item||[]),skE=new Set(SKI.en||[]),skM=new Set(SKI.min||[]);
+  const ok=n=>(!c.owned||own(n))&&!skI.has(n);
   const EN=(P.ench||{pan:[],shovel:[]});const noPerf=c.perfect===false;
   const base=clone(S);base.only=null;if(c.night!=null)base.b=Object.assign({},base.b,{night:!!c.night});if(noPerf||c.streak===false)base.rhy=false;
   // conditions you can (or can't) keep up, from the Best Build tool's Assumptions tab
@@ -921,18 +923,24 @@ async function bfEngine(c,scoreTot,onProg){
   const SEC=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed"];
   const score0=st=>scoreTot(tot(st),st);
   const score=st=>{const t=tot(st);return scoreTot(t,st)+1e-6*SEC.reduce((a,k)=>a+Math.log(1+Math.max(0,+t[k]||0)),0)};
-  const pans=G.pans.filter(x=>ok(x.name)||x.name===base.pan),shovels=G.shovels.filter(x=>ok(x.name)||x.name===base.shovel);
-  const shEns=["",...EN.shovel.map(x=>x.n).filter(n=>!noPerf||!STREAK[n])];
-  const TRN=((P.x2||{}).trinkets||[]).map(t=>t.n).filter(n=>ok(n)||n===base.trinket);
+  const pans=G.pans.filter(x=>ok(x.name)||(x.name===base.pan&&!skI.has(x.name))),shovels=G.shovels.filter(x=>ok(x.name)||(x.name===base.shovel&&!skI.has(x.name)));
+  const shEns=["",...EN.shovel.map(x=>x.n).filter(n=>(!noPerf||!STREAK[n])&&!skE.has(n))];
+  const panEns=["",...EN.pan.map(x=>x.n).filter(n=>!skE.has(n))];
+  const TRN=((P.x2||{}).trinkets||[]).map(t=>t.n).filter(n=>ok(n)||(n===base.trinket&&!skI.has(n)));
   const POOL={};["Necklace","Charm","Ring"].forEach(sl=>POOL[sl]=EQ.filter(x=>x.slot===sl&&EQB[x.n]&&ok(x.n)).map(x=>x.n));
   const muts=MUTS.filter(m=>c.muts.includes(m[0])).map(m=>m[0]);
   const useful=c.useful||["Luck","Capacity"];
   // museum: strength before speed, so slots and modifiers are only picked for speed when they also give something else useful
   const musUseful=c.musUseful||useful;
-  const MC={};MORDER.forEach(r=>MC[r]=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.some(([k])=>musUseful.includes(k))).map(m=>m.n).concat(["Any"]));
+  const MC={};MORDER.forEach(r=>MC[r]=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&!skM.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.some(([k])=>musUseful.includes(k))).map(m=>m.n).concat(["Any"]));
   const MODN=Object.keys(MODS).filter(u=>u==="None"||MODS[u][1].some(k=>musUseful.includes(k)));
   const start=clone(base);if(c.museum){start.museumBoard=clone(musBoard(base)||{});start.mus="custom"}
   if(noPerf&&STREAK[start.shEn])start.shEn="";
+  // a skipped part you already have is taken off before the search
+  if(skI.has(start.pan)&&pans.length)start.pan=pans[0].name;if(skI.has(start.shovel)&&shovels.length)start.shovel=shovels[0].name;
+  if(skE.has(start.panEn))start.panEn="";if(skE.has(start.shEn))start.shEn="";if(skI.has(start.trinket))start.trinket="";
+  SLOTDEF.forEach(([k])=>{const v=start.slots[k];if(v&&skI.has(v.n))delete start.slots[k]});
+  if(start.museumBoard)Object.values(start.museumBoard).forEach(a=>(a||[]).forEach((x,i)=>{if(x&&skM.has(x.m))a[i]={m:"Any",u:x.u}}));
   // pieces you already wear keep their stars and roll; anything new is counted at 6★ and a 100% roll
   SLOTDEF.forEach(([k])=>{const v=start.slots[k];if(v&&v.n&&!muts.includes(v.m||"None"))v.m=muts[muts.length-1]});
   const before=tot(base),beforeSc=score(base);
@@ -944,7 +952,7 @@ async function bfEngine(c,scoreTot,onProg){
     let cur=score(st),changed=true,it=0;
     while(changed&&it++<25){changed=false;
       if(c.tools){
-        {let bb=null;for(const p of pans)for(const e of ["",...EN.pan.map(x=>x.n)]){const v=score(Object.assign({},st,{pan:p.name,panEn:e}));if(!bb||v>bb.v)bb={v,p:p.name,e}}if(bb&&bb.v>cur+1e-12){st.pan=bb.p;st.panEn=bb.e;cur=bb.v;changed=true}}
+        {let bb=null;for(const p of pans)for(const e of panEns){const v=score(Object.assign({},st,{pan:p.name,panEn:e}));if(!bb||v>bb.v)bb={v,p:p.name,e}}if(bb&&bb.v>cur+1e-12){st.pan=bb.p;st.panEn=bb.e;cur=bb.v;changed=true}}
         {let bb=null;for(const p of shovels)for(const e of shEns){const v=score(Object.assign({},st,{shovel:p.name,shEn:e}));if(!bb||v>bb.v)bb={v,p:p.name,e}}if(bb&&bb.v>cur+1e-12){st.shovel=bb.p;st.shEn=bb.e;cur=bb.v;changed=true}}
         {let bb=null;for(const p of pans)for(const q of shovels){const v=score(Object.assign({},st,{pan:p.name,shovel:q.name}));if(!bb||v>bb.v)bb={v,p:p.name,s:q.name}}if(bb&&bb.v>cur+1e-12){st.pan=bb.p;st.shovel=bb.s;cur=bb.v;changed=true}}}
       if(c.trinket){let bb=null;for(const n of ["",...TRN]){const v=score(Object.assign({},st,{trinket:n}));if(!bb||v>bb.v)bb={v,n}}if(bb&&bb.v>cur+1e-12){st.trinket=bb.n;cur=bb.v;changed=true}}
@@ -971,8 +979,8 @@ async function bfEngine(c,scoreTot,onProg){
   const fin=best.st,sc=score0(best.st),why=[];const pct=v=>{const d=v-sc;return Math.abs(d)<1e-12?0:(Math.exp(d)-1)*100};
   const lab=(p,e)=>p+(e?", "+e:"");
   if(c.tools){
-    {let bb=null;for(const p of pans){if(p.name===fin.pan)continue;for(const e of ["",...EN.pan.map(x=>x.n)]){const v=score0(Object.assign({},fin,{pan:p.name,panEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Pan",pick:lab(fin.pan,fin.panEn),alt:bb.t,pct:pct(bb.v)})}
-    {let bb=null;for(const e of ["",...EN.pan.map(x=>x.n)]){if(e===fin.panEn)continue;const v=score0(Object.assign({},fin,{panEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Pan enchant",pick:fin.panEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const p of pans){if(p.name===fin.pan)continue;for(const e of panEns){const v=score0(Object.assign({},fin,{pan:p.name,panEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Pan",pick:lab(fin.pan,fin.panEn),alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const e of panEns){if(e===fin.panEn)continue;const v=score0(Object.assign({},fin,{panEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Pan enchant",pick:fin.panEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}
     {let bb=null;for(const p of shovels){if(p.name===fin.shovel)continue;for(const e of shEns){const v=score0(Object.assign({},fin,{shovel:p.name,shEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Shovel",pick:lab(fin.shovel,fin.shEn),alt:bb.t,pct:pct(bb.v)})}
     {let bb=null;for(const e of shEns){if(e===fin.shEn)continue;const v=score0(Object.assign({},fin,{shEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Shovel enchant",pick:fin.shEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}}
   if(c.trinket){let bb=null;for(const n of ["",...TRN]){if(n===fin.trinket)continue;const v=score0(Object.assign({},fin,{trinket:n}));if(!bb||v>bb.v)bb={v,t:n||"no trinket"}}if(bb)why.push({part:"Trinket",pick:fin.trinket||"no trinket",alt:bb.t,pct:pct(bb.v)})}

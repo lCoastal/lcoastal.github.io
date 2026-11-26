@@ -94,7 +94,7 @@ $("run").onclick=async()=>{if(!S.muts.length){ptToast("Pick at least one mutatio
   if(!cw||!cw.ptFindBuild){btn.disabled=false;$("prog").textContent="";ptToast("Couldn't load the Stat Calculator");return}
   const useful=S.goal==="min"?(S.perMin?["Luck","Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed"]:["Luck","Capacity"]):(PRESET[S.goal]||PRESET.luck).useful;
   const ev=S.events?{meteor:S.events==="meteor"||S.events==="both",weather:S.events==="weather"||S.events==="both"}:null;
-  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful,musUseful:useful.filter(k=>k!=="Dig Speed"&&k!=="Shake Speed"),fresh:!S.cmp},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
+  const R=await cw.ptFindBuild({skip:ptSkipSet(),muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful,musUseful:useful.filter(k=>k!=="Dig Speed"&&k!=="Shake Speed"),fresh:!S.cmp},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
   btn.disabled=false;$("prog").textContent="";LAST={R,goal:S.goal,info,cw,zone:S.zone,perfect:S.perfect,cmp:S.cmp};showRes()};
 function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCard").hidden=false;const {R,cw}=L;const st=R.st,t=R.tot,b=R.base;
   const g=Math.exp(R.sc-R.beforeSc)-1;const gTxt=g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found";
@@ -109,7 +109,7 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
   const capL=.565*t.Luck/Math.max(1,t.Capacity);
   $("res").innerHTML=`<div class="sum">${head}${((PRESET[L.goal]||{}).useful||["Luck","Capacity"]).filter((k,i,a)=>i<6).map(k=>`<div><span class="lab">${esc(k)}</span><b style="color:${statVar(k)}">${fv(k,t[k])}</b>${L.cmp?`<span class="hint">now ${fv(k,R.before[k])}</span>`:""}</div>`).join("")}</div>
     ${L.goal==="luck"||L.goal==="size"||L.goal==="sell"||L.goal==="items"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}
-    ${ptBuildCards(st,cw)}${L.cmp?`<h3 class="sec">Compared with your current build</h3><table class="bt"><tr><th></th><th>Build</th><th>Now</th></tr>${rows.join("")}</table>`:""}
+    ${ptBuildCards(st,cw,{skip:true})}${L.cmp?`<h3 class="sec">Compared with your current build</h3><table class="bt"><tr><th></th><th>Build</th><th>Now</th></tr>${rows.join("")}</table>`:""}
     ${L.cmp&&cw.ptWhyHTML?cw.ptWhyHTML(R):""}
     <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
 function sheetText(){const L=LAST;let txt=L.cw.ptBuildTextOf(L.R.st);
@@ -140,3 +140,7 @@ drawOwn();
 drawForm();
 (async()=>{try{const cw=await window.parent.ptCalcWin();if(cw&&cw.ptWhyCSS)document.head.insertAdjacentHTML("beforeend",`<style>${cw.ptWhyCSS}</style>`)}catch(e){}})();
 document.addEventListener("click",e=>{const o=e.target.closest("[data-opentool]");if(o){try{window.parent.ptOpenTool(o.dataset.opentool)}catch(err){}}});
+
+// skipped parts: the bar under the search button, and a rerun when you skip something from the build
+const drawSkips=()=>{const b=document.getElementById("skipBar");if(b)b.innerHTML=ptSkipBar()};drawSkips();
+document.addEventListener("pt-skips",e=>{drawSkips();if(e.detail&&e.detail.rerun&&LAST&&!$("run").disabled)$("run").click()});

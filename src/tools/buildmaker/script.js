@@ -76,7 +76,7 @@ $("run").onclick=async()=>{const W=WROWS.filter(s=>r1(S.w[s])>0).map(s=>[s,r1(S.
   const btn=$("run");btn.disabled=true;$("prog").textContent="Loading the Stat Calculator…";
   let cw=null;try{cw=await window.parent.ptCalcWin()}catch(e){}
   if(!cw||!cw.ptFindBuild){btn.disabled=false;$("prog").textContent="";ptToast("Couldn't load the Stat Calculator");return}
-  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,night:S.night,events:{meteor:!!S.evMeteor,weather:!!S.evWeather},cons:S.cons,pots:S.pickPots,consList:S.pickCons,fresh:true,useful:(()=>{const u=new Set();W.forEach(([s])=>{if(s==="Minerals per minute")PANSTATS.forEach(x=>u.add(x));else if(s==="Rare finds per minute")["Luck"].concat(PANSTATS).forEach(x=>u.add(x));else u.add(s)});if(S.tap!=="any"){u.add("Dig Strength");u.add("Capacity")}return [...u]})(),musUseful:S.strFirst?(()=>{const u=new Set();W.forEach(([s])=>{if(s==="Minerals per minute")PANSTATS.forEach(x=>u.add(x));else if(s==="Rare finds per minute")["Luck"].concat(PANSTATS).forEach(x=>u.add(x));else u.add(s)});if(S.tap!=="any"){u.add("Dig Strength");u.add("Capacity")}return [...u].filter(k=>k!=="Dig Speed"&&k!=="Shake Speed")})():null},t=>scoreOf(t,W),(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
+  const R=await cw.ptFindBuild({skip:ptSkipSet(),muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,night:S.night,events:{meteor:!!S.evMeteor,weather:!!S.evWeather},cons:S.cons,pots:S.pickPots,consList:S.pickCons,fresh:true,useful:(()=>{const u=new Set();W.forEach(([s])=>{if(s==="Minerals per minute")PANSTATS.forEach(x=>u.add(x));else if(s==="Rare finds per minute")["Luck"].concat(PANSTATS).forEach(x=>u.add(x));else u.add(s)});if(S.tap!=="any"){u.add("Dig Strength");u.add("Capacity")}return [...u]})(),musUseful:S.strFirst?(()=>{const u=new Set();W.forEach(([s])=>{if(s==="Minerals per minute")PANSTATS.forEach(x=>u.add(x));else if(s==="Rare finds per minute")["Luck"].concat(PANSTATS).forEach(x=>u.add(x));else u.add(s)});if(S.tap!=="any"){u.add("Dig Strength");u.add("Capacity")}return [...u].filter(k=>k!=="Dig Speed"&&k!=="Shake Speed")})():null},t=>scoreOf(t,W),(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
   btn.disabled=false;$("prog").textContent="";LAST={R,W,cw,tap:S.tap,totem:S.totem,cons:S.cons,picked:[...S.pickPots,...S.pickCons],ev:{meteor:!!S.evMeteor,weather:!!S.evWeather}};showRes()};
 const fv=(s,v)=>PCT.has(s)?fmt(v,v<10?1:0)+"%":fmt(v,Math.abs(v)<10?2:0);
 // the build laid out on the page: pan and shovel, equipment and museum, each with its picture
@@ -92,7 +92,7 @@ async function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("
   const panLine=`<p class="hint">Each pan takes <b>${pt.digs} tap${pt.digs===1?"":"s"}</b>${L.totem?" (with the Strength Totem)":""} and <b>${pt.shakes} shake${pt.shakes===1?"":"s"}</b>: about ${fmt(pt.s,2)} s at ${fmt(S.digSp,0)}% dig and ${fmt(S.shSp,0)}% shake speed, so about ${fmt(d["Minerals per minute"],0)} minerals per minute.</p>`;
   $("res").innerHTML=`<p class="hint">Weights: ${esc(wTxt())}, Consumables: ${esc(consTxt(L))}, Events: ${esc([L.ev.meteor&&"Meteor Shower 2×",L.ev.weather&&"weather 1.5×"].filter(Boolean).join(", ")||"none")}</p>
     <div class="sum">${WROWS.filter(s=>wOf(s)>0).map(tile).join("")}</div>${panLine}
-    ${buildHTML(R.st,cw)}
+    ${buildHTML(R.st,cw,{skip:true})}
     ${rest.length?`<details class="own"><summary><b>Every other stat</b></summary><div class="sum">${rest.map(tile).join("")}</div></details>`:""}
     ${cw.ptWhyHTML?cw.ptWhyHTML(R):""}
     <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="saveImg">Save as image</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
@@ -114,3 +114,7 @@ document.addEventListener("click",async e=>{if(!LAST)return;
 drawW();drawForm();
 (async()=>{try{const cw=await window.parent.ptCalcWin();if(cw&&cw.ptWhyCSS)document.head.insertAdjacentHTML("beforeend",`<style>${cw.ptWhyCSS}</style>`)}catch(e){}})();
 document.addEventListener("click",e=>{const o=e.target.closest("[data-opentool]");if(o){try{window.parent.ptOpenTool(o.dataset.opentool)}catch(err){}}});
+
+// skipped parts: the bar under the search button, and a rerun when you skip something from the build
+const drawSkips=()=>{const b=document.getElementById("skipBar");if(b)b.innerHTML=ptSkipBar()};drawSkips();
+document.addEventListener("pt-skips",e=>{drawSkips();if(e.detail&&e.detail.rerun&&LAST&&!$("run").disabled)$("run").click()});
