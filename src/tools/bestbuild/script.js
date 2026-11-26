@@ -104,7 +104,7 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
   const capL=.565*t.Luck/Math.max(1,t.Capacity);
   $("res").innerHTML=`<div class="sum">${head}${((PRESET[L.goal]||{}).useful||["Luck","Capacity"]).filter((k,i,a)=>i<6).map(k=>`<div><span class="lab">${esc(k)}</span><b>${fv(k,t[k])}</b>${L.cmp?`<span class="hint">now ${fv(k,R.before[k])}</span>`:""}</div>`).join("")}</div>
     ${L.goal==="luck"||L.goal==="size"||L.goal==="sell"||L.goal==="items"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}
-    <table class="bt"><tr><th></th><th>Build</th>${L.cmp?"<th>Now</th>":""}</tr>${rows.join("")}</table>${mus}
+    ${ptBuildCards(st,cw)}${L.cmp?`<h3 class="sec">Compared with your current build</h3><table class="bt"><tr><th></th><th>Build</th><th>Now</th></tr>${rows.join("")}</table>`:""}
     ${L.cmp&&cw.ptWhyHTML?cw.ptWhyHTML(R):""}
     <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
 function sheetText(){const L=LAST;let txt=L.cw.ptBuildTextOf(L.R.st);

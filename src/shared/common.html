@@ -66,6 +66,22 @@ input[type=search],input[type=text],input[type=number],select{padding:7px 10px;b
 .acn{padding:8px;color:var(--muted);font-size:13px}
 @media (max-width:600px){.ac{flex:1 1 100%}}
 .ptoast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:50}
+/* build cards (ptBuildCards) */
+.bgrid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:12px 0 4px}
+.bgrid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
+.bk{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel);min-width:0}
+.bk.eq{border:1px solid var(--rc,var(--line))}
+.bk.empty{color:var(--muted)}
+.bk>div:last-child{display:flex;flex-direction:column;min-width:0}
+.bk b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk small{font-size:12px;color:var(--muted)}
+.bk .en{color:#9a6ee6}.bk .mu{color:#d79a1c;font-weight:600}
+.bk .ic,.mit img,.mit .noimg{flex:none}
+.bk .ic{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--sunk);border-radius:8px}
+.bk .ic img{max-width:40px;max-height:40px}
+.noimg{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:8px;background:var(--sunk);color:var(--muted);font-weight:700}
+.rings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+@media (max-width:760px){.rings{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <script>
 const P=(()=>{try{return window.parent.PTDATA||null}catch(e){return null}})()||{mins:[],gear:{pans:[],shovels:[],sluices:[],img:{},upg:{}},equip:[],eimg:{},codes:{},locs:[],reqs:{},mods:[]};
@@ -275,6 +291,19 @@ async function ptSaveImg(name,make){let blob=null;try{blob=await make()}catch(e)
 // board: {Exotic:[{m,u}], Mythic:[...], ...}. Each display: picture, name, what it boosts, modifier and max-boost weight.
 // o.skip adds a Skip button per mineral (data-skip), o.empty is the text for an empty display, o.hideEmpty drops empty rarities.
 const PT_MUS_ORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"],PT_MUS_SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
+// a whole build as picture cards: pan, shovel, trinket, equipment (rings 4 to a row) and museum. Used by both Build Maker tabs.
+const ptBkIC=(k,n)=>{try{return window.parent.ptIcon(k,n)||""}catch(e){return ""}};
+const ptBkEQ=Object.fromEntries(P.equip.map(e=>[e.n,e]));
+const ptBkPic=(src,alt)=>src?`<img src="${src}" alt="" loading="lazy">`:`<span class="noimg" aria-hidden="true">${esc((alt||"?")[0])}</span>`;
+function ptBuildCards(st,cw){
+  const tool=(lab,kind,n,en)=>`<div class="bk tool"><div class="ic">${ptBkPic(ptBkIC(kind,n),n)}</div><div><span class="lab">${lab}</span><b>${esc(n||"-")}</b>${en?`<small class="en">${esc(en)}</small>`:""}</div></div>`;
+  const top=`<div class="bgrid3">${tool("Pan","Pan",st.pan,st.panEn)}${tool("Shovel","Shovel",st.shovel,st.shEn)}<div class="bk tool"><div class="ic">${st.trinket?ptBkPic(ptBkIC("Trinket",st.trinket),st.trinket):""}</div><div><span class="lab">Trinket</span><b>${esc(st.trinket||"None")}</b></div></div></div>`;
+  const card=([k,l])=>{const v=(st.slots||{})[k];if(!v||!v.n)return `<div class="bk eq empty"><span class="lab">${l}</span><b>-</b></div>`;const x=ptBkEQ[v.n]||{};const col=rc(x.r||"");
+    return `<div class="bk eq" style="--rc:${col}"><div class="ic">${ptBkPic(ptBkIC("Equipment",v.n),v.n)}</div><div><span class="lab">${l}</span><b style="color:${col}">${esc(v.n)}</b><small>${esc(x.r||"")}, ${v.l==="5"?"5":"6"}★${v.m&&v.m!=="None"?`, <span class="mu">${esc(v.m)}</span>`:""}${(v.q??100)!==100?`, ${v.q}%`:""}</small></div></div>`};
+  const defs=cw.ptSlotDefs(),eq=`<div class="bgrid2">${defs.filter(d=>d[2]!=="Ring").map(card).join("")}</div><div class="rings">${defs.filter(d=>d[2]==="Ring").map(card).join("")}</div>`;
+  let mus="";const bd=st.museumBoard;if(bd&&Object.values(bd).some(a=>(a||[]).some(x=>x&&x.m)))mus=`<h3 class="sec">Museum</h3>${ptMuseumView(bd,{empty:"Nothing here helps"})}`;
+  return `${top}<h3 class="sec">Equipment</h3>${eq}${mus}`}
+
 function ptMuseumView(board,o){o=o||{};board=board||{};const MI={};P.mins.forEach(m=>MI[m.n.toLowerCase()]=m);
   const eff=v=>`<em class="${v<0?"neg":""}">${v<0?"−":"+"}${Math.abs(v)}×</em>`;
   const filled=r=>(board[r]||[]).filter(x=>x&&x.m).length;
