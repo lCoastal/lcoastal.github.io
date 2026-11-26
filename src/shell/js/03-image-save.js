@@ -6,7 +6,7 @@ const getDl = () =>
 let ptImgLast = "Image saved";
 window.ptImgMsg = () => ptImgLast;
 async function ptCopyImg(blob) {
-  const ws = [...Object.values(frames), pop]
+  const ws = [...Object.values(frames), ...Object.values(pops)]
     .map((f) => {
       try {
         return f && f.contentWindow;

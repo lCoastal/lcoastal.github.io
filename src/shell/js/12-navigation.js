@@ -13,7 +13,7 @@ if (false)
   });
 function show(id) {
   if (!TOOLS[id]) id = "builds";
-  if (typeof pop !== "undefined" && pop) pop.hidden = true;
+  Object.values(pops).forEach((p) => (p.hidden = true));
   const f = frameFor(id);
   Object.entries(frames).forEach(([k, fr]) => (fr.hidden = k !== id));
   document.getElementById("skel").hidden = !!f.dataset.ok;

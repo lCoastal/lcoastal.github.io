@@ -33,7 +33,7 @@ window.ptSetSetting = (k, v) => {
       localStorage.setItem("pt-compact", COMPACT ? "1" : "0");
     } catch (e) {}
     Object.values(frames).forEach(syncCompact);
-    if (pop) syncCompact(pop);
+    Object.values(pops).forEach((p) => syncCompact(p));
   } else {
     SET[k] = v;
     try {
@@ -47,7 +47,7 @@ window.ptSetSetting = (k, v) => {
       drawRecent();
     }
     if (k === "img")
-      [...Object.values(frames), pop].forEach((f) => {
+      [...Object.values(frames), ...Object.values(pops)].forEach((f) => {
         try {
           f && f.contentWindow.ptImgLabels && f.contentWindow.ptImgLabels();
         } catch (e) {}
@@ -55,14 +55,14 @@ window.ptSetSetting = (k, v) => {
     if (k === "theme") applyTheme();
     if (k === "accent") {
       ptAccentInto(document);
-      [...Object.values(frames), pop].forEach((f) => {
+      [...Object.values(frames), ...Object.values(pops)].forEach((f) => {
         try {
           f && ptAccentInto(f.contentDocument);
         } catch (e) {}
       });
     }
     if (k === "short" || k === "dec")
-      [...Object.values(frames), pop].forEach((f) => {
+      [...Object.values(frames), ...Object.values(pops)].forEach((f) => {
         try {
           f && f.contentWindow.ptNumRefresh && f.contentWindow.ptNumRefresh();
         } catch (e) {}
@@ -82,7 +82,7 @@ new MutationObserver(() => {
   if (ownTheme !== undefined && cur === ownTheme) {
     Object.values(frames).forEach(syncTheme);
     try {
-      if (pop) syncTheme(pop);
+      Object.values(pops).forEach((p) => syncTheme(p));
     } catch (e) {}
     return;
   }
@@ -91,7 +91,7 @@ new MutationObserver(() => {
     if (hostTheme !== SET.theme) applyTheme();
   } else {
     Object.values(frames).forEach(syncTheme);
-    if (pop) syncTheme(pop);
+    Object.values(pops).forEach((p) => syncTheme(p));
   }
 }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 ptAccentInto(document);

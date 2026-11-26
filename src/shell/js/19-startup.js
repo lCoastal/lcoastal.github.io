@@ -1,5 +1,5 @@
 function openMenu() {
-  if (pop) pop.hidden = true;
+  Object.values(pops).forEach((p) => (p.hidden = true));
   drawer.hidden = false;
   scrim.hidden = false;
   menuBtn.setAttribute("aria-expanded", "true");

@@ -14,7 +14,7 @@ window.ptYou = {
     } catch (e) {}
     clearTimeout(window.ptYou._t);
     window.ptYou._t = setTimeout(() => {
-      [...Object.values(frames), typeof pop !== "undefined" ? pop : null].forEach((f) => {
+      [...Object.values(frames), ...Object.values(pops)].forEach((f) => {
         try {
           if (f && f.contentWindow !== from && f.contentWindow.ptYouChanged) f.contentWindow.ptYouChanged();
         } catch (e) {}
@@ -75,7 +75,7 @@ window.ptStore = {
     try {
       localStorage.setItem("pt-own", JSON.stringify(OWN));
     } catch (e) {}
-    [...Object.values(frames), pop].forEach((f) => {
+    [...Object.values(frames), ...Object.values(pops)].forEach((f) => {
       try {
         f && f.contentWindow && f.contentWindow.ptStoreChanged && f.contentWindow.ptStoreChanged();
       } catch (e) {}

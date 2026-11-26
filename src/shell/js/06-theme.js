@@ -36,6 +36,6 @@ function applyTheme() {
   else r.removeAttribute("data-theme");
   Object.values(frames).forEach(syncTheme);
   try {
-    if (pop) syncTheme(pop);
+    Object.values(pops).forEach((p) => syncTheme(p));
   } catch (e) {}
 }
