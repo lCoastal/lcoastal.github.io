@@ -217,3 +217,5 @@ table.out th.bkc{text-align:center}
 .msl .acl{min-width:280px;max-width:min(360px,calc(100vw - 24px))}
 .msl .acl .aco{flex-wrap:wrap;row-gap:0}.msl .acl .at{flex-basis:100%;order:3;text-align:left;padding-left:34px;white-space:normal;margin-top:-2px}
 #upBody .iso{flex-direction:column;align-items:flex-start;gap:5px;margin-bottom:12px}#upBody .isoc{row-gap:7px}#upBody #upList{margin-top:4px}
+@media (max-width:420px){.upi.pth .upnum{grid-column:1;grid-row:1}.upi.pth .upn{grid-column:2}
+.uptot{grid-template-columns:minmax(0,1fr) auto}.uptot>.upb{grid-column:1/-1;justify-self:start}}

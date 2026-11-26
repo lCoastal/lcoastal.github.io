@@ -454,7 +454,7 @@ function renderPath(){const steps=upPath(8);const sk=(S.upSkip||[]).length;
   if(!steps.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';UPLAST=[];return}
   const tm=steps.reduce((a,c)=>a+(c.money||0),0),tp=steps.reduce((a,c)=>a+(c.pans||0),0);
   $("upList").innerHTML=steps.map((c,i)=>upRow(c,i,[`<button type="button" class="btn sm" data-upto="${i}" title="Applies steps 1 to ${i+1}">${i?"Do 1–"+(i+1):"Do it"}</button>`,`<button type="button" class="btn sm ghost" data-upskip="${i}" title="Leave this out and work the path out again">Skip</button>`])).join("")
-    +`<div class="uptot"><span>Whole path</span><span class="upm">${tm?esc(uMoneyTxt(tm)):""}</span><span class="upp">${tp?esc(uPansTxt(tp)):""}</span><span></span></div>`;
+    +`<div class="uptot"><span>Whole path</span><span class="upm">${tm?esc(uMoneyTxt(tm)):""}</span><span class="upp">${tp?esc(uPansTxt(tp)):""}</span><span class="upb">${steps.length>1?`<button type="button" class="btn sm" data-upto="${steps.length-1}" title="Applies every step at once">Do all ${steps.length}</button>`:""}</span></div>`;
   UPLAST=steps}
 // what kind of suggestion it is, for the filter
 const UCAT=[["all","All"],["gear","Gear"],["museum","Museum"],["mut","Mutations & enchants"],["boost","Potions & boosts"]];
@@ -462,7 +462,7 @@ const ucat=c=>/^Museum/.test(c.kind)?"museum":/^(Mutation|Pan enchant)/.test(c.k
 function renderUpList(){
   if(S.upMode==="path")return renderPath();
   const cf=S.upCat||"all";const list=upCandidates().filter(c=>cf==="all"||ucat(c)===cf).slice(0,10);
-  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality.`+zeroNote();
+  $("upHint").innerHTML=`Equipment is shown at 6★ and 100% quality. These are alternatives, so try one at a time; to do several at once, use the <button type="button" class="rst" data-uppath="1">Upgrade path</button>, which has a Do all button.`+zeroNote();
   if(!list.length){$("upList").innerHTML='<p class="hint">Nothing here beats what you already have for this goal.</p>';return}
   $("upList").innerHTML=list.map((c,i)=>upRow(c,i,[`<button type="button" class="btn sm" data-uptry="${i}">Try it</button>`])).join("");
   UPLAST=list}
@@ -475,6 +475,7 @@ document.addEventListener("click",e=>{
   const um=e.target.closest("[data-um]");if(um){S.upMode=um.dataset.um;save();renderUp();return}
   const sk=e.target.closest("[data-upskip]");if(sk){const c=UPLAST[+sk.dataset.upskip];if(c){S.upSkip=[...(S.upSkip||[]),upKey(c)];save();renderUpList()}return}
   if(e.target.closest("[data-upunskip]")){S.upSkip=[];save();renderUpList();return}
+  if(e.target.closest("[data-uppath]")){S.upMode="path";save();renderUp();return}
   const ut=e.target.closest("[data-upto]");if(ut){const c=UPLAST[+ut.dataset.upto];if(!c)return;UPUNDO=clone(S);const keep={upMode:S.upMode,upSkip:S.upSkip,upGoal:S.upGoal,upW:S.upW,upEvent:S.upEvent};Object.assign(S,clone(c.after),keep);save();all();toastUp(+ut.dataset.upto?`Did steps 1–${+ut.dataset.upto+1}`:`Did ${c.name}`);return}
   const ev=e.target.closest("[data-uev]");if(ev){S.upEvent=!S.upEvent;save();renderUp();return}
   const t=e.target.closest("[data-uptry]");if(t){const c=UPLAST[+t.dataset.uptry];if(!c)return;
