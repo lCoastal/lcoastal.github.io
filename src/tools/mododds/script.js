@@ -1,7 +1,7 @@
 
 const $=id=>document.getElementById(id);
-let S={mb:"",luck:"",cap:"",mag:false,surge:false,night:false,min:"",zone:""};try{Object.assign(S,JSON.parse(localStorage.getItem("pmo-s")||"{}"))}catch(e){}
-const youPush=ptYouLink(S,{mb:"mb",luck:"luck",cap:"cap"},()=>render());
+let S={mb:"",luck:"",cap:"",mag:false,surge:false,night:false,min:"",zone:"",wmode:"",kg:"",sb:""};try{Object.assign(S,JSON.parse(localStorage.getItem("pmo-s")||"{}"))}catch(e){}
+const youPush=ptYouLink(S,{mb:"mb",luck:"luck",cap:"cap",sb:"sb",mag:"mag"},()=>render());
 const save=()=>{try{localStorage.setItem("pmo-s",JSON.stringify(S))}catch(e){}youPush()};
 // the game's modifier weights; a modifier's base share is its weight ÷ the total (Treasured, Voidtorn, event ones etc. are 0 here)
 const WEIGHT={Shiny:1,Pure:.8,Glowing:.5,Scorching:.25,Irradiated:.1,Iridescent:.02,Cosmic:.005,Mutated:.001,Lunar:.00025,Perfect:.0001};
@@ -30,7 +30,7 @@ function calcAll(){const mb=Math.max(0,+S.mb||0);
 const ORDER=["Perfect","Lunar","Mutated","Cosmic","Iridescent","Irradiated","Scorching","Glowing","Pure","Shiny"];
 function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge","night"].forEach(k=>$(k).checked=!!S[k]);
   const {effAny,effWhich,q,sh,n}=calcAll();
-  if(document.activeElement!==$("min"))$("min").value=S.min;renderOne({q,sh});
+  if(document.activeElement!==$("min"))$("min").value=S.min;$("wmode").value=S.wmode||"";["kg","sb"].forEach(k=>{if(document.activeElement!==$(k))$(k).value=S[k]});renderOne({q,sh});
   $("sum").innerHTML=`<div><span class="lab">Ores with a modifier</span><b>${fmt(q*100,1)}%</b><div class="bar"><i style="width:${q*100}%"></i></div></div>
     <div><span class="lab">Effective boost</span><b>${fmt(effAny,0)}</b><span class="hint">${fmt(effWhich,0)} for which modifier</span></div>
     <div><span class="lab">Perfect per pan</span><b>${oneInP(1-Math.pow(1-q*sh.Perfect/100,n))}</b><span class="hint">about ${fmt(n,1)} ores per pan</span></div>`;
@@ -58,15 +58,27 @@ function renderOne(calc){const m=curMin(),zs=$("zone");
   if(!zl.some(z=>z.z===S.zone))S.zone=zl[0].z;
   zs.disabled=false;zs.innerHTML=zl.map(z=>`<option value="${esc(z.z)}"${z.z===S.zone?" selected":""}>${esc(z.z)}, 1 in ${nIn(z.q)} minerals</option>`).join("");
   const z=zl.find(x=>x.z===S.zone),items=st.items,hasStats=+S.luck>0&&+S.cap>0;
-  const {q,sh}=calc,rows=[["Any modifier",q]].concat(ORDER.filter(k=>k!=="Lunar"||S.night).map(k=>[k,q*(sh[k]||0)/100])).concat([["No modifier",1-q]]);
+  // weight: chance a mineral comes out at least this heavy (weight model, Size Boost, zone factor, Solar Magnifier)
+  $("kgFld").hidden=S.wmode!=="kg";
+  const sb=Math.max(0,+S.sb||0),unit=m.bw>0?m.bw*(1+sb/100)*zoneSize(z.z)*(S.mag?1.5:1):0;
+  const target=S.wmode==="mus"?(m.mu&&m.mu.kg>0?m.mu.kg:0):S.wmode==="kg"?Math.max(0,+S.kg||0):0;
+  let pw=1,wTxt="";
+  if(S.wmode&&target>0){if(!(unit>0)){pw=0;wTxt=`${esc(m.n)} has no known base weight, so its size can't be worked out.`}
+    else{pw=wtModel(Math.max(1,+S.cap||4000)).sf(target/unit);
+      wTxt=`${pw>0?`1 in ${nIn(pw)}`:"No"} ${esc(m.n)} come${pw>0?"s":""} out at ${fmt(target,target<10?2:1)} kg or more${S.wmode==="mus"?" (museum max boost)":""} at ${fmt(sb,0)}% Size Boost${S.mag?" with the Solar Magnifier":""} in ${esc(z.z)} (×${zoneSize(z.z).toFixed(2)}).${pw>0?"":" That's past the heaviest roll: it needs more Size Boost."}${+S.cap>0?"":" Type your capacity above for a closer number."}`}}
+  else if(S.wmode==="mus"&&!(m.mu&&m.mu.kg>0))wTxt=`${esc(m.n)} doesn't go in the museum, so there's no max-boost weight.`;
+  const sized=S.wmode&&target>0,lab=sized?` at ${fmt(target,target<10?2:1)} kg+`:"";
+  const {q,sh}=calc,rows=[["Any modifier",q]].concat(ORDER.filter(k=>k!=="Lunar"||S.night).map(k=>[k,q*(sh[k]||0)/100])).concat([["No modifier",1-q]]).map(([k,p])=>[k,p*pw]);
   const pans=p=>{const per=1-Math.pow(1-z.q*p,items);return per>0?1/per:Infinity};
-  $("oneOut").innerHTML=`<div class="tw"><table class="o one"><thead><tr><th>${esc(m.n)} that is</th><th>Chance per ${esc(m.n)}</th><th>${esc(m.n)} per one</th><th>Pans per one</th></tr></thead><tbody>${rows.map(([k,p])=>`<tr class="${k==="Any modifier"||k==="No modifier"?"tot":""}"><td><b>${k}</b></td><td data-l="Chance">${oneInP(p)}</td><td data-l="Per one">${nIn(p)}</td><td data-l="Pans">${p>0?fmt(pans(p),pans(p)<10?1:0):"never"}</td></tr>`).join("")}</tbody></table></div>
-    <p class="hint">${esc(m.n)} is 1 in ${nIn(z.q)} minerals in ${esc(z.z)} at ${hasStats?`${fmt(+S.luck,0)} luck`:"no luck typed"}, and a pan holds about ${fmt(items,0)} minerals${+S.cap>0?"":" (type your capacity above)"}. Pans per one is how many pans it takes on average to get one ${esc(m.n)} with that modifier.</p>`}
+  $("oneOut").innerHTML=`${wTxt?`<p class="wnote">${wTxt}</p>`:""}<div class="tw"><table class="o one"><thead><tr><th>${esc(m.n)}${lab} that is</th><th>Chance per ${esc(m.n)}</th><th>${esc(m.n)} per one</th><th>Pans per one</th></tr></thead><tbody>${rows.map(([k,p])=>`<tr class="${k==="Any modifier"||k==="No modifier"?"tot":""}"><td><b>${k}</b></td><td data-l="Chance">${p>0?oneInP(p):"never"}</td><td data-l="Per one">${nIn(p)}</td><td data-l="Pans">${p>0?fmt(pans(p),pans(p)<10?1:0):"never"}</td></tr>`).join("")}</tbody></table></div>
+    <p class="hint">${esc(m.n)} is 1 in ${nIn(z.q)} minerals in ${esc(z.z)} at ${hasStats?`${fmt(+S.luck,0)} luck`:"no luck typed"}, and a pan holds about ${fmt(items,0)} minerals${+S.cap>0?"":" (type your capacity above)"}. Pans per one is how many pans it takes on average to get one ${esc(m.n)}${lab} with that modifier. Size and modifier are rolled separately, so their chances multiply.</p>`}
 $("min").addEventListener("input",()=>{S.min=$("min").value;save();render()});
 $("zone").addEventListener("change",()=>{S.zone=$("zone").value;save();render()});
+$("wmode").addEventListener("change",()=>{S.wmode=$("wmode").value;save();render()});
+["kg","sb"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
 ["mb","luck","cap"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
 ["mag","surge","night"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();render()}));
-$("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;S.mb=Math.round(t["Modifier Boost"]||0);S.luck=Math.round(t.Luck||0);S.cap=Math.round(t.Capacity)||S.cap;save();render()};
+$("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;S.mb=Math.round(t["Modifier Boost"]||0);S.luck=Math.round(t.Luck||0);S.cap=Math.round(t.Capacity)||S.cap;S.sb=Math.round(t["Size Boost"]||0)||S.sb;save();render()};
 // ---- save the results as an image (just the numbers, no page controls) ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();

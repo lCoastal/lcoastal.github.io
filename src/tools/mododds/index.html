@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Modifier Odds</title>
+<title>Modifier &amp; Size Odds</title>
 
 %%COMMON%%
 <style data-file="style.css"></style>
@@ -12,7 +12,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Modifier Odds</h1>
+    <h1>Modifier &amp; Size Odds</h1>
     <p class="lede">Your chance of every ore modifier from your Modifier Boost and luck.<br>Built on the game's modifier weights and testing.</p>
   </header>
   <p class="disc" role="note"><b>Heads up:</b> this is a model fitted on testing, not the game's own code, so it can be a little off. Some sessions come out higher than it says for a reason that isn't known yet. Enchants, events and weather aren't counted. How it works is explained at the bottom.</p>
@@ -24,17 +24,22 @@
       <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
     </div>
     <div class="tg2">
-      <input type="checkbox" id="mag" hidden>
       <label class="ck"><input type="checkbox" id="surge"> Modifier Surge event (×2)</label>
       <label class="ck"><input type="checkbox" id="night"> Night (Lunar can drop)</label>
     </div>
   </section>
   <section class="card" id="oneCard">
-    <h2>For one mineral</h2>
-    <p class="hint">Pick a mineral to see how many of it you'd pan per modifier, and how many pans that takes in a zone. Uses your luck and capacity above.</p>
+    <h2>For one mineral, at a size</h2>
+    <p class="hint">Pick a mineral to see how many of it you'd pan per modifier, and how many pans that takes in a zone. Add a weight to count only ones at least that heavy. Uses your luck and capacity above.</p>
     <div class="inputs">
       <label class="fld"><span class="lab">Mineral</span><input type="text" id="min" placeholder="e.g. Gold" autocomplete="off"></label>
       <label class="fld"><span class="lab">Zone</span><select id="zone"></select></label>
+    </div>
+    <div class="inputs">
+      <label class="fld"><span class="lab">Weight</span><select id="wmode"><option value="">Any weight</option><option value="kg">At least…</option><option value="mus">Museum max boost</option></select></label>
+      <label class="fld" id="kgFld"><span class="lab">At least (kg)</span><input type="number" id="kg" min="0" step="0.1" inputmode="decimal" placeholder="e.g. 20"></label>
+      <label class="fld"><span class="lab">Size Boost (%)</span><input type="number" id="sb" min="0" inputmode="decimal" placeholder="e.g. 1476"></label>
+      <label class="ck"><input type="checkbox" id="mag"> Solar Magnifier (×1.5 weight)</label>
     </div>
     <div id="oneOut"></div>
   </section>

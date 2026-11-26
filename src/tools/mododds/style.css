@@ -47,3 +47,6 @@ table.o td{vertical-align:baseline}
 table.one td:nth-child(n+2),table.one th:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}
 table.one tr.tot td{color:var(--muted)}
 #oneCard .inputs{margin-bottom:10px}
+.wnote{margin:0 0 10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px}
+#oneCard .inputs .ck{align-self:end;padding-bottom:8px}
+#oneCard .fld .ac{flex:none;width:100%}

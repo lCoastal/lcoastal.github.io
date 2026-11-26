@@ -39,7 +39,7 @@ const HUBS = [
     [
       ["odds", "Luck Odds"],
       ["bestcap", "Best Luck Cap"],
-      ["mododds", "Modifier Odds"],
+      ["mododds", "Modifier & Size Odds"],
       ["minmuts", "Modifier Values"],
     ],
   ],

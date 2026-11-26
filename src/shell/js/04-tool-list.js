@@ -17,7 +17,7 @@ const LIST = [
   { id: "sizefinder", name: "Size Boost Finder", desc: "Size Boost you need for a mineral to hit a weight" },
   { id: "pansize", name: "Pan Size", desc: "Fewest, average and most minerals per pan" },
   { id: "buildcmp", name: "Compare Builds", desc: "Compare the luck and capacity of several builds for one mineral" },
-  { id: "mododds", name: "Modifier Odds", desc: "Chance of each ore modifier from your boost" },
+  { id: "mododds", name: "Modifier & Size Odds", desc: "Chance of each ore modifier from your boost, and how many of a mineral it takes to get one at a size with a modifier" },
   { id: "farmroute", name: "Museum Farm Route", desc: "Paste your museum, get zones to farm in order" },
   { id: "museumfind", name: "Best Museum Finder", desc: "Fills your museum for a goal you pick" },
   { id: "museumopt", name: "Museum Improver", desc: "Finds a better museum without lowering any stat" },
