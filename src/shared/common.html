@@ -234,7 +234,9 @@ const zoneSize=loc=>loc?(ZONE_SIZE[baseLoc(loc)]??ZONE_SIZE[loc]??1):1;
 // <option>s for a zone picker: "Most zones" (x1) first, then every measured zone with its factor
 const zoneSizeOpts=sel=>`<option value="">Most zones (×1)</option>`+Object.keys(ZONE_SIZE).sort().map(z=>`<option value="${z}"${z===sel?" selected":""}>${z} (×${ZONE_SIZE[z].toFixed(2)})</option>`).join("");
 function wtModel(cap){cap=Math.max(1,+cap||0);const h=Math.max(0,.533*(1-Math.exp(-(cap-1797)/2266))),a=Math.max(1.01,4.24+.000667*cap),pu=1-WT_SMALL-h;
-  const N=2000,cdf=new Float64Array(N+1);let acc=0,prev=0;for(let i=0;i<=N;i++){const r=i/N,v=r<=0||r>=1?0:Math.pow(r,a-1)*Math.pow(1-r,WT_B-1);if(i)acc+=(prev+v)/2;cdf[i]=acc;prev=v}for(let i=0;i<=N;i++)cdf[i]/=acc;
+  // worked in logs, so a huge capacity (a in the millions) doesn't underflow to 0/0
+  const N=2000,cdf=new Float64Array(N+1),lv=new Float64Array(N+1);let mx=-Infinity;for(let i=0;i<=N;i++){const r=i/N;lv[i]=r<=0||r>=1?-Infinity:(a-1)*Math.log(r)+(WT_B-1)*Math.log(1-r);if(lv[i]>mx)mx=lv[i]}
+  let acc=0,prev=0;for(let i=0;i<=N;i++){const v=isFinite(lv[i])?Math.exp(lv[i]-mx):0;if(i)acc+=(prev+v)/2;cdf[i]=acc;prev=v}for(let i=0;i<=N;i++)cdf[i]/=acc;
   const bcdf=r=>{if(r<=0)return 0;if(r>=1)return 1;const x=r*N,i=Math.floor(x);return cdf[i]+(cdf[i+1]-cdf[i])*(x-i)};
   const cl=v=>Math.min(1,Math.max(0,v)),W=WT_TOP-WT_MIN,TL=WT_MAX-WT_TOP;
   // the usual roll, 0.75 to 15.5
