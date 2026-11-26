@@ -39,3 +39,7 @@ table.t tr:last-child td{border-bottom:0}
 .big div.rec{border-color:color-mix(in srgb,var(--accent) 60%,var(--line));background:color-mix(in srgb,var(--accent) 9%,var(--sunk))}
 .fld select{width:100%}
 .warn{color:var(--neg)}
+
+table.uc td:nth-child(n+2),table.uc th:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}
+table.uc tr.on td{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+#utbl h3.sub{font-size:13px;margin:16px 0 6px}
