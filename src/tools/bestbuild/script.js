@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id);
 const MUTN=["None","Silver","Gold","Diamond","Granite","Overclocked","Festive","Sunforged","Prismatic"];
-let S={tab:"find",goal:"min",min:"",zone:"",useCap:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
+let S={tab:"find",cmp:false,goal:"min",min:"",zone:"",useCap:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-bestbuild")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("pt-bestbuild",JSON.stringify(S))}catch(e){}};
 // presets follow the community build guide (Prospecting! Build Guide, Pharaoh's Tomb update): what each kind of build is for
@@ -56,7 +56,7 @@ function drawForm(){
   $("goalTxt").innerHTML=S.goal==="min"?"The best chance per pan of getting at least one of this mineral in this zone. Luck sets each mineral's chance (too much luck can push you past common ones), capacity sets how many minerals a pan holds. With the luck cap option on, it also tries panning under a luck cap.":(PRESET[S.goal]||PRESET.luck).txt;
   $("minRow").hidden=S.goal!=="min";
   $("muts").innerHTML=MUTN.map(m=>`<button type="button" class="chip" data-m="${m}" aria-pressed="${S.muts.includes(m)}">${m}</button>`).join("");
-  ["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap"].forEach(k=>$(k).checked=!!S[k]);$("streak").disabled=!S.perfect;
+  ["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap","cmp"].forEach(k=>$(k).checked=!!S[k]);$("streak").disabled=!S.perfect;
   $("mastery").value=S.mastery;$("events").value=S.events;
   document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));$("pane-find").hidden=S.tab!=="find";$("pane-as").hidden=S.tab!=="as";
   const off=[!S.perfect&&"no perfect digs",S.perfect&&!S.streak&&"no full streak",!S.sun&&"no Sun Blessing",!S.nomad&&"Nomad not stacked",S.night?"night":"day"].filter(Boolean);
@@ -67,7 +67,7 @@ function drawForm(){
 makeAC({inp:$("mq"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),icon:()=>{const m=minObj();return m&&m.ic},pick:x=>{S.min=x.n;S.zone="";save();drawForm()}});
 document.addEventListener("click",e=>{const g=e.target.closest("[data-g]");if(g){S.goal=g.dataset.g;save();drawForm();return}
   const m=e.target.closest("[data-m]");if(m){const n=m.dataset.m;S.muts=S.muts.includes(n)?S.muts.filter(x=>x!==n):S.muts.concat([n]);save();drawForm();return}});
-["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();drawForm()}));
+["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap","cmp"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();drawForm()}));
 ["mastery","events"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).value;save()}));
 document.addEventListener("click",e=>{const t=e.target.closest("[data-tab]");if(t){S.tab=t.dataset.tab;save();drawForm();window.scrollTo(0,0)}});
 $("openCalc2").onclick=()=>{try{window.parent.ptOpenTool("calc")}catch(e){}};
@@ -89,23 +89,23 @@ $("run").onclick=async()=>{if(!S.muts.length){ptToast("Pick at least one mutatio
   if(!cw||!cw.ptFindBuild){btn.disabled=false;$("prog").textContent="";ptToast("Couldn't load the Stat Calculator");return}
   const useful=S.goal==="min"?["Luck","Capacity"]:(PRESET[S.goal]||PRESET.luck).useful;
   const ev=S.events?{meteor:S.events==="meteor"||S.events==="both",weather:S.events==="weather"||S.events==="both"}:null;
-  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
-  btn.disabled=false;$("prog").textContent="";LAST={R,goal:S.goal,info,cw,zone:S.zone,perfect:S.perfect};showRes()};
+  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful,fresh:!S.cmp},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
+  btn.disabled=false;$("prog").textContent="";LAST={R,goal:S.goal,info,cw,zone:S.zone,perfect:S.perfect,cmp:S.cmp};showRes()};
 function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCard").hidden=false;const {R,cw}=L;const st=R.st,t=R.tot,b=R.base;
   const g=Math.exp(R.sc-R.beforeSc)-1;const gTxt=g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found";
   let head="";if(L.goal==="min"){const now=L.info.per(t.Luck,t.Capacity),was=L.info.per(R.before.Luck,R.before.Capacity);
-    head=`<div><span class="lab">${esc(L.info.m.n)} in ${esc(L.zone)}</span><b class="pos">${oneInT(now.p)}</b><span class="hint">now ${oneInT(was.p)}</span></div><div><span class="lab">Luck cap</span><b>${now.cap?fmt(now.cap,0):"None"}</b><span class="hint">${now.cap?"pan with this cap on":"pan at your own luck"}</span></div>`}
-  else head=`<div><span class="lab">${esc((PRESET[L.goal]||PRESET.luck).lab)}</span><b class="${g>0.0005?"pos":""}">${gTxt}</b><span class="hint">vs your current build</span></div>`;
+    head=`<div><span class="lab">${esc(L.info.m.n)} in ${esc(L.zone)}</span><b class="pos">${oneInT(now.p)}</b>${L.cmp?`<span class="hint">now ${oneInT(was.p)}</span>`:""}</div><div><span class="lab">Luck cap</span><b>${now.cap?fmt(now.cap,0):"None"}</b><span class="hint">${now.cap?"pan with this cap on":"pan at your own luck"}</span></div>`}
+  else if(L.cmp)head=`<div><span class="lab">${esc((PRESET[L.goal]||PRESET.luck).lab)}</span><b class="${g>0.0005?"pos":""}">${gTxt}</b><span class="hint">vs your current build</span></div>`;
   const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":`, ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
-  const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"-"}</td><td class="was">${now===was?"":(was||"-")}</td></tr>`;
+  const row=(lab,now,was)=>L.cmp?`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"-"}</td><td class="was">${now===was?"":(was||"-")}</td></tr>`:`<tr><td>${lab}</td><td>${now||"-"}</td></tr>`;
   const tl=(p,e)=>esc(p||"")+(e?`, ${esc(e)}`:"");
   const rows=[row("Pan",tl(st.pan,st.panEn),tl(b.pan,b.panEn)),row("Shovel",tl(st.shovel,st.shEn),tl(b.shovel,b.shEn)),row("Trinket",esc(st.trinket||""),esc(b.trinket||""))].concat(cw.ptSlotDefs().map(([k,l])=>row(l,it(st.slots[k]),it(b.slots[k]))));
   let mus="";if(R.museum)mus=`<h3 class="sec">Museum</h3>${ptMuseumView(st.museumBoard,{empty:"Nothing here helps"})}`;
   const capL=.565*t.Luck/Math.max(1,t.Capacity);
-  $("res").innerHTML=`<div class="sum">${head}${((PRESET[L.goal]||{}).useful||["Luck","Capacity"]).filter((k,i,a)=>i<6).map(k=>`<div><span class="lab">${esc(k)}</span><b>${fv(k,t[k])}</b><span class="hint">now ${fv(k,R.before[k])}</span></div>`).join("")}</div>
+  $("res").innerHTML=`<div class="sum">${head}${((PRESET[L.goal]||{}).useful||["Luck","Capacity"]).filter((k,i,a)=>i<6).map(k=>`<div><span class="lab">${esc(k)}</span><b>${fv(k,t[k])}</b>${L.cmp?`<span class="hint">now ${fv(k,R.before[k])}</span>`:""}</div>`).join("")}</div>
     ${L.goal==="luck"||L.goal==="size"||L.goal==="sell"||L.goal==="items"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}
-    <table class="bt"><tr><th></th><th>Best build</th><th>Now</th></tr>${rows.join("")}</table>${mus}
-    ${cw.ptWhyHTML?cw.ptWhyHTML(R):""}
+    <table class="bt"><tr><th></th><th>Build</th>${L.cmp?"<th>Now</th>":""}</tr>${rows.join("")}</table>${mus}
+    ${L.cmp&&cw.ptWhyHTML?cw.ptWhyHTML(R):""}
     <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
 function sheetText(){const L=LAST;let txt=L.cw.ptBuildTextOf(L.R.st);
   if(L.goal==="min"){const n=L.info.per(L.R.tot.Luck,L.R.tot.Capacity);txt=txt.replace(/^(Title:[^\n]*\n)/,`$1Subtitle: Best build for ${L.info.m.n} in ${L.zone}: about ${oneInT(n.p)}${n.cap?`, with a luck cap of ${fmt(n.cap,0)}`:""}\n`)}
