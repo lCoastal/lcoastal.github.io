@@ -262,29 +262,7 @@ function discordCompactAnsi(lines){
   });
   return "```ansi\n"+colored.join("\n")+"\n```";
 }
-// copy the breakdown as Discord text, at the level the slider is on.
-// Discord only colours text inside an ```ansi code block (desktop and web; the phone app shows it without colours).
 const ANSI={Luck:32,Capacity:33,"Size Boost":31,"Modifier Boost":36,"Sell Boost":33,"Dig Strength":31,"Shake Strength":35,"Dig Speed":34,"Shake Speed":35,"Walk Speed":37,"Jump Power":32,"Inventory Size":37,Toughness:37};
-$("cpBrk").onclick=async()=>{const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(B,strip(B,g)));const D=brkData(B),lv=brkLvl();
-  if(!D.stats.length){ptToast("No stats to copy yet");return}
-  const E="\u001b[",col=(c,t,b)=>`${E}${b?"1;":""}${c}m${t}${E}0m`,gray=t=>col(30,t),
-    tv=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1),sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
-  const W=46,VW=11,pad=(t,w)=>{t=String(t);return t.length>w?t.slice(0,w-1)+"…":t+" ".repeat(w-t.length)},rpad=(t,w)=>{t=String(t);return " ".repeat(Math.max(0,w-t.length))+t};
-  const L=[col(37,String(S.bname||"").trim()||"My Prospecting stats",true)];const gear=[B.pan&&"Pan: "+B.pan+(B.panEn?" ("+B.panEn+")":""),B.shovel&&"Shovel: "+B.shovel+(B.shEn?" ("+B.shEn+")":"")].filter(Boolean).join(", ");if(gear)L.push(gear);
-  const lbl=x=>x.label+(x.sub?` (${x.sub})`:"");
-  const line=(lab,val,good)=>"    "+pad(lab,W-5)+" "+col(good?32:31,rpad(val,VW));
-  const head=(lab,val)=>"  "+gray(pad(lab.toUpperCase(),W-2))+col(37,rpad(val,VW),true);
-  D.stats.forEach(d=>{const c=ANSI[d.s]||37,sum=d.fo1||(d.mult===1&&d.xm===1)?"":`${tv(d.s,d.flatT)} × ${mxf(d.mult)}${d.xm!==1?` × ${fmt(d.xm,2)}`:""}`;
-    if(lv===0){L.push(col(c,pad(d.s,W),true)+col(37,rpad(tv(d.s,d.total),VW),true));return}
-    if(lv===1){L.push(col(c,pad(d.s,16),true)+gray(pad(sum?sum+" =":"",W-16))+col(37,rpad(tv(d.s,d.total),VW),true));return}
-    L.push("");L.push(col(c,pad(d.s,W),true)+col(37,rpad(tv(d.s,d.total),VW),true));if(sum)L.push("  "+gray(sum));
-    L.push(head("Flat points",tv(d.s,d.flatT)));d.F.forEach(o=>L.push(line(lbl(o.x),sv(d.s,o.v),o.v>=0)));
-    if(!d.fo1&&d.M.length){L.push(head("Multiplier","×"+mxf(d.mult)));d.M.forEach(o=>L.push(line(lbl(o.x),(o.v<0?"−":"+")+mxf(Math.abs(o.v))+"×",o.v>=0)))}
-    if(d.X.length){L.push(head("Multiplies the total","×"+fmt(d.xm,2)));d.X.forEach(o=>L.push(line(lbl(o.x),"×"+fmt(o.v,2),o.v>=1)))}});
-  if(lv<2)L.splice(gear?2:1,0,"");
-  const txt="```ansi\n"+L.join("\n")+"\n```";let ok=false;
-  try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
-  ptToast(!ok?"Couldn't copy, your browser blocked it":txt.length>2000?`Copied, but it's ${fmt(txt.length,0)} characters: Discord allows 2,000 (4,000 with Nitro). Switch some stats off or use Semi`:"Copied, paste it into Discord")};
 $("brkLvl").addEventListener("input",()=>{S.brkLevel=+$("brkLvl").value;save();renderParts()});
 document.addEventListener("click",e=>{const b=e.target.closest("[data-lvl]");if(!b)return;S.brkLevel=+b.dataset.lvl;save();renderParts()});
 function renderIso(){const off=S.isoOff||[];$("isoChips").innerHTML=GROUPS.map(([g,l])=>`<button type="button" class="chip" data-iso="${g}" aria-pressed="${!off.includes(g)&&!S.only}">${l}</button>`).join("");
