@@ -212,3 +212,7 @@ table.out th.bkc{text-align:center}
 .qw input{width:100%}
 .qbtn{border:1px dashed var(--line);background:none;border-radius:6px;padding:5px 6px;font:12px var(--f-mono);color:var(--muted);cursor:pointer;width:100%;text-align:right}
 .qbtn:hover{border-color:var(--accent);color:var(--fg)}
+
+.msl .ac{flex:1 1 auto;min-width:0}.msl .ac input{width:100%;min-width:0;box-sizing:border-box;padding:6px;font-size:13px}.msl .ac.hasi input{padding-left:38px}
+.msl .acl{min-width:280px;max-width:min(360px,calc(100vw - 24px))}
+.msl .acl .aco{flex-wrap:wrap;row-gap:0}.msl .acl .at{flex-basis:100%;order:3;text-align:left;padding-left:34px;white-space:normal;margin-top:-2px}

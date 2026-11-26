@@ -756,8 +756,15 @@ const boostTxt=m=>m&&m.mu?m.mu.b.map(([s,v])=>`${s} ${v<0?"−":"+"}${Math.abs(v
 function musEditor(){const ed=$("musEd");$("musCopy").hidden=S.mus==="custom";if(S.mus!=="custom"){ed.innerHTML="";return}
   if(!S.museumBoard)S.museumBoard=blankBoard();const bd=S.museumBoard;
   ed.innerHTML=MORDER.map(r=>{const opts=P.mins.filter(m=>m.r===r&&m.mu);return `<div class="mrow" style="--rc:${rc(r)}"><span class="rl">${r}</span><div class="mslots">${(bd[r]||[]).map((sl,i)=>`<div class="msl">
-    <select data-mm="${r}|${i}" aria-label="${r} display ${i+1}"><option value="">Empty</option><option value="Any"${sl.m==="Any"?" selected":""}>Anything (only the modifier counts)</option>${opts.map(m=>`<option value="${esc(m.n)}"${m.n===sl.m?" selected":""}>${esc(m.n)}, ${esc(boostTxt(m))}</option>`).join("")}</select>
-    <select data-mu="${r}|${i}" aria-label="${r} display ${i+1} modifier">${P.mods.map(md=>`<option value="${esc(md[0])}"${md[0]===(sl.u||"None")?" selected":""}>${md[0]==="None"?"No modifier":esc(md[0])}</option>`).join("")}</select></div>`).join("")}</div></div>`}).join("")}
+    <input type="text" data-mmi="${r}|${i}" placeholder="Empty" aria-label="${r} display ${i+1}">
+    <select data-mu="${r}|${i}" aria-label="${r} display ${i+1} modifier">${P.mods.map(md=>`<option value="${esc(md[0])}"${md[0]===(sl.u||"None")?" selected":""}>${md[0]==="None"?"No modifier":esc(md[0])}</option>`).join("")}</select></div>`).join("")}</div></div>`}).join("");
+  // each display is a search box with the mineral's picture, in the list and once picked; "Any" shows the same ? tile as museum views elsewhere
+  ed.querySelectorAll("[data-mmi]").forEach(inp=>{const [r,i]=inp.dataset.mmi.split("|"),sl=()=>S.museumBoard[r][+i];
+    const items=[{n:"Empty",v:null,tag:"No mineral"},{n:"Any",v:"Any",ic:ANY_IMG,tag:"Only the modifier counts"}].concat(P.mins.filter(m=>m.r===r&&m.mu).map(m=>({n:m.n,v:m.n,ic:m.ic,col:rc(r),tag:boostTxt(m)})));
+    makeAC({inp,items,keep:true,cur:()=>sl().m||"",icon:()=>{const v=sl().m;if(!v)return "";if(v==="Any")return ANY_IMG;const m=P.mins.find(x=>x.n===v);return m&&m.ic},
+      pick:x=>{sl().m=x.v;save();render()}})})}
+// the "Any" display tile as a picture: a rounded square with a ?, like .pt-many
+const ANY_IMG="data:image/svg+xml,"+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 34"><rect width="34" height="34" rx="8" fill="#2a3038"/><text x="17" y="23.5" text-anchor="middle" font-family="Segoe UI,system-ui,sans-serif" font-size="18" font-weight="700" fill="#9aa4ae">?</text></svg>');
 $("musCopy").onclick=()=>{const src=S.mus==="custom"?null:musBoard();const bd=blankBoard();if(src)MORDER.forEach(r=>(src[r]||[]).forEach((sl,i)=>{if(bd[r][i]&&sl)bd[r][i]={m:sl.m||null,u:sl.u||"None"}}));
   if(S.mus!=="custom"||!S.museumBoard)S.museumBoard=bd;S.mus="custom";save();fillMus();musEditor();render()};
 // ---- build sheet <-> calculator ----

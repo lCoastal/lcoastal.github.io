@@ -87,7 +87,7 @@ const statKey=n=>STATK[String(n||"").trim().toLowerCase()]||null;
 const statVar=n=>{const k=statKey(n);return k?`var(--k-${k})`:"var(--fg)"};
 const STATHEX={luck:"#86f34a",cap:"#f0b44a",size:"#ff6b6b",digstr:"#ff9d7f",digspd:"#8ecbff",sell:"#ffd21f",walk:"#d6dbe0",mod:"#39e06a",shkstr:"#ff8fb1",shkspd:"#b9a6ff",inv:"#e0b07a",jump:"#d6dbe0"};
 const statHex=n=>STATHEX[statKey(n)]||"#e6e9ec";
-// type-to-search box: o={inp, items:[{n,tag,ic,col,...}], pick(x), cur()->text shown when idle, icon()->picture for the box, free:true keeps what you typed}
+// type-to-search box: o={inp, items:[{n,tag,ic,col,...}], pick(x), cur()->text shown when idle, icon()->picture for the box, free:true keeps what you typed, keep:true keeps the items in the order given}
 function makeAC(o){const inp=o.inp,wrap=document.createElement("span");wrap.className="ac";inp.parentNode.insertBefore(wrap,inp);wrap.appendChild(inp);
   const im=document.createElement("img");im.className="aci";im.alt="";wrap.appendChild(im);
   const L=document.createElement("div");L.className="acl";L.setAttribute("role","listbox");L.id=(inp.id||"ac")+"L";L.hidden=true;wrap.appendChild(L);
@@ -96,7 +96,7 @@ function makeAC(o){const inp=o.inp,wrap=document.createElement("span");wrap.clas
   const sync=()=>{const s=o.icon&&o.icon();if(s&&document.activeElement!==inp){im.src=s;wrap.classList.add("hasi")}else wrap.classList.remove("hasi");if(!o.free&&document.activeElement!==inp&&o.cur)inp.value=o.cur()};
   const mark=()=>{L.querySelectorAll(".aco").forEach((e,i)=>e.setAttribute("aria-selected",String(i===I)));const e=L.querySelector(`[data-aci="${I}"]`);if(e){e.scrollIntoView({block:"nearest"});inp.setAttribute("aria-activedescendant",e.id)}else inp.removeAttribute("aria-activedescendant")};
   const showL=()=>{const q=inp.value.trim().toLowerCase();const qq=!o.free&&o.cur&&q===o.cur().toLowerCase()?"":q;const st=x=>x.n.toLowerCase().startsWith(qq)?1:0;
-    hits=o.items.filter(x=>x.n.toLowerCase().includes(qq)).sort((a,b)=>st(b)-st(a)||(a.tag||"").localeCompare(b.tag||"")||a.n.localeCompare(b.n)).slice(0,60);
+    hits=o.items.filter(x=>x.n.toLowerCase().includes(qq)).sort((a,b)=>st(b)-st(a)||(o.keep?0:(a.tag||"").localeCompare(b.tag||"")||a.n.localeCompare(b.n))).slice(0,60);
     if(o.free&&!q){hide();return}
     I=o.free?-1:0;L.innerHTML=hits.length?hits.map((x,i)=>`<div class="aco" role="option" id="${L.id}${i}" data-aci="${i}" aria-selected="${i===I}">${x.ic?`<img src="${x.ic}" alt="">`:""}<span class="an"${x.col?` style="color:${x.col}"`:""}>${esc(x.n)}</span>${x.tag?`<span class="at">${esc(x.tag)}</span>`:""}</div>`).join(""):`<div class="acn">Nothing matches "${esc(inp.value.trim())}"</div>`;
     L.hidden=false;inp.setAttribute("aria-expanded","true")};
