@@ -929,12 +929,8 @@ async function bfEngine(c,scoreTot,onProg){
   const useful=c.useful||["Luck","Capacity"];
   // museum: strength before speed, so slots and modifiers are only picked for speed when they also give something else useful
   const musUseful=c.musUseful||useful;
-  const MC={};MORDER.forEach(r=>{const all=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.length);const use=all.filter(m=>m.mu.b.some(([k])=>musUseful.includes(k)));
-    // nothing in this rarity helps the goal: try them all, so the slot still gets the one with the most in other stats
-    // and once the helpful ones run out, the rest still beat an empty "Any" on other stats
-    const rest=all.filter(m=>!use.includes(m)&&m.mu.b.some(([k])=>SEC.includes(k)));
-    MC[r]=use.concat(rest).map(m=>m.n).concat(["Any"])});
-  let MODN=Object.keys(MODS).filter(u=>u==="None"||MODS[u][1].some(k=>musUseful.includes(k)));if(MODN.length<2)MODN=Object.keys(MODS);
+  const MC={};MORDER.forEach(r=>MC[r]=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.some(([k])=>musUseful.includes(k))).map(m=>m.n).concat(["Any"]));
+  const MODN=Object.keys(MODS).filter(u=>u==="None"||MODS[u][1].some(k=>musUseful.includes(k)));
   const start=clone(base);if(c.museum){start.museumBoard=clone(musBoard(base)||{});start.mus="custom"}
   if(noPerf&&STREAK[start.shEn])start.shEn="";
   // pieces you already wear keep their stars and roll; anything new is counted at 6★ and a 100% roll
@@ -961,6 +957,16 @@ async function bfEngine(c,scoreTot,onProg){
     }
     if(!best||cur>best.sc+1e-12)best={sc:cur,st};
   }
+  // anything that adds nothing to the goal becomes "Any" (or nothing): museum slots, enchants, trinket, gear slots
+  {const f=best.st,s0=()=>score0(f);let ref=s0();const same=()=>Math.abs(s0()-ref)<1e-12;
+    if(c.museum)MORDER.forEach(r=>((f.museumBoard||{})[r]||[]).forEach((x,i,a)=>{if(!x||x.m==="Any")return;const keep=x;a[i]={m:"Any",u:x.u};if(!same()){a[i]={m:x.m,u:"None"};if(!same())a[i]=keep}}));
+    const any=f.anyParts={slots:{}};
+    if(c.tools){for(const k of ["panEn","shEn"]){if(!f[k])continue;const keep=f[k];f[k]="";if(same())any[k]=true;else f[k]=keep}
+      // a pan or shovel where every other one scores the same: any will do
+      if(f.pan&&pans.every(p=>{const keep=f.pan;f.pan=p.name;const r=same();f.pan=keep;return r}))any.pan=true;
+      if(f.shovel&&shovels.every(p=>{const keep=f.shovel;f.shovel=p.name;const r=same();f.shovel=keep;return r}))any.shovel=true}
+    if(c.trinket&&f.trinket){const keep=f.trinket;f.trinket="";if(same())any.trinket=true;else f.trinket=keep}
+    SLOTDEF.forEach(([k])=>{const v=f.slots[k];if(!v||!v.n)return;delete f.slots[k];if(same())any.slots[k]=true;else f.slots[k]=v});}
   // why this build: for each part, the best thing you could put there instead and how much worse it is
   const fin=best.st,sc=score0(best.st),why=[];const pct=v=>{const d=v-sc;return Math.abs(d)<1e-12?0:(Math.exp(d)-1)*100};
   const lab=(p,e)=>p+(e?", "+e:"");
@@ -981,6 +987,9 @@ async function bfEngine(c,scoreTot,onProg){
     if(bm)why.push({part:"Mutation",pick:`${v0.m||"None"} on ${v0.n}`,alt:bm.t,pct:pct(bm.v),note:cnt>1?"on one of them":""})}
   // a part that adds nothing to the goal: going without it scores the same, so the alternative is "anything"
   const zero=(o)=>Math.abs(score0(Object.assign({},fin,o))-sc)<1e-12;
+  const AP=fin.anyParts||{slots:{}};
+  why.forEach(w=>{if((w.part==="Pan"&&AP.pan)||(w.part==="Shovel"&&AP.shovel)){w.pick="Any";w.alt="Any";w.none=true;w.pct=0}
+    if((w.part==="Pan enchant"&&AP.panEn)||(w.part==="Shovel enchant"&&AP.shEn)||(w.part==="Trinket"&&AP.trinket)){w.pick="Any";w.alt="Any";w.none=true;w.pct=0}});
   why.forEach(w=>{if(w.pct!==0)return;
     if((w.part==="Pan enchant"&&zero({panEn:""}))||(w.part==="Shovel enchant"&&zero({shEn:""}))||(w.part==="Trinket"&&zero({trinket:""}))){w.alt="Any";w.none=true}});
   // what every build here was compared under
