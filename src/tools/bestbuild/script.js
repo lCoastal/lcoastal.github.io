@@ -93,7 +93,7 @@ $("run").onclick=async()=>{if(!S.muts.length){ptToast("Pick at least one mutatio
   if(!cw||!cw.ptFindBuild){btn.disabled=false;$("prog").textContent="";ptToast("Couldn't load the Stat Calculator");return}
   const useful=S.goal==="min"?(S.perMin?["Luck","Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed"]:["Luck","Capacity"]):(PRESET[S.goal]||PRESET.luck).useful;
   const ev=S.events?{meteor:S.events==="meteor"||S.events==="both",weather:S.events==="weather"||S.events==="both"}:null;
-  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful,fresh:!S.cmp},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
+  const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful,musUseful:useful.filter(k=>k!=="Dig Speed"&&k!=="Shake Speed"),fresh:!S.cmp},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
   btn.disabled=false;$("prog").textContent="";LAST={R,goal:S.goal,info,cw,zone:S.zone,perfect:S.perfect,cmp:S.cmp};showRes()};
 function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCard").hidden=false;const {R,cw}=L;const st=R.st,t=R.tot,b=R.base;
   const g=Math.exp(R.sc-R.beforeSc)-1;const gTxt=g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found";

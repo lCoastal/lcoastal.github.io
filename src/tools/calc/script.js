@@ -924,8 +924,10 @@ async function bfEngine(c,scoreTot,onProg){
   const POOL={};["Necklace","Charm","Ring"].forEach(sl=>POOL[sl]=EQ.filter(x=>x.slot===sl&&EQB[x.n]&&ok(x.n)).map(x=>x.n));
   const muts=MUTS.filter(m=>c.muts.includes(m[0])).map(m=>m[0]);
   const useful=c.useful||["Luck","Capacity"];
-  const MC={};MORDER.forEach(r=>MC[r]=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.some(([k])=>useful.includes(k))).map(m=>m.n).concat(["Any"]));
-  const MODN=Object.keys(MODS).filter(u=>u==="None"||MODS[u][1].some(k=>useful.includes(k)));
+  // museum: strength before speed, so slots and modifiers are only picked for speed when they also give something else useful
+  const musUseful=c.musUseful||useful;
+  const MC={};MORDER.forEach(r=>MC[r]=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.some(([k])=>musUseful.includes(k))).map(m=>m.n).concat(["Any"]));
+  const MODN=Object.keys(MODS).filter(u=>u==="None"||MODS[u][1].some(k=>musUseful.includes(k)));
   const start=clone(base);if(c.museum){start.museumBoard=clone(musBoard(base)||{});start.mus="custom"}
   if(noPerf&&STREAK[start.shEn])start.shEn="";
   // pieces you already wear keep their stars and roll; anything new is counted at 6★ and a 100% roll
