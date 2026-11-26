@@ -42,7 +42,8 @@ function drawForm(){
   $("asSum").textContent="Assuming: "+off.join(", ")}
 // ---- pick your own potions and consumables ----
 const POTS=((P.x2||{}).potions||[]);let CONSL=[];
-const isMoney=p=>/\$/.test(p.cost||"");
+// money potions: bought with cash from an Alchemist (Traveling Merchant ones are limited stock, so left out)
+const isMoney=p=>/\$/.test(p.cost||"")&&!/Traveling Merchant/i.test(p.where||"");
 function drawPick(){$("consPick").hidden=S.cons!=="pick";if(S.cons!=="pick")return;
   const grp=(t,list,key)=>list.length?`<div class="pkg"><span class="lab">${t}</span>${list.map(x=>`<label class="ck"><input type="checkbox" data-pk="${key}" value="${esc(x.n)}"${S[key].includes(x.n)?" checked":""}><span><b>${esc(x.n)}</b><small>${esc(String(x.fx||"").replace(/\s*\([^)]*\)\s*$/,""))}</small></span></label>`).join("")}</div>`:"";
   $("pkList").innerHTML=grp("Potions",POTS,"pickPots")+grp("Consumables",CONSL,"pickCons");
