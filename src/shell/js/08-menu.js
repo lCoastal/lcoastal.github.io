@@ -5,8 +5,7 @@ const SECTIONS = [
     "Builds",
     "#14b8a6",
     [
-      ["bestbuild", "e:Guardian Pendant.png"],
-      ["buildmaker", "e:Clockwork.png"],
+      ["h-build", "e:Guardian Pendant.png"],
       ["calc", "e:Prismatic Star.png"],
       ["rpm", "e:Speed Coil.png"],
       ["builds", "e:Celestial Rings.png"],

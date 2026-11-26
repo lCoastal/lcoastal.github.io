@@ -1,6 +1,15 @@
 // tools that cover the same ground are grouped into one menu entry with tabs: [hub id, name, menu text, [tool id, tab label]...]
 const HUBS = [
   [
+    "h-build",
+    "Build Maker",
+    "Make a whole build: gear, pan, shovel, enchants and museum, for a goal or for how much each stat matters to you",
+    [
+      ["bestbuild", "For a goal"],
+      ["buildmaker", "By stat priorities"],
+    ],
+  ],
+  [
     "h-research",
     "Research",
     "How the game works, the formulas, the tests behind them and a checker for your own data",
