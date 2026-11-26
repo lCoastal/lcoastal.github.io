@@ -5,21 +5,23 @@ const STATS=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig S
 const DER=["Minerals per minute","Rare finds per minute"];
 const panTime=t=>{const C=Math.max(1,t.Capacity);
   const digs=Math.min(Math.ceil(C),Math.ceil(C/Math.max(1e-9,(S.totem?1.5:1)*t["Dig Strength"]))),shakes=Math.min(Math.ceil(C),Math.ceil(C/Math.max(1e-9,t["Shake Strength"])));
-  return {digs,shakes,s:digs*S.digS+shakes*S.shS+S.gapS}};
+  return {digs,shakes,s:digs*digSec()+shakes*shSec()+1.15}};
+// seconds per dig and per shake at the speeds you enter, from the community timing tests (as in Rolls per Minute)
+const digSec=()=>143.9*Math.pow(Math.max(1,S.digSp),-0.9324),shSec=()=>1/(23.514*Math.max(1,S.shSp)/(442.88+Math.max(1,S.shSp)));
 const derived=t=>{const T=Math.max(.01,panTime(t).s);return {"Minerals per minute":panItems(t.Capacity)*60/T,"Rare finds per minute":Math.max(1,t.Luck)*Math.pow(Math.max(1,t.Capacity),.565)*60/T/1e6}};
 const PANSTATS=["Capacity","Dig Strength","Shake Strength"];
 const TAPOPT=[["any","Don't mind"],["prefer","Prefer one tap"],["must","Must be one tap"]];
 const taps=t=>Math.max(1,Math.ceil(t.Capacity/Math.max(1e-9,(S.totem?1.5:1)*t["Dig Strength"])));
 const PCT=new Set(["Size Boost","Modifier Boost","Sell Boost","Dig Speed","Shake Speed"]);
 const CONSOPT=[["none","None"],["pick","Pick my own"],["mine","As in the Stat Calculator"],["all","Every potion and consumable"]];
-let S={w:{Luck:1,Capacity:.6},tap:"prefer",totem:true,digS:.3,shS:.1,gapS:1.15,strFirst:true,cons:"none",muts:["Sunforged","Prismatic"],mutDef:2,perfect:true,streak:true,sun:true,nomad:true,night:false,evMeteor:false,evWeather:false,pickPots:[],pickCons:[],owned:false,tools:true,trinket:true,museum:true};
+let S={w:{Luck:1,Capacity:.6},tap:"prefer",totem:true,digSp:1000,shSp:1000,strFirst:true,cons:"none",muts:["Sunforged","Prismatic"],mutDef:2,perfect:true,streak:true,sun:true,nomad:true,night:false,evMeteor:false,evWeather:false,pickPots:[],pickCons:[],owned:false,tools:true,trinket:true,museum:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-buildmaker")||"{}"))}catch(e){}
 if(S.mutDef!==2){S.muts=["Sunforged","Prismatic"];S.mutDef=2}
 const save=()=>{try{localStorage.setItem("pt-buildmaker",JSON.stringify(S))}catch(e){}};
 const r1=v=>Math.round(Math.min(5,Math.max(0,+v||0))*10)/10;
 // ---- form ----
 const WROWS=STATS.concat(DER);
-$("weights").innerHTML=WROWS.map(s=>`${s===DER[0]?`<span class="wsep">Per minute, from your taps and shakes at your own times (set below)</span>`:""}`+`<label class="wt" data-row="${s}"><span>${s}</span><input type="range" min="0" max="5" step="0.1" data-w="${s}" aria-label="${s} weight"><input type="number" class="wn" min="0" max="5" step="0.1" inputmode="decimal" data-w="${s}" aria-label="${s} weight, exact"></label>`).join("");
+$("weights").innerHTML=WROWS.map(s=>`${s===DER[0]?`<span class="wsep">Per minute, from your taps and shakes at your speeds (set below)</span>`:""}`+`<label class="wt" data-row="${s}"><span>${s}</span><input type="range" min="0" max="5" step="0.1" data-w="${s}" aria-label="${s} weight"><input type="number" class="wn" min="0" max="5" step="0.1" inputmode="decimal" data-w="${s}" aria-label="${s} weight, exact"></label>`).join("");
 function drawW(skip){WROWS.forEach(s=>{const v=r1(S.w[s]);document.querySelectorAll(`[data-w="${s}"]`).forEach(i=>{if(i!==skip)i.value=i.type==="number"?v.toFixed(1):v});document.querySelector(`[data-row="${s}"]`).classList.toggle("off",!(v>0))})}
 $("weights").addEventListener("input",e=>{const t=e.target.closest("[data-w]");if(!t)return;S.w[t.dataset.w]=r1(t.value);save();drawW(t)});
 $("weights").addEventListener("change",e=>{const t=e.target.closest("[data-w]");if(t)drawW()});
@@ -28,8 +30,8 @@ $("wLuck").onclick=()=>setW({Luck:1});$("wRare").onclick=()=>setW({Luck:1,Capaci
 function drawForm(){
   $("tap").innerHTML=TAPOPT.map(([k,l])=>`<button type="button" class="chip" data-tap="${k}" aria-pressed="${S.tap===k}">${l}</button>`).join("");
   $("tapTxt").textContent=S.tap==="must"?"Only builds that fill the pan in one tap: Dig Strength"+(S.totem?" × 1.5":"")+" at least your Capacity.":S.tap==="prefer"?"A build that needs a second tap counts as if its luck and capacity were halved, a third tap as a third, and so on.":"Taps don't count. Use the per-minute rows above to count pan time instead.";
-  [["digS",.3],["shS",.1],["gapS",1.15]].forEach(([k])=>{if(document.activeElement!==$(k))$(k).value=S[k]});
-  $("ratio").textContent=S.shS>0?`1 dig costs as much as ${fmt(S.digS/S.shS,1)} shake${Math.abs(S.digS/S.shS-1)<.05?"":"s"}`:"";
+  ["digSp","shSp"].forEach(k=>{if(document.activeElement!==$(k))$(k).value=S[k]});
+  $("ratio").textContent=`About ${fmt(digSec(),2)} s a dig and ${fmt(shSec(),3)} s a shake, so 1 dig costs as much as ${fmt(digSec()/shSec(),1)} shakes`;
   $("totem").checked=!!S.totem;$("strFirst").checked=!!S.strFirst;
   $("cons").innerHTML=CONSOPT.map(([k,l])=>`<button type="button" class="chip" data-c="${k}" aria-pressed="${S.cons===k}">${l}</button>`).join("");
   drawPick();
@@ -56,14 +58,9 @@ document.addEventListener("click",e=>{const tp=e.target.closest("[data-tap]");if
   const c=e.target.closest("[data-c]");if(c){S.cons=c.dataset.c;save();drawForm();return}
   const m=e.target.closest("[data-m]");if(m){const n=m.dataset.m;S.muts=S.muts.includes(n)?S.muts.filter(x=>x!==n):S.muts.concat([n]);save();drawForm()}});
 ["perfect","streak","sun","nomad","night","owned","tools","trinket","museum","evMeteor","evWeather","totem","strFirst"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();drawForm()}));
-["digS","shS","gapS"].forEach(k=>$(k).addEventListener("input",()=>{const v=parseFloat($(k).value);if(v>=0&&v<60){S[k]=v;save();drawForm()}}));
-// stopwatch: tap the button once per dig (or shake) in game; the average gap between taps is your time for one
-const SW={};
-function swTap(k){const now=performance.now(),w=SW[k]=SW[k]||{n:0,t0:0,t1:0};if(!w.n)w.t0=now;w.t1=now;w.n++;
-  const per=w.n>1?(w.t1-w.t0)/1000/(w.n-1):0;$(k+"W").textContent=w.n>1?`${w.n} taps, ${fmt(per,3)} s each`:"Keep tapping, once per "+(k==="digS"?"dig":"shake");
-  if(w.n>=5){S[k]=Math.round(per*1000)/1000;save();drawForm()}}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-sw]");if(b){swTap(b.dataset.sw);return}
-  const r=e.target.closest("[data-swr]");if(r){delete SW[r.dataset.swr];$(r.dataset.swr+"W").textContent=""}});
+["digSp","shSp"].forEach(k=>$(k).addEventListener("input",()=>{const v=parseFloat($(k).value);if(v>0){S[k]=v;save();drawForm()}}));
+$("spCalc").onclick=async()=>{let t=null;try{const cw=await window.parent.ptCalcWin();t=cw.ptTotals()}catch(e){}if(!t){ptToast("Couldn't read the Stat Calculator");return}
+  S.digSp=Math.round(t["Dig Speed"]);S.shSp=Math.round(t["Shake Speed"]);save();drawForm();ptToast("Copied from the Stat Calculator")};
 $("openCalc").onclick=()=>{try{window.parent.ptOpenTool("calc")}catch(e){}};
 // ---- scoring: weight × log(1 + stat) for every weighted stat, so doubling a stat on weight 2 counts twice as much as on weight 1 ----
 const val=(t,s,d)=>Math.log(1+Math.max(0,+(DER.includes(s)?d[s]:t[s])||0));
@@ -92,7 +89,7 @@ async function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("
   const ws=STATS.filter(s=>wOf(s)>0),rest=STATS.filter(s=>!(wOf(s)>0)&&Math.abs(+t[s]||0)>1e-9);
   const d=derived(t),pt=panTime(t),nt=Math.max(1,Math.ceil(t.Capacity/Math.max(1e-9,(L.totem?1.5:1)*t["Dig Strength"])));
   const tile=s=>`<div><span class="lab">${s}${wOf(s)>0?`, ${wOf(s).toFixed(1)}`:""}</span><b>${DER.includes(s)?fmt(d[s],d[s]<10?2:0):fv(s,+t[s]||0)}</b></div>`;
-  const panLine=`<p class="hint">Each pan takes <b>${pt.digs} tap${pt.digs===1?"":"s"}</b>${L.totem?" (with the Strength Totem)":""} and <b>${pt.shakes} shake${pt.shakes===1?"":"s"}</b>: about ${fmt(pt.s,2)} s at your times (${fmt(S.digS,2)} s a dig, ${fmt(S.shS,2)} s a shake, ${fmt(S.gapS,2)} s between pans), so about ${fmt(d["Minerals per minute"],0)} minerals per minute.</p>`;
+  const panLine=`<p class="hint">Each pan takes <b>${pt.digs} tap${pt.digs===1?"":"s"}</b>${L.totem?" (with the Strength Totem)":""} and <b>${pt.shakes} shake${pt.shakes===1?"":"s"}</b>: about ${fmt(pt.s,2)} s at ${fmt(S.digSp,0)}% dig and ${fmt(S.shSp,0)}% shake speed, so about ${fmt(d["Minerals per minute"],0)} minerals per minute.</p>`;
   $("res").innerHTML=`<p class="hint">Weights: ${esc(wTxt())}, Consumables: ${esc(consTxt(L))}, Events: ${esc([L.ev.meteor&&"Meteor Shower 2×",L.ev.weather&&"weather 1.5×"].filter(Boolean).join(", ")||"none")}</p>
     <div class="sum">${WROWS.filter(s=>wOf(s)>0).map(tile).join("")}</div>${panLine}
     ${buildHTML(R.st,cw)}

@@ -35,13 +35,13 @@
 
   <section class="card">
     <h2>Taps, shakes and museum</h2>
-    <p class="hint">The per-minute rows price each pan by its taps and shakes at your own times. The search never changes your speed, only strength and capacity, so it doesn't lean on any speed formula.</p>
-    <div class="row" style="align-items:flex-start">
-      <div class="fld"><span class="lab">Seconds per dig</span><input type="number" id="digS" min="0" step="0.01" inputmode="decimal"><span class="sw"><button type="button" class="btn sm" data-sw="digS">Tap per dig</button><button type="button" class="lnk" data-swr="digS">Reset</button></span><span class="hint" id="digSW"></span></div>
-      <div class="fld"><span class="lab">Seconds per shake</span><input type="number" id="shS" min="0" step="0.01" inputmode="decimal"><span class="sw"><button type="button" class="btn sm" data-sw="shS">Tap per shake</button><button type="button" class="lnk" data-swr="shS">Reset</button></span><span class="hint" id="shSW"></span></div>
-      <div class="fld"><span class="lab">Seconds between pans</span><input type="number" id="gapS" min="0" step="0.05" inputmode="decimal"></div>
+    <p class="hint">The per-minute rows price each pan by its taps and shakes at the speeds you enter here. The search keeps these speeds fixed and only changes strength and capacity.</p>
+    <div class="row" style="align-items:flex-end">
+      <div class="fld"><span class="lab">Your Dig Speed (%)</span><input type="number" id="digSp" min="1" step="1" inputmode="decimal"></div>
+      <div class="fld"><span class="lab">Your Shake Speed (%)</span><input type="number" id="shSp" min="1" step="1" inputmode="decimal"></div>
+      <button type="button" class="btn" id="spCalc">Use my Stat Calculator speeds</button>
     </div>
-    <p class="hint"><b id="ratio"></b>. To time yourself, press "Tap per dig" once on every dig in game (at least 5); the average fills in. Same for shakes.</p>
+    <p class="hint"><b id="ratio"></b>. Times come from the community dig and shake tests, plus about 1.15 s between pans. Those tests only go up to about 600% Dig Speed, so above that the times are an estimate.</p>
     <div class="top"><span class="lab">Filling the pan</span><span class="chips" id="tap" role="group" aria-label="Filling the pan"></span></div>
     <p class="hint" id="tapTxt"></p>
     <div class="iso"><label class="ck"><input type="checkbox" id="totem"> Count the Strength Totem (Dig Strength × 1.5)</label><label class="ck"><input type="checkbox" id="strFirst"> Museum: strength before speed</label></div>
