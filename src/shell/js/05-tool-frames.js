@@ -664,7 +664,7 @@ const PT_KIT_CSS =
   ".pt-mslot img,.pt-many{width:34px;height:34px;object-fit:contain;flex:none}" +
   ".pt-many{display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:var(--sunk);color:var(--muted);font-weight:700}" +
   ".pt-mslot>div{flex:1;min-width:0}.pt-mslot b{display:block;font-size:14px}.pt-mslot b.muted{color:var(--muted);font-weight:500}" +
-  ".pt-mslot span{font-size:12px;color:var(--muted)}.pt-mslot em{font-style:normal;font-family:var(--f-mono);color:var(--accent)}.pt-mslot em.neg{color:var(--neg)}" +
+  ".pt-mslot span{font-size:12px;color:var(--muted)}.pt-mslot .pt-ml{display:block;line-height:1.45}.pt-mslot em{font-style:normal;font-family:var(--f-mono);color:var(--accent)}.pt-mslot em.neg{color:var(--neg)}" +
   ".pt-mmod{font-style:normal;font-weight:600;color:#d79a1c}" +
   ".pt-mskip{flex:none;margin-left:auto;font:600 11.5px var(--f-body);padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}";
 const PRE = PRE0 + "<style data-pt-kit>" + PT_KIT_CSS + "</style><script>(" + ptFrameInit.toString() + ")()<\/script><script>(" + ptShareKit.toString() + ")()<\/script><script>(" + ptDeclutter.toString() + ")()<\/script>";
