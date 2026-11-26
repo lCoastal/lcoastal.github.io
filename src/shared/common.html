@@ -67,6 +67,7 @@ input[type=search],input[type=text],input[type=number],select{padding:7px 10px;b
 @media (max-width:600px){.ac{flex:1 1 100%}}
 .ptoast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;z-index:50}
 /* build cards (ptBuildCards) */
+.bk.eq[data-equip]{cursor:pointer}.bk.eq[data-equip]:hover{background:var(--sunk)}
 .bgrid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin:12px 0 4px}
 .bgrid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
 .bk{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel);min-width:0}
@@ -295,11 +296,13 @@ const PT_MUS_ORDER=["Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Comm
 const ptBkIC=(k,n)=>{try{return window.parent.ptIcon(k,n)||""}catch(e){return ""}};
 const ptBkEQ=Object.fromEntries(P.equip.map(e=>[e.n,e]));
 const ptBkPic=(src,alt)=>src?`<img src="${src}" alt="" loading="lazy">`:`<span class="noimg" aria-hidden="true">${esc((alt||"?")[0])}</span>`;
+document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-equip]");if(!c)return;try{window.parent.ptOpen("equip",c.dataset.equip)}catch(err){}});
+document.addEventListener("keydown",e=>{if(e.key!=="Enter"&&e.key!==" ")return;const c=e.target.closest&&e.target.closest("[data-equip]");if(!c)return;e.preventDefault();try{window.parent.ptOpen("equip",c.dataset.equip)}catch(err){}});
 function ptBuildCards(st,cw){
   const tool=(lab,kind,n,en)=>`<div class="bk tool"><div class="ic">${ptBkPic(ptBkIC(kind,n),n)}</div><div><span class="lab">${lab}</span><b>${esc(n||"-")}</b>${en?`<small class="en">${esc(en)}</small>`:""}</div></div>`;
   const top=`<div class="bgrid3">${tool("Pan","Pan",st.pan,st.panEn)}${tool("Shovel","Shovel",st.shovel,st.shEn)}<div class="bk tool"><div class="ic">${st.trinket?ptBkPic(ptBkIC("Trinket",st.trinket),st.trinket):""}</div><div><span class="lab">Trinket</span><b>${esc(st.trinket||"None")}</b></div></div></div>`;
   const card=([k,l])=>{const v=(st.slots||{})[k];if(!v||!v.n)return `<div class="bk eq empty"><span class="lab">${l}</span><b>-</b></div>`;const x=ptBkEQ[v.n]||{};const col=rc(x.r||"");
-    return `<div class="bk eq" style="--rc:${col}"><div class="ic">${ptBkPic(ptBkIC("Equipment",v.n),v.n)}</div><div><span class="lab">${l}</span><b style="color:${col}">${esc(v.n)}</b><small>${esc(x.r||"")}, ${v.l==="5"?"5":"6"}★${v.m&&v.m!=="None"?`, <span class="mu">${esc(v.m)}</span>`:""}${(v.q??100)!==100?`, ${v.q}%`:""}</small></div></div>`};
+    return `<div class="bk eq" style="--rc:${col}" data-equip="${esc(v.n)}" role="button" tabindex="0" title="Open ${esc(v.n)}"><div class="ic">${ptBkPic(ptBkIC("Equipment",v.n),v.n)}</div><div><span class="lab">${l}</span><b style="color:${col}">${esc(v.n)}</b><small>${esc(x.r||"")}, ${v.l==="5"?"5":"6"}★${v.m&&v.m!=="None"?`, <span class="mu">${esc(v.m)}</span>`:""}${(v.q??100)!==100?`, ${v.q}%`:""}</small></div></div>`};
   const defs=cw.ptSlotDefs(),eq=`<div class="bgrid2">${defs.filter(d=>d[2]!=="Ring").map(card).join("")}</div><div class="rings">${defs.filter(d=>d[2]==="Ring").map(card).join("")}</div>`;
   let mus="";const bd=st.museumBoard;if(bd&&Object.values(bd).some(a=>(a||[]).some(x=>x&&x.m)))mus=`<h3 class="sec">Museum</h3>${ptMuseumView(bd,{empty:"Nothing here helps"})}`;
   return `${top}<h3 class="sec">Equipment</h3>${eq}${mus}`}

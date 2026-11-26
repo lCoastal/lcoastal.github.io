@@ -174,7 +174,7 @@ function catSection(x){const c=CATS[x.n.toLowerCase()]||x.cat;if(!c)return "";co
     <p class="muted" style="margin:0;font-size:12.5px">Put ${esc(c)} into the Mutation Forge at Frozen Peak to roll a new mutation on this ${esc(x.slot.toLowerCase())}. More catalysts make the better mutations more likely.</p></div>`}
 document.addEventListener("click",e=>{if(e.target.closest("#toMut")){try{closeEquip();window.parent.ptCallTool("mutations","ptOpenTab","mut")}catch(err){}}});
 function toast(t){const d=document.createElement("div");d.className="toast";d.textContent=t;d.setAttribute("role","status");document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
-function closeEquip(){scrim.hidden=true;lastFocus&&lastFocus.focus&&lastFocus.focus()}
+function closeEquip(){scrim.hidden=true;lastFocus&&lastFocus.focus&&lastFocus.focus();if(window.PT_POPUP){try{window.parent.ptPopupClosed()}catch(e){}}}
 scrim.addEventListener("click",e=>{if(e.target===scrim)closeEquip()});
 scrim.addEventListener("click",e=>{const q=e.target.closest("[data-qopen]");if(!q)return;closeEquip();try{window.parent.ptCallTool("quests","ptOpenItem",q.dataset.qopen)}catch(err){}});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!scrim.hidden)closeEquip()});

@@ -1,15 +1,15 @@
-// a second Minerals instance that only shows its pop-up, laid over whatever tool is open
-let pop = null,
-  popReady = null;
-function popFrame() {
-  if (pop) return popReady;
-  pop = document.createElement("iframe");
+// a second Minerals or Equipment instance that only shows its pop-up, laid over whatever tool is open
+const pops = {},
+  popReady = {};
+function popFrame(id) {
+  if (pops[id]) return popReady[id];
+  const pop = (pops[id] = document.createElement("iframe"));
   pop.className = "popframe";
-  pop.title = "Mineral";
+  pop.title = id === "minerals" ? "Mineral" : "Equipment";
   pop.hidden = true;
   pop.setAttribute("allowtransparency", "true");
-  pop.srcdoc = TOOLS.minerals.replace(/<head>/i, "<head>" + PRE + "<script>window.PT_POPUP=1<\/script>");
-  popReady = new Promise((res) =>
+  pop.srcdoc = TOOLS[id].replace(/<head>/i, "<head>" + PRE + "<script>window.PT_POPUP=1<\/script>");
+  popReady[id] = new Promise((res) =>
     pop.addEventListener(
       "load",
       () => {
@@ -20,22 +20,30 @@ function popFrame() {
     ),
   );
   document.body.appendChild(pop);
-  return popReady;
+  return popReady[id];
 }
 window.ptPopupClosed = () => {
-  if (pop) pop.hidden = true;
+  Object.values(pops).forEach((p) => (p.hidden = true));
 };
 window.ptOpen = async (kind, name) => {
   const curTool = (location.hash || "").slice(1);
   if (kind === "mineral" && curTool !== "minerals") {
-    const f = await popFrame();
+    const f = await popFrame("minerals");
     f.hidden = false;
     try {
       f.contentWindow.openMineral(name);
     } catch (e) {}
     return;
   }
-  if (pop) pop.hidden = true;
+  if (kind === "equip" && curTool !== "equipment") {
+    const f = await popFrame("equipment");
+    f.hidden = false;
+    try {
+      f.contentWindow.ptOpenItem(name);
+    } catch (e) {}
+    return;
+  }
+  window.ptPopupClosed();
   if (kind === "equip") {
     callTool("equipment", "ptOpenItem", name);
     return;
