@@ -13,7 +13,7 @@
 <div class="wrap">
   <header>
     <h1>Build by Stat Priorities</h1>
-    <p class="lede">Set how much each stat matters, from 0 to 5, and it makes a new build from scratch that fits best: every piece and mutation, pan, shovel, enchants, trinket and museum.</p>
+    <p class="lede">Set how much each stat matters, from 0 to 5, choose whether the pan must fill in one tap, and it makes a new build from scratch that fits best: every piece and mutation, pan, shovel, enchants, trinket and museum.</p>
   </header>
 
   <section class="card">
@@ -31,6 +31,21 @@
     <div class="top" style="justify-content:space-between"><h2 style="margin:0">How much does each stat matter?</h2><span class="acts"><button type="button" class="btn sm" id="wLuck">Luck only</button><button type="button" class="btn sm" id="wRare">Luck + capacity</button><button type="button" class="btn sm" id="wClear">All to 0</button></span></div>
     <div class="wts" id="weights"></div>
     <p class="hint">0 ignores a stat. A stat on 2 counts twice as much as one on 1. Each stat counts by how many times bigger it gets, not by its raw number, so stats with big numbers (like luck) don't drown out small ones (like walk speed), and the more you already have of one, the less extra counts.</p>
+  </section>
+
+  <section class="card">
+    <h2>Taps, shakes and museum</h2>
+    <p class="hint">The per-minute rows price each pan by its taps and shakes at your own times. The search never changes your speed, only strength and capacity, so it doesn't lean on any speed formula.</p>
+    <div class="row" style="align-items:flex-start">
+      <div class="fld"><span class="lab">Seconds per dig</span><input type="number" id="digS" min="0" step="0.01" inputmode="decimal"><span class="sw"><button type="button" class="btn sm" data-sw="digS">Tap per dig</button><button type="button" class="lnk" data-swr="digS">Reset</button></span><span class="hint" id="digSW"></span></div>
+      <div class="fld"><span class="lab">Seconds per shake</span><input type="number" id="shS" min="0" step="0.01" inputmode="decimal"><span class="sw"><button type="button" class="btn sm" data-sw="shS">Tap per shake</button><button type="button" class="lnk" data-swr="shS">Reset</button></span><span class="hint" id="shSW"></span></div>
+      <div class="fld"><span class="lab">Seconds between pans</span><input type="number" id="gapS" min="0" step="0.05" inputmode="decimal"></div>
+    </div>
+    <p class="hint"><b id="ratio"></b>. To time yourself, press "Tap per dig" once on every dig in game (at least 5); the average fills in. Same for shakes.</p>
+    <div class="top"><span class="lab">Filling the pan</span><span class="chips" id="tap" role="group" aria-label="Filling the pan"></span></div>
+    <p class="hint" id="tapTxt"></p>
+    <div class="iso"><label class="ck"><input type="checkbox" id="totem"> Count the Strength Totem (Dig Strength × 1.5)</label><label class="ck"><input type="checkbox" id="strFirst"> Museum: strength before speed</label></div>
+    <p class="hint">With strength before speed, museum slots and modifiers are only picked for dig or shake speed when they also give something else you weighted.</p>
   </section>
 
   <section class="card">
