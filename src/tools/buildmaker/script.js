@@ -90,7 +90,7 @@ async function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("
   const d=derived(t),pt=panTime(t),nt=Math.max(1,Math.ceil(t.Capacity/Math.max(1e-9,(L.totem?1.5:1)*t["Dig Strength"])));
   const tile=s=>`<div><span class="lab">${s}${wOf(s)>0?`, ${wOf(s).toFixed(1)}`:""}</span><b style="color:${DER.includes(s)?"var(--fg)":statVar(s)}">${DER.includes(s)?fmt(d[s],d[s]<10?2:0):fv(s,+t[s]||0)}</b></div>`;
   const panLine=`<p class="hint">Each pan takes <b>${pt.digs} tap${pt.digs===1?"":"s"}</b>${L.totem?" (with the Strength Totem)":""} and <b>${pt.shakes} shake${pt.shakes===1?"":"s"}</b>: about ${fmt(pt.s,2)} s at ${fmt(S.digSp,0)}% dig and ${fmt(S.shSp,0)}% shake speed, so about ${fmt(d["Minerals per minute"],0)} minerals per minute.</p>`;
-  $("res").innerHTML=`<p class="hint">Weights: ${esc(wTxt())}, Consumables: ${esc(consTxt(L))}, Events: ${esc([L.ev.meteor&&"Meteor Shower 2×",L.ev.weather&&"weather 1.5×"].filter(Boolean).join(", ")||"none")}</p>
+  $("res").innerHTML=`<p class="hint">Consumables: ${esc(consTxt(L))}, Events: ${esc([L.ev.meteor&&"Meteor Shower 2×",L.ev.weather&&"weather 1.5×"].filter(Boolean).join(", ")||"none")}</p>
     <div class="sum">${WROWS.filter(s=>wOf(s)>0).map(tile).join("")}</div>
     ${buildHTML(R.st,cw,{skip:true})}
     ${rest.length?`<details class="own"><summary><b>Every other stat</b></summary><div class="sum">${rest.map(tile).join("")}</div></details>`:""}
