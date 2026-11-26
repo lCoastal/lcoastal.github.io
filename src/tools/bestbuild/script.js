@@ -3,7 +3,7 @@ const MUTN=["None","Silver","Gold","Diamond","Granite","Overclocked","Festive","
 let S={tab:"find",cmp:false,goal:"min",min:"",zone:"",useCap:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-bestbuild")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("pt-bestbuild",JSON.stringify(S))}catch(e){}};
-// presets follow the community build guide (Prospecting! Build Guide, Pharaoh's Tomb update): what each kind of build is for
+// presets: what each kind of build is for
 const GOALS=[["min","A mineral"],["luckeff","Luck Efficiency"],["hybrid","Hybrid"],["size","Size Boost"],["items","Items Farming"],["money","Money (autopan)"],["sell","Sell Boost (selling only)"],["rare","Tomb Raider (per pan)"],["luck","Luck only"]];
 const lg=v=>Math.log(Math.max(1e-9,v));
 // a tap fills the pan when Dig Strength x 1.5 (Strength Totem) >= Capacity; every extra tap costs about another dig's time
@@ -16,20 +16,20 @@ const panTime=t=>{const C=Math.max(1,t.Capacity),ds=Math.max(1,t["Dig Speed"]),s
 // (about 2.75x at 475% Modifier Boost and 3.66x at 1,917%, from the modifier shares in the logs and the toolkit's prices)
 const modVal=mb=>{const q=ptAnyMod(mb),avg=Math.min(4,2.75+0.00063*Math.max(0,mb-475));return 1-q+q*avg};
 const PRESET={
-  luckeff:{txt:"Highest average rerolls per tap: <b>luck × capacity<sup>0.565</sup></b>, divided by the taps it takes to fill the pan. The guide's Luck Efficiency builds are one-tap builds (Dig Strength × 1.5 ≥ Capacity with the Strength Totem), so a build that needs a second tap loses about half.",
+  luckeff:{txt:"Highest average rerolls per tap: <b>luck × capacity<sup>0.565</sup></b>, divided by the taps it takes to fill the pan. A pan fills in one tap when Dig Strength × 1.5 ≥ Capacity (with the Strength Totem); a build that needs a second tap loses about half.",
     useful:["Luck","Capacity","Dig Strength"],sf:t=>lg(t.Luck)+.565*lg(t.Capacity)-lg(taps(t)),lab:"Rerolls per tap"},
-  hybrid:{txt:"Rerolls per tap, times Size Boost and what modifiers add to the price. Like the guide's Hybrid builds: efficiency first, with size and modifier boost on top (the guide aims for 1,800%+ size and 4,000%+ modifier boost).",
+  hybrid:{txt:"Rerolls per tap, times Size Boost and what modifiers add to the price: efficiency first, with size and modifier boost on top.",
     useful:["Luck","Capacity","Dig Strength","Size Boost","Modifier Boost"],sf:t=>lg(t.Luck)+.565*lg(t.Capacity)-lg(taps(t))+lg(1+t["Size Boost"]/100)+lg(modVal(t["Modifier Boost"])),lab:"Hybrid score"},
   size:{txt:"Highest Size Boost, for big museum and crafting minerals. Luck only breaks ties.",
     useful:["Size Boost","Luck"],sf:t=>lg(1+t["Size Boost"]/100)+.01*lg(t.Luck),lab:"Size Boost"},
   items:{txt:"Most minerals per minute, for Dredge Master quests: minerals per pan ÷ time per pan, using the dig and shake speed tests (as in Rolls per Minute). Luck doesn't count.",
     useful:["Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed"],sf:t=>lg(panItems(t.Capacity))-lg(panTime(t)),lab:"Minerals per minute"},
-  money:{txt:"Rough money per minute while autopanning: minerals per minute × Size Boost × what modifiers add × Sell Boost, with a little luck for pricier minerals. An estimate for comparing builds, like the guide's Money Printer builds.",
+  money:{txt:"Rough money per minute while autopanning: minerals per minute × Size Boost × what modifiers add × Sell Boost, with a little luck for pricier minerals. An estimate for comparing builds.",
     useful:["Luck","Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed","Size Boost","Modifier Boost","Sell Boost"],
     sf:t=>lg(panItems(t.Capacity))-lg(panTime(t))+lg(1+t["Size Boost"]/100)+lg(modVal(t["Modifier Boost"]))+lg(1+t["Sell Boost"]/100)+.25*lg(t.Luck),lab:"Money per minute"},
-  sell:{txt:"Highest Sell Boost. Like the guide's Sell Boost builds, it's only for putting on right before you sell a full backpack.",
+  sell:{txt:"Highest Sell Boost. Only for putting on right before you sell a full backpack.",
     useful:["Sell Boost"],sf:t=>lg(1+t["Sell Boost"]/100),lab:"Sell Boost"},
-  rare:{txt:"Best odds per pan at the rarest minerals: <b>luck × capacity<sup>0.565</sup></b>, with no penalty for extra taps. For when pans are limited rather than time, like the guide's Tomb Raider builds (six pans per tomb vein).",
+  rare:{txt:"Best odds per pan at the rarest minerals: <b>luck × capacity<sup>0.565</sup></b>, with no penalty for extra taps. For when pans are limited rather than time, like the Pharaoh's Tomb (six pans per tomb vein).",
     useful:["Luck","Capacity"],sf:t=>lg(t.Luck)+.565*lg(t.Capacity),lab:"Rare finds per pan"},
   luck:{txt:"Highest total luck. Capacity doesn't count.",useful:["Luck"],sf:t=>lg(t.Luck),lab:"Luck"}};
 // ---- drop model (same as Luck Odds / Best Luck Cap): each mineral's chance per pick at a given luck ----
