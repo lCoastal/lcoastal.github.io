@@ -3,7 +3,35 @@ const MUTN=["None","Silver","Gold","Diamond","Granite","Overclocked","Festive","
 let S={tab:"find",goal:"min",min:"",zone:"",useCap:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-bestbuild")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("pt-bestbuild",JSON.stringify(S))}catch(e){}};
-const GOALS=[["min","A mineral"],["rare","Rare finds per pan"],["luck","Luck only"]];
+// presets follow the community build guide (Prospecting! Build Guide, Pharaoh's Tomb update): what each kind of build is for
+const GOALS=[["min","A mineral"],["luckeff","Luck Efficiency"],["hybrid","Hybrid"],["size","Size Boost"],["items","Items Farming"],["money","Money (autopan)"],["sell","Sell Boost (selling only)"],["rare","Tomb Raider (per pan)"],["luck","Luck only"]];
+const lg=v=>Math.log(Math.max(1e-9,v));
+// a tap fills the pan when Dig Strength x 1.5 (Strength Totem) >= Capacity; every extra tap costs about another dig's time
+const taps=t=>Math.max(1,Math.ceil(t.Capacity/Math.max(1e-9,1.5*t["Dig Strength"])));
+// minerals per minute, from the community dig and shake timing tests (same as Rolls per Minute)
+const panTime=t=>{const C=Math.max(1,t.Capacity),ds=Math.max(1,t["Dig Speed"]),ss=Math.max(1,t["Shake Speed"]);
+  const digs=Math.min(Math.ceil(C),Math.ceil(C/Math.max(1e-9,t["Dig Strength"]))),shakes=Math.min(Math.ceil(C),Math.ceil(C/Math.max(1e-9,t["Shake Strength"])));
+  return digs*143.9*Math.pow(ds,-0.9324)+shakes/(23.514*ss/(442.88+ss))+1.15};
+// what modifiers add to an average mineral's price: chance of one x the average price multiplier of a modified mineral
+// (about 2.75x at 475% Modifier Boost and 3.66x at 1,917%, from the modifier shares in the logs and the toolkit's prices)
+const modVal=mb=>{const q=ptAnyMod(mb),avg=Math.min(4,2.75+0.00063*Math.max(0,mb-475));return 1-q+q*avg};
+const PRESET={
+  luckeff:{txt:"Highest average rerolls per tap: <b>luck × capacity<sup>0.565</sup></b>, divided by the taps it takes to fill the pan. The guide's Luck Efficiency builds are one-tap builds (Dig Strength × 1.5 ≥ Capacity with the Strength Totem), so a build that needs a second tap loses about half.",
+    useful:["Luck","Capacity","Dig Strength"],sf:t=>lg(t.Luck)+.565*lg(t.Capacity)-lg(taps(t)),lab:"Rerolls per tap"},
+  hybrid:{txt:"Rerolls per tap, times Size Boost and what modifiers add to the price. Like the guide's Hybrid builds: efficiency first, with size and modifier boost on top (the guide aims for 1,800%+ size and 4,000%+ modifier boost).",
+    useful:["Luck","Capacity","Dig Strength","Size Boost","Modifier Boost"],sf:t=>lg(t.Luck)+.565*lg(t.Capacity)-lg(taps(t))+lg(1+t["Size Boost"]/100)+lg(modVal(t["Modifier Boost"])),lab:"Hybrid score"},
+  size:{txt:"Highest Size Boost, for big museum and crafting minerals. Luck only breaks ties.",
+    useful:["Size Boost","Luck"],sf:t=>lg(1+t["Size Boost"]/100)+.01*lg(t.Luck),lab:"Size Boost"},
+  items:{txt:"Most minerals per minute, for Dredge Master quests: minerals per pan ÷ time per pan, using the dig and shake speed tests (as in Rolls per Minute). Luck doesn't count.",
+    useful:["Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed"],sf:t=>lg(panItems(t.Capacity))-lg(panTime(t)),lab:"Minerals per minute"},
+  money:{txt:"Rough money per minute while autopanning: minerals per minute × Size Boost × what modifiers add × Sell Boost, with a little luck for pricier minerals. An estimate for comparing builds, like the guide's Money Printer builds.",
+    useful:["Luck","Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed","Size Boost","Modifier Boost","Sell Boost"],
+    sf:t=>lg(panItems(t.Capacity))-lg(panTime(t))+lg(1+t["Size Boost"]/100)+lg(modVal(t["Modifier Boost"]))+lg(1+t["Sell Boost"]/100)+.25*lg(t.Luck),lab:"Money per minute"},
+  sell:{txt:"Highest Sell Boost. Like the guide's Sell Boost builds, it's only for putting on right before you sell a full backpack.",
+    useful:["Sell Boost"],sf:t=>lg(1+t["Sell Boost"]/100),lab:"Sell Boost"},
+  rare:{txt:"Best odds per pan at the rarest minerals: <b>luck × capacity<sup>0.565</sup></b>, with no penalty for extra taps. For when pans are limited rather than time, like the guide's Tomb Raider builds (six pans per tomb vein).",
+    useful:["Luck","Capacity"],sf:t=>lg(t.Luck)+.565*lg(t.Capacity),lab:"Rare finds per pan"},
+  luck:{txt:"Highest total luck. Capacity doesn't count.",useful:["Luck"],sf:t=>lg(t.Luck),lab:"Luck"}};
 // ---- drop model (same as Luck Odds / Best Luck Cap): each mineral's chance per pick at a given luck ----
 const CAP_EFF=0.56,CAPS=[1,5,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000];
 const LOC={};P.mins.forEach(m=>(m.ch||[]).forEach(c=>{const l=c[0];const p=parseFloat(String(c[1]).replace(/[%,]/g,""))/100;if(!(p>0))return;(LOC[l]=LOC[l]||[]).push({m,p})}));
@@ -20,11 +48,12 @@ const MINS=P.mins.filter(m=>Object.keys(LOC).some(l=>fullList(l).some(x=>x.m===m
 const zonesOf=m=>Object.keys(LOC).filter(l=>fullList(l).some(x=>x.m===m)&&(LOC[l].length>1||baseLoc(l)!==l)).sort((a,b)=>a.localeCompare(b));
 const minObj=()=>MINS.find(m=>m.n===S.min)||null;
 
+const fv=(k,v)=>!isFinite(v)?"-":/Boost|Speed/.test(k)?fmt(v,0)+"%":fmt(v,v<10?1:0);
 const oneInT=p=>!(p>0)?"-":p>=.5?fmt(p*100,0)+"% per pan":"1 in "+(1/p<10?fmt(1/p,1):fmt(Math.round(1/p),0))+" pans";
 // ---- form ----
 function drawForm(){
   $("goal").innerHTML=GOALS.map(([k,l])=>`<button type="button" class="chip" data-g="${k}" aria-pressed="${S.goal===k}">${l}</button>`).join("");
-  $("goalTxt").innerHTML=S.goal==="min"?"The best odds per pan for one mineral in one zone, with a luck cap if that helps.":S.goal==="rare"?"Best odds per pan at the rarest minerals: <b>luck × capacity<sup>0.565</sup></b>. Capacity gives more minerals per pan but fades, while luck keeps paying off for the rarest ones.":"Highest total luck. Capacity doesn't count.";
+  $("goalTxt").innerHTML=S.goal==="min"?"The best chance per pan of getting at least one of this mineral in this zone. Luck sets each mineral's chance (too much luck can push you past common ones), capacity sets how many minerals a pan holds. With the luck cap option on, it also tries panning under a luck cap.":(PRESET[S.goal]||PRESET.luck).txt;
   $("minRow").hidden=S.goal!=="min";
   $("muts").innerHTML=MUTN.map(m=>`<button type="button" class="chip" data-m="${m}" aria-pressed="${S.muts.includes(m)}">${m}</button>`).join("");
   ["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap"].forEach(k=>$(k).checked=!!S[k]);$("streak").disabled=!S.perfect;
@@ -54,12 +83,11 @@ $("run").onclick=async()=>{if(!S.muts.length){ptToast("Pick at least one mutatio
     // chance per pan at the better of your own luck and the best cap below it
     const per=(L,C)=>{let p=ef(Math.max(1,L)),cap=null;if(S.useCap)CAPS.forEach((c,i)=>{if(c<L&&capE[i]>p*(1+1e-6)){p=capE[i];cap=c}});return {p:1-Math.pow(1-p,panItems(C)),cap}};
     sf=t=>Math.log(Math.max(1e-300,per(t.Luck,t.Capacity).p));info={m,per}}
-  else if(S.goal==="rare")sf=t=>Math.log(Math.max(1e-9,t.Luck))+.565*Math.log(Math.max(1e-9,t.Capacity));
-  else sf=t=>Math.log(Math.max(1e-9,t.Luck));
+  else sf=(PRESET[S.goal]||PRESET.luck).sf;
   const btn=$("run");btn.disabled=true;$("prog").textContent="Loading the Stat Calculator…";
   let cw=null;try{cw=await window.parent.ptCalcWin()}catch(e){}
   if(!cw||!cw.ptFindBuild){btn.disabled=false;$("prog").textContent="";ptToast("Couldn't load the Stat Calculator");return}
-  const useful=S.goal==="luck"?["Luck"]:["Luck","Capacity"];
+  const useful=S.goal==="min"?["Luck","Capacity"]:(PRESET[S.goal]||PRESET.luck).useful;
   const ev=S.events?{meteor:S.events==="meteor"||S.events==="both",weather:S.events==="weather"||S.events==="both"}:null;
   const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
   btn.disabled=false;$("prog").textContent="";LAST={R,goal:S.goal,info,cw,zone:S.zone,perfect:S.perfect};showRes()};
@@ -67,25 +95,26 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
   const g=Math.exp(R.sc-R.beforeSc)-1;const gTxt=g>0.0005?(g<1?"+"+fmt(g*100,g<.1?1:0)+"%":"×"+fmt(g+1,g+1<10?2:0)):"no better build found";
   let head="";if(L.goal==="min"){const now=L.info.per(t.Luck,t.Capacity),was=L.info.per(R.before.Luck,R.before.Capacity);
     head=`<div><span class="lab">${esc(L.info.m.n)} in ${esc(L.zone)}</span><b class="pos">${oneInT(now.p)}</b><span class="hint">now ${oneInT(was.p)}</span></div><div><span class="lab">Luck cap</span><b>${now.cap?fmt(now.cap,0):"None"}</b><span class="hint">${now.cap?"pan with this cap on":"pan at your own luck"}</span></div>`}
-  else head=`<div><span class="lab">${L.goal==="luck"?"Luck":"Rare finds per pan"}</span><b class="${g>0.0005?"pos":""}">${gTxt}</b><span class="hint">vs your current build</span></div>`;
+  else head=`<div><span class="lab">${esc((PRESET[L.goal]||PRESET.luck).lab)}</span><b class="${g>0.0005?"pos":""}">${gTxt}</b><span class="hint">vs your current build</span></div>`;
   const mut=v=>v&&v.m&&v.m!=="None"?` (${esc(v.m)})`:"";const it=v=>v&&v.n?esc(v.n)+mut(v)+(v.l==="6"&&(v.q??100)===100?"":`, ${v.l==="5"?"5":"6"}★ ${v.q??100}%`):"";
   const row=(lab,now,was)=>`<tr class="${now===was?"":"chg"}"><td>${lab}</td><td>${now||"-"}</td><td class="was">${now===was?"":(was||"-")}</td></tr>`;
   const tl=(p,e)=>esc(p||"")+(e?`, ${esc(e)}`:"");
   const rows=[row("Pan",tl(st.pan,st.panEn),tl(b.pan,b.panEn)),row("Shovel",tl(st.shovel,st.shEn),tl(b.shovel,b.shEn)),row("Trinket",esc(st.trinket||""),esc(b.trinket||""))].concat(cw.ptSlotDefs().map(([k,l])=>row(l,it(st.slots[k]),it(b.slots[k]))));
   let mus="";if(R.museum)mus=`<h3 class="sec">Museum</h3>${ptMuseumView(st.museumBoard,{empty:"Nothing here helps"})}`;
   const capL=.565*t.Luck/Math.max(1,t.Capacity);
-  $("res").innerHTML=`<div class="sum">${head}<div><span class="lab">Luck</span><b>${fmt(t.Luck,0)}</b><span class="hint">now ${fmt(R.before.Luck,0)}</span></div><div><span class="lab">Capacity</span><b>${fmt(t.Capacity,0)}</b><span class="hint">now ${fmt(R.before.Capacity,0)}</span></div></div>
-    ${L.goal==="luck"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}
+  $("res").innerHTML=`<div class="sum">${head}${((PRESET[L.goal]||{}).useful||["Luck","Capacity"]).filter((k,i,a)=>i<6).map(k=>`<div><span class="lab">${esc(k)}</span><b>${fv(k,t[k])}</b><span class="hint">now ${fv(k,R.before[k])}</span></div>`).join("")}</div>
+    ${L.goal==="luck"||L.goal==="size"||L.goal==="sell"||L.goal==="items"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}
     <table class="bt"><tr><th></th><th>Best build</th><th>Now</th></tr>${rows.join("")}</table>${mus}
     ${cw.ptWhyHTML?cw.ptWhyHTML(R):""}
     <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
 function sheetText(){const L=LAST;let txt=L.cw.ptBuildTextOf(L.R.st);
   if(L.goal==="min"){const n=L.info.per(L.R.tot.Luck,L.R.tot.Capacity);txt=txt.replace(/^(Title:[^\n]*\n)/,`$1Subtitle: Best build for ${L.info.m.n} in ${L.zone}: about ${oneInT(n.p)}${n.cap?`, with a luck cap of ${fmt(n.cap,0)}`:""}\n`)}
+  else txt=txt.replace(/^(Title:[^\n]*\n)/,`$1Subtitle: ${(GOALS.find(g=>g[0]===L.goal)||["","Luck"])[1]} build\n`);
   return txt}
 document.addEventListener("click",async e=>{if(!LAST)return;
   if(e.target.closest("#toSheet")){try{window.parent.ptCallTool("builds","ptAddBuildText",sheetText());ptToast("Saved to Build Sheets")}catch(err){ptToast("Couldn't reach Build Sheets")}return}
   if(e.target.closest("#share")){const url=await ptCopyShare(sheetText());ptToast(url?"Share link copied":"Couldn't copy, your browser blocked it");return}
-  if(e.target.closest("#csv")){const L=LAST;const head=L.goal==="min"?(()=>{const n=L.info.per(L.R.tot.Luck,L.R.tot.Capacity);return [["Goal",`${L.info.m.n} in ${L.zone}`],["Odds per pan",oneInT(n.p)],["Luck cap",n.cap||"none"],[]]})():[["Goal",L.goal==="luck"?"Luck only":"Rare finds per pan"],[]];
+  if(e.target.closest("#csv")){const L=LAST;const head=L.goal==="min"?(()=>{const n=L.info.per(L.R.tot.Luck,L.R.tot.Capacity);return [["Goal",`${L.info.m.n} in ${L.zone}`],["Odds per pan",oneInT(n.p)],["Luck cap",n.cap||"none"],[]]})():[["Goal",(GOALS.find(g=>g[0]===L.goal)||["","Luck only"])[1]],[]];
     if(await ptDownloadCSV(L.goal==="min"?`Best build for ${L.info.m.n}`:"Best build",L.cw.ptFinderRows(L.R,head)))ptToast("Download started");return}
   if(e.target.closest("#use")){LAST.cw.ptUseBuild(LAST.R.st,LAST.R.museum);ptToast("Loaded into the Stat Calculator");return}});
 // ---- what I own: one list of everything, with tick-all per group ----
