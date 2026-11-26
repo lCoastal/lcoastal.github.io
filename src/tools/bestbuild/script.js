@@ -107,7 +107,7 @@ function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("resCar
   const rows=[row("Pan",tl(st.pan,st.panEn),tl(b.pan,b.panEn)),row("Shovel",tl(st.shovel,st.shEn),tl(b.shovel,b.shEn)),row("Trinket",esc(st.trinket||""),esc(b.trinket||""))].concat(cw.ptSlotDefs().map(([k,l])=>row(l,it(st.slots[k]),it(b.slots[k]))));
   let mus="";if(R.museum)mus=`<h3 class="sec">Museum</h3>${ptMuseumView(st.museumBoard,{empty:"Nothing here helps"})}`;
   const capL=.565*t.Luck/Math.max(1,t.Capacity);
-  $("res").innerHTML=`<div class="sum">${head}${((PRESET[L.goal]||{}).useful||["Luck","Capacity"]).filter((k,i,a)=>i<6).map(k=>`<div><span class="lab">${esc(k)}</span><b>${fv(k,t[k])}</b>${L.cmp?`<span class="hint">now ${fv(k,R.before[k])}</span>`:""}</div>`).join("")}</div>
+  $("res").innerHTML=`<div class="sum">${head}${((PRESET[L.goal]||{}).useful||["Luck","Capacity"]).filter((k,i,a)=>i<6).map(k=>`<div><span class="lab">${esc(k)}</span><b style="color:${statVar(k)}">${fv(k,t[k])}</b>${L.cmp?`<span class="hint">now ${fv(k,R.before[k])}</span>`:""}</div>`).join("")}</div>
     ${L.goal==="luck"||L.goal==="size"||L.goal==="sell"||L.goal==="items"?"":`<p class="hint">At this build 1 capacity is worth about ${fmt(capL,capL<10?2:0)} luck for the rarest minerals.${L.perfect?"":" Counted as autopan: use Mastered on the shovel for full luck."}</p>`}
     ${ptBuildCards(st,cw)}${L.cmp?`<h3 class="sec">Compared with your current build</h3><table class="bt"><tr><th></th><th>Build</th><th>Now</th></tr>${rows.join("")}</table>`:""}
     ${L.cmp&&cw.ptWhyHTML?cw.ptWhyHTML(R):""}
