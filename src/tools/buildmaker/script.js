@@ -12,8 +12,9 @@ const TAPOPT=[["any","Don't mind"],["prefer","Prefer one tap"],["must","Must be 
 const taps=t=>Math.max(1,Math.ceil(t.Capacity/Math.max(1e-9,(S.totem?1.5:1)*t["Dig Strength"])));
 const PCT=new Set(["Size Boost","Modifier Boost","Sell Boost","Dig Speed","Shake Speed"]);
 const CONSOPT=[["none","None"],["pick","Pick my own"],["mine","As in the Stat Calculator"],["all","Every potion and consumable"]];
-let S={w:{Luck:1,Capacity:.6},tap:"prefer",totem:true,digS:.3,shS:.1,gapS:1.15,strFirst:true,cons:"none",muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,night:false,evMeteor:false,evWeather:false,pickPots:[],pickCons:[],owned:false,tools:true,trinket:true,museum:true};
+let S={w:{Luck:1,Capacity:.6},tap:"prefer",totem:true,digS:.3,shS:.1,gapS:1.15,strFirst:true,cons:"none",muts:["Sunforged","Prismatic"],mutDef:2,perfect:true,streak:true,sun:true,nomad:true,night:false,evMeteor:false,evWeather:false,pickPots:[],pickCons:[],owned:false,tools:true,trinket:true,museum:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-buildmaker")||"{}"))}catch(e){}
+if(S.mutDef!==2){S.muts=["Sunforged","Prismatic"];S.mutDef=2}
 const save=()=>{try{localStorage.setItem("pt-buildmaker",JSON.stringify(S))}catch(e){}};
 const r1=v=>Math.round(Math.min(5,Math.max(0,+v||0))*10)/10;
 // ---- form ----

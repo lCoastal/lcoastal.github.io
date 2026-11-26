@@ -1,7 +1,8 @@
 const $=id=>document.getElementById(id);
 const MUTN=["None","Silver","Gold","Diamond","Granite","Overclocked","Festive","Sunforged","Prismatic"];
-let S={tab:"find",cmp:false,goal:"min",min:"",zone:"",useCap:true,perMin:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
+let S={tab:"find",cmp:false,goal:"min",min:"",zone:"",useCap:true,perMin:true,muts:["Sunforged","Prismatic"],mutDef:2,perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-bestbuild")||"{}"))}catch(e){}
+if(S.mutDef!==2){S.muts=["Sunforged","Prismatic"];S.mutDef=2}
 const save=()=>{try{localStorage.setItem("pt-bestbuild",JSON.stringify(S))}catch(e){}};
 // presets: what each kind of build is for
 const GOALS=[["min","A mineral"],["luckeff","Luck Efficiency"],["hybrid","Hybrid"],["size","Size Boost"],["items","Items Farming"],["money","Money (autopan)"],["sell","Sell Boost (selling only)"],["rarepm","Rare finds per minute"],["rare","Tomb Raider (per pan)"],["luck","Luck only"]];
