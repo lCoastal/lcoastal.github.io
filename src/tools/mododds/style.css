@@ -43,3 +43,7 @@ table.o .off td{opacity:.45}
 
 /* line the numbers up with the mineral name, not the middle of the row */
 table.o td{vertical-align:baseline}
+
+table.one td:nth-child(n+2),table.one th:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}
+table.one tr.tot td{color:var(--muted)}
+#oneCard .inputs{margin-bottom:10px}

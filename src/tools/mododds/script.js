@@ -1,6 +1,6 @@
 
 const $=id=>document.getElementById(id);
-let S={mb:"",luck:"",cap:"",mag:false,surge:false,night:false};try{Object.assign(S,JSON.parse(localStorage.getItem("pmo-s")||"{}"))}catch(e){}
+let S={mb:"",luck:"",cap:"",mag:false,surge:false,night:false,min:"",zone:""};try{Object.assign(S,JSON.parse(localStorage.getItem("pmo-s")||"{}"))}catch(e){}
 const youPush=ptYouLink(S,{mb:"mb",luck:"luck",cap:"cap"},()=>render());
 const save=()=>{try{localStorage.setItem("pmo-s",JSON.stringify(S))}catch(e){}youPush()};
 // the game's modifier weights; a modifier's base share is its weight ÷ the total (Treasured, Voidtorn, event ones etc. are 0 here)
@@ -30,6 +30,7 @@ function calcAll(){const mb=Math.max(0,+S.mb||0);
 const ORDER=["Perfect","Lunar","Mutated","Cosmic","Iridescent","Irradiated","Scorching","Glowing","Pure","Shiny"];
 function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge","night"].forEach(k=>$(k).checked=!!S[k]);
   const {effAny,effWhich,q,sh,n}=calcAll();
+  if(document.activeElement!==$("min"))$("min").value=S.min;renderOne({q,sh});
   $("sum").innerHTML=`<div><span class="lab">Ores with a modifier</span><b>${fmt(q*100,1)}%</b><div class="bar"><i style="width:${q*100}%"></i></div></div>
     <div><span class="lab">Effective boost</span><b>${fmt(effAny,0)}</b><span class="hint">${fmt(effWhich,0)} for which modifier</span></div>
     <div><span class="lab">Perfect per pan</span><b>${oneInP(1-Math.pow(1-q*sh.Perfect/100,n))}</b><span class="hint">about ${fmt(n,1)} ores per pan</span></div>`;
@@ -45,6 +46,24 @@ function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge"
   const order=ORDER;
   $("tbl").innerHTML=`<table class="o"><thead><tr><th>Modifier</th><th>Share of modified</th><th>Base share</th><th>Per ore</th><th>Per pan</th><th>Sell ×</th></tr></thead><tbody>${order.map(k=>{const on=k!=="Lunar"||S.night;const s=on?(sh[k]||0):0;const po=q*s/100;
     return `<tr class="${on?"":"off"}"><td><span class="mn"><b>${k}</b><span>${k==="Lunar"&&!S.night?"Night only":"Museum: "+esc(MUSE[k]||"")}</span></span></td><td data-l="Share" class="${s>BASE[k]*1.05?"up":""}">${on?fmt(s,s<0.1?4:2)+"%"+trend(k):"-"}</td><td data-l="Base">${fmt(BASE[k],4)}%</td><td data-l="Per ore">${on?oneInP(po):"-"}</td><td data-l="Per pan">${on?oneInP(1-Math.pow(1-po,n)):"-"}</td><td data-l="Sell">${PRICE[k]}×</td></tr>`}).join("")}</tbody></table>`}
+// ---- one mineral: how many of it you'd pan per modifier, and how many pans that takes in a zone ----
+const MINS=P.mins.filter(m=>(m.ch||[]).length).sort((a,b)=>a.n.localeCompare(b.n));
+const curMin=()=>MINS.find(m=>m.n.toLowerCase()===String(S.min).trim().toLowerCase());
+const AC=makeAC({inp:$("min"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),cur:()=>{const m=curMin();return m?m.n:""},icon:()=>{const m=curMin();return m&&m.ic},pick:x=>{$("min").value=x.n;$("min").dispatchEvent(new Event("input"))}});
+const nIn=p=>!(p>0)?"never":p>=.5?fmt(1/p,1):fmt(Math.round(1/p),0);
+function renderOne(calc){const m=curMin(),zs=$("zone");
+  if(!m){zs.innerHTML="";zs.disabled=true;$("oneOut").innerHTML=String(S.min).trim()?`<p class="hint">No mineral called "${esc(S.min)}".</p>`:"";return}
+  const st=ptMineralStats(m.n,{luck:S.luck,cap:S.cap}),zl=(st?st.zones:[]).filter(z=>z.q>0).sort((a,b)=>b.q-a.q);
+  if(!zl.length){zs.innerHTML="";zs.disabled=true;$("oneOut").innerHTML=`<p class="hint">${esc(m.n)} doesn't drop from panning, so there's nothing to work out here.</p>`;return}
+  if(!zl.some(z=>z.z===S.zone))S.zone=zl[0].z;
+  zs.disabled=false;zs.innerHTML=zl.map(z=>`<option value="${esc(z.z)}"${z.z===S.zone?" selected":""}>${esc(z.z)}, 1 in ${nIn(z.q)} minerals</option>`).join("");
+  const z=zl.find(x=>x.z===S.zone),items=st.items,hasStats=+S.luck>0&&+S.cap>0;
+  const {q,sh}=calc,rows=[["Any modifier",q]].concat(ORDER.filter(k=>k!=="Lunar"||S.night).map(k=>[k,q*(sh[k]||0)/100])).concat([["No modifier",1-q]]);
+  const pans=p=>{const per=1-Math.pow(1-z.q*p,items);return per>0?1/per:Infinity};
+  $("oneOut").innerHTML=`<div class="tw"><table class="o one"><thead><tr><th>${esc(m.n)} that is</th><th>Chance per ${esc(m.n)}</th><th>${esc(m.n)} per one</th><th>Pans per one</th></tr></thead><tbody>${rows.map(([k,p])=>`<tr class="${k==="Any modifier"||k==="No modifier"?"tot":""}"><td><b>${k}</b></td><td data-l="Chance">${oneInP(p)}</td><td data-l="Per one">${nIn(p)}</td><td data-l="Pans">${p>0?fmt(pans(p),pans(p)<10?1:0):"never"}</td></tr>`).join("")}</tbody></table></div>
+    <p class="hint">${esc(m.n)} is 1 in ${nIn(z.q)} minerals in ${esc(z.z)} at ${hasStats?`${fmt(+S.luck,0)} luck`:"no luck typed"}, and a pan holds about ${fmt(items,0)} minerals${+S.cap>0?"":" (type your capacity above)"}. Pans per one is how many pans it takes on average to get one ${esc(m.n)} with that modifier.</p>`}
+$("min").addEventListener("input",()=>{S.min=$("min").value;save();render()});
+$("zone").addEventListener("change",()=>{S.zone=$("zone").value;save();render()});
 ["mb","luck","cap"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
 ["mag","surge","night"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();render()}));
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;S.mb=Math.round(t["Modifier Boost"]||0);S.luck=Math.round(t.Luck||0);S.cap=Math.round(t.Capacity)||S.cap;save();render()};

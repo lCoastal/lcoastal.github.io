@@ -29,6 +29,15 @@
       <label class="ck"><input type="checkbox" id="night"> Night (Lunar can drop)</label>
     </div>
   </section>
+  <section class="card" id="oneCard">
+    <h2>For one mineral</h2>
+    <p class="hint">Pick a mineral to see how many of it you'd pan per modifier, and how many pans that takes in a zone. Uses your luck and capacity above.</p>
+    <div class="inputs">
+      <label class="fld"><span class="lab">Mineral</span><input type="text" id="min" placeholder="e.g. Gold" autocomplete="off"></label>
+      <label class="fld"><span class="lab">Zone</span><select id="zone"></select></label>
+    </div>
+    <div id="oneOut"></div>
+  </section>
   <section class="card"><div style="display:flex;justify-content:flex-end"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="big" id="sum"></div><div class="tw" id="tbl"></div><p class="hint" style="margin:8px 0 0">Next to each share, <b class="tr up">▲</b> means more Modifier Boost makes that modifier more common and <b class="tr dn">▼</b> means it gets rarer. Hover one to see why.</p></section>
   <section class="card"><h2>How it works</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
