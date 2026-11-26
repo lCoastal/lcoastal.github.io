@@ -1,10 +1,10 @@
 const $=id=>document.getElementById(id);
 const MUTN=["None","Silver","Gold","Diamond","Granite","Overclocked","Festive","Sunforged","Prismatic"];
-let S={tab:"find",cmp:false,goal:"min",min:"",zone:"",useCap:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
+let S={tab:"find",cmp:false,goal:"min",min:"",zone:"",useCap:true,perMin:true,muts:MUTN.filter(m=>m!=="Festive"),perfect:true,streak:true,sun:true,nomad:true,trkMax:false,mastery:"",events:"",night:false,owned:false,tools:true,trinket:true,museum:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem("pt-bestbuild")||"{}"))}catch(e){}
 const save=()=>{try{localStorage.setItem("pt-bestbuild",JSON.stringify(S))}catch(e){}};
 // presets: what each kind of build is for
-const GOALS=[["min","A mineral"],["luckeff","Luck Efficiency"],["hybrid","Hybrid"],["size","Size Boost"],["items","Items Farming"],["money","Money (autopan)"],["sell","Sell Boost (selling only)"],["rare","Tomb Raider (per pan)"],["luck","Luck only"]];
+const GOALS=[["min","A mineral"],["luckeff","Luck Efficiency"],["hybrid","Hybrid"],["size","Size Boost"],["items","Items Farming"],["money","Money (autopan)"],["sell","Sell Boost (selling only)"],["rarepm","Rare finds per minute"],["rare","Tomb Raider (per pan)"],["luck","Luck only"]];
 const lg=v=>Math.log(Math.max(1e-9,v));
 // a tap fills the pan when Dig Strength x 1.5 (Strength Totem) >= Capacity; every extra tap costs about another dig's time
 const taps=t=>Math.max(1,Math.ceil(t.Capacity/Math.max(1e-9,1.5*t["Dig Strength"])));
@@ -29,6 +29,8 @@ const PRESET={
     sf:t=>lg(panItems(t.Capacity))-lg(panTime(t))+lg(1+t["Size Boost"]/100)+lg(modVal(t["Modifier Boost"]))+lg(1+t["Sell Boost"]/100)+.25*lg(t.Luck),lab:"Money per minute"},
   sell:{txt:"Highest Sell Boost. Only for putting on right before you sell a full backpack.",
     useful:["Sell Boost"],sf:t=>lg(1+t["Sell Boost"]/100),lab:"Sell Boost"},
+  rarepm:{txt:"Most rare finds per minute: <b>luck × capacity<sup>0.565</sup></b> ÷ time per pan, counting every dig and shake (the same timing as Items Farming). For Dredge Master quests and other farming where time is what runs out.",
+    useful:["Luck","Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed"],sf:t=>lg(t.Luck)+.565*lg(t.Capacity)-lg(panTime(t)),lab:"Rare finds per minute"},
   rare:{txt:"Best odds per pan at the rarest minerals: <b>luck × capacity<sup>0.565</sup></b>, with no penalty for extra taps. For when pans are limited rather than time, like the Pharaoh's Tomb (six pans per tomb vein).",
     useful:["Luck","Capacity"],sf:t=>lg(t.Luck)+.565*lg(t.Capacity),lab:"Rare finds per pan"},
   luck:{txt:"Highest total luck. Capacity doesn't count.",useful:["Luck"],sf:t=>lg(t.Luck),lab:"Luck"}};
@@ -53,10 +55,10 @@ const oneInT=p=>!(p>0)?"-":p>=.5?fmt(p*100,0)+"% per pan":"1 in "+(1/p<10?fmt(1/
 // ---- form ----
 function drawForm(){
   $("goal").innerHTML=GOALS.map(([k,l])=>`<button type="button" class="chip" data-g="${k}" aria-pressed="${S.goal===k}">${l}</button>`).join("");
-  $("goalTxt").innerHTML=S.goal==="min"?"The best chance per pan of getting at least one of this mineral in this zone. Luck sets each mineral's chance (too much luck can push you past common ones), capacity sets how many minerals a pan holds. With the luck cap option on, it also tries panning under a luck cap.":(PRESET[S.goal]||PRESET.luck).txt;
+  $("goalTxt").innerHTML=S.goal==="min"?(S.perMin?"The most of this mineral per minute in this zone: how many a pan gives on average, divided by how long the pan takes, counting every dig and shake.":"The best chance per pan of getting at least one of this mineral in this zone.")+" Luck sets each mineral's chance (too much luck can push you past common ones), capacity sets how many minerals a pan holds. With the luck cap option on, it also tries panning under a luck cap.":(PRESET[S.goal]||PRESET.luck).txt;
   $("minRow").hidden=S.goal!=="min";
   $("muts").innerHTML=MUTN.map(m=>`<button type="button" class="chip" data-m="${m}" aria-pressed="${S.muts.includes(m)}">${m}</button>`).join("");
-  ["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap","cmp"].forEach(k=>$(k).checked=!!S[k]);$("streak").disabled=!S.perfect;
+  ["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap","perMin","cmp"].forEach(k=>$(k).checked=!!S[k]);$("streak").disabled=!S.perfect;
   $("mastery").value=S.mastery;$("events").value=S.events;
   document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.tab===S.tab)));$("pane-find").hidden=S.tab!=="find";$("pane-as").hidden=S.tab!=="as";
   const off=[!S.perfect&&"no perfect digs",S.perfect&&!S.streak&&"no full streak",!S.sun&&"no Sun Blessing",!S.nomad&&"Nomad not stacked",S.night?"night":"day"].filter(Boolean);
@@ -67,7 +69,7 @@ function drawForm(){
 makeAC({inp:$("mq"),items:MINS.map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),icon:()=>{const m=minObj();return m&&m.ic},pick:x=>{S.min=x.n;S.zone="";save();drawForm()}});
 document.addEventListener("click",e=>{const g=e.target.closest("[data-g]");if(g){S.goal=g.dataset.g;save();drawForm();return}
   const m=e.target.closest("[data-m]");if(m){const n=m.dataset.m;S.muts=S.muts.includes(n)?S.muts.filter(x=>x!==n):S.muts.concat([n]);save();drawForm();return}});
-["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap","cmp"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();drawForm()}));
+["perfect","streak","sun","nomad","trkMax","night","owned","tools","trinket","museum","useCap","perMin","cmp"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();drawForm()}));
 ["mastery","events"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).value;save()}));
 document.addEventListener("click",e=>{const t=e.target.closest("[data-tab]");if(t){S.tab=t.dataset.tab;save();drawForm();window.scrollTo(0,0)}});
 $("openCalc2").onclick=()=>{try{window.parent.ptOpenTool("calc")}catch(e){}};
@@ -82,12 +84,14 @@ $("run").onclick=async()=>{if(!S.muts.length){ptToast("Pick at least one mutatio
     const capE=CAPS.map(c=>ef(c*CAP_EFF));
     // chance per pan at the better of your own luck and the best cap below it
     const per=(L,C)=>{let p=ef(Math.max(1,L)),cap=null;if(S.useCap)CAPS.forEach((c,i)=>{if(c<L&&capE[i]>p*(1+1e-6)){p=capE[i];cap=c}});return {p:1-Math.pow(1-p,panItems(C)),cap}};
-    sf=t=>Math.log(Math.max(1e-300,per(t.Luck,t.Capacity).p));info={m,per}}
+    // per minute: how many of it a pan gives on average, over the time the pan takes (every dig and shake counted)
+    const each=(L)=>{let p=ef(Math.max(1,L));if(S.useCap)CAPS.forEach((c,i)=>{if(c<L&&capE[i]>p)p=capE[i]});return p};
+    sf=S.perMin?t=>Math.log(Math.max(1e-300,each(t.Luck)*panItems(t.Capacity)))-lg(panTime(t)):t=>Math.log(Math.max(1e-300,per(t.Luck,t.Capacity).p));info={m,per}}
   else sf=(PRESET[S.goal]||PRESET.luck).sf;
   const btn=$("run");btn.disabled=true;$("prog").textContent="Loading the Stat Calculator…";
   let cw=null;try{cw=await window.parent.ptCalcWin()}catch(e){}
   if(!cw||!cw.ptFindBuild){btn.disabled=false;$("prog").textContent="";ptToast("Couldn't load the Stat Calculator");return}
-  const useful=S.goal==="min"?["Luck","Capacity"]:(PRESET[S.goal]||PRESET.luck).useful;
+  const useful=S.goal==="min"?(S.perMin?["Luck","Capacity","Dig Strength","Dig Speed","Shake Strength","Shake Speed"]:["Luck","Capacity"]):(PRESET[S.goal]||PRESET.luck).useful;
   const ev=S.events?{meteor:S.events==="meteor"||S.events==="both",weather:S.events==="weather"||S.events==="both"}:null;
   const R=await cw.ptFindBuild({muts:S.muts,tools:S.tools,trinket:S.trinket,museum:S.museum,owned:S.owned,perfect:S.perfect,streak:S.streak,sun:S.sun,nomad:S.nomad,trkMax:S.trkMax,mastery:S.mastery===""?null:+S.mastery,events:ev,night:S.night,useful,fresh:!S.cmp},sf,(i,n)=>$("prog").textContent=`Searching… ${i+1} of ${n}`);
   btn.disabled=false;$("prog").textContent="";LAST={R,goal:S.goal,info,cw,zone:S.zone,perfect:S.perfect,cmp:S.cmp};showRes()};
