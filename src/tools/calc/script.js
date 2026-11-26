@@ -198,7 +198,8 @@ const brkLvl=()=>S.brkLevel!=null?+S.brkLevel:0;
 const LVLN=["Just stats","Semi","Full breakdown"];
 // multiplier lines: small museum bonuses (a Common display's +0.005×) need more than 2 decimals; trailing zeros are dropped
 const mxf=v=>v>=100?fmt(v,2):String(+v.toFixed(4));
-const BRK_STATS=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Walk Speed","Inventory Size","Toughness"];
+// only stats that boosts multiply; Walk Speed, Jump Power, Inventory Size and Toughness are just added up, so a breakdown says nothing
+const BRK_STATS=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed"];
 const FLAT_ONLY=new Set(["Toughness","Inventory Size"]);
 // per-stat breakdown data, shared by the page and the saved image
 // returns [{s,flatT,mult,xm,total,F:[{x,v}],M:[{x,v}],X:[{x,v}]}] for every stat you have that isn't switched off
