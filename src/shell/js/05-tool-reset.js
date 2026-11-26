@@ -2,7 +2,7 @@
 const PT_RESET = {
   builds: { keys: ["pbs-builds", "pbs-current", "pbs-fold", "pbs-hidep", "pbs-rings", "pbs-view"], what: "every build sheet, its name and the view" },
   planner: { keys: ["mp-board", "mp-board-b", "mp-cmp", "mp-cmp-hide", "mp-cmp-names"], what: "the boards and comparison view (saved loadouts stay)" },
-  boosts: { keys: ["mb-incmut", "mb-stat", "mb-zone", "mb-pick", "mb-mpick", "mb-pickon", "mb-name"] },
+  boosts: { keys: ["mb-incmut", "mb-stat", "mb-zone", "mb-rar", "mb-pick", "mb-mpick", "mb-pickon", "mb-name"] },
   minerals: { keys: ["pm-filters"] },
   locations: { keys: ["pl-loc", "pl-tcopy"] },
   pans: { keys: ["pg-pans"] },

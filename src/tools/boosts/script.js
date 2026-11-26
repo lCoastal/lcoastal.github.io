@@ -51,6 +51,12 @@ zoneSel.innerHTML='<option value="">All zones</option>'+ZLIST.map(g=>`<optgroup 
 try{const z=localStorage.getItem("mb-zone");if(z&&ZLIST.some(g=>g.z.includes(z)))zone=z}catch(e){}
 zoneSel.value=zone;
 zoneSel.addEventListener("change",()=>{zone=zoneSel.value;try{localStorage.setItem("mb-zone",zone)}catch(e){}render()});
+// rarity filter, like the zone one
+let rar="";const rarSel=document.getElementById("rar");
+rarSel.innerHTML='<option value="">All rarities</option>'+ORDER.map(r=>`<option value="${r}">${r}</option>`).join("");
+try{const v=localStorage.getItem("mb-rar");if(v&&ORDER.includes(v))rar=v}catch(e){}
+rarSel.value=rar;
+rarSel.addEventListener("change",()=>{rar=rarSel.value;try{localStorage.setItem("mb-rar",rar)}catch(e){}render()});
 window.ptBoostsZone=z=>{zone=ZLIST.some(g=>g.z.includes(z))?z:"";zoneSel.value=zone;render()};
 document.getElementById("q").addEventListener("input",e=>{q=e.target.value.trim().toLowerCase();render()});
 // your own picks: star minerals, then switch "Only my picks" on or off to show just those
@@ -73,7 +79,7 @@ function rarityRows(r){let rows=D.filter(d=>d[1]===r&&(!q||d[0].toLowerCase().in
   rows.sort((a,b)=>val(b)-val(a)||a[2]-b[2]||a[0].localeCompare(b[0]));
   const best=stat!=="All"&&rows.length?val(rows[0]):null;if(rev)rows.reverse();return {rows,best,val}}
 // weakest-first with a stat picked also turns the rarities around, so Common comes first and each rarity starts with its weakest
-const rarOrder=()=>rev&&stat!=="All"?[...ORDER].reverse():ORDER;
+const rarOrder=()=>(rev&&stat!=="All"?[...ORDER].reverse():ORDER).filter(r=>!rar||r===rar);
 function render(){
   [...chips.children].forEach(c=>{if(c!==dirB)c.setAttribute("aria-pressed",String(c.textContent===stat))});
   dirB.innerHTML=rev?"<b>↑</b> Ascending":"<b>↓</b> Descending";dirB.title=rev?(stat!=="All"?"Common first, weakest boost first":"Weakest boost first"):"Strongest boost first";
@@ -95,7 +101,7 @@ function render(){
 // ---- save as image: what's shown (search, stat and sort included), rarities in two balanced columns, mutations underneath ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 const IMGC={Common:"#a3adb8",Uncommon:"#6cc46e",Rare:"#68a6f0",Epic:"#b880ee",Legendary:"#f2b53a",Mythic:"#f0687f",Exotic:"#f17ad6"};
-const autoTitle=()=>(stat==="All"?"Mineral max boosts":"Max "+stat+" boosts")+(zone?", "+zone:"")+(pickOn?", my picks":"");
+const autoTitle=()=>(stat==="All"?(rar?rar+" mineral max boosts":"Mineral max boosts"):"Max "+stat+" boosts"+(rar?", "+rar:""))+(zone?", "+zone:"")+(pickOn?", my picks":"");
 const imgTitle=()=>nameCustom||autoTitle();
 async function boostsImage(){const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
   const W=1700,PAD=40,GAP=30,CW=(W-PAD*2-GAP)/2;
