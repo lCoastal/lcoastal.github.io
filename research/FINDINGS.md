@@ -6,7 +6,7 @@ tags: [findings, formulas, logs]
 
 # Prospecting findings
 
-Everything measured so far about Prospecting (Roblox): the formulas the toolkit at [lcoastal.github.io](https://lcoastal.github.io) uses, what the logs in this repo showed, and what's still open. Last updated 26/11/26, toolkit version 531.
+Everything measured so far about Prospecting (Roblox): the formulas the toolkit at [lcoastal.github.io](https://lcoastal.github.io) uses, what the logs in this repo showed, and what's still open. Last updated 26/11/26, toolkit version 532.
 
 **The toolkit's code is the final word.** If this file and the code disagree, the code wins: the weight model and zone factors are in [src/shared/common.html](../src/shared/common.html), the stat calculator in [src/tools/calc/script.js](../src/tools/calc/script.js), test write-ups in [src/tools/testlog/script.js](../src/tools/testlog/script.js).
 
@@ -49,7 +49,7 @@ weight = base weight × (1 + Size Boost) × zone factor × k   (× 1.5 with the 
 ```
 
 - **k is between 0.75 and 15.5 most of the time.** The lightest is exactly 0.75 in every zone.
-- **k reaches 17.0 at times.** Re-checked on the 24/11 section: 17.0 again in every zone, 1.73% past 15.5.
+- **k reaches 17.0 at times.** On all logs (5.1M minerals) 17.0 in every zone and 1.58% past 15.5; the toolkit uses 1.6%. The share past 15.5 varies a lot between zones (0.1% to 8.6%) and luck ranges, which fits it coming and going over time rather than following luck or the modifier. 18 rows past 17 were the same 6 Bloodstones logged three times with identical weights (minerals coming back from storage).
    In some stretches about a quarter of minerals come out 1.1× heavier (15.5 × 1.1 = 17.05). Across 2.57M minerals about 1.4% landed between 15.5 and 17. It switches on and off by time (10-minute windows go from 0% to 4.6%), doesn't depend on the modifier, and the lightest stays 0.75 while it's on. Cause unknown.
 - **The spread depends on capacity.** 26.1% are small (k evenly between 0.75 and 1.88). A share h(cap) is skewed heavy (k = 0.75 + 14.75 × Beta(a, 1.99)). The rest are even between 0.75 and 15.5. h = 0.533 × (1 − e^−((cap − 1797) / 2266)), a = 4.24 + 0.000667 × cap. Fitted on 1,856 to 7,240 capacity and confirmed within about 1% (median, mean, top 10%) from 6,692 to 8,638 capacity.
 - **Below about 2,000 capacity minerals come out lighter than the model says.** The community's 1,001-capacity sample had a median of 0.67 kg where the model says 1.06.
@@ -58,50 +58,54 @@ weight = base weight × (1 + Size Boost) × zone factor × k   (× 1.5 with the 
 
 ## Zone weight factors
 
-Every weight in a zone is multiplied by its factor. Measured from each zone's lightest mineral (exactly 0.75 × factor) on the 22/11 log, and the factors come in steps: 0.80, 0.88, 0.92, 0.96, 1.00, 1.04, 1.12, 1.20.
+Every weight in a zone is multiplied by its factor. Measured from each zone's lightest mineral (exactly 0.75 × factor) on all logs together (5.1M minerals, 29 zones, 26/11/26). Every zone matched its step to the second decimal: 0.80, 0.88, 0.92, 0.96, 1.00, 1.04, 1.12, 1.20.
 
 | Zone | Factor | Minerals measured |
 |---|---|---|
-| Rubble Creek Sands | ×0.80 | 84,630 |
-| Rubble Creek Deposits | ×0.88 | 16,154 |
-| Fortune River | ×0.92 | 14,489 |
-| Azuralite Oasis | ×0.96 | 29,438 (24/11 section) |
-| Magma Furnace | ×0.96 | 28,547 |
-| Sunset Beach | ×0.96 | 100,526 |
-| Volcanic Sands | ×0.96 | 18,912 |
-| Windswept Beach | ×0.96 | 89,412 |
-| Crystal Cavern River | ×1.00 | older 20/11 log, nearest step |
-| Fortune River Delta | ×1.00 | 21,377 |
-| Frostbite River | ×1.00 | 10,017 |
-| Frostbite Waterfall | ×1.00 | 14,703 |
-| Lifespring Oasis | ×1.00 | 54,271 |
-| Meteor Falls | ×1.00 | 102,014 |
-| Mystic Floodplains | ×1.00 | 960,663 |
-| Sandstone Stream | ×1.00 | 246,579 |
-| Starfall River | ×1.00 | 13,469 |
-| Volcanic Springs | ×1.00 | older 20/11 log, nearest step |
-| Astral Caverns | ×1.04 | 26,855 |
-| Deeproot Spring | ×1.04 | 5,371 |
-| Enchanted Ruins | ×1.04 | 295,169 |
-| Frozen Peak | ×1.04 | 118,387 |
-| Fungal Marsh | ×1.04 | 101,876 |
-| Overgrown Grotto | ×1.04 | older 20/11 log, nearest step |
-| Rotwood Swamp | ×1.04 | 45,588 |
-| Abyssal Depth | ×1.12 | 25,039 |
-| Infernal Heart | ×1.12 | 87,235 |
-| Timelocked Sanctuary | ×1.20 | 86,449 |
+| Haunted Creek | ×0.80 | 580 (likeliest step) |
+| Rubble Creek Sands | ×0.80 | 157,024 |
+| Rubble Creek Deposits | ×0.88 | 37,724 |
+| Fortune River | ×0.92 | 61,418 |
+| Azuralite Oasis | ×0.96 | 46,817 |
+| Magma Furnace | ×0.96 | 92,200 |
+| Sunset Beach | ×0.96 | 267,650 |
+| Volcanic Sands | ×0.96 | 56,365 |
+| Windswept Beach | ×0.96 | 142,355 |
+| Crystal Cavern River | ×1.00 | 8,446 |
+| Fortune River Delta | ×1.00 | 24,459 |
+| Frostbite River | ×1.00 | 30,554 |
+| Frostbite Waterfall | ×1.00 | 21,732 |
+| Lifespring Oasis | ×1.00 | 409,514 |
+| Meteor Falls | ×1.00 | 188,580 |
+| Mystic Floodplains | ×1.00 | 960,963 |
+| Sandstone Stream | ×1.00 | 1,167,859 |
+| Starfall River | ×1.00 | 51,381 |
+| Volcanic Springs | ×1.00 | 41,657 |
+| Astral Caverns | ×1.04 | 50,396 |
+| Deeproot Spring | ×1.04 | 33,724 |
+| Enchanted Ruins | ×1.04 | 315,544 |
+| Frozen Peak | ×1.04 | 203,707 |
+| Fungal Marsh | ×1.04 | 224,460 |
+| Overgrown Grotto | ×1.04 | 7,258 |
+| Rotwood Swamp | ×1.04 | 112,106 |
+| Abyssal Depth | ×1.12 | 85,632 |
+| Infernal Heart | ×1.12 | 120,267 |
+| Timelocked Sanctuary | ×1.20 | 190,505 |
 | Tomb Vein I | ×1.00? | not measured yet |
 | Tomb Vein II | ×1.00? | not measured yet |
 | Tomb Vein III | ×1.00? | not measured yet |
 | The Void | ×1.00? | not measured yet |
-| Haunted Creek | ×1.00? | not measured yet |
 | North Pole | ×1.00? | not measured yet |
 | Seashell Beach | ×1.00? | not measured yet |
 
 ## Minerals per pan
 
-- Average: 0.678 × capacity^0.565 (ours). The community's own fit, 0.688 × capacity^0.563, is within 0.6% of it from 1k to 30k capacity.
-- Fewest in a full pan: ⌊½ × √capacity⌋ (held on 14,855 pans). Most: about 2.5 × √capacity.
+Checked on all logs together (47,128 pans, capacity 5,592 to 9,245, 26/11/26):
+
+- **Average: 0.678 × capacity^0.565.** Within 0.2% on average over 37,772 normal pans (1.8% typical spread between capacities). A refit (1.076 × C^0.513) changed it by under 1% in the tested range and extrapolates worse, so it stays. The community's 0.688 × C^0.563 is within 0.6%.
+- **Fewest in a full pan: ⌊½ × √capacity⌋.** Held on every full pan. 0.28% of pans were part-filled (1 to 40 minerals, interrupted pans) and don't count.
+- **Most: about 2.5 × √capacity.** Held on 99.97% of pans; 13 went up to 2.73 × √capacity. 99% of pans stay under 2.28 × √capacity.
+- **Tempered shovel enchant, confirmed:** stretches with 15 to 25% more minerals per pan at the same capacity matched +5% per point of Toughness above the deposit's, up to +25%, zone by zone with the Pharaoh's Shovel (Toughness 11): ×1.25 at deposit toughness 6 and under, ×1.20 at 7, ×1.15 at 8, ×1.05 at 10, ×1.00 at 11.
 - Luck doesn't change how many minerals a pan holds.
 
 ## Luck
@@ -114,18 +118,29 @@ Every weight in a zone is multiplied by its factor. Measured from each zone's li
 
 ## Modifiers
 
-The toolkit uses: chance a mineral has a modifier = 1 − 0.9369^(Modifier Boost ÷ 100), split between modifiers by their base shares. Checked against our logs and a community test:
+**Chance a mineral gets a normal modifier** (Shiny up to Perfect), measured on all logs together in steady hours (the stretches without another modifier boost on):
 
-| Modifier Boost | Toolkit says (unmodified) | Our logs | Community test |
-|---|---|---|---|
-| about 475 to 503% | 73% | 68.4% (650,265 at 475%, 19/11) and 74.7% (232,931 at 475%, 20/11) | 71.3% (503%) |
-| about 1,000 to 1,080% | 50% | 52.9% (419,724 at 1,081%) | 42.4% (1,012%) |
-| 1,661% | 34% | 25.5% (51,006, 18/11) | |
-| about 1,830 to 1,920% | 29% | 13.1% at 1,831%, 12.6% at 1,917% overall; about 20% in steady hours, 1% to 20% hour to hour. The 24/11 section (1.2M at 1,917%) again 19 to 21% steady, dips to 5 to 11% | 4.2% (1,903%) |
+| Modifier Boost | Steady hours, unmodified | Hours | Old formula 1 − 0.9369^(boost ÷ 100) | Toolkit now | Community test |
+|---|---|---|---|---|---|
+| 475% | 73% (hourly 70 to 76%) | 16 | 73.4% | 73% | 71.3% (503%) |
+| 1,081% | 53% (50 to 53%) | 6 | 49.4% | 53% | 42.4% (1,012%) |
+| 1,661% | 25.5% | 1 | 33.9% | 27% | |
+| 1,831% | about 16% (4 to 17%) | 2 | 30.3% | 22% | |
+| 1,917% | 20% (1.3 to 21%) | 37 | 28.7% | 20% | 4.2% (1,903%) |
 
-- The toolkit predicts too few modifiers at high boost. Our logs and the community test disagree on how many; our 1,916% log swings hour to hour, so something it doesn't record (Surge, the Magnifier, night) was on part of the time.
-- **The Solar Magnifier and Modifier Surge each act like doubling Modifier Boost, and they stack.** 503% with either one gave about 40 to 41% unmodified, the same as about 1,000% without. 1,012% with either gave about 1%.
-- To settle it: a clean log at about 1,900% Modifier Boost, daytime, with no Surge and no Magnifier.
+- The unmodified share falls faster past about 1,100%, so no single smooth formula fits. Since 26/11/26 (version 532) the toolkit runs a curve through the measured points: straight lines in log space between 0% → 100%, 475% → 73%, 1,081% → 53% and 1,917% → 20%, keeping the last slope past 1,917%. That gives 6% with a modifier at 100%, 47% at 1,081%, 80% at 1,917%, 90% at 2,500%. Code: `ptAnyMod` in `src/shared/common.html`.
+- Hours well below the steady value (1.3% unmodified at 1,917%) are another boost on top: the **Solar Magnifier and Modifier Surge each act like doubling Modifier Boost, and they stack** (community test).
+- The community test disagrees at high boost (4.2% at 1,903% against our steady 20%). A clean log at about 1,900% with no Surge, no Magnifier and daytime would settle it.
+
+**Which modifier you get** (shares of modified minerals; seen / model), all logs:
+
+| Boost | Shiny | Pure | Glowing | Scorching | Irradiated | Iridescent | Cosmic | Mutated | Perfect |
+|---|---|---|---|---|---|---|---|---|---|
+| 475% | 11.5 / 11.7 | 9.6 / 9.6 | 7.8 / 7.7 | 11.2 / 9.8 | 28.8 / 26.6 | 20.5 / 22.0 | 8.0 / 9.5 | 1.8 / 2.2 | 0.21 / 0.23 |
+| 1,081% | 11.1 / 11.7 | 9.3 / 9.4 | 6.4 / 5.9 | 5.6 / 4.8 | 17.3 / 13.9 | 29.4 / 29.3 | 16.2 / 18.4 | 4.0 / 4.7 | 0.41 / 0.51 |
+| 1,917% | 11.4 / 11.7 | 9.2 / 9.4 | 6.2 / 5.9 | 4.7 / 4.5 | 12.9 / 12.6 | 28.2 / 27.3 | 20.5 / 20.6 | 5.7 / 5.7 | 0.63 / 0.63 |
+
+Within about 10% everywhere (3.1M modified minerals at 1,917%). Lunar can't be checked: the logs don't record night.
 
 ## Gear mutations
 
@@ -162,17 +177,17 @@ Raw numbers: [community/2026-11-25_tests.md](community/2026-11-25_tests.md).
 
 ## Open questions
 
-- Modifier chance at high boost: 4% or 20% unmodified at about 1,900%? Needs a clean log.
+- Modifier chance at high boost: 4% (community) or 20% (our steady hours) unmodified at about 1,900%? Needs a clean log.
 - What causes the ×1.1 stretches (k up to 17)?
 - Which zones a Volcanic Eruption covers, and how often.
-- Zone factors for Tomb Vein I, II and III, The Void, Haunted Creek, North Pole and Seashell Beach; re-measure Crystal Cavern River, Overgrown Grotto and Volcanic Springs.
+- Zone factors for Tomb Vein I, II and III, The Void, North Pole and Seashell Beach; more Haunted Creek (580 minerals so far).
 - The weight spread below about 1,800 capacity.
 - The luck model at 90k+ luck; Aurorite vs Moonstone in Fortune River Delta; Firefly Zone drop rates.
 - Dig time above about 600% Dig Speed; shakes per second when a pan needs many more than 6 shakes.
 
 ## Formulas page
 
-The toolkit's Formulas page as of version 531.
+The toolkit's Formulas page as of version 532.
 
 ### Pans
 
@@ -223,7 +238,7 @@ S = Size Boost you need, as a number (×100 for %, so 18.35 = 1,835%), W = the w
 #### Zone size factor
 
 ```
-Z = 0.80  Rubble Creek Sands
+Z = 0.80  Haunted Creek, Rubble Creek Sands
 Z = 0.88  Rubble Creek Deposits
 Z = 0.92  Fortune River
 Z = 0.96  Azuralite Oasis, Magma Furnace, Sunset Beach, Volcanic Sands, Windswept Beach
@@ -231,10 +246,10 @@ Z = 1.00  Crystal Cavern River, Fortune River Delta, Frostbite River, Frostbite 
 Z = 1.04  Astral Caverns, Deeproot Spring, Enchanted Ruins, Frozen Peak, Fungal Marsh, Overgrown Grotto, Rotwood Swamp
 Z = 1.12  Abyssal Depth, Infernal Heart
 Z = 1.20  Timelocked Sanctuary
-Z = 1?    Not measured yet: Haunted Creek, North Pole, Seashell Beach, The Void, Tomb Vein I, II and III
+Z = 1?    Not measured yet: North Pole, Seashell Beach, The Void, Tomb Vein I, II and III
 ```
 
-Z = how much a zone multiplies every weight. Measured on 2.57 million minerals in 24 zones: a zone's lightest mineral is exactly 0.75 × its factor. Azuralite Oasis was confirmed on another 1.2 million. Crystal Cavern River, Overgrown Grotto and Volcanic Springs are from an older, smaller log. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones).
+Z = how much a zone multiplies every weight. Measured on 5.1 million minerals in 29 zones: a zone's lightest mineral is exactly 0.75 × its factor. Haunted Creek is from only 580 minerals, so it's the likeliest step rather than a sure one. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones).
 
 ### Luck
 
@@ -274,7 +289,36 @@ part = how much of the max boost you get (×100 for %), W = the piece's weight (
 
 ## Test log
 
-The toolkit's Test Log as of version 531, newest first.
+The toolkit's Test Log as of version 532, newest first.
+
+### 26/11/26: Every log at once: pan size, weight, zone factors and modifiers
+
+Zone: 29 zones
+
+Setup: Luck 10 – 150,000; Capacity 5,592 – 9,245; Modifier Boost 475%, 1,081%, 1,661%, 1,831% and 1,917%
+
+Amount: Minerals 5,121,071; Pans 47,128
+
+**Tested**
+- Fewest, most and average minerals per pan against capacity
+- Lightest and heaviest weight, and each zone's factor
+- Chance a mineral gets a modifier, and which one
+
+**Found**
+- Average minerals per pan is 0.678 × capacity^0.565 to within 0.2% on average over 37,772 normal pans; a refit changed it by under 1%, so it stays
+- Fewest per pan, ⌊½√capacity⌋, held on every full pan. 0.28% of pans were part-filled (1 to 40 minerals) and are left out
+- Most per pan, 2.5√capacity, held on 99.97% of pans; 13 went up to 2.73√capacity
+- Stretches with 15 to 25% more minerals per pan at the same capacity are the Tempered shovel enchant: zone by zone it matched +5% per point of the Pharaoh's Shovel's 11 Toughness above the deposit's, up to +25% (1.25 at toughness 6 and under, 1.20 at 7, 1.15 at 8, 1.05 at 10, 1.00 at 11)
+- Every zone's lightest mineral was exactly 0.75 × its factor across 5.1M minerals, in 29 zones. Haunted Creek showed up for the first time (580 minerals, lightest 0.82, so most likely 0.80)
+- The heaviest roll was 17.0 in every zone; 1.58% of minerals landed between 15.5 and 17. 18 rows past 17 were the same 6 Bloodstones logged three times with identical weights (minerals coming back from storage)
+- Which modifier you get matched the model within about 10% for every modifier at every boost
+- Whether a mineral gets one at all matched up to about 1,100% Modifier Boost, then the old formula said too few: at 1,917% it said 29% unmodified, steady hours showed 20%
+
+**Changed in the toolkit**
+- Modifier chance now follows the measured points: 73% unmodified at 475%, 53% at 1,081%, 20% at 1,917%
+- The 15.5 to 17 tail is now 1.6% of minerals (was 1.4%)
+- Haunted Creek ×0.80 added; every zone's measured count updated
+
 
 ### 26/11/26: Weights re-checked on 1.2M more minerals, and a second eruption
 

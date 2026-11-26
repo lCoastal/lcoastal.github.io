@@ -89,7 +89,7 @@ function interp(pts,x){x=Math.max(1,x);if(x>=pts[pts.length-1][0])return pts[pts
 // share of ores that get a normal (panning) modifier: about 36% in my tests at different boosts,
 // so Modifier Boost changes which modifier you get far more than how often. Voidtorn and event modifiers come on top.
 // chance a mineral gets a normal modifier: each 1x of Modifier Boost is a ~6.3% chance, compounding (fitted on ~1.7M logged minerals, 1.1x to 16.6x boost; luck makes no difference)
-const anyMod=e=>1-Math.pow(1-.0631,Math.max(0,+e||0)/100);
+const anyMod=ptAnyMod;
 const NAT_MOD=anyMod(926);
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
 // which modifier you get: rolled several times keeping the rarest (by the game's weights).

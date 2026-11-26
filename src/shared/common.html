@@ -184,6 +184,13 @@ async function ptTableImage(o){const F='"IBM Plex Sans","Segoe UI",system-ui,san
 function ptToast(t){const d=document.createElement("div");d.className="ptoast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 // items in one full pan, measured: ≈20 at 400 capacity, ≈44 at 1,600, ≈87 at 5,462 (plain √capacity undercounts big pans)
 function panItems(cap){return Math.max(1,0.6779*Math.pow(Math.max(1,+cap||1),0.56474))}
+// chance a mineral gets a normal modifier, from Modifier Boost in % (panel value). Measured on 5.1M logged minerals
+// (19/11 to 26/11/26) in steady hours: 475% -> 73% unmodified, 1,081% -> 53%, 1,917% -> 20% (1,661% -> 25.5% sits on the line).
+// The drop speeds up past about 1,100%, so this runs through the measured points (straight lines in log space) instead of one
+// formula; past 1,917% it keeps the last slope. The old single formula (1 - 0.9369^(boost/100)) said 29% unmodified at 1,917%.
+const MOD_UN=[[0,1],[475,.73],[1081,.53],[1917,.20]];
+function ptAnyMod(pct){const x=Math.max(0,+pct||0);let i=1;while(i<MOD_UN.length-1&&x>MOD_UN[i][0])i++;
+  const [x0,y0]=MOD_UN[i-1],[x1,y1]=MOD_UN[i],ly=Math.log(y0)+(Math.log(y1)-Math.log(y0))*(x-x0)/(x1-x0);return 1-Math.min(1,Math.exp(ly))}
 // luck model helper: minerals with the same odds share one slot evenly (otherwise whichever is listed first takes the whole slot)
 // very rare minerals (base odds about 1 in 18 million to 1 in 1.6 billion) drop about 1.9x more often than the roll model alone says;
 // measured over ~2.4M logged minerals in 11 zones. Rarer or commoner minerals are unchanged.
@@ -194,19 +201,18 @@ function tieSpan(list,x,tot){let m=_TIE.get(list);if(!m){m=new Map();let c=0;lis
 // Weight = BaseWeight x (1 + Size Boost) x zone factor x k (x1.5 Solar Magnifier). Most k are between 0.75 and 15.5:
 // 26.1% small k~U(0.75,1.88); h(cap) skewed k=0.75+14.75*Beta(a,1.99); the rest k~U(0.75,15.5).
 // h = 0.533(1-e^-((cap-1797)/2266)), a = 4.24 + 0.000667 cap
-// At times about a quarter of minerals come out x1.1, so k reaches 17.0: about 1.4% of all minerals land between 15.5 and 17,
+// At times about a quarter of minerals come out x1.1, so k reaches 17.0: about 1.6% of all minerals land between 15.5 and 17
+// (5.1M minerals; 1.4% on the first 2.57M),
 // thinning out towards 17 (WT_TAIL, a straight-line fade).
-const WT_MIN=.75,WT_TOP=15.5,WT_MAX=17,WT_TAIL=.014,WT_SMALL=.261,WT_SM_HI=1.88,WT_B=1.99;
-// zone size factor: every weight in a zone is multiplied by this. Measured 24/11/26 on a GalaxisHub log of 2.57M minerals in 24 zones:
+const WT_MIN=.75,WT_TOP=15.5,WT_MAX=17,WT_TAIL=.016,WT_SMALL=.261,WT_SM_HI=1.88,WT_B=1.99;
+// zone size factor: every weight in a zone is multiplied by this. Measured 26/11/26 on every log so far (5.1M minerals, 29 zones):
 // each zone's lightest roll is exactly 0.75 x its factor, and the factors come in steps (0.80, 0.88, 0.92, 0.96, 1.00, 1.04, 1.12, 1.20).
-// Azuralite Oasis was confirmed at 0.96 on the 24/11 to 26/11 part of the same log (29,438 minerals).
-// Volcanic Springs, Crystal Cavern River and Overgrown Grotto weren't in either: their values are from the
-// smaller 20/11/26 log, put on the nearest step. Zones not listed count as 1.
-const ZONE_SIZE={"Rubble Creek Sands":0.8,"Rubble Creek Deposits":0.88,"Fortune River":0.92,"Magma Furnace":0.96,"Volcanic Sands":0.96,"Sunset Beach":0.96,"Windswept Beach":0.96,"Azuralite Oasis":0.96,"Fortune River Delta":1,"Frostbite River":1,"Frostbite Waterfall":1,"Lifespring Oasis":1,"Meteor Falls":1,"Mystic Floodplains":1,"Sandstone Stream":1,"Starfall River":1,"Volcanic Springs":1,"Crystal Cavern River":1,"Astral Caverns":1.04,"Deeproot Spring":1.04,"Enchanted Ruins":1.04,"Frozen Peak":1.04,"Fungal Marsh":1.04,"Rotwood Swamp":1.04,"Overgrown Grotto":1.04,"Abyssal Depth":1.12,"Infernal Heart":1.12,"Timelocked Sanctuary":1.2};
+// Haunted Creek is from only 580 minerals (lightest 0.82, so most likely the 0.80 step). Zones not listed count as 1.
+const ZONE_SIZE={"Rubble Creek Sands":0.8,"Rubble Creek Deposits":0.88,"Fortune River":0.92,"Magma Furnace":0.96,"Volcanic Sands":0.96,"Sunset Beach":0.96,"Windswept Beach":0.96,"Azuralite Oasis":0.96,"Fortune River Delta":1,"Frostbite River":1,"Frostbite Waterfall":1,"Lifespring Oasis":1,"Meteor Falls":1,"Mystic Floodplains":1,"Sandstone Stream":1,"Starfall River":1,"Volcanic Springs":1,"Crystal Cavern River":1,"Astral Caverns":1.04,"Deeproot Spring":1.04,"Enchanted Ruins":1.04,"Frozen Peak":1.04,"Fungal Marsh":1.04,"Rotwood Swamp":1.04,"Overgrown Grotto":1.04,"Abyssal Depth":1.12,"Infernal Heart":1.12,"Timelocked Sanctuary":1.2,"Haunted Creek":0.8};
 // zones with no weights logged yet: counted as 1 until a log covers them
-const ZONE_SIZE_TODO=["Tomb Vein I","Tomb Vein II","Tomb Vein III","The Void","Haunted Creek","North Pole","Seashell Beach"];
-// minerals logged per zone for the factors above (zones missing here come from the older log)
-const ZONE_SIZE_N={"Rubble Creek Sands":84630,"Rubble Creek Deposits":16154,"Fortune River":14489,"Magma Furnace":28547,"Volcanic Sands":18912,"Sunset Beach":100526,"Windswept Beach":89412,"Fortune River Delta":21377,"Frostbite River":10017,"Frostbite Waterfall":14703,"Lifespring Oasis":54271,"Meteor Falls":102014,"Mystic Floodplains":960663,"Sandstone Stream":246579,"Starfall River":13469,"Astral Caverns":26855,"Deeproot Spring":5371,"Enchanted Ruins":295169,"Frozen Peak":118387,"Fungal Marsh":101876,"Rotwood Swamp":45588,"Abyssal Depth":25039,"Infernal Heart":87235,"Timelocked Sanctuary":86449,"Azuralite Oasis":29438};
+const ZONE_SIZE_TODO=["Tomb Vein I","Tomb Vein II","Tomb Vein III","The Void","North Pole","Seashell Beach"];
+// minerals logged per zone for the factors above
+const ZONE_SIZE_N={"Sandstone Stream":1167859,"Mystic Floodplains":960963,"Lifespring Oasis":409514,"Enchanted Ruins":315544,"Sunset Beach":267650,"Fungal Marsh":224460,"Frozen Peak":203707,"Timelocked Sanctuary":190505,"Meteor Falls":188580,"Rubble Creek Sands":157024,"Windswept Beach":142355,"Infernal Heart":120267,"Rotwood Swamp":112106,"Magma Furnace":92200,"Abyssal Depth":85632,"Fortune River":61418,"Volcanic Sands":56365,"Starfall River":51381,"Astral Caverns":50396,"Azuralite Oasis":46817,"Volcanic Springs":41657,"Rubble Creek Deposits":37724,"Deeproot Spring":33724,"Frostbite River":30554,"Fortune River Delta":24459,"Frostbite Waterfall":21732,"Crystal Cavern River":8446,"Overgrown Grotto":7258,"Haunted Creek":580};
 const zoneSize=loc=>loc?(ZONE_SIZE[baseLoc(loc)]??ZONE_SIZE[loc]??1):1;
 // <option>s for a zone picker: "Most zones" (x1) first, then every measured zone with its factor
 const zoneSizeOpts=sel=>`<option value="">Most zones (×1)</option>`+Object.keys(ZONE_SIZE).sort().map(z=>`<option value="${z}"${z===sel?" selected":""}>${z} (×${ZONE_SIZE[z].toFixed(2)})</option>`).join("");

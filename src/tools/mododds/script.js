@@ -9,8 +9,8 @@ const WSUM=Object.values(WEIGHT).reduce((a,b)=>a+b,0);
 const BASE=Object.fromEntries(Object.entries(WEIGHT).map(([k,w])=>[k,w/WSUM*100]));
 const PRICE={Perfect:24,Lunar:14,Mutated:9,Cosmic:6,Iridescent:3.5,Irradiated:2.5,Scorching:2,Glowing:1.6,Pure:1.35,Shiny:1.2};
 const MUSE=Object.fromEntries(P.mods.map(m=>[m[0],m[1].join(", ")]));
-// chance a mineral gets a normal modifier: each 1x of Modifier Boost is a ~6.3% chance, compounding (fitted on ~1.7M logged minerals, 1.1x to 16.6x boost; luck makes no difference)
-const anyMod=e=>1-Math.pow(1-.0631,Math.max(0,+e||0)/100);
+// chance a mineral gets a normal modifier: ptAnyMod (shared), measured on 5.1M logged minerals; luck makes no difference
+const anyMod=ptAnyMod;
 const NAT_MOD=anyMod(926);
 const MODW=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
 // which modifier you get: rolled several times keeping the rarest (by the game's weights).

@@ -41,7 +41,7 @@ const eqVal=(s,l,q,mult)=>{const lo=l==="5"?s[1]:s[3],hi=l==="5"?s[2]:s[4];retur
 // Minerals per pan (from our logs): average 0.678 × capacity^0.565, most ≈ 2.5 × √capacity.
 // Umbrella: +25 per modified mineral (chance 1 − 0.937^(Modifier Boost ×)). Reactor: +25 per mineral over 20.
 const TRROLL={"Beach Umbrella":1,"Mass Reactor":1};
-function trkLuck(n,cap,mb,max){const c=Math.max(0,cap),k=max?2.5*Math.sqrt(c):.678*Math.pow(c,.565),pm=1-Math.pow(.937,Math.max(0,mb)/100);
+function trkLuck(n,cap,mb,max){const c=Math.max(0,cap),k=max?2.5*Math.sqrt(c):.678*Math.pow(c,.565),pm=ptAnyMod(mb);
   return {n:k,pm,luck:n==="Beach Umbrella"?25*k*pm:Math.max(0,25*(k-20))}}
 const TRLAB=(n,max)=>TRROLL[n]?`${n} (${max?"max":"average"} roll)`:n;
 // permanent quest buffs: kept when boosts are reset
@@ -325,7 +325,7 @@ document.addEventListener("input",e=>{const r=e.target.closest&&e.target.closest
 // chance an ore gets one particular modifier, at a Modifier Boost (in %) and luck. Same model as Modifier Odds:
 // "any modifier" from the boost, then which one from rolls that keep the rarest.
 const MODW_C=[["Perfect",.0001],["Lunar",.00025],["Mutated",.001],["Cosmic",.005],["Iridescent",.02],["Irradiated",.1],["Scorching",.25],["Glowing",.5],["Pure",.8],["Shiny",1]];
-function modChanceCalc(u,mbPct,luck){const anyMod=e=>1-Math.pow(1-.0631,Math.max(0,+e||0)/100);
+function modChanceCalc(u,mbPct,luck){const anyMod=ptAnyMod;
   const list=MODW_C.filter(([k])=>k!=="Lunar"||u==="Lunar");if(!list.some(([k])=>k===u))return 0;const tot=list.reduce((a,x)=>a+x[1],0);
   const f=N=>{let a=0;const o={};list.forEach(([k,w2])=>{const p=w2/tot;o[k]=Math.pow(1-a,N)-Math.pow(Math.max(0,1-a-p),N);a+=p});return o};
   const L=Math.max(1,11.662*Math.pow(Math.max(1,mbPct)/100,.838)+1.96352*Math.max(0,luck)/1000),parts=[f(1),f(Math.max(1,L*.172)),f(L)];
