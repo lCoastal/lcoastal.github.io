@@ -550,6 +550,63 @@ const PRE0 =
   '<base target="_blank"><script>try{if(!window.hostBridge&&window.parent&&window.parent.hostBridge)window.hostBridge=window.parent.hostBridge}catch(e){}document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-mineral],[data-location],[data-equip]");if(!t)return;if(!(e.ctrlKey||e.metaKey)&&!(t.classList.contains("mlink")&&!e.target.closest("button,a,input,select,label")))return;e.preventDefault();e.stopPropagation();try{window.parent.ptOpen(t.hasAttribute("data-mineral")?"mineral":t.hasAttribute("data-equip")?"equip":"location",t.getAttribute("data-mineral")||t.getAttribute("data-equip")||t.getAttribute("data-location"))}catch(err){}},true);document.addEventListener("DOMContentLoaded",function(){var st=document.createElement("style");st.textContent=".mlink{cursor:pointer}.pt-ft{display:flex!important;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;text-align:center;max-width:none!important;white-space:nowrap}.pt-ft i{font-style:normal}.pt-fix{flex-basis:100%;white-space:normal!important;overflow-wrap:break-word;max-width:100%;text-align:center;font-size:12.5px;color:var(--muted,#888);margin:6px 0 0;line-height:1.4}.pt-fix b{color:var(--fg,inherit);font-weight:600}.pt-ver{flex-basis:100%;text-align:center;font-size:12px;font-weight:500;letter-spacing:.02em;margin:2px 0 0;color:color-mix(in srgb,var(--fg,#888) 30%,var(--bg,transparent))}@media (max-width:600px){.pt-ft .lg{display:none}.pt-ft{gap:6px}.pt-ft>span{padding:4px 9px!important}}.pt-ft>span{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:600;line-height:1.3;color:var(--pc);background:color-mix(in srgb,var(--pc) 13%,transparent);border:1px solid color-mix(in srgb,var(--pc) 45%,transparent)}.pt-ft a{color:inherit!important;text-decoration:none!important}.pt-ft .p1{--pc:#14b8a6}.pt-ft .p2{--pc:#f59e0b}.pt-ft .p3{--pc:#a78bfa}.pt-ft .p4{--pc:#6b7cff}@media (prefers-color-scheme:light){:root:not([data-theme=dark]) .pt-ft .p1{--pc:#0f8f80}:root:not([data-theme=dark]) .pt-ft .p2{--pc:#b86e00}:root:not([data-theme=dark]) .pt-ft .p3{--pc:#7c5ce0}:root:not([data-theme=dark]) .pt-ft .p4{--pc:#4b5bdc}}:root[data-theme=light] .pt-ft .p1{--pc:#0f8f80}:root[data-theme=light] .pt-ft .p2{--pc:#b86e00}:root[data-theme=light] .pt-ft .p3{--pc:#7c5ce0}:root[data-theme=light] .pt-ft .p4{--pc:#4b5bdc}";document.head.appendChild(st);document.querySelectorAll("p").forEach(function(p){if(!/Made by @__coastal\\s*$/.test(p.innerHTML)||p.classList.contains("pt-ft"))return;var m=p.textContent.match(/Last\\s+edited\\s*([0-9\\/]+)/);p.classList.add("pt-ft");p.innerHTML="<span class=\\"p1\\"><a href=\\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Made by <\/i>@__coastal<\/a><\/span><span class=\\"p2\\"><a href=\\"https://prospecting.miraheze.org/wiki/Main_Page\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Prospecting <\/i>Wiki<\/a><\/span><span class=\\"p3\\"><i class=\\"lg\\">Last edited <\/i>"+(m?m[1]:"")+"<\/span><span class=\\"p4\\"><a class=\\"pt-dc\\" href=\\"https://discord.gg/TuXc7dguFG\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Join the official <\/i>Discord<\/a><\/span>";if(!p.querySelector(\".pt-ver\"))p.insertAdjacentHTML(\"beforeend\",\"<div class=\\\"pt-fix\\\">Spotted something wrong or out of date? Message <b>@__coastal<\/b> on Discord.<\/div><div class=\\\"pt-ver\\\">Version %%PTVER%%<\/div>\");var p3=p.querySelector(".p3");if(p3&&m){var q=m[1].split("/");var d=new Date(2000+(+q[2]),(+q[1])-1,+q[0]);var n=Math.round((new Date().setHours(0,0,0,0)-d.getTime())/864e5);p3.title=n<=0?"That was today":n===1?"That was 1 day ago":"That was "+n+" days ago";p3.style.cursor="help"}var a1=p.querySelector(".p1 a"),a2=p.querySelector(".p2 a"),a4=p.querySelector(".p4 a");if(a2)a2.title="Click to go to the wiki";if(a4)a4.title="Click to get invited";if(a1){var MS=["Psst... click me","Click for a secret","Don\\u2019t click this","Bet you won\\u2019t click","Hidden developer tips inside","You\\u2019ve been chosen. Click.","Click to claim your reward","Secret pan strategy, one click away","Only 1 in 26,764 players find this","Meet the mind behind the toolkit","Click for the ultimate luck boost","Exclusive behind-the-scenes content","The best-kept secret in Prospecting","Something rare is waiting for you","Click to unlock developer mode"],li=-1;var pick=function(){var i;do{i=Math.floor(Math.random()*MS.length)}while(i===li);li=i;a1.title=MS[i]};pick();a1.addEventListener("mouseenter",pick);a1.addEventListener("focus",pick)}})});<\/script>';
 // less clutter in every tool: long notes and intros fold to two lines, "How it works" cards start closed,
 // and the luck-formula warning is one line you can open
+// colours mutation names (Perfect, Irradiated, Sunforged...) and stat names (Luck, Dig Strength...) in their own colour wherever they're written
+function ptColorize() {
+  var MUT = ["Perfect","Treasured","Entombed","Lunar","Voidtorn","Mutated","Cosmic","Electrified","Iridescent","Irradiated","Crystalline","Scorching","Glowing","Pure","Shiny","Sunforged","Prismatic","Overclocked","Festive"];
+  var ST = {"Luck":"luck","Capacity":"cap","Size Boost":"size","Modifier Boost":"mod","Sell Boost":"sell","Dig Strength":"digstr","Dig Speed":"digspd","Shake Strength":"shkstr","Shake Speed":"shkspd","Walk Speed":"walk","Walkspeed":"walk","Inventory Size":"inv","Jump Power":"jump"};
+  var names = MUT.concat(Object.keys(ST)).sort(function (a, b) { return b.length - a.length; });
+  var re = new RegExp("(^|[^A-Za-z'])(" + names.join("|") + ")(?![A-Za-z])", "g");
+  var SKIP = "script,style,textarea,input,select,option,button,code,pre,svg,canvas,title,a,[contenteditable],.chip,.pt-noc,.ptc,.pt-mmod,.mu,[style*='color']";
+  var cap = /^[A-Z][a-z]/;
+  function colorOf(n) { return ST[n] ? "var(--k-" + ST[n] + ")" : "var(--m-" + n.toLowerCase() + ")"; }
+  function doText(t) {
+    var v = t.nodeValue;
+    if (!v || v.length < 3 || !/[A-Z]/.test(v)) return;
+    var p = t.parentElement;
+    if (!p || p.closest(SKIP)) return;
+    re.lastIndex = 0;
+    var m, last = 0, frag = null;
+    while ((m = re.exec(v))) {
+      var name = m[2], start = m.index + m[1].length, end = start + name.length;
+      // part of a longer name ("Lunar Mask", "Basic Luck Potion"): leave it
+      var after = v.slice(end).match(/^ ([A-Za-z][a-z]+)/), before = v.slice(0, start).match(/([A-Za-z][a-z']+) $/);
+      if (after && cap.test(after[1])) continue;
+      if (before && cap.test(before[1]) && !/^(Max|Your|Total|Base|Extra|Best|More|Less|No|And|Or|With|Without|Each|Every|All|For|Of|Most|Higher|Lower)$/.test(before[1])) continue;
+      frag = frag || document.createDocumentFragment();
+      frag.appendChild(document.createTextNode(v.slice(last, start)));
+      var sp = document.createElement("span");
+      sp.className = "ptc";
+      sp.style.color = colorOf(name);
+      sp.textContent = name;
+      frag.appendChild(sp);
+      last = end;
+    }
+    if (!frag) return;
+    frag.appendChild(document.createTextNode(v.slice(last)));
+    t.parentNode.replaceChild(frag, t);
+  }
+  function walk(root) {
+    if (!root || root.nodeType === 3) { if (root) doText(root); return; }
+    if (root.nodeType !== 1 || root.closest(SKIP)) return;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), list = [], n;
+    while ((n = w.nextNode())) list.push(n);
+    list.forEach(doText);
+  }
+  var pend = new Set(), sched = false;
+  function flush() { sched = false; var a = Array.from(pend); pend.clear(); a.forEach(function (x) { if (x.isConnected) walk(x); }); }
+  function go() {
+    walk(document.body);
+    new MutationObserver(function (ms) {
+      ms.forEach(function (mu) {
+        if (mu.type === "characterData") pend.add(mu.target);
+        else mu.addedNodes.forEach(function (x) { if (!(x.nodeType === 1 && x.classList.contains("ptc"))) pend.add(x); });
+      });
+      if (!sched && pend.size) { sched = true; requestAnimationFrame(flush); }
+    }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.body) go(); else document.addEventListener("DOMContentLoaded", go);
+}
+
 function ptDeclutter() {
   var css =
     ".pt-clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.pt-clamp.pt-open{display:block;-webkit-line-clamp:unset;overflow:visible}" +
@@ -661,7 +718,9 @@ const PT_KIT_CSS =
   ":where(table.t td){padding:5px 8px;border-bottom:1px dashed var(--line);text-align:right;font-family:var(--f-mono);white-space:nowrap}" +
   ":where(table.t th:first-child,table.t td:first-child){text-align:left;font-family:var(--f-body)}:where(table.t tr[data-c]:hover td,table.t tr[data-m]:hover td){background:var(--sunk)}" +
   ":where(.tw){overflow-x:auto}" +
-  // the shared museum view (ptMuseumView in common.html)
+  // mutation colours, light and dark (used by ptColorize)
+  ":root{--m-perfect:#0e9c8d;--m-treasured:#a88400;--m-entombed:#24928a;--m-lunar:#8f7a2a;--m-voidtorn:#6a1fd1;--m-mutated:#5b3fc4;--m-cosmic:#c0145a;--m-electrified:#9c8f00;--m-iridescent:#a800b7;--m-irradiated:#3a9e00;--m-crystalline:#0077b7;--m-scorching:#b75500;--m-glowing:#9c8a00;--m-pure:#6b6b6b;--m-shiny:#2f63b0;--m-sunforged:#b77700;--m-prismatic:#7e2394;--m-overclocked:#9f3d17;--m-festive:#952222}@media (prefers-color-scheme:dark){:root:not([data-theme=\"light\"]){--m-perfect:#5ef1e1;--m-treasured:#ffd849;--m-entombed:#40c8be;--m-lunar:#ffe99b;--m-voidtorn:#a35bff;--m-mutated:#a07bff;--m-cosmic:#ff5f9e;--m-electrified:#ffeb0b;--m-iridescent:#f36bff;--m-irradiated:#67ff20;--m-crystalline:#b7e6ff;--m-scorching:#ff861c;--m-glowing:#fff292;--m-pure:#ffffff;--m-shiny:#d4e7ff;--m-sunforged:#ffc457;--m-prismatic:#c05bd8;--m-overclocked:#e0602f;--m-festive:#d23c3c}}:root[data-theme=\"dark\"]{--m-perfect:#5ef1e1;--m-treasured:#ffd849;--m-entombed:#40c8be;--m-lunar:#ffe99b;--m-voidtorn:#a35bff;--m-mutated:#a07bff;--m-cosmic:#ff5f9e;--m-electrified:#ffeb0b;--m-iridescent:#f36bff;--m-irradiated:#67ff20;--m-crystalline:#b7e6ff;--m-scorching:#ff861c;--m-glowing:#fff292;--m-pure:#ffffff;--m-shiny:#d4e7ff;--m-sunforged:#ffc457;--m-prismatic:#c05bd8;--m-overclocked:#e0602f;--m-festive:#d23c3c}.ptc{font-weight:inherit}" +
+    // the shared museum view (ptMuseumView in common.html)
   ".pt-mus{display:flex;flex-direction:column;gap:8px}" +
   ".pt-mband{border:1px solid var(--rc);border-radius:8px;overflow:hidden;background:var(--panel)}" +
   ".pt-mband h3{margin:0;padding:6px 12px;font:700 12px var(--f-body);color:var(--rc);background:var(--sunk);border-bottom:1px solid var(--rc);display:flex;justify-content:space-between}" +
@@ -675,7 +734,7 @@ const PT_KIT_CSS =
   ".pt-mls{display:block}.pt-mband.wide{width:100%}.pt-mband.wide .pt-mls{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,max-content));column-gap:22px}" +
   ".pt-mmod{font-style:normal;font-weight:600;color:#d79a1c}" +
   ".pt-mskip{flex:none;margin-left:auto;font:600 11.5px var(--f-body);padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}";
-const PRE = PRE0 + "<style data-pt-kit>" + PT_KIT_CSS + "</style><script>(" + ptFrameInit.toString() + ")()<\/script><script>(" + ptShareKit.toString() + ")()<\/script><script>(" + ptDeclutter.toString() + ")()<\/script>";
+const PRE = PRE0 + "<style data-pt-kit>" + PT_KIT_CSS + "</style><script>(" + ptFrameInit.toString() + ")()<\/script><script>(" + ptShareKit.toString() + ")()<\/script><script>(" + ptDeclutter.toString() + ")()<\/script><script>(" + ptColorize.toString() + ")()<\/script>";
 
 function syncTheme(f) {
   try {
