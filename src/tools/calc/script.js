@@ -917,7 +917,10 @@ async function bfEngine(c,scoreTot,onProg){
   else if(c.cons==="pick"){const PN=((P.x2||{}).potions||[]).map(p=>p.n);base.pots=(c.pots||[]).filter(n=>PN.includes(n));base.cons=(c.consList||[]).filter(n=>CONS.some(x=>x.n===n))}
   // can't do perfect digs: streak enchants never build up, and digging without Mastered means autopan at about two thirds of your luck
   const tot=st=>{const t=compute(st).tot;if(noPerf&&st.shEn!=="Mastered")t.Luck*=2/3;return t};
-  const score=st=>scoreTot(tot(st),st);
+  // ties: when a choice does nothing for the goal, the one with the most in every other stat wins (a tiny second score)
+  const SEC=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed"];
+  const score0=st=>scoreTot(tot(st),st);
+  const score=st=>{const t=tot(st);return scoreTot(t,st)+1e-6*SEC.reduce((a,k)=>a+Math.log(1+Math.max(0,+t[k]||0)),0)};
   const pans=G.pans.filter(x=>ok(x.name)||x.name===base.pan),shovels=G.shovels.filter(x=>ok(x.name)||x.name===base.shovel);
   const shEns=["",...EN.shovel.map(x=>x.n).filter(n=>!noPerf||!STREAK[n])];
   const TRN=((P.x2||{}).trinkets||[]).map(t=>t.n).filter(n=>ok(n)||n===base.trinket);
@@ -926,8 +929,12 @@ async function bfEngine(c,scoreTot,onProg){
   const useful=c.useful||["Luck","Capacity"];
   // museum: strength before speed, so slots and modifiers are only picked for speed when they also give something else useful
   const musUseful=c.musUseful||useful;
-  const MC={};MORDER.forEach(r=>MC[r]=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.some(([k])=>musUseful.includes(k))).map(m=>m.n).concat(["Any"]));
-  const MODN=Object.keys(MODS).filter(u=>u==="None"||MODS[u][1].some(k=>musUseful.includes(k)));
+  const MC={};MORDER.forEach(r=>{const all=P.mins.filter(m=>m.r===r&&!BF_SKIPMUS.has(m.n)&&m.mu&&m.mu.b&&m.mu.b.length);const use=all.filter(m=>m.mu.b.some(([k])=>musUseful.includes(k)));
+    // nothing in this rarity helps the goal: try them all, so the slot still gets the one with the most in other stats
+    // and once the helpful ones run out, the rest still beat an empty "Any" on other stats
+    const rest=all.filter(m=>!use.includes(m)&&m.mu.b.some(([k])=>SEC.includes(k)));
+    MC[r]=use.concat(rest).map(m=>m.n).concat(["Any"])});
+  let MODN=Object.keys(MODS).filter(u=>u==="None"||MODS[u][1].some(k=>musUseful.includes(k)));if(MODN.length<2)MODN=Object.keys(MODS);
   const start=clone(base);if(c.museum){start.museumBoard=clone(musBoard(base)||{});start.mus="custom"}
   if(noPerf&&STREAK[start.shEn])start.shEn="";
   // pieces you already wear keep their stars and roll; anything new is counted at 6★ and a 100% roll
@@ -955,22 +962,27 @@ async function bfEngine(c,scoreTot,onProg){
     if(!best||cur>best.sc+1e-12)best={sc:cur,st};
   }
   // why this build: for each part, the best thing you could put there instead and how much worse it is
-  const fin=best.st,sc=best.sc,why=[];const pct=v=>(Math.exp(v-sc)-1)*100;const lab=(p,e)=>p+(e?", "+e:"");
+  const fin=best.st,sc=score0(best.st),why=[];const pct=v=>{const d=v-sc;return Math.abs(d)<1e-12?0:(Math.exp(d)-1)*100};
+  const lab=(p,e)=>p+(e?", "+e:"");
   if(c.tools){
-    {let bb=null;for(const p of pans){if(p.name===fin.pan)continue;for(const e of ["",...EN.pan.map(x=>x.n)]){const v=score(Object.assign({},fin,{pan:p.name,panEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Pan",pick:lab(fin.pan,fin.panEn),alt:bb.t,pct:pct(bb.v)})}
-    {let bb=null;for(const e of ["",...EN.pan.map(x=>x.n)]){if(e===fin.panEn)continue;const v=score(Object.assign({},fin,{panEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Pan enchant",pick:fin.panEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}
-    {let bb=null;for(const p of shovels){if(p.name===fin.shovel)continue;for(const e of shEns){const v=score(Object.assign({},fin,{shovel:p.name,shEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Shovel",pick:lab(fin.shovel,fin.shEn),alt:bb.t,pct:pct(bb.v)})}
-    {let bb=null;for(const e of shEns){if(e===fin.shEn)continue;const v=score(Object.assign({},fin,{shEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Shovel enchant",pick:fin.shEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}}
-  if(c.trinket){let bb=null;for(const n of ["",...TRN]){if(n===fin.trinket)continue;const v=score(Object.assign({},fin,{trinket:n}));if(!bb||v>bb.v)bb={v,t:n||"no trinket"}}if(bb)why.push({part:"Trinket",pick:fin.trinket||"no trinket",alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const p of pans){if(p.name===fin.pan)continue;for(const e of ["",...EN.pan.map(x=>x.n)]){const v=score0(Object.assign({},fin,{pan:p.name,panEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Pan",pick:lab(fin.pan,fin.panEn),alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const e of ["",...EN.pan.map(x=>x.n)]){if(e===fin.panEn)continue;const v=score0(Object.assign({},fin,{panEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Pan enchant",pick:fin.panEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const p of shovels){if(p.name===fin.shovel)continue;for(const e of shEns){const v=score0(Object.assign({},fin,{shovel:p.name,shEn:e}));if(!bb||v>bb.v)bb={v,t:lab(p.name,e)}}}if(bb)why.push({part:"Shovel",pick:lab(fin.shovel,fin.shEn),alt:bb.t,pct:pct(bb.v)})}
+    {let bb=null;for(const e of shEns){if(e===fin.shEn)continue;const v=score0(Object.assign({},fin,{shEn:e}));if(!bb||v>bb.v)bb={v,t:e||"no enchant"}}if(bb)why.push({part:"Shovel enchant",pick:fin.shEn||"no enchant",alt:bb.t,pct:pct(bb.v)})}}
+  if(c.trinket){let bb=null;for(const n of ["",...TRN]){if(n===fin.trinket)continue;const v=score0(Object.assign({},fin,{trinket:n}));if(!bb||v>bb.v)bb={v,t:n||"no trinket"}}if(bb)why.push({part:"Trinket",pick:fin.trinket||"no trinket",alt:bb.t,pct:pct(bb.v)})}
   const seen=new Set();
   for(const [k,l,slot] of SLOTDEF){const v0=fin.slots[k];if(!v0||!v0.n)continue;const key=slot+"|"+v0.n+"|"+v0.m;if(seen.has(key))continue;seen.add(key);
     const cnt=SLOTDEF.filter(([kk,,sl])=>sl===slot&&fin.slots[kk]&&fin.slots[kk].n===v0.n&&fin.slots[kk].m===v0.m).length;
     const others=Object.entries(fin.slots).filter(([kk])=>kk!==k).map(([,v])=>v&&v.n);let bi=null,bm=null;
-    for(const n of POOL[slot]){if(n===v0.n||(BF_UNIQ.has(n)&&others.includes(n)))continue;for(const m of muts){fin.slots[k]={n,l:"6",m,q:100};const v=score(fin);if(!bi||v>bi.v)bi={v,t:n+(m!=="None"?` (${m})`:"")}}}
-    for(const m of muts){if(m===v0.m)continue;fin.slots[k]=Object.assign({},v0,{m});const v=score(fin);if(!bm||v>bm.v)bm={v,t:m}}
+    for(const n of POOL[slot]){if(n===v0.n||(BF_UNIQ.has(n)&&others.includes(n)))continue;for(const m of muts){fin.slots[k]={n,l:"6",m,q:100};const v=score0(fin);if(!bi||v>bi.v)bi={v,t:n+(m!=="None"?` (${m})`:"")}}}
+    for(const m of muts){if(m===v0.m)continue;fin.slots[k]=Object.assign({},v0,{m});const v=score0(fin);if(!bm||v>bm.v)bm={v,t:m}}
     fin.slots[k]=v0;const nm=(slot==="Ring"&&cnt>1?cnt+"× ":"")+v0.n+(v0.m&&v0.m!=="None"?` (${v0.m})`:"");
     if(bi)why.push({part:slot==="Ring"?"Ring":l,pick:nm,alt:bi.t,pct:pct(bi.v),note:cnt>1?"for one of them":""});
     if(bm)why.push({part:"Mutation",pick:`${v0.m||"None"} on ${v0.n}`,alt:bm.t,pct:pct(bm.v),note:cnt>1?"on one of them":""})}
+  // a part that adds nothing to the goal: going without it scores the same, so the alternative is "anything"
+  const zero=(o)=>Math.abs(score0(Object.assign({},fin,o))-sc)<1e-12;
+  why.forEach(w=>{if(w.pct!==0)return;
+    if((w.part==="Pan enchant"&&zero({panEn:""}))||(w.part==="Shovel enchant"&&zero({shEn:""}))||(w.part==="Trinket"&&zero({trinket:""}))){w.alt="Any";w.none=true}});
   // what every build here was compared under
   const as=[];const b=fin.b||{},n=fin.n||{};
   as.push("Every new piece at 6★ with a 100% roll; pieces you already had keep theirs");
@@ -1001,11 +1013,13 @@ window.ptFinderRows=(R,extra)=>{const it=v=>v&&v.n?v.n+(v.m&&v.m!=="None"?` (${v
   if(R.assume){out.push([],["Assumes"]);R.assume.forEach(a=>out.push([a]))}
   return out};
 // "why" and "assumptions" as HTML, shared by the finder here and the Best Build tool
-window.ptWhyHTML=R=>{if(!R||!R.why)return "";const f=v=>v>-0.05?"about the same":fmt(-v,-v<10?1:0)+"% worse";
-  return `<details class="bfwhy" open><summary><b>Why this build</b></summary><table class="bfwt"><tr><th></th><th>Picked</th><th>Best alternative</th><th>If you swapped it</th></tr>${R.why.map(w=>`<tr><td>${esc(w.part)}</td><td>${esc(w.pick)}</td><td>${esc(w.alt)}${w.note?` <span class="hint">(${esc(w.note)})</span>`:""}</td><td class="${w.pct>-1?"near":""}">${f(w.pct)}</td></tr>`).join("")}</table>
-  <p class="hint">Anything marked "about the same" or under 1% is a near tie: use whichever you have.</p></details>
+window.ptWhyHTML=R=>{if(!R||!R.why)return "";const f=w=>w.pct===0?(w.none?`<span class="bfnone">No bonus</span>`:"Same"):w.pct>-0.05?"about the same":fmt(-w.pct,-w.pct<10?1:0)+"% worse";
+  // "no enchant", "no trinket" and "Any" as a quiet pill instead of plain words
+  const nm=t=>/^(no enchant|no trinket|Any)$/.test(t)?`<span class="bfnone">${t==="Any"?"Any":"None"}</span>`:esc(t);
+  return `<details class="bfwhy" open><summary><b>Why this build</b></summary><table class="bfwt"><tr><th></th><th>Picked</th><th>Best alternative</th><th>If you swapped it</th></tr>${R.why.map(w=>`<tr><td>${esc(w.part)}</td><td>${nm(w.pick)}</td><td>${nm(w.alt)}${w.note&&!w.none?` <span class="hint">(${esc(w.note)})</span>`:""}</td><td class="${w.pct>-1?"near":""}">${f(w)}</td></tr>`).join("")}</table>
+  <p class="hint">"Same" means swapping changes nothing. "No bonus" means that part adds nothing to this goal, so use anything there. "About the same" or under 1% is a near tie: use whichever you have.</p></details>
   <details class="bfwhy"><summary><b>What this assumes</b></summary><ul class="bfas">${R.assume.map(a=>`<li>${esc(a)}</li>`).join("")}</ul><p class="hint">How it's worked out: <button type="button" class="lnk" data-opentool="mechanics">How It Works</button>, <button type="button" class="lnk" data-opentool="formulas">Formulas</button></p></details>`};
-window.ptWhyCSS=`.bfwhy{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}.bfwhy summary{cursor:pointer}.bfwt{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.bfwt th{text-align:left;font:600 11px var(--f-body);color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}.bfwt td{padding:5px 6px;border-bottom:1px dashed var(--line);vertical-align:top}.bfwt td:first-child{color:var(--muted);white-space:nowrap}.bfwt td:last-child{white-space:nowrap;font-family:var(--f-mono)}.bfwt td.near{color:var(--warn,#9a5b00)}.bfas{margin:6px 0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}`;
+window.ptWhyCSS=`.bfnone{display:inline-block;padding:1px 8px;border-radius:999px;background:var(--sunk);border:1px solid var(--line);color:var(--muted);font:600 11.5px var(--f-body,inherit)}.bfwhy{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:8px 12px}.bfwhy summary{cursor:pointer}.bfwt{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.bfwt th{text-align:left;font:600 11px var(--f-body);color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}.bfwt td{padding:5px 6px;border-bottom:1px dashed var(--line);vertical-align:top}.bfwt td:first-child{color:var(--muted);white-space:nowrap}.bfwt td:last-child{white-space:nowrap;font-family:var(--f-mono)}.bfwt td.near{color:var(--warn,#9a5b00)}.bfas{margin:6px 0;padding-left:18px;font-size:13.5px;display:flex;flex-direction:column;gap:3px}.lnk{background:none;border:0;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}`;
 async function runBf(){const c=bfCfg();if(!c.muts.length){ptToast("Pick at least one mutation");return}
   const btn=$("bfRun");btn.disabled=true;const prog=$("bfProg");const goal=c.goal;
   const sf=goal==="luck"?t=>Math.log(Math.max(1e-9,t.Luck)):t=>Math.log(Math.max(1e-9,t.Luck))+.565*Math.log(Math.max(1e-9,t.Capacity));
