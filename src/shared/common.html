@@ -308,7 +308,7 @@ function ptMuseumView(board,o){o=o||{};board=board||{};const MI={};P.mins.forEac
   const eff=v=>`<em class="${v<0?"neg":""}">${v<0?"−":"+"}${Math.abs(v)}×</em>`;
   const filled=r=>(board[r]||[]).filter(x=>x&&x.m).length;
   return `<div class="pt-mus">${PT_MUS_ORDER.filter(r=>!o.hideEmpty||filled(r)).map(r=>{const row=(board[r]||[]).slice(0,PT_MUS_SLOTS[r]);while(row.length<PT_MUS_SLOTS[r])row.push(null);
-    return `<div class="pt-mband" style="--rc:${rc(r)}"><h3>${r} <small>${filled(r)} of ${PT_MUS_SLOTS[r]}</small></h3><div class="pt-mslots">${row.map(sl=>{
+    return `<div class="pt-mband" style="--rc:${rc(r)};--n:${PT_MUS_SLOTS[r]}"><h3>${r} <small>${filled(r)} of ${PT_MUS_SLOTS[r]}</small></h3><div class="pt-mslots">${row.map(sl=>{
       if(!sl||!sl.m)return `<div class="pt-mslot"><div><b class="muted">Empty</b><span>${esc(o.empty||"Nothing picked here")}</span></div></div>`;
       const u=sl.u&&sl.u!=="None"?`<i class="pt-mmod">${esc(sl.u)}</i>`:"";
       if(sl.m==="Any")return `<div class="pt-mslot"><span class="pt-many" aria-hidden="true">?</span><div><b>Any ${esc(r)}</b><span>Any mineral, for its modifier${u?" ":""}${u}</span></div></div>`;
