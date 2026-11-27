@@ -79,7 +79,7 @@ function render(){const it=BY[S.item];$("item").value=S.item;if(document.activeE
       <div><span class="lab">90% chance</span><b>${q>=1?"1":big(k90)}</b><span class="hint">reforges, ${money(c90,it.c)}</span></div>
       <div><span class="lab">99% chance</span><b>${q>=1?"1":big(k99)}</b><span class="hint">reforges, ${money(c99,it.c)}</span></div></div>
     ${verdict}${budLine}
-    <table class="t"><tr><th>Stat</th><th class="n">Roll range (${S.star}★)</th><th class="n">Step</th><th class="n">Possible values</th><th class="n">Chance of max</th></tr>${rows}</table>
+    <div class="tw"><table class="t"><tr><th>Stat</th><th class="n">Roll range (${S.star}★)</th><th class="n">Step</th><th class="n">Possible values</th><th class="n">Chance of max</th></tr>${rows}</table></div>
     <p class="hint">Percent stats are shown in %. All ${fmt(it.st.length,0)} stats together can land ${big(all)} different ways.</p>`}
 render();
 })();
