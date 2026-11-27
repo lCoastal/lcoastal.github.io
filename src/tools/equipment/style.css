@@ -29,9 +29,9 @@ td.ic{width:44px;padding:4px 5px!important}
 .sts{display:flex;flex-direction:column;gap:2px;font-size:12.5px}
 .sts span{white-space:nowrap}
 /* stat name colours (same family as the build sheets' key) */
-:root{--k-luck:#2f8f1f;--k-cap:#b5700f;--k-size:#c53030;--k-digstr:#c2552f;--k-digspd:#2a6fb8;--k-sell:#9a7a00;--k-walk:#5d6670;--k-mod:#1f8f5a;--k-shkstr:#b5486a;--k-shkspd:#6b4fc0}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--k-luck:#86f34a;--k-cap:#f0b44a;--k-size:#ff6b6b;--k-digstr:#ff9d7f;--k-digspd:#8ecbff;--k-sell:#ffd21f;--k-walk:#d6dbe0;--k-mod:#39e06a;--k-shkstr:#ff8fb1;--k-shkspd:#b9a6ff}}
-:root[data-theme="dark"]{--k-luck:#86f34a;--k-cap:#f0b44a;--k-size:#ff6b6b;--k-digstr:#ff9d7f;--k-digspd:#8ecbff;--k-sell:#ffd21f;--k-walk:#d6dbe0;--k-mod:#39e06a;--k-shkstr:#ff8fb1;--k-shkspd:#b9a6ff}
+:root{--k-luck:#2f8f1f;--k-cap:#a8740a;--k-size:#c62828;--k-digstr:#b9532c;--k-digspd:#2a6fb8;--k-sell:#9a7a00;--k-walk:#5d6670;--k-mod:#1f8f3a;--k-shkstr:#b9532c;--k-shkspd:#5d6670}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--k-luck:#c3ffb6;--k-cap:#ffe6b6;--k-size:#ff4444;--k-digstr:#ffc3b0;--k-digspd:#aadbff;--k-sell:#ffdb1a;--k-walk:#ffffff;--k-mod:#2cff4a;--k-shkstr:#ffc3b0;--k-shkspd:#ffffff}}
+:root[data-theme="dark"]{--k-luck:#c3ffb6;--k-cap:#ffe6b6;--k-size:#ff4444;--k-digstr:#ffc3b0;--k-digspd:#aadbff;--k-sell:#ffdb1a;--k-walk:#ffffff;--k-mod:#2cff4a;--k-shkstr:#ffc3b0;--k-shkspd:#ffffff}
 .sk{font-weight:600}
 table.eq tr .nm b{color:var(--nc)}
 .sts em{font-style:normal;font-family:var(--f-mono);color:var(--fg)}

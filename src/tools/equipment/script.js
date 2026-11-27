@@ -181,7 +181,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!scrim.hidden)close
 window.ptOpenItem=name=>{const x=BYN[String(name).toLowerCase()];if(x)showEquip(x.i)};
 // picture of the list as it is now (same filters, sort, value level and tags), one fixed column grid so every group lines up
 const RHX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
-const KHX={Luck:"#86f34a",Capacity:"#f0b44a","Size Boost":"#ff6b6b","Dig Strength":"#ff9d7f","Dig Speed":"#8ecbff","Sell Boost":"#ffd21f","Walk Speed":"#d6dbe0","Modifier Boost":"#39e06a","Shake Strength":"#ff8fb1","Shake Speed":"#b9a6ff"};
+const KHX={Luck:"#c3ffb6",Capacity:"#ffe6b6","Size Boost":"#ff4444","Dig Strength":"#ffc3b0","Dig Speed":"#aadbff","Sell Boost":"#ffdb1a","Walk Speed":"#ffffff","Modifier Boost":"#2cff4a","Shake Strength":"#ffc3b0","Shake Speed":"#ffffff"};
 async function equipImage(){
   const groups=LAST.filter(g=>g[1].length);if(!groups.length)return null;
   try{await document.fonts.ready}catch(e){}

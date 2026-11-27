@@ -48,9 +48,9 @@ input[type=search],input[type=text],input[type=number],select{padding:7px 10px;b
 .foot a{color:var(--accent)}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 .tilde{}
-:root{--k-luck:#2f8f1f;--k-cap:#b5700f;--k-size:#c53030;--k-digstr:#c2552f;--k-digspd:#2a6fb8;--k-sell:#9a7a00;--k-walk:#5d6670;--k-mod:#1f8f5a;--k-shkstr:#b5486a;--k-shkspd:#6b4fc0;--k-inv:#8a5a2b;--k-jump:#5d6670}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--k-luck:#86f34a;--k-cap:#f0b44a;--k-size:#ff6b6b;--k-digstr:#ff9d7f;--k-digspd:#8ecbff;--k-sell:#ffd21f;--k-walk:#d6dbe0;--k-mod:#39e06a;--k-shkstr:#ff8fb1;--k-shkspd:#b9a6ff;--k-inv:#e0b07a;--k-jump:#d6dbe0}}
-:root[data-theme="dark"]{--k-luck:#86f34a;--k-cap:#f0b44a;--k-size:#ff6b6b;--k-digstr:#ff9d7f;--k-digspd:#8ecbff;--k-sell:#ffd21f;--k-walk:#d6dbe0;--k-mod:#39e06a;--k-shkstr:#ff8fb1;--k-shkspd:#b9a6ff;--k-inv:#e0b07a;--k-jump:#d6dbe0}
+:root{--k-luck:#2f8f1f;--k-cap:#a8740a;--k-size:#c62828;--k-digstr:#b9532c;--k-digspd:#2a6fb8;--k-sell:#9a7a00;--k-walk:#5d6670;--k-mod:#1f8f3a;--k-shkstr:#b9532c;--k-shkspd:#5d6670;--k-inv:#8a4a26;--k-jump:#b0602a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--k-luck:#c3ffb6;--k-cap:#ffe6b6;--k-size:#ff4444;--k-digstr:#ffc3b0;--k-digspd:#aadbff;--k-sell:#ffdb1a;--k-walk:#ffffff;--k-mod:#2cff4a;--k-shkstr:#ffc3b0;--k-shkspd:#ffffff;--k-inv:#da8662;--k-jump:#ffbc8c}}
+:root[data-theme="dark"]{--k-luck:#c3ffb6;--k-cap:#ffe6b6;--k-size:#ff4444;--k-digstr:#ffc3b0;--k-digspd:#aadbff;--k-sell:#ffdb1a;--k-walk:#ffffff;--k-mod:#2cff4a;--k-shkstr:#ffc3b0;--k-shkspd:#ffffff;--k-inv:#da8662;--k-jump:#ffbc8c}
 /* type-to-search box with a suggestion list (Luck Odds, Best Luck Cap) */
 .ac{position:relative;flex:0 1 300px;min-width:0;display:flex}
 .ac input{width:100%;box-sizing:border-box}
@@ -105,7 +105,7 @@ window.ptStoreChanged=()=>{document.querySelectorAll("[data-tg]").forEach(b=>{b.
 const STATK={"luck":"luck","capacity":"cap","size boost":"size","dig strength":"digstr","dig speed":"digspd","sell boost":"sell","walk speed":"walk","walkspeed":"walk","modifier boost":"mod","shake strength":"shkstr","shake speed":"shkspd","inventory size":"inv","jump power":"jump"};
 const statKey=n=>STATK[String(n||"").trim().toLowerCase()]||null;
 const statVar=n=>{const k=statKey(n);return k?`var(--k-${k})`:"var(--fg)"};
-const STATHEX={luck:"#86f34a",cap:"#f0b44a",size:"#ff6b6b",digstr:"#ff9d7f",digspd:"#8ecbff",sell:"#ffd21f",walk:"#d6dbe0",mod:"#39e06a",shkstr:"#ff8fb1",shkspd:"#b9a6ff",inv:"#e0b07a",jump:"#d6dbe0"};
+const STATHEX={luck:"#c3ffb6",cap:"#ffe6b6",size:"#ff4444",digstr:"#ffc3b0",digspd:"#aadbff",sell:"#ffdb1a",walk:"#ffffff",mod:"#2cff4a",shkstr:"#ffc3b0",shkspd:"#ffffff",inv:"#da8662",jump:"#ffbc8c"};
 const statHex=n=>STATHEX[statKey(n)]||"#e6e9ec";
 // type-to-search box: o={inp, items:[{n,tag,ic,col,...}], pick(x), cur()->text shown when idle, icon()->picture for the box, free:true keeps what you typed, keep:true keeps the items in the order given}
 function makeAC(o){const inp=o.inp,wrap=document.createElement("span");wrap.className="ac";inp.parentNode.insertBefore(wrap,inp);wrap.appendChild(inp);

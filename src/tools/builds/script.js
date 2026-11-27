@@ -7,13 +7,13 @@ const SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
 const RCOL={Exotic:"var(--r-exotic)",Mythic:"var(--r-mythic)",Legendary:"var(--r-legendary)",Epic:"var(--r-epic)",Rare:"var(--r-rare)",Uncommon:"var(--r-uncommon)",Common:"var(--r-common)"};
 const CODE={"Luck":"L","Capacity":"C","Size Boost":"W","Dig Strength":"D","Dig Speed":"S","Sell Boost":"$","Walk Speed":"K","Modifier Boost":"M","Shake Strength":"A","Shake Speed":"P"};
 // stat colours, the same as everywhere else in the toolkit (the sheet is always dark)
-const SHX={"Luck":"#86f34a","Capacity":"#f0b44a","Size Boost":"#ff6b6b","Dig Strength":"#ff9d7f","Dig Speed":"#8ecbff","Sell Boost":"#ffd21f","Walk Speed":"#d6dbe0","Modifier Boost":"#39e06a","Shake Strength":"#ff8fb1","Shake Speed":"#b9a6ff"};
+const SHX={"Luck":"#c3ffb6","Capacity":"#ffe6b6","Size Boost":"#ff4444","Dig Strength":"#ffc3b0","Dig Speed":"#aadbff","Sell Boost":"#ffdb1a","Walk Speed":"#ffffff","Modifier Boost":"#2cff4a","Shake Strength":"#ffc3b0","Shake Speed":"#ffffff"};
 const STAT_RE=/\b(luck|capacity|size boost|sell boost|modifier boost|dig strength|dig speed|shake strength|shake speed|walk ?speed)\b/gi;
 const statKeyB=w=>{const k=w.toLowerCase().replace("walkspeed","walk speed");return Object.keys(SHX).find(x=>x.toLowerCase()===k)};
 // colour every stat name in the sheet's text (only text between tags, never inside attributes)
 const colourStats=h=>{const i=h.indexOf("</h1>");const head=i>=0?h.slice(0,i+5):"";return head+cs0(i>=0?h.slice(i+5):h)};
 const cs0=h=>h.replace(/>([^<]+)</g,(m,t)=>">"+t.replace(STAT_RE,w=>{const k=statKeyB(w);return k?`<span style="color:${SC2(k)}">${w}</span>`:w})+"<");
-const CCOL={L:"#86f34a",C:"#f0b44a",W:"#ff6b6b",D:"#ff9d7f",S:"#8ecbff",$:"#ffd21f",K:"#d6dbe0",M:"#39e06a",A:"#ff8fb1",P:"#b9a6ff","2":"#86f34a","+":"#86f34a","-":"#ff5a5a"};
+const CCOL={L:"#c3ffb6",C:"#ffe6b6",W:"#ff4444",D:"#ffc3b0",S:"#aadbff",$:"#ffdb1a",K:"#ffffff",M:"#2cff4a",A:"#ffc3b0",P:"#ffffff","2":"#86f34a","+":"#86f34a","-":"#ff5a5a"};
 const D=[
 ["Copper","Common",60,[["Size Boost",.04]]],["Gold","Common",40,[["Sell Boost",.05]]],["Amethyst","Common",20,[["Dig Speed",.05]]],["Blue Ice","Common",40,[["Dig Speed",.05]]],["Pyrite","Common",60,[["Capacity",.05]]],["Silver","Common",40,[["Shake Speed",.05]]],["Platinum","Common",40,[["Dig Speed",.05]]],["Seashell","Common",20,[["Capacity",.05]]],["Obsidian","Common",30,[["Size Boost",.04]]],["Pearl","Common",20,[["Shake Speed",.05]]],
 ["Coral","Uncommon",10,[["Capacity",.08]]],["Glowberry","Uncommon",40,[["Sell Boost",.08]]],["Electrum","Uncommon",40,[["Sell Boost",.08]]],["Neodymium","Uncommon",40,[["Shake Strength",.08]]],["Smoky Quartz","Uncommon",20,[["Shake Strength",.08]]],["Malachite","Uncommon",20,[["Modifier Boost",.08]]],["Sapphire","Uncommon",20,[["Dig Speed",.08]]],["Rock Candy","Uncommon",60,[["Size Boost",.05]]],["Nickel","Uncommon",40,[["Capacity",.08]]],["Titanium","Uncommon",40,[["Dig Speed",.08]]],["Topaz","Uncommon",20,[["Capacity",.08]]],["Zircon","Uncommon",20,[["Size Boost",.05]]],

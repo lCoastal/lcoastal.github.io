@@ -50,7 +50,7 @@ function ptMapColor(s, light, accent) {
   if (a < 1 && l < 0.2) return s; // shadows / dark overlays
   // greys, including the dark blue-greys the pictures use for backgrounds: flip light and dark
   if (sat < 0.2 || (l < 0.3 && sat < 0.5)) return out(ptHslToRgb(h, sat, Math.min(1, Math.max(0, 1.04 - l))));
-  if (l > 0.45) return out(ptHslToRgb(h, sat, Math.max(0.25, l - 0.21))); // bright colours: darker for a light page
+  if (l > 0.45) return out(ptHslToRgb(h, Math.max(sat, l > 0.7 ? 0.6 : sat), Math.max(0.25, Math.min(0.42, l - 0.21)))); // bright and pale colours: darker for a light page
   return s;
 }
 // names coloured in pictures: the dark-theme colours (light pictures darken them like every other colour)
@@ -58,16 +58,16 @@ const PT_NAMECOL = {
   Perfect: "#5ef1e1", Treasured: "#ffd849", Entombed: "#40c8be", Lunar: "#ffe99b", Voidtorn: "#a35bff", Mutated: "#a07bff", Cosmic: "#ff5f9e",
   Electrified: "#ffeb0b", Iridescent: "#f36bff", Irradiated: "#67ff20", Crystalline: "#b7e6ff", Scorching: "#ff861c", Glowing: "#fff292",
   Pure: "#ffffff", Shiny: "#d4e7ff", Sunforged: "#ffc457", Prismatic: "#c05bd8", Overclocked: "#e0602f", Festive: "#d23c3c",
-  Luck: "#86f34a", Capacity: "#f0b44a", "Size Boost": "#ff6b6b", "Modifier Boost": "#39e06a", "Sell Boost": "#ffd21f", "Dig Strength": "#ff9d7f",
-  "Dig Speed": "#8ecbff", "Shake Strength": "#ff8fb1", "Shake Speed": "#b9a6ff", "Walk Speed": "#d6dbe0", Walkspeed: "#d6dbe0", "Inventory Size": "#e0b07a", "Jump Power": "#d6dbe0",
+  Luck: "#c3ffb6", Capacity: "#ffe6b6", "Size Boost": "#ff4444", "Modifier Boost": "#2cff4a", "Sell Boost": "#ffdb1a", "Dig Strength": "#ffc3b0",
+  "Dig Speed": "#aadbff", "Shake Strength": "#ffc3b0", "Shake Speed": "#ffffff", "Walk Speed": "#ffffff", Walkspeed: "#ffffff", "Inventory Size": "#da8662", "Jump Power": "#ffbc8c",
 };
 // light pictures: the same light-theme colours the pages use (set directly, not translated)
 const PT_NAMECOL_LIGHT = {
   Perfect: "#0e9c8d", Treasured: "#a88400", Entombed: "#24928a", Lunar: "#8f7a2a", Voidtorn: "#6a1fd1", Mutated: "#5b3fc4", Cosmic: "#c0145a",
   Electrified: "#9c8f00", Iridescent: "#a800b7", Irradiated: "#3a9e00", Crystalline: "#0077b7", Scorching: "#b75500", Glowing: "#9c8a00",
   Pure: "#6b6b6b", Shiny: "#2f63b0", Sunforged: "#b77700", Prismatic: "#7e2394", Overclocked: "#9f3d17", Festive: "#952222",
-  Luck: "#2f8f1f", Capacity: "#b5700f", "Size Boost": "#c53030", "Modifier Boost": "#1f8f5a", "Sell Boost": "#9a7a00", "Dig Strength": "#c2552f",
-  "Dig Speed": "#2a6fb8", "Shake Strength": "#b5486a", "Shake Speed": "#6b4fc0", "Walk Speed": "#5d6670", Walkspeed: "#5d6670", "Inventory Size": "#8a5a2b", "Jump Power": "#5d6670",
+  Luck: "#2f8f1f", Capacity: "#a8740a", "Size Boost": "#c62828", "Modifier Boost": "#1f8f3a", "Sell Boost": "#9a7a00", "Dig Strength": "#b9532c",
+  "Dig Speed": "#2a6fb8", "Shake Strength": "#b9532c", "Shake Speed": "#5d6670", "Walk Speed": "#5d6670", Walkspeed: "#5d6670", "Inventory Size": "#8a4a26", "Jump Power": "#b0602a",
 };
 const PT_NAMERE = new RegExp("(^|[^A-Za-z'])(" + Object.keys(PT_NAMECOL).sort((a, b) => b.length - a.length).join("|") + ")(?![A-Za-z])", "g");
 const PT_OKBEFORE = /^(Max|Your|Total|Base|Extra|Best|More|Less|No|And|Or|With|Without|Each|Every|All|For|Of|Most|Higher|Lower)$/;
