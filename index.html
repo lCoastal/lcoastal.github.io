@@ -629,7 +629,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .recent .rclr {margin-left: auto;
+  .recent .rclr, .quick .rclr {margin-left: auto;
     border: 0;
     background: none;
     color: var(--muted);
@@ -853,6 +853,57 @@
         opacity: 0.6;
       }
     }
+  }
+
+  /* pin button on each menu entry */
+  .navw {
+    position: relative;
+  }
+  .navw > .nav {
+    padding-right: 40px;
+  }
+  .pin {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .navw:hover .pin,
+  .pin:focus-visible,
+  .pin.on {
+    opacity: 1;
+  }
+  .pin.on {
+    color: #f5b301;
+  }
+  .pin:hover {
+    background: color-mix(in srgb, var(--fg) 8%, transparent);
+  }
+  @media (hover: none) {
+    .pin {
+      opacity: 0.55;
+    }
+    .pin.on {
+      opacity: 1;
+    }
+  }
+  .quick .dsec + .navw,
+  .quick .navw + .dsec {
+    margin-top: 0;
+  }
+  .quick .navw + .dsec {
+    margin-top: 8px;
   }
 </style>
 
@@ -11429,7 +11480,7 @@
     })();
   }
   const PRE0 =
-    '<base target="_blank"><script>try{if(!window.hostBridge&&window.parent&&window.parent.hostBridge)window.hostBridge=window.parent.hostBridge}catch(e){}document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-mineral],[data-location],[data-equip]");if(!t)return;if(!(e.ctrlKey||e.metaKey)&&!(t.classList.contains("mlink")&&!e.target.closest("button,a,input,select,label")))return;e.preventDefault();e.stopPropagation();try{window.parent.ptOpen(t.hasAttribute("data-mineral")?"mineral":t.hasAttribute("data-equip")?"equip":"location",t.getAttribute("data-mineral")||t.getAttribute("data-equip")||t.getAttribute("data-location"))}catch(err){}},true);document.addEventListener("DOMContentLoaded",function(){var st=document.createElement("style");st.textContent=".mlink{cursor:pointer}.pt-ft{display:flex!important;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;text-align:center;max-width:none!important;white-space:nowrap}.pt-ft i{font-style:normal}.pt-fix{flex-basis:100%;white-space:normal!important;overflow-wrap:break-word;max-width:100%;text-align:center;font-size:12.5px;color:var(--muted,#888);margin:6px 0 0;line-height:1.4}.pt-fix b{color:var(--fg,inherit);font-weight:600}.pt-ver{flex-basis:100%;text-align:center;font-size:12px;font-weight:500;letter-spacing:.02em;margin:2px 0 0;color:color-mix(in srgb,var(--fg,#888) 30%,var(--bg,transparent))}@media (max-width:600px){.pt-ft .lg{display:none}.pt-ft{gap:6px}.pt-ft>span{padding:4px 9px!important}}.pt-ft>span{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:600;line-height:1.3;color:var(--pc);background:color-mix(in srgb,var(--pc) 13%,transparent);border:1px solid color-mix(in srgb,var(--pc) 45%,transparent)}.pt-ft a{color:inherit!important;text-decoration:none!important}.pt-ft .p1{--pc:#14b8a6}.pt-ft .p2{--pc:#f59e0b}.pt-ft .p3{--pc:#a78bfa}.pt-ft .p4{--pc:#6b7cff}@media (prefers-color-scheme:light){:root:not([data-theme=dark]) .pt-ft .p1{--pc:#0f8f80}:root:not([data-theme=dark]) .pt-ft .p2{--pc:#b86e00}:root:not([data-theme=dark]) .pt-ft .p3{--pc:#7c5ce0}:root:not([data-theme=dark]) .pt-ft .p4{--pc:#4b5bdc}}:root[data-theme=light] .pt-ft .p1{--pc:#0f8f80}:root[data-theme=light] .pt-ft .p2{--pc:#b86e00}:root[data-theme=light] .pt-ft .p3{--pc:#7c5ce0}:root[data-theme=light] .pt-ft .p4{--pc:#4b5bdc}";document.head.appendChild(st);document.querySelectorAll("p").forEach(function(p){if(!/Made by @__coastal\\s*$/.test(p.innerHTML)||p.classList.contains("pt-ft"))return;var m=p.textContent.match(/Last\\s+edited\\s*([0-9\\/]+)/);p.classList.add("pt-ft");p.innerHTML="<span class=\\"p1\\"><a href=\\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Made by <\/i>@__coastal<\/a><\/span><span class=\\"p2\\"><a href=\\"https://prospecting.miraheze.org/wiki/Main_Page\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Prospecting <\/i>Wiki<\/a><\/span><span class=\\"p3\\"><i class=\\"lg\\">Last edited <\/i>"+(m?m[1]:"")+"<\/span><span class=\\"p4\\"><a class=\\"pt-dc\\" href=\\"https://discord.gg/TuXc7dguFG\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Join the official <\/i>Discord<\/a><\/span>";if(!p.querySelector(\".pt-ver\"))p.insertAdjacentHTML(\"beforeend\",\"<div class=\\\"pt-fix\\\">Spotted something wrong or out of date? Message <b>@__coastal<\/b> on Discord.<\/div><div class=\\\"pt-ver\\\">Version 579<\/div>\");var p3=p.querySelector(".p3");if(p3&&m){var q=m[1].split("/");var d=new Date(2000+(+q[2]),(+q[1])-1,+q[0]);var n=Math.round((new Date().setHours(0,0,0,0)-d.getTime())/864e5);p3.title=n<=0?"That was today":n===1?"That was 1 day ago":"That was "+n+" days ago";p3.style.cursor="help"}var a1=p.querySelector(".p1 a"),a2=p.querySelector(".p2 a"),a4=p.querySelector(".p4 a");if(a2)a2.title="Click to go to the wiki";if(a4)a4.title="Click to get invited";if(a1){var MS=["Psst... click me","Click for a secret","Don\\u2019t click this","Bet you won\\u2019t click","Hidden developer tips inside","You\\u2019ve been chosen. Click.","Click to claim your reward","Secret pan strategy, one click away","Only 1 in 26,764 players find this","Meet the mind behind the toolkit","Click for the ultimate luck boost","Exclusive behind-the-scenes content","The best-kept secret in Prospecting","Something rare is waiting for you","Click to unlock developer mode"],li=-1;var pick=function(){var i;do{i=Math.floor(Math.random()*MS.length)}while(i===li);li=i;a1.title=MS[i]};pick();a1.addEventListener("mouseenter",pick);a1.addEventListener("focus",pick)}})});<\/script>';
+    '<base target="_blank"><script>try{if(!window.hostBridge&&window.parent&&window.parent.hostBridge)window.hostBridge=window.parent.hostBridge}catch(e){}document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-mineral],[data-location],[data-equip]");if(!t)return;if(!(e.ctrlKey||e.metaKey)&&!(t.classList.contains("mlink")&&!e.target.closest("button,a,input,select,label")))return;e.preventDefault();e.stopPropagation();try{window.parent.ptOpen(t.hasAttribute("data-mineral")?"mineral":t.hasAttribute("data-equip")?"equip":"location",t.getAttribute("data-mineral")||t.getAttribute("data-equip")||t.getAttribute("data-location"))}catch(err){}},true);document.addEventListener("DOMContentLoaded",function(){var st=document.createElement("style");st.textContent=".mlink{cursor:pointer}.pt-ft{display:flex!important;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;text-align:center;max-width:none!important;white-space:nowrap}.pt-ft i{font-style:normal}.pt-fix{flex-basis:100%;white-space:normal!important;overflow-wrap:break-word;max-width:100%;text-align:center;font-size:12.5px;color:var(--muted,#888);margin:6px 0 0;line-height:1.4}.pt-fix b{color:var(--fg,inherit);font-weight:600}.pt-ver{flex-basis:100%;text-align:center;font-size:12px;font-weight:500;letter-spacing:.02em;margin:2px 0 0;color:color-mix(in srgb,var(--fg,#888) 30%,var(--bg,transparent))}@media (max-width:600px){.pt-ft .lg{display:none}.pt-ft{gap:6px}.pt-ft>span{padding:4px 9px!important}}.pt-ft>span{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:12.5px;font-weight:600;line-height:1.3;color:var(--pc);background:color-mix(in srgb,var(--pc) 13%,transparent);border:1px solid color-mix(in srgb,var(--pc) 45%,transparent)}.pt-ft a{color:inherit!important;text-decoration:none!important}.pt-ft .p1{--pc:#14b8a6}.pt-ft .p2{--pc:#f59e0b}.pt-ft .p3{--pc:#a78bfa}.pt-ft .p4{--pc:#6b7cff}@media (prefers-color-scheme:light){:root:not([data-theme=dark]) .pt-ft .p1{--pc:#0f8f80}:root:not([data-theme=dark]) .pt-ft .p2{--pc:#b86e00}:root:not([data-theme=dark]) .pt-ft .p3{--pc:#7c5ce0}:root:not([data-theme=dark]) .pt-ft .p4{--pc:#4b5bdc}}:root[data-theme=light] .pt-ft .p1{--pc:#0f8f80}:root[data-theme=light] .pt-ft .p2{--pc:#b86e00}:root[data-theme=light] .pt-ft .p3{--pc:#7c5ce0}:root[data-theme=light] .pt-ft .p4{--pc:#4b5bdc}";document.head.appendChild(st);document.querySelectorAll("p").forEach(function(p){if(!/Made by @__coastal\\s*$/.test(p.innerHTML)||p.classList.contains("pt-ft"))return;var m=p.textContent.match(/Last\\s+edited\\s*([0-9\\/]+)/);p.classList.add("pt-ft");p.innerHTML="<span class=\\"p1\\"><a href=\\"https://www.youtube.com/watch?v=dQw4w9WgXcQ\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Made by <\/i>@__coastal<\/a><\/span><span class=\\"p2\\"><a href=\\"https://prospecting.miraheze.org/wiki/Main_Page\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Prospecting <\/i>Wiki<\/a><\/span><span class=\\"p3\\"><i class=\\"lg\\">Last edited <\/i>"+(m?m[1]:"")+"<\/span><span class=\\"p4\\"><a class=\\"pt-dc\\" href=\\"https://discord.gg/TuXc7dguFG\\" target=\\"_blank\\" rel=\\"noopener\\"><i class=\\"lg\\">Join the official <\/i>Discord<\/a><\/span>";if(!p.querySelector(\".pt-ver\"))p.insertAdjacentHTML(\"beforeend\",\"<div class=\\\"pt-fix\\\">Spotted something wrong or out of date? Message <b>@__coastal<\/b> on Discord.<\/div><div class=\\\"pt-ver\\\">Version 580<\/div>\");var p3=p.querySelector(".p3");if(p3&&m){var q=m[1].split("/");var d=new Date(2000+(+q[2]),(+q[1])-1,+q[0]);var n=Math.round((new Date().setHours(0,0,0,0)-d.getTime())/864e5);p3.title=n<=0?"That was today":n===1?"That was 1 day ago":"That was "+n+" days ago";p3.style.cursor="help"}var a1=p.querySelector(".p1 a"),a2=p.querySelector(".p2 a"),a4=p.querySelector(".p4 a");if(a2)a2.title="Click to go to the wiki";if(a4)a4.title="Click to get invited";if(a1){var MS=["Psst... click me","Click for a secret","Don\\u2019t click this","Bet you won\\u2019t click","Hidden developer tips inside","You\\u2019ve been chosen. Click.","Click to claim your reward","Secret pan strategy, one click away","Only 1 in 26,764 players find this","Meet the mind behind the toolkit","Click for the ultimate luck boost","Exclusive behind-the-scenes content","The best-kept secret in Prospecting","Something rare is waiting for you","Click to unlock developer mode"],li=-1;var pick=function(){var i;do{i=Math.floor(Math.random()*MS.length)}while(i===li);li=i;a1.title=MS[i]};pick();a1.addEventListener("mouseenter",pick);a1.addEventListener("focus",pick)}})});<\/script>';
   // less clutter in every tool: long notes and intros fold to two lines, "How it works" cards start closed,
   // and the luck-formula warning is one line you can open
   // colours mutation names (Perfect, Irradiated, Sunforged...) and stat names (Luck, Dig Strength...) in their own colour wherever they're written
@@ -11938,6 +11989,91 @@
     if (k === "g") return ((D.gear || {}).img || {})[n] || "";
     return "";
   };
+  // pinned and recently used tools, at the top of the menu (kept per browser)
+  const ENTRIES = GROUPS.flatMap((g) => g[4]).filter((x) => LIST.some((t) => t.id === x[0]));
+  const entKey = (x) => x[0] + (x[2] ? ":" + x[2] : "");
+  const entByKey = (k) => ENTRIES.find((x) => entKey(x) === k);
+  const ldKeys = (k) => {
+    try {
+      const v = JSON.parse(localStorage.getItem(k) || "[]");
+      return Array.isArray(v) ? v.filter(entByKey) : [];
+    } catch (e) {
+      return [];
+    }
+  };
+  const svKeys = (k, v) => {
+    try {
+      localStorage.setItem(k, JSON.stringify(v));
+    } catch (e) {}
+  };
+  let PINS = ldKeys("pt-pins"),
+    RTOOLS = ldKeys("pt-rtools");
+  let CURNAV = ["", ""];
+  const navHTML = (x, pinBtn) => {
+    const k = entKey(x),
+      pinned = PINS.includes(k),
+      nm = entryName(x);
+    return `<div class="navw"><button type="button" class="nav"${pinBtn ? ` id="nav-${x[0]}${x[2] ? "-" + x[2] : ""}"` : ""} data-go="${k}" data-tool="${x[0]}"${x[2] ? ` data-sub="${x[2]}"` : ""}><span class="ntx"><b>${nm}</b><span>${entryDesc(x)}</span></span></button><button type="button" class="pin${pinned ? " on" : ""}" data-pin="${k}" aria-pressed="${pinned}" aria-label="${pinned ? "Unpin" : "Pin"} ${nm}" title="${pinned ? "Unpin" : "Pin to the top"}">${pinned ? "★" : "☆"}</button></div>`;
+  };
+  const quick = document.createElement("div");
+  quick.className = "dgrp quick";
+  quick.id = "quick";
+  quick.style.setProperty("--gc", "var(--muted)");
+  drawer.appendChild(quick);
+  function drawQuick() {
+    const rec = RTOOLS.filter((k) => !PINS.includes(k)).slice(0, 5);
+    quick.hidden = !PINS.length && !rec.length;
+    quick.innerHTML =
+      (PINS.length ? `<div class="dsec">Pinned</div>${PINS.map((k) => navHTML(entByKey(k))).join("")}` : "") +
+      (rec.length
+        ? `<div class="dsec">Recent tools<button type="button" class="rclr" data-rtclr>Clear</button></div>${rec.map((k) => navHTML(entByKey(k))).join("")}`
+        : "");
+    drawer.querySelectorAll("[data-pin]").forEach((b) => {
+      const on = PINS.includes(b.dataset.pin),
+        nm = entryName(entByKey(b.dataset.pin));
+      b.classList.toggle("on", on);
+      b.textContent = on ? "★" : "☆";
+      b.setAttribute("aria-pressed", String(on));
+      b.setAttribute("aria-label", (on ? "Unpin " : "Pin ") + nm);
+      b.title = on ? "Unpin" : "Pin to the top";
+    });
+    if (CURNAV[0] && typeof ptMarkNav === "function") ptMarkNav(CURNAV[0], CURNAV[1]);
+  }
+  window.ptToolSeen = (id, sub) => {
+    CURNAV = [id, sub || ""];
+    const x = ENTRIES.find((e) => e[0] === id && (!e[2] || e[2] === sub));
+    if (!x || id === "home") return;
+    const k = entKey(x);
+    if (RTOOLS[0] === k) return;
+    RTOOLS = [k, ...RTOOLS.filter((r) => r !== k)].slice(0, 8);
+    svKeys("pt-rtools", RTOOLS);
+    drawQuick();
+  };
+  drawer.addEventListener("click", (e) => {
+    const p = e.target.closest("[data-pin]");
+    if (p) {
+      const k = p.dataset.pin;
+      PINS = PINS.includes(k) ? PINS.filter((x) => x !== k) : [...PINS, k];
+      svKeys("pt-pins", PINS);
+      drawQuick();
+      const again = drawer.querySelector(`.navw:not(#quick .navw) [data-pin="${k}"]`) || drawer.querySelector(`[data-pin="${k}"]`);
+      if (!p.isConnected && again) again.focus();
+      return;
+    }
+    if (e.target.closest("[data-rtclr]")) {
+      RTOOLS = [];
+      svKeys("pt-rtools", RTOOLS);
+      drawQuick();
+      return;
+    }
+    const g = e.target.closest("[data-go]");
+    if (!g) return;
+    const x = entByKey(g.dataset.go);
+    if (!x) return;
+    if (x[2]) openHubTab(x[0], x[2]);
+    else show(x[0]);
+    closeMenu();
+  });
   {
     const r = document.createElement("div");
     r.className = "dgrp recent";
@@ -11976,26 +12112,15 @@
     const g = document.createElement("div");
     g.className = "dgrp";
     g.style.setProperty("--gc", "var(--muted)");
-    g.innerHTML = `<div class="dsec">${title}</div>`;
-    items.forEach((x) => {
-      const [id, , sub] = x;
-      if (!LIST.some((t) => t.id === id)) return;
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "nav";
-      b.id = "nav-" + id + (sub ? "-" + sub : "");
-      b.dataset.tool = id;
-      if (sub) b.dataset.sub = sub;
-      b.innerHTML = `<span class="ntx"><b>${entryName(x)}</b><span>${entryDesc(x)}</span></span>`;
-      b.onclick = () => {
-        if (sub) openHubTab(id, sub);
-        else show(id);
-        closeMenu();
-      };
-      g.appendChild(b);
-    });
+    g.innerHTML =
+      `<div class="dsec">${title}</div>` +
+      items
+        .filter((x) => LIST.some((t) => t.id === x[0]))
+        .map((x) => navHTML(x, true))
+        .join("");
     drawer.appendChild(g);
   });
+  drawQuick();
   // reset everything: click once, wait 5 seconds, then click again within 10 seconds
   // compact view: tighter tables and cards in every tool, kept per browser
   let COMPACT = false;
@@ -12437,6 +12562,7 @@
     const ent = GROUPS.flatMap((g) => g[4]).find((x) => x[0] === id && (!x[2] || x[2] === curSub(id)));
     document.getElementById("curName").textContent = ent ? entryName(ent) : LIST.find((x) => x.id === id).name;
     ptMarkNav(id, curSub(id));
+    window.ptToolSeen && ptToolSeen(id, curSub(id));
     const gb = document.getElementById("gBtn");
     if (gb) gb.toggleAttribute("aria-current", id === "settings");
     if (gb && id === "settings") gb.setAttribute("aria-current", "page");
@@ -12484,6 +12610,7 @@
   window.ptSubChanged = (tid, sub) => {
     HUBSUB[tid] = sub;
     ptMarkNav(tid, sub);
+    if (frames[tid] && !frames[tid].hidden && window.ptToolSeen) ptToolSeen(tid, sub);
     const ent = GROUPS.flatMap((g) => g[4]).find((x) => x[0] === tid && x[2] === sub);
     if (ent && frames[tid] && !frames[tid].hidden) document.getElementById("curName").textContent = entryName(ent);
     document

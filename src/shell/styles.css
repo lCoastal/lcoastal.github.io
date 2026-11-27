@@ -605,7 +605,7 @@ main iframe {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.recent .rclr {margin-left: auto;
+.recent .rclr, .quick .rclr {margin-left: auto;
   border: 0;
   background: none;
   color: var(--muted);
@@ -829,4 +829,55 @@ main iframe {
       opacity: 0.6;
     }
   }
+}
+
+/* pin button on each menu entry */
+.navw {
+  position: relative;
+}
+.navw > .nav {
+  padding-right: 40px;
+}
+.pin {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.navw:hover .pin,
+.pin:focus-visible,
+.pin.on {
+  opacity: 1;
+}
+.pin.on {
+  color: #f5b301;
+}
+.pin:hover {
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+}
+@media (hover: none) {
+  .pin {
+    opacity: 0.55;
+  }
+  .pin.on {
+    opacity: 1;
+  }
+}
+.quick .dsec + .navw,
+.quick .navw + .dsec {
+  margin-top: 0;
+}
+.quick .navw + .dsec {
+  margin-top: 8px;
 }

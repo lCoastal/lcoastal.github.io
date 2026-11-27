@@ -26,6 +26,7 @@ function show(id) {
   const ent = GROUPS.flatMap((g) => g[4]).find((x) => x[0] === id && (!x[2] || x[2] === curSub(id)));
   document.getElementById("curName").textContent = ent ? entryName(ent) : LIST.find((x) => x.id === id).name;
   ptMarkNav(id, curSub(id));
+  window.ptToolSeen && ptToolSeen(id, curSub(id));
   const gb = document.getElementById("gBtn");
   if (gb) gb.toggleAttribute("aria-current", id === "settings");
   if (gb && id === "settings") gb.setAttribute("aria-current", "page");
@@ -73,6 +74,7 @@ function ptMarkNav(id, sub) {
 window.ptSubChanged = (tid, sub) => {
   HUBSUB[tid] = sub;
   ptMarkNav(tid, sub);
+  if (frames[tid] && !frames[tid].hidden && window.ptToolSeen) ptToolSeen(tid, sub);
   const ent = GROUPS.flatMap((g) => g[4]).find((x) => x[0] === tid && x[2] === sub);
   if (ent && frames[tid] && !frames[tid].hidden) document.getElementById("curName").textContent = entryName(ent);
   document
