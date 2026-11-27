@@ -53,11 +53,47 @@ function ptMapColor(s, light, accent) {
   if (l > 0.45) return out(ptHslToRgb(h, sat, Math.max(0.25, l - 0.21))); // bright colours: darker for a light page
   return s;
 }
+// names coloured in pictures: the dark-theme colours (light pictures darken them like every other colour)
+const PT_NAMECOL = {
+  Perfect: "#5ef1e1", Treasured: "#ffd849", Entombed: "#40c8be", Lunar: "#ffe99b", Voidtorn: "#a35bff", Mutated: "#a07bff", Cosmic: "#ff5f9e",
+  Electrified: "#ffeb0b", Iridescent: "#f36bff", Irradiated: "#67ff20", Crystalline: "#b7e6ff", Scorching: "#ff861c", Glowing: "#fff292",
+  Pure: "#ffffff", Shiny: "#d4e7ff", Sunforged: "#ffc457", Prismatic: "#c05bd8", Overclocked: "#e0602f", Festive: "#d23c3c",
+  Luck: "#86f34a", Capacity: "#f0b44a", "Size Boost": "#ff6b6b", "Modifier Boost": "#39e06a", "Sell Boost": "#ffd21f", "Dig Strength": "#ff9d7f",
+  "Dig Speed": "#8ecbff", "Shake Strength": "#ff8fb1", "Shake Speed": "#b9a6ff", "Walk Speed": "#d6dbe0", Walkspeed: "#d6dbe0", "Inventory Size": "#e0b07a", "Jump Power": "#d6dbe0",
+};
+// light pictures: the same light-theme colours the pages use (set directly, not translated)
+const PT_NAMECOL_LIGHT = {
+  Perfect: "#0e9c8d", Treasured: "#a88400", Entombed: "#24928a", Lunar: "#8f7a2a", Voidtorn: "#6a1fd1", Mutated: "#5b3fc4", Cosmic: "#c0145a",
+  Electrified: "#9c8f00", Iridescent: "#a800b7", Irradiated: "#3a9e00", Crystalline: "#0077b7", Scorching: "#b75500", Glowing: "#9c8a00",
+  Pure: "#6b6b6b", Shiny: "#2f63b0", Sunforged: "#b77700", Prismatic: "#7e2394", Overclocked: "#9f3d17", Festive: "#952222",
+  Luck: "#2f8f1f", Capacity: "#b5700f", "Size Boost": "#c53030", "Modifier Boost": "#1f8f5a", "Sell Boost": "#9a7a00", "Dig Strength": "#c2552f",
+  "Dig Speed": "#2a6fb8", "Shake Strength": "#b5486a", "Shake Speed": "#6b4fc0", "Walk Speed": "#5d6670", Walkspeed: "#5d6670", "Inventory Size": "#8a5a2b", "Jump Power": "#5d6670",
+};
+const PT_NAMERE = new RegExp("(^|[^A-Za-z'])(" + Object.keys(PT_NAMECOL).sort((a, b) => b.length - a.length).join("|") + ")(?![A-Za-z])", "g");
+const PT_OKBEFORE = /^(Max|Your|Total|Base|Extra|Best|More|Less|No|And|Or|With|Without|Each|Every|All|For|Of|Most|Higher|Lower)$/;
+// split a line of picture text into [piece, colour or null]; null when nothing in it should be coloured
+function ptColorSegs(v) {
+  PT_NAMERE.lastIndex = 0;
+  let m, last = 0;
+  const out = [];
+  while ((m = PT_NAMERE.exec(v))) {
+    const name = m[2], start = m.index + m[1].length, end = start + name.length;
+    const after = v.slice(end).match(/^ ([A-Za-z][a-z]+)/), before = v.slice(0, start).match(/([A-Za-z][a-z']+) $/);
+    if (after && /^[A-Z]/.test(after[1])) continue;
+    if (before && /^[A-Z]/.test(before[1]) && !PT_OKBEFORE.test(before[1])) continue;
+    out.push([v.slice(last, start), null], [name, PT_NAMECOL[name]]);
+    last = end;
+  }
+  if (!out.length) return null;
+  out.push([v.slice(last), null]);
+  return out;
+}
 window.ptInstallImgTheme = (w) => {
   try {
     const C = w.CanvasRenderingContext2D && w.CanvasRenderingContext2D.prototype;
     if (!C || C.__ptTheme) return;
     C.__ptTheme = 1;
+    const FD = Object.getOwnPropertyDescriptor(C, "fillStyle");
     const state = () => {
       if (w.ptNoImgTheme) return null; // a picture that copies the page as it looks (Build Sheets' sheet)
       const t = w.document.documentElement.getAttribute("data-theme");
@@ -83,6 +119,35 @@ window.ptInstallImgTheme = (w) => {
         },
       });
     });
+    // stat and mutation names in picture text get their colour too (only on plain grey/white text, never in big titles)
+    const ft = C.fillText;
+    C.fillText = function (text, x, y, maxW) {
+      try {
+        if (w.ptNoImgColor || maxW != null || typeof text !== "string" || !/[A-Z]/.test(text)) return ft.apply(this, arguments);
+        const px = parseFloat((String(this.font).match(/([\d.]+)px/) || [])[1] || 0);
+        const cur = ptParseColor(this.fillStyle);
+        if (px >= 22 || !cur || ptRgbToHsl(cur[0], cur[1], cur[2])[1] > 0.2) return ft.apply(this, arguments);
+        const segs = ptColorSegs(text);
+        if (!segs) return ft.apply(this, arguments);
+        const al = this.textAlign, fs = this.fillStyle, tot = this.measureText(text).width;
+        let cx = al === "right" || al === "end" ? x - tot : al === "center" ? x - tot / 2 : x;
+        this.textAlign = "left";
+        segs.forEach(([t, col]) => {
+          if (!t) return;
+          if (col) {
+            const st = state();
+            // light picture: its own light colour, set as is; dark: the dark colour (accent mapping doesn't touch these)
+            FD.set.call(this, st && st.light ? PT_NAMECOL_LIGHT[t] || col : col);
+          } else FD.set.call(this, fs);
+          ft.call(this, t, cx, y);
+          cx += this.measureText(t).width;
+        });
+        this.textAlign = al;
+        FD.set.call(this, fs);
+      } catch (e) {
+        return ft.apply(this, arguments);
+      }
+    };
     const G = w.CanvasGradient.prototype,
       add = G.addColorStop;
     G.addColorStop = function (o, c) {
