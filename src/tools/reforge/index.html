@@ -23,6 +23,8 @@
       <label class="fld"><span class="lab">Money you can spend <span style="font-weight:500">(optional)</span></span><input type="text" id="bud" inputmode="decimal" placeholder="e.g. 50b or 2.5t" autocomplete="off"><small>Shows your chance within it. Without it, anything over $1T for a 90% chance counts as not realistic.</small></label>
     </div>
     <div class="top"><span class="lab">Stars</span><span class="chips" role="group" aria-label="Star level"><button type="button" class="chip" data-star="1">1★</button><button type="button" class="chip" data-star="2">2★</button><button type="button" class="chip" data-star="3">3★</button><button type="button" class="chip" data-star="4">4★</button><button type="button" class="chip" data-star="5">5★</button><button type="button" class="chip" data-star="6">6★</button></span></div>
+    <div class="top"><span class="lab">Crafting Mastery</span><span class="chips" role="group" aria-label="Crafting Mastery"><button type="button" class="chip" data-mast="0">None</button><button type="button" class="chip" data-mast="5">5%</button><button type="button" class="chip" data-mast="10">10%</button><button type="button" class="chip" data-mast="15">15%</button><button type="button" class="chip" data-mast="20">20%</button><button type="button" class="chip" data-mast="25">25%</button></span></div>
+    <div class="top"><label class="ck"><input type="checkbox" id="cl"> Crafter's Luck gamepass</label><span class="chips" id="clmW" role="group" aria-label="How Crafter's Luck works"><button type="button" class="chip" data-clm="stat">Each stat rolls twice</button><button type="button" class="chip" data-clm="item">Whole item rolls twice</button></span></div>
     <div class="top"><span class="lab">Goal</span><span class="chips" id="goal" role="group" aria-label="Goal"><button type="button" class="chip" data-goal="max">100% (every stat maxed)</button><button type="button" class="chip" data-goal="pct">At least a roll %</button></span>
       <label class="fld inl" id="pctF"><input type="number" id="pct" min="0" max="100" step="0.1" inputmode="decimal" aria-label="Roll % you want"><span>% or better</span></label></div>
   </section>
@@ -35,7 +37,8 @@
       <li><b>Stars raise the top, not the bottom.</b> Each star above 1★ adds the stat's quality step to the top of the range, so higher stars have more possible values and a 100% roll gets rarer. 6★ adds one more step on top of 5★.</li>
       <li><b>Roll %</b> is counted as the average of where each stat landed in its range (0% at the minimum, 100% at the maximum). Stats with only one possible value are left out.</li>
       <li><b>Reforge cost:</b> the Nth reforge costs Price × (1 + 0.5 × N<sup>1.8</sup>), where N is how many reforges were done before it and Price is the item's crafting price, from community testing. Items bought with Candy or Ornaments are counted in that currency.</li>
-      <li><b>Mastery and gamepasses</b> aren't counted yet.</li>
+      <li><b>Crafting Mastery</b> is counted as a raised floor: at 25%, no stat rolls below a quarter of the way up its range, and the values left are equally likely. Not confirmed yet.</li>
+      <li><b>Crafter's Luck</b> is counted as rolling twice and keeping the better one, either for each stat on its own or for the whole item (the roll with the higher roll %). Not confirmed yet: reforge about 50 times and average where one stat lands. About 67% means each stat, 55 to 60% means the whole item (with 25% mastery: about 81% or about 70%).</li>
     </ul>
   </section>
   <p class="foot">Roll data from the game's equipment files (1★ to 5★ checked value by value against the community export). Made by @__coastal</p>

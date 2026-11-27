@@ -5,7 +5,7 @@ const EQ={};(P.equip||[]).forEach(x=>EQ[x.n]=x);
 const eqImg=n=>{const x=EQ[n];return x&&x.img?(P.eimg||{})[x.img]||"":""};
 const BY={};RF.forEach(x=>BY[x.n]=x);
 const ITEMS=RF.slice().sort((a,b)=>a.n.localeCompare(b.n));
-let S={item:"Sun's Gift",done:"",goal:"max",pct:95,bud:"",star:5};
+let S={item:"Sun's Gift",done:"",goal:"max",pct:95,bud:"",star:5,mast:0,cl:false,clm:"stat"};
 try{Object.assign(S,JSON.parse(localStorage.getItem("rf-s")||"{}"))}catch(e){}
 if(!BY[S.item])S.item=ITEMS[0].n;
 const save=()=>{try{localStorage.setItem("rf-s",JSON.stringify(S))}catch(e){}};
@@ -23,9 +23,18 @@ function expCost(p,r0,q){if(!(q>0))return Infinity;if(q>=1)return costN(p,r0);
   if(1/q<1e5){let t=0,s=1;for(let n=r0;s>1e-12;n++){t+=s*costN(p,n);s*=1-q}return t}
   return p*(1/q+0.5*1.67649*Math.pow(1/q+r0,1.8))}
 // chance of a roll % of at least X: every stat's position is spread evenly over its steps, roll % is their average
-function chanceAtLeast(item,x){const st=item.st.filter(s=>steps(s)>1);if(!st.length)return 1;const R=2000;let dist=new Float64Array(st.length*R+1);dist[0]=1;let top=0;
-  st.forEach(s=>{const n=steps(s);const nd=new Float64Array(st.length*R+1);for(let a=0;a<=top;a++){const v=dist[a];if(!v)continue;for(let k=0;k<n;k++){nd[a+Math.round(k/(n-1)*R)]+=v/n}}top+=R;dist=nd});
+// where one stat can land: [position 0..1 in its range, chance] for each value it can roll.
+// Mastery raises the floor (no value below that share of the range); Crafter's Luck per stat rolls twice and keeps the higher
+function statDist(s){const n=steps(s);if(n<=1)return [[1,1]];const f=Math.min(25,Math.max(0,+S.mast||0))/100;const k0=Math.min(n-1,Math.ceil(f*(n-1)-1e-9)),m=n-k0;
+  return Array.from({length:m},(_,j)=>[(k0+j)/(n-1),S.cl&&S.clm!=="item"?(2*j+1)/(m*m):1/m])}
+// chance of every stat at its max, for one roll
+const pMax1=item=>item.st.reduce((a,s)=>{const d=statDist(s);return a*d[d.length-1][1]},1);
+// chance of a roll % of at least X for one roll: roll % is the average of where each stat landed
+function pAtLeast1(item,x){const st=item.st.filter(s=>steps(s)>1);if(!st.length)return 1;const R=2000;let dist=new Float64Array(st.length*R+1);dist[0]=1;let top=0;
+  st.forEach(s=>{const sd=statDist(s);const nd=new Float64Array(st.length*R+1);for(let a=0;a<=top;a++){const v=dist[a];if(!v)continue;for(const[pos,pr]of sd)nd[a+Math.round(pos*R)]+=v*pr}top+=R;dist=nd});
   const need=Math.ceil(x/100*st.length*R-1e-9);let p=0;for(let a=need;a<=top;a++)p+=dist[a];return Math.min(1,p)}
+// Crafter's Luck per item: two whole rolls, the better one kept, so it lands if either does
+const perItem=p=>S.cl&&S.clm==="item"?1-Math.pow(1-p,2):p;
 const big=v=>{if(!isFinite(v))return "∞";const a=Math.abs(v);const U=[[1e15,"Qa"],[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"K"]];
   if(a>=1e18)return v.toExponential(1).replace("e+","e");for(const[u,l]of U)if(a>=u)return fmt(v/u,a/u<10?2:a/u<100?1:0)+l;return fmt(v,0)};
 const money=(v,c)=>c==="$"?"$"+big(v):big(v)+" "+c;
@@ -39,15 +48,19 @@ const parseMoney=v=>{const m=String(v||"").trim().toLowerCase().replace(/[$,\s]/
 // how many reforges a budget buys, starting after r0 done
 function affordable(p,r0,b){let lo=0,hi=1;while(costK(p,r0,hi)<=b&&hi<1e12)hi*=2;while(hi-lo>1){const m=Math.floor((lo+hi)/2);costK(p,r0,m)<=b?lo=m:hi=m}return lo}
 makeAC({inp:$("item"),items:ITEMS.map(x=>({n:x.n,tag:x.r,ic:eqImg(x.n),col:rc(x.r)})),icon:()=>eqImg(S.item),pick:x=>{S.item=x.n;save();render()}});
+$("cl").addEventListener("change",()=>{S.cl=$("cl").checked;save();render()});
 $("bud").addEventListener("input",()=>{S.bud=$("bud").value;save();render()});
 $("done").addEventListener("input",()=>{S.done=$("done").value;save();render()});
 $("pct").addEventListener("input",()=>{S.pct=$("pct").value;save();render()});
 document.addEventListener("click",e=>{const g=e.target.closest("[data-goal]");if(g){S.goal=g.dataset.goal;save();render();return}
+  const ma=e.target.closest("[data-mast]");if(ma){S.mast=+ma.dataset.mast;save();render();return}
+  const cm=e.target.closest("[data-clm]");if(cm){S.clm=cm.dataset.clm;save();render();return}
   const st=e.target.closest("[data-star]");if(st){S.star=+st.dataset.star;save();render()}});
 function render(){const it=BY[S.item];$("item").value=S.item;if(document.activeElement!==$("done"))$("done").value=S.done;if(document.activeElement!==$("pct"))$("pct").value=S.pct;if(document.activeElement!==$("bud"))$("bud").value=S.bud;
-  document.querySelectorAll("[data-goal]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.goal===S.goal)));document.querySelectorAll("[data-star]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.star===+S.star)));$("pctF").hidden=S.goal!=="pct";
+  document.querySelectorAll("[data-goal]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.goal===S.goal)));document.querySelectorAll("[data-mast]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.mast===+S.mast)));document.querySelectorAll("[data-clm]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.clm===S.clm)));$("cl").checked=!!S.cl;$("clmW").hidden=!S.cl;
+  document.querySelectorAll("[data-star]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.star===+S.star)));$("pctF").hidden=S.goal!=="pct";
   const r0=Math.max(0,Math.floor(+S.done||0)),pc=Math.min(100,Math.max(0,+S.pct||0));
-  const all=it.st.reduce((a,s)=>a*steps(s),1),q=S.goal==="max"?1/all:chanceAtLeast(it,pc);
+  const all=it.st.reduce((a,s)=>a*steps(s),1),q=perItem(S.goal==="max"?pMax1(it):pAtLeast1(it,pc));
   const goalTxt=S.goal==="max"?"a 100% roll (every stat maxed)":`a roll of ${fmt(pc,1)}% or better`;
   const k50=needK(q,.5),k90=needK(q,.9),k99=needK(q,.99);
   const c50=costK(it.p,r0,k50),c90=costK(it.p,r0,k90),c99=costK(it.p,r0,k99),ce=expCost(it.p,r0,q);
@@ -58,8 +71,8 @@ function render(){const it=BY[S.item];$("item").value=S.item;if(document.activeE
     :ok?`<div class="verdict ok"><b>Recommended budget: ${money(c90,it.c)}</b>That's enough for about ${fmt(k90,0)} reforge${k90===1?"":"s"}, which gets ${goalTxt} 9 times out of 10. On average it takes ${fmt(1/q,q>0.1?1:0)} reforge${1/q<1.5?"":"s"} and ${money(ce,it.c)}.</div>`
     :hasB?`<div class="verdict no"><b>A 90% chance is over your budget</b>It takes about ${big(k90)} reforges and ${money(c90,it.c)}.</div>`
     :`<div class="verdict no"><b>Not realistic</b>Even a 50% chance of ${goalTxt} takes about ${big(k50)} reforges and ${money(c50,it.c)}, because each reforge costs more than the last.${S.goal==="max"?" Try a lower roll % instead.":""}</div>`;
-  const rows=it.st.map(s=>{const n=steps(s);return `<tr><td>${esc(s[0])}</td><td class="n">${fmt(s[1],3)} to ${fmt(topVal(s),3)}</td><td class="n">${fmt(s[3],3)}</td><td class="n">${fmt(n,0)}</td><td class="n">${n>1?"1 in "+fmt(n,0):"Always"}</td></tr>`}).join("");
-  $("res").innerHTML=`<div class="rh">${eqImg(it.n)?`<img src="${eqImg(it.n)}" alt="">`:""}<span><b style="color:${rc(it.r)}">${esc(it.n)}</b><small>${S.star}★ ${esc(it.r)} ${esc(it.slot)}, crafting price ${money(it.p,it.c)}${it.lim?", limited":""}</small></span></div>
+  const rows=it.st.map(s=>{const n=steps(s);return `<tr><td>${esc(s[0])}</td><td class="n">${fmt(s[1],3)} to ${fmt(topVal(s),3)}</td><td class="n">${fmt(s[3],3)}</td><td class="n">${fmt(n,0)}</td><td class="n">${(()=>{const d=statDist(s),pm=d[d.length-1][1];return n>1&&pm<1?oneIn(pm):"Always"})()}</td></tr>`}).join("");
+  $("res").innerHTML=`<div class="rh">${eqImg(it.n)?`<img src="${eqImg(it.n)}" alt="">`:""}<span><b style="color:${rc(it.r)}">${esc(it.n)}</b><small>${S.star}★ ${esc(it.r)} ${esc(it.slot)}${+S.mast?`, ${S.mast}% mastery`:""}${S.cl?`, Crafter's Luck (${S.clm==="item"?"per item":"per stat"})`:""}, crafting price ${money(it.p,it.c)}${it.lim?", limited":""}</small></span></div>
     <div class="sum"><div><span class="lab">Chance each reforge</span><b>${oneIn(q)}</b><span class="hint">for ${goalTxt}</span></div>
       <div><span class="lab">Next reforge costs</span><b>${money(costN(it.p,r0),it.c)}</b><span class="hint">reforge #${fmt(r0+1,0)}</span></div>
       <div><span class="lab">50% chance</span><b>${q>=1?"1":big(k50)}</b><span class="hint">reforges, ${money(c50,it.c)}</span></div>
