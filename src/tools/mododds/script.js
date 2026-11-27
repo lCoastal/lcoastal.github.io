@@ -45,7 +45,7 @@ function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge"
     return `<span class="tr ${cls}" title="${esc(why)}" aria-label="${esc(why)}">${cls==="up"?"▲":cls==="dn"?"▼":"–"}</span>`};
   const order=ORDER;
   $("tbl").innerHTML=`<table class="o"><thead><tr><th>Modifier</th><th>Share of modified</th><th>Base share</th><th>Per ore</th><th>Per pan</th><th>Sell ×</th></tr></thead><tbody>${order.map(k=>{const on=k!=="Lunar"||S.night;const s=on?(sh[k]||0):0;const po=q*s/100;
-    return `<tr class="${on?"":"off"}"><td><span class="mn"><b>${k}</b><span>${k==="Lunar"&&!S.night?"Night only":"Museum: "+esc(MUSE[k]||"")}</span></span></td><td data-l="Share" class="${s>BASE[k]*1.05?"up":""}">${on?fmt(s,s<0.1?4:2)+"%"+trend(k):"-"}</td><td data-l="Base">${fmt(BASE[k],4)}%</td><td data-l="Per ore">${on?oneInP(po):"-"}</td><td data-l="Per pan">${on?oneInP(1-Math.pow(1-po,n)):"-"}</td><td data-l="Sell">${PRICE[k]}×</td></tr>`}).join("")}</tbody></table>`}
+    return `<tr class="${on?"":"off"}"><td><span class="mn"><b>${k}</b><span>${k==="Lunar"&&!S.night?"Night only":"Museum: "+esc(MUSE[k]||"")}</span></span></td><td data-l="Share">${on?fmt(s,s<0.1?4:2)+"%"+trend(k):"-"}</td><td data-l="Base">${fmt(BASE[k],4)}%</td><td data-l="Per ore">${on?oneInP(po):"-"}</td><td data-l="Per pan">${on?oneInP(1-Math.pow(1-po,n)):"-"}</td><td data-l="Sell">${PRICE[k]}×</td></tr>`}).join("")}</tbody></table>`}
 // ---- one mineral: how many of it you'd pan per modifier, and how many pans that takes in a zone ----
 const MINS=P.mins.filter(m=>(m.ch||[]).length).sort((a,b)=>a.n.localeCompare(b.n));
 const curMin=()=>MINS.find(m=>m.n.toLowerCase()===String(S.min).trim().toLowerCase());
@@ -110,7 +110,7 @@ async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
     const vals=[fmt(r.s,r.s<0.1?4:2)+"%",fmt(BASE[r.k],4)+"%",oneInP(r.po),oneInP(r.pp),PRICE[r.k]+"×"];
     vals.forEach((v,i)=>{let x=cx(i+1);c.font=`14px ${FM}`;
       if(i===0){const t=trend(r.k);if(t){c.font=`12px ${F}`;c.fillStyle=t==="up"?"#3cc2a8":t==="dn"?"#ef7a66":"#98a2ad";const g=t==="up"?"▲":t==="dn"?"▼":"–";c.fillText(g,x-c.measureText(g).width,mid+4);x-=c.measureText(g).width+6;c.font=`14px ${FM}`}}
-      c.fillStyle=i===0&&r.s>BASE[r.k]*1.05?"#3cc2a8":"#e6e9ec";c.fillText(v,x-c.measureText(v).width,mid+5)})});
+      c.fillStyle="#e6e9ec";c.fillText(v,x-c.measureText(v).width,mid+5)})});
   y+=rows.length*RH+28;{const et="Estimates from a fitted model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+28,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.fillText(et,ex+14,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptModImage=modImage;
