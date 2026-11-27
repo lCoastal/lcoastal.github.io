@@ -28,7 +28,7 @@ function calcAll(){const mb=Math.max(0,+S.mb||0);
   const effAny=mb*(S.surge?2:1),effWhich=Math.max(1,mb*(S.surge?2:1));
   return {mb,effAny,effWhich,q:anyMod(effAny),sh:shares(effWhich),n:panItems(S.cap)}}
 const ORDER=["Perfect","Lunar","Mutated","Cosmic","Iridescent","Irradiated","Scorching","Glowing","Pure","Shiny"];
-function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge","night"].forEach(k=>$(k).checked=!!S[k]);
+function render(){["mb","luck","cap"].forEach(k=>$(k).value=S[k]);["mag","surge","night"].forEach(k=>$(k).checked=!!S[k]);$("night2").checked=!!S.night;
   const {effAny,effWhich,q,sh,n}=calcAll();
   if(document.activeElement!==$("min"))$("min").value=S.min;$("wmode").value=S.wmode||"";["kg","sb"].forEach(k=>{if(document.activeElement!==$(k))$(k).value=S[k]});renderOne({q,sh});
   $("sum").innerHTML=`<div><span class="lab">Ores with a modifier</span><b>${fmt(q*100,1)}%</b><div class="bar"><i style="width:${q*100}%"></i></div></div>
@@ -78,12 +78,15 @@ $("wmode").addEventListener("change",()=>{S.wmode=$("wmode").value;save();render
 ["kg","sb"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
 ["mb","luck","cap"].forEach(k=>$(k).addEventListener("input",()=>{S[k]=$(k).value;save();render()}));
 ["mag","surge","night"].forEach(k=>$(k).addEventListener("change",()=>{S[k]=$(k).checked;save();render()}));
+$("night2").addEventListener("change",()=>{S.night=$("night2").checked;save();render()});
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;S.mb=Math.round(t["Modifier Boost"]||0);S.luck=Math.round(t.Luck||0);S.cap=Math.round(t.Capacity)||S.cap;S.sb=Math.round(t["Size Boost"]||0)||S.sb;save();render()};
 // ---- save the results as an image (just the numbers, no page controls) ----
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
   const F='"IBM Plex Sans","Segoe UI",system-ui,sans-serif',FD='"Chakra Petch","Segoe UI",system-ui,sans-serif',FM='"IBM Plex Mono",Consolas,monospace';try{await document.fonts.ready}catch(e){}
   const rows=ORDER.filter(k=>k!=="Lunar"||S.night).map(k=>{const s=sh[k]||0,po=q*s/100;return {k,s,po,pp:1-Math.pow(1-po,n)}});
+  // same arrows as the table: which way each share goes with more Modifier Boost
+  const more=modShares(Math.max(1,effWhich*1.25),S.night,S.luck);const trend=k=>{const a=sh[k]||0,b=more[k]||0;if(!(a>0))return "";const r=b/a;return r>1.01?"up":r<0.99?"dn":"fl"};
   const W=1200,PAD=40,RH=46,SUMH=78,H=PAD+90+SUMH+18+36+rows.length*RH+60;
   const cv=document.createElement("canvas");const sc=2;cv.width=W*sc;cv.height=H*sc;const c=cv.getContext("2d");c.scale(sc,sc);
   const rr=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()};
@@ -105,7 +108,9 @@ async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
   rows.forEach((r,k)=>{const top=y+k*RH,mid=top+RH/2;if(k%2){c.fillStyle="#191d22";c.fillRect(PAD,top,W-PAD*2,RH)}
     c.fillStyle="#e6e9ec";c.font=`600 15px ${F}`;c.fillText(r.k,PAD+12,mid-2);c.fillStyle="#98a2ad";c.font=`11.5px ${F}`;c.fillText(fit("Museum: "+(MUSE[r.k]||""),nameW-12),PAD+12,mid+14);
     const vals=[fmt(r.s,r.s<0.1?4:2)+"%",fmt(BASE[r.k],4)+"%",oneInP(r.po),oneInP(r.pp),PRICE[r.k]+"×"];
-    vals.forEach((v,i)=>{const x=cx(i+1);c.font=`14px ${FM}`;c.fillStyle=i===0&&r.s>BASE[r.k]*1.05?"#3cc2a8":"#e6e9ec";c.fillText(v,x-c.measureText(v).width,mid+5)})});
+    vals.forEach((v,i)=>{let x=cx(i+1);c.font=`14px ${FM}`;
+      if(i===0){const t=trend(r.k);if(t){c.font=`12px ${F}`;c.fillStyle=t==="up"?"#3cc2a8":t==="dn"?"#ef7a66":"#98a2ad";const g=t==="up"?"▲":t==="dn"?"▼":"–";c.fillText(g,x-c.measureText(g).width,mid+4);x-=c.measureText(g).width+6;c.font=`14px ${FM}`}}
+      c.fillStyle=i===0&&r.s>BASE[r.k]*1.05?"#3cc2a8":"#e6e9ec";c.fillText(v,x-c.measureText(v).width,mid+5)})});
   y+=rows.length*RH+28;{const et="Estimates from a fitted model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptModImage=modImage;

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Modifier &amp; Size Odds</title>
+<title>Modifier Odds</title>
 
 %%COMMON%%
 <style data-file="style.css"></style>
@@ -12,7 +12,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Modifier &amp; Size Odds</h1>
+    <h1>Modifier Odds</h1>
     <p class="lede">Your chance of every ore modifier from your Modifier Boost and luck.<br>Built on the game's modifier weights and testing.</p>
   </header>
   <p class="disc" role="note"><b>Heads up:</b> this is a model fitted on testing, not the game's own code, so it can be a little off. Some sessions come out higher than it says for a reason that isn't known yet. Enchants, events and weather aren't counted. How it works is explained at the bottom.</p>
@@ -28,6 +28,7 @@
       <label class="ck"><input type="checkbox" id="night"> Night (Lunar can drop)</label>
     </div>
   </section>
+  <section class="card"><div style="display:flex;justify-content:flex-end;align-items:center;gap:14px;flex-wrap:wrap"><label class="ck"><input type="checkbox" id="night2"> Show Lunar (night)</label><button type="button" class="btn" id="toImg">Save as image</button></div><div class="big" id="sum"></div><div class="tw" id="tbl"></div><p class="hint" style="margin:8px 0 0">Next to each share, <b class="tr up">▲</b> means more Modifier Boost makes that modifier more common and <b class="tr dn">▼</b> means it gets rarer. Hover one to see why.</p></section>
   <section class="card" id="oneCard">
     <h2>For one mineral, at a size</h2>
     <p class="hint">Pick a mineral to see how many of it you'd pan per modifier, and how many pans that takes in a zone. Add a weight to count only ones at least that heavy. Uses your luck and capacity above.</p>
@@ -43,7 +44,6 @@
     </div>
     <div id="oneOut"></div>
   </section>
-  <section class="card"><div style="display:flex;justify-content:flex-end"><button type="button" class="btn" id="toImg">Save as image</button></div><div class="big" id="sum"></div><div class="tw" id="tbl"></div><p class="hint" style="margin:8px 0 0">Next to each share, <b class="tr up">▲</b> means more Modifier Boost makes that modifier more common and <b class="tr dn">▼</b> means it gets rarer. Hover one to see why.</p></section>
   <section class="card"><h2>How it works</h2>
     <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
       <li><b>Does an ore get a modifier at all?</b> How many ores get a normal one (Shiny up to Perfect) depends only on your Modifier Boost (luck makes no difference): more boost always helps, with smaller gains the more you have: 27% at 475%, 47% at 1,081% and 80% at 1,917%, measured on 5.1 million logged minerals. It rises faster past about 1,100%. Some stretches at the same boost come out noticeably higher (up to 99% at 1,917%), so something else, likely the Solar Magnifier or Modifier Surge, raises it further. Voidtorn (from Void tools) and event modifiers like Ghostly or Spooky come on top of that.</li>
