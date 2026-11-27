@@ -39,6 +39,7 @@ window.ptSetSetting = (k, v) => {
     try {
       localStorage.setItem("pt-settings", JSON.stringify(SET));
     } catch (e) {}
+    if (k === "rtools") drawQuick();
     if (k === "recent") {
       RECENT = RECENT.slice(0, +v);
       try {

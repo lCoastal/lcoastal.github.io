@@ -16,7 +16,7 @@ function draw(){const c=get();
   document.getElementById("dec").setAttribute("aria-disabled",String(!c.short));
   document.getElementById("ex1").textContent=c.short?`$1,000,000,000 → $${sh(1e9,c.dec)}`:"$1,000,000,000 stays as it is";
   document.getElementById("ex2").textContent=`~1 in 64,543,541,734 → ~1 in ${sh(64543541734,c.dec)}`;
-  const rv=c.recent===undefined?8:+c.recent;document.querySelectorAll("#rec [data-r]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.r===rv)));
+  const tv=c.rtools===undefined?5:+c.rtools;document.querySelectorAll("#rtl [data-t]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.t===tv)));const rv=c.recent===undefined?8:+c.recent;document.querySelectorAll("#rec [data-r]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.r===rv)));
   if(!REC){const k=document.getElementById("hkNow");k.classList.remove("rec");k.textContent=lab(c.hk);document.getElementById("hkSet").textContent="Change"}
   const h=c.hk||{};document.getElementById("hkReset").hidden=!!h.ctrl&&!h.alt&&!h.shift&&!h.meta&&String(h.key).toLowerCase()==="k"}
 // record a new shortcut: modifiers plus one key, two keys at most; Esc cancels
@@ -40,7 +40,7 @@ document.addEventListener("keydown",e=>{if(!REC)return;e.preventDefault();e.stop
   set("hk",h);stopRec();msg("Search now opens with "+lab(h)+".")},true);
 document.addEventListener("click",e=>{const s=e.target.closest(".sw[data-k]");if(s){set(s.dataset.k,s.getAttribute("aria-checked")!=="true");return}
   const d=e.target.closest("#dec [data-d]");if(d){set("dec",+d.dataset.d);return}
-  const r=e.target.closest("#rec [data-r]");if(r){set("recent",+r.dataset.r);return}
+  const rt=e.target.closest("#rtl [data-t]");if(rt){set("rtools",+rt.dataset.t);return}const r=e.target.closest("#rec [data-r]");if(r){set("recent",+r.dataset.r);return}
   const im=e.target.closest("#imgm [data-m]");if(im){set("img",im.dataset.m);return}
   const t=e.target.closest("#thm [data-t]");if(t){set("theme",t.dataset.t);return}
   const a=e.target.closest("#acc [data-a]");if(a)set("accent",a.dataset.a)});

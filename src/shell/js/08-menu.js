@@ -42,7 +42,12 @@ quick.id = "quick";
 quick.style.setProperty("--gc", "var(--muted)");
 drawer.appendChild(quick);
 function drawQuick() {
-  const rec = RTOOLS.filter((k) => !PINS.includes(k)).slice(0, 5);
+  let lim = 5;
+  try {
+    const v = JSON.parse(localStorage.getItem("pt-settings") || "{}").rtools;
+    if (v !== undefined && +v >= 0) lim = +v;
+  } catch (e) {}
+  const rec = RTOOLS.filter((k) => !PINS.includes(k)).slice(0, lim);
   quick.hidden = !PINS.length && !rec.length;
   quick.innerHTML =
     (PINS.length ? `<div class="dsec">Pinned</div>${PINS.map((k) => navHTML(entByKey(k))).join("")}` : "") +
@@ -66,7 +71,7 @@ window.ptToolSeen = (id, sub) => {
   if (!x || id === "home") return;
   const k = entKey(x);
   if (RTOOLS[0] === k) return;
-  RTOOLS = [k, ...RTOOLS.filter((r) => r !== k)].slice(0, 8);
+  RTOOLS = [k, ...RTOOLS.filter((r) => r !== k)].slice(0, 12);
   svKeys("pt-rtools", RTOOLS);
   drawQuick();
 };
