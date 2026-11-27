@@ -29,7 +29,7 @@ $("lvls").onclick=e=>{const b=e.target.closest("[data-lv]");if(!b)return;const k
   else{const nx=st.lvls.includes(k)?st.lvls.filter(x=>x!==k):[...st.lvls,k];if(!nx.length)return;st.lvls=LKEYS.filter(x=>nx.includes(x))}
   st.lvl=st.lvls[0];save();drawLvls();render()};
 $("sort").value=st.sort;
-const KCOL={"Luck":"luck","Capacity":"cap","Size Boost":"size","Dig Strength":"digstr","Dig Speed":"digspd","Sell Boost":"sell","Walk Speed":"walk","Modifier Boost":"mod","Shake Strength":"shkstr","Shake Speed":"shkspd"};
+const KCOL={"Luck":"luck","Capacity":"cap","Size Boost":"size","Dig Strength":"digstr","Dig Speed":"digspd","Sell Boost":"sell","Walk Speed":"walk","Modifier Boost":"mod","Shake Strength":"shkstr","Shake Speed":"shkspd","Inventory Size":"inv","Jump Power":"jump"};
 const slotsEl=$("slots"),rarsEl=$("rars");
 // type and stat filters: pick as many as you like
 if(!Array.isArray(st.slots))st.slots=st.slot?[st.slot]:[];if(!Array.isArray(st.stats))st.stats=[];if(!st.match)st.match="all";
@@ -181,7 +181,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!scrim.hidden)close
 window.ptOpenItem=name=>{const x=BYN[String(name).toLowerCase()];if(x)showEquip(x.i)};
 // picture of the list as it is now (same filters, sort, value level and tags), one fixed column grid so every group lines up
 const RHX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
-const KHX={Luck:"#c3ffb6",Capacity:"#ffe6b6","Size Boost":"#ff4444","Dig Strength":"#ffc3b0","Dig Speed":"#aadbff","Sell Boost":"#ffdb1a","Walk Speed":"#ffffff","Modifier Boost":"#2cff4a","Shake Strength":"#ffc3b0","Shake Speed":"#ffffff"};
+const KHX={Luck:"#c3ffb6",Capacity:"#ffe6b6","Size Boost":"#ff4444","Dig Strength":"#ffc3b0","Dig Speed":"#aadbff","Sell Boost":"#ffdb1a","Walk Speed":"#ffffff","Modifier Boost":"#2cff4a","Shake Strength":"#ffc3b0","Shake Speed":"#ffffff","Inventory Size":"#da8662","Jump Power":"#ffbc8c"};
 async function equipImage(){
   const groups=LAST.filter(g=>g[1].length);if(!groups.length)return null;
   try{await document.fonts.ready}catch(e){}

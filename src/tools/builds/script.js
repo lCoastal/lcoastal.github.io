@@ -7,7 +7,7 @@ const SLOTS={Exotic:1,Mythic:2,Legendary:3,Epic:3,Rare:3,Uncommon:3,Common:3};
 const RCOL={Exotic:"var(--r-exotic)",Mythic:"var(--r-mythic)",Legendary:"var(--r-legendary)",Epic:"var(--r-epic)",Rare:"var(--r-rare)",Uncommon:"var(--r-uncommon)",Common:"var(--r-common)"};
 const CODE={"Luck":"L","Capacity":"C","Size Boost":"W","Dig Strength":"D","Dig Speed":"S","Sell Boost":"$","Walk Speed":"K","Modifier Boost":"M","Shake Strength":"A","Shake Speed":"P"};
 // stat colours, the same as everywhere else in the toolkit (the sheet is always dark)
-const SHX={"Luck":"#c3ffb6","Capacity":"#ffe6b6","Size Boost":"#ff4444","Dig Strength":"#ffc3b0","Dig Speed":"#aadbff","Sell Boost":"#ffdb1a","Walk Speed":"#ffffff","Modifier Boost":"#2cff4a","Shake Strength":"#ffc3b0","Shake Speed":"#ffffff"};
+const SHX={"Luck":"#c3ffb6","Capacity":"#ffe6b6","Size Boost":"#ff4444","Dig Strength":"#ffc3b0","Dig Speed":"#aadbff","Sell Boost":"#ffdb1a","Walk Speed":"#ffffff","Modifier Boost":"#2cff4a","Shake Strength":"#ffc3b0","Shake Speed":"#ffffff","Inventory Size":"#da8662","Jump Power":"#ffbc8c"};
 const STAT_RE=/\b(luck|capacity|size boost|sell boost|modifier boost|dig strength|dig speed|shake strength|shake speed|walk ?speed)\b/gi;
 const statKeyB=w=>{const k=w.toLowerCase().replace("walkspeed","walk speed");return Object.keys(SHX).find(x=>x.toLowerCase()===k)};
 // colour every stat name in the sheet's text (only text between tags, never inside attributes)
