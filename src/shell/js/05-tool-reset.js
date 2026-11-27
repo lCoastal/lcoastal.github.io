@@ -23,6 +23,7 @@ const PT_RESET = {
   dredge: { keys: ["pt-dredge"] },
   eqload: { keys: ["pt-eqload"] },
   craftquality: { keys: ["c5-s"] },
+  reforge: { keys: ["rf-s"] },
   eqcompare: { keys: ["eqc-s"] },
   museumfind: { keys: ["pmf-s"] },
   museumopt: { keys: ["mo-s"] },

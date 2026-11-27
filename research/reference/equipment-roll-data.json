@@ -1,0 +1,4613 @@
+{
+  "Equipment": {
+    "Charm": [
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 111000,
+              "Stats": {
+                "ShakeSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.05,
+                  "Max": 0.2,
+                  "RollStep": 0.025
+                },
+                "DigSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.05,
+                  "Max": 0.2,
+                  "RollStep": 0.025
+                },
+                "Luck": {
+                  "Min": 4,
+                  "QualityStep": 1,
+                  "Max": 7,
+                  "RollStep": 0.2
+                },
+                "InventorySize": {
+                  "Min": 10,
+                  "QualityStep": 10,
+                  "Max": 30,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Lapis Lazuli": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 2
+                },
+                "Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.8,
+                  "Amount": 4
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Rare",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 18
+        },
+        "Name": "Lapis Armband",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 50000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 1,
+                  "QualityStep": 1,
+                  "Max": 6,
+                  "RollStep": 1
+                },
+                "Luck": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 5,
+                  "RollStep": 0.2
+                },
+                "InventorySize": {
+                  "Min": 10,
+                  "QualityStep": 10,
+                  "Max": 30,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Jade": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 4
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Uncommon",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 49
+        },
+        "Name": "Jade Armband",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 5000000,
+              "Stats": {
+                "SizeBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.05,
+                  "Max": 0.25,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 5,
+                  "QualityStep": 5,
+                  "Max": 10,
+                  "RollStep": 1
+                },
+                "SellBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.1,
+                  "Max": 0.5,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Ruby": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 3
+                },
+                "Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 8
+                },
+                "Emerald": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 2
+                },
+                "Sapphire": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 3
+                },
+                "Diamond": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Legendary",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 50
+        },
+        "Name": "Crown",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 30000000,
+              "Stats": {
+                "SizeBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.1,
+                  "Max": 0.5,
+                  "RollStep": 0.1
+                },
+                "Luck": {
+                  "Min": 10,
+                  "QualityStep": 10,
+                  "Max": 50,
+                  "RollStep": 1
+                },
+                "SellBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.2,
+                  "Max": 1,
+                  "RollStep": 0.1
+                }
+              },
+              "Materials": {
+                "Rose Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.6,
+                  "Amount": 3
+                },
+                "Pink Diamond": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                },
+                "Golden Pearl": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Mythic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 54
+        },
+        "Name": "Royal Federation Crown",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1500000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 5
+                },
+                "ModBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.05,
+                  "Max": 0.25,
+                  "RollStep": 0.05
+                },
+                "Luck": {
+                  "Min": 10,
+                  "QualityStep": 2.5,
+                  "Max": 15,
+                  "RollStep": 1
+                },
+                "InventorySize": {
+                  "Min": 50,
+                  "QualityStep": 25,
+                  "Max": 100,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Golden Pearl": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.25,
+                  "Amount": 2
+                },
+                "Catseye": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Legendary",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 55
+        },
+        "Name": "Guiding Light",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 120000,
+              "Stats": {
+                "ShakeSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.1,
+                  "Max": 0.3,
+                  "RollStep": 0.05
+                },
+                "DigSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.1,
+                  "Max": 0.3,
+                  "RollStep": 0.05
+                }
+              },
+              "Materials": {
+                "Meteoric Iron": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 1
+                },
+                "Neodymium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 3
+                },
+                "Titanium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Rare",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 67
+        },
+        "Name": "Speed Coil",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1000000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 10,
+                  "QualityStep": 20,
+                  "Max": 60,
+                  "RollStep": 1
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 150,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Osmium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Moonstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                },
+                "Aurorite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Epic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 68
+        },
+        "Name": "Gravity Coil",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 4000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 0,
+                  "QualityStep": 0.5,
+                  "Max": 3,
+                  "RollStep": 1
+                },
+                "DigAmount": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.1
+                },
+                "InventorySize": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 30,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Pyrite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 5
+                },
+                "Titanium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 1
+                },
+                "Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Common",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 76
+        },
+        "Name": "Garden Glove",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 65000000,
+              "Stats": {
+                "Capacity": {
+                  "Min": -80,
+                  "QualityStep": 5,
+                  "Max": -60,
+                  "RollStep": 1
+                },
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 200,
+                  "RollStep": 5
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 200,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Flarebloom": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Cinnabar": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Fire Opal": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Mythic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 103
+        },
+        "Name": "Phoenix Wings",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 100000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 10,
+                  "Max": 210,
+                  "RollStep": 1
+                },
+                "ShakeSpeed": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.22,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.05
+                },
+                "SellBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.01
+                },
+                "Capacity": {
+                  "Min": 50,
+                  "QualityStep": 25,
+                  "Max": 100,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Dinosaur Skull": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Cinnabar": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.6,
+                  "Amount": 5
+                },
+                "Volcanic Core": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Dragon Bone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.6,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Exotic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 112
+        },
+        "Name": "Fossilized Crown",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 10000000,
+              "Stats": {
+                "ShakeAmount": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 5,
+                  "RollStep": 1
+                },
+                "DigAmount": {
+                  "Min": 15,
+                  "QualityStep": 2,
+                  "Max": 27,
+                  "RollStep": 1
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 200,
+                  "RollStep": 10
+                }
+              },
+              "Materials": {
+                "Dragon Bone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Ammonite Fossil": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Legendary",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 113
+        },
+        "Name": "Dragon Claw",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 75000000,
+              "Stats": {
+                "ShakeSpeed": {
+                  "Min": -0.4,
+                  "QualityStep": 0.025,
+                  "Max": -0.3,
+                  "RollStep": 0.05
+                },
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 150,
+                  "RollStep": 5
+                },
+                "SellBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                },
+                "ShakeAmount": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 1
+                }
+              },
+              "Materials": {
+                "Borealite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 5
+                },
+                "Frostshard": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Aetherite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 3
+                },
+                "Mythril": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 151,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Mythic"
+        },
+        "Name": "Cryogenic Preserver",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 300000000,
+              "Stats": {
+                "ModBoost": {
+                  "Min": 0.5,
+                  "QualityStep": 0.2,
+                  "Max": 1.2,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.4,
+                  "RollStep": 0.05
+                },
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 60,
+                  "Max": 340,
+                  "RollStep": 1
+                },
+                "DigSpeed": {
+                  "Min": 0.1,
+                  "QualityStep": 0.04,
+                  "Max": 0.24,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Radiant Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 2
+                },
+                "Vineheart": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Chrysoberyl": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 3
+                },
+                "Firefly Stone": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 10
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 180,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Antlers of Life",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 220000000,
+              "Stats": {
+                "ShakeAmount": {
+                  "Min": 20,
+                  "QualityStep": 4,
+                  "Max": 34,
+                  "RollStep": 1
+                },
+                "WalkSpeed": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 2,
+                  "RollStep": 0.5
+                },
+                "SizeBoost": {
+                  "Min": 0.3,
+                  "QualityStep": 0.2,
+                  "Max": 1,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 80,
+                  "QualityStep": 20,
+                  "Max": 120,
+                  "RollStep": 1
+                },
+                "InventorySize": {
+                  "Min": 200,
+                  "QualityStep": 50,
+                  "Max": 300,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Pumpkin Soul": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Radiant Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Lost Soul": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 10
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "Rarity": "Exotic",
+          "Hidden": true,
+          "EquipmentType": "Charm",
+          "NameColor": null,
+          "Limited": true,
+          "ItemID": 222
+        },
+        "Name": "Pumpkin Lord",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1,
+              "CandyPrice": 600,
+              "Materials": {
+                "Vortessence": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 2
+                },
+                "Cinnabar": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 5
+                },
+                "Lost Soul": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 10
+                }
+              },
+              "Stats": {
+                "Capacity": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 200,
+                  "RollStep": 10
+                },
+                "SizeBoost": {
+                  "Min": 0.3,
+                  "QualityStep": 0.05,
+                  "Max": 0.5,
+                  "RollStep": 0.05
+                },
+                "Luck": {
+                  "Min": 30,
+                  "QualityStep": 10,
+                  "Max": 60,
+                  "RollStep": 5
+                },
+                "InventorySize": {
+                  "Min": 300,
+                  "QualityStep": 100,
+                  "Max": 600,
+                  "RollStep": 10
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "HalloweenLimited": true,
+          "Rarity": "Mythic",
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "NameColor": null,
+          "Limited": true,
+          "ItemID": 230
+        },
+        "Name": "Candy Sack",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1,
+              "CandyPrice": 1000,
+              "Materials": {
+                "Pumpkin Soul": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Inferlume": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Volcanic Core": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Prismara": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Cryonic Artifact": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                }
+              },
+              "Stats": {
+                "ModBoost": {
+                  "Min": 0.4,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 400,
+                  "QualityStep": 100,
+                  "Max": 600,
+                  "RollStep": 10
+                },
+                "WalkSpeed": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 3,
+                  "RollStep": 0.1
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 200,
+                  "RollStep": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "HalloweenLimited": true,
+          "Rarity": "Exotic",
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "NameColor": null,
+          "Limited": true,
+          "ItemID": 232
+        },
+        "Name": "Witch Hat",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1,
+              "Stats": {
+                "Capacity": {
+                  "Min": 50,
+                  "QualityStep": 25,
+                  "Max": 100,
+                  "RollStep": 10
+                },
+                "WalkSpeed": {
+                  "Min": 0.5,
+                  "QualityStep": 0.25,
+                  "Max": 1,
+                  "RollStep": 0.25
+                },
+                "Luck": {
+                  "Min": 50,
+                  "QualityStep": 10,
+                  "Max": 100,
+                  "RollStep": 5
+                },
+                "ShakeAmount": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 4,
+                  "RollStep": 0.1
+                }
+              },
+              "OrnamentPrice": 1000,
+              "Materials": {
+                "Frostshard": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Peppermint Prism": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 4
+                },
+                "Candy Cane": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 8
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "Hidden": false,
+          "Rarity": "Mythic",
+          "ChristmasLimited": true,
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Limited": true,
+          "ItemID": 273
+        },
+        "Name": "Santa Hat",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1000000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 222,
+                  "QualityStep": 111,
+                  "Max": 444,
+                  "RollStep": 1
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 250,
+                  "RollStep": 5
+                },
+                "ShakeSpeed": {
+                  "Min": 0.3,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.05
+                },
+                "DigSpeed": {
+                  "Min": 0.3,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Eternium": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Astral Spore": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Radiant Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 5
+                },
+                "Red Beryl": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 3
+                },
+                "Umbrite": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 276,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Timelocked Soul",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1500000,
+              "Stats": {
+                "Luck": {
+                  "Min": 5,
+                  "QualityStep": 3,
+                  "Max": 10,
+                  "RollStep": 1
+                },
+                "Capacity": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 1
+                }
+              },
+              "Materials": {
+                "Peridot": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                },
+                "Onyx": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                },
+                "Pyronium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Epic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Charm",
+          "ItemID": 278
+        },
+        "Name": "Lava Lantern",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 650000000,
+              "Stats": {
+                "TreasureChance": {
+                  "Min": 0.5,
+                  "QualityStep": 0.15,
+                  "Max": 1,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 300,
+                  "RollStep": 5
+                },
+                "ModBoost": {
+                  "Min": 0.5,
+                  "QualityStep": 0.1,
+                  "Max": 1.1,
+                  "RollStep": 0.01
+                },
+                "WalkSpeed": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 3,
+                  "RollStep": 0.5
+                },
+                "DigAmount": {
+                  "Min": 75,
+                  "QualityStep": 25,
+                  "Max": 200,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Radiant Gold": {
+                  "MinWeight": 0.5,
+                  "QualityStep": 0.4,
+                  "Amount": 10
+                },
+                "Adamantine": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Prismara": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Mythril": {
+                  "MinWeight": 0.5,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 284,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Excalibur",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 15000000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 15,
+                  "QualityStep": 10,
+                  "Max": 50,
+                  "RollStep": 1
+                },
+                "SizeBoost": {
+                  "Min": 0.5,
+                  "QualityStep": 0.1,
+                  "Max": 1.1,
+                  "RollStep": 0.01
+                },
+                "WalkSpeed": {
+                  "Min": -4,
+                  "QualityStep": 0.25,
+                  "Max": -2,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 15,
+                  "QualityStep": 10,
+                  "Max": 50,
+                  "RollStep": 1
+                }
+              },
+              "Materials": {
+                "Rose Gold": {
+                  "MinWeight": 2.5,
+                  "QualityStep": 0.3,
+                  "Amount": 5
+                },
+                "Gold": {
+                  "MinWeight": 5,
+                  "QualityStep": 0.1,
+                  "Amount": 5
+                },
+                "Radiant Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Mythril": {
+                  "MinWeight": 1.25,
+                  "QualityStep": 1,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 285,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Mythic"
+        },
+        "Name": "Helm of the Round",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1250000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 300,
+                  "QualityStep": 80,
+                  "Max": 460,
+                  "RollStep": 8
+                },
+                "ShakeAmount": {
+                  "Min": 60,
+                  "QualityStep": 20,
+                  "Max": 100,
+                  "RollStep": 0.4
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.2,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 200,
+                  "QualityStep": 50,
+                  "Max": 300,
+                  "RollStep": 1
+                },
+                "WalkSpeed": {
+                  "Min": 1,
+                  "QualityStep": 0,
+                  "Max": 2,
+                  "RollStep": 0.1
+                }
+              },
+              "Materials": {
+                "Star Garnet": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 5
+                },
+                "Depleted Shard": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 10
+                },
+                "Starpiercer": {
+                  "MinWeight": 0,
+                  "QualityStep": 1.5,
+                  "Amount": 1
+                },
+                "Vortessence": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 302,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Starlight Wings",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 40000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 50,
+                  "QualityStep": 20,
+                  "Max": 100,
+                  "RollStep": 5
+                },
+                "ModBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                },
+                "JumpPower": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 6,
+                  "RollStep": 0.5
+                },
+                "WalkSpeed": {
+                  "Min": 2,
+                  "QualityStep": 0.5,
+                  "Max": 4,
+                  "RollStep": 0.1
+                },
+                "InventorySize": {
+                  "Min": 50,
+                  "QualityStep": 20,
+                  "Max": 100,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Flarebloom": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 2
+                },
+                "Pink Diamond": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 3
+                },
+                "Luminum": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 5
+                },
+                "Catseye": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 312,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Mythic"
+        },
+        "Name": "Bunny Ears",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 9000000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 50,
+                  "QualityStep": 25,
+                  "Max": 100,
+                  "RollStep": 5
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 200,
+                  "RollStep": 5
+                },
+                "Capacity": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 150,
+                  "RollStep": 5
+                },
+                "SizeBoost": {
+                  "Min": 0.3,
+                  "QualityStep": 0.2,
+                  "Max": 1.1,
+                  "RollStep": 0.01
+                },
+                "ShakeSpeed": {
+                  "Min": 0.4,
+                  "QualityStep": 0.1,
+                  "Max": 0.5,
+                  "RollStep": 0.01
+                },
+                "SellBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Celestium": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Bloodstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 2
+                },
+                "Dinosaur Skull": {
+                  "MinWeight": 0,
+                  "QualityStep": 10,
+                  "Amount": 3
+                },
+                "Gold": {
+                  "MinWeight": 60,
+                  "QualityStep": 20,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 331,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Ascended"
+        },
+        "Name": "Clockwork",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 4000000000,
+              "Stats": {
+                "JumpPower": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 5,
+                  "RollStep": 0.1
+                },
+                "Luck": {
+                  "Min": 300,
+                  "QualityStep": 150,
+                  "Max": 650,
+                  "RollStep": 10
+                },
+                "ModBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.25,
+                  "Max": 0.45,
+                  "RollStep": 0.025
+                },
+                "ShakeSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.6,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.4,
+                  "QualityStep": 0.1,
+                  "Max": 0.5,
+                  "RollStep": 0.01
+                },
+                "WalkSpeed": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 2,
+                  "RollStep": 0.1
+                },
+                "DigSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.6,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Aetherium": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 5
+                },
+                "Eye of the Sands": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 1
+                },
+                "Singularium": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                },
+                "Umbrite": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 512,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Lunar Mask",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Stats": {
+                "DigAmount": {
+                  "Min": 150,
+                  "QualityStep": 40,
+                  "Max": 250,
+                  "RollStep": 1
+                },
+                "Luck": {
+                  "Min": 200,
+                  "QualityStep": 50,
+                  "Max": 300,
+                  "RollStep": 10
+                },
+                "ModBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.2,
+                  "Max": 0.3,
+                  "RollStep": 0.02
+                },
+                "ShakeSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.4,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.1,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                },
+                "WalkSpeed": {
+                  "Min": -8,
+                  "QualityStep": 0.5,
+                  "Max": -4,
+                  "RollStep": 0.1
+                },
+                "NightLuckFlat": {
+                  "Min": 400,
+                  "QualityStep": 200,
+                  "Max": 700,
+                  "RollStep": 10
+                }
+              },
+              "Materials": {
+                "Pumpkin Soul": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 4
+                },
+                "Moonspire": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Lost Soul": {
+                  "MinWeight": 0,
+                  "QualityStep": 1.5,
+                  "Amount": 10
+                }
+              },
+              "Price": 1,
+              "Catalyst": "Celestium",
+              "CandyPrice": 1500
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "HalloweenLimited": true,
+          "ItemID": 607,
+          "Hidden": false,
+          "NameColor": null,
+          "EquipmentType": "Charm",
+          "Limited": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Dullahan's Curse",
+        "ClassName": "Tool"
+      }
+    ],
+    "Neck": [
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 5000,
+              "Stats": {
+                "Luck": {
+                  "Min": 1,
+                  "QualityStep": 0.25,
+                  "Max": 1.5,
+                  "RollStep": 0.1
+                },
+                "SellBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.025,
+                  "Max": 0.05,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Platinum": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 8
+                },
+                "Amethyst": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.1,
+                  "Amount": 2
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Common",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Neck",
+          "ItemID": 8
+        },
+        "Name": "Amethyst Pendant",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 60000,
+              "Stats": {
+                "Luck": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 3,
+                  "RollStep": 0.2
+                },
+                "DigAmount": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 2,
+                  "RollStep": 0.25
+                },
+                "ShakeAmount": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.1
+                }
+              },
+              "Materials": {
+                "Titanium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 3
+                },
+                "Topaz": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.15,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Uncommon",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Neck",
+          "ItemID": 17
+        },
+        "Name": "Topaz Necklace",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 22000,
+              "Stats": {
+                "Luck": {
+                  "Min": 2,
+                  "QualityStep": 0.5,
+                  "Max": 3,
+                  "RollStep": 0.1
+                },
+                "DigAmount": {
+                  "Min": 0,
+                  "QualityStep": 0.5,
+                  "Max": 2,
+                  "RollStep": 0.1
+                }
+              },
+              "Materials": {
+                "Pearl": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.25,
+                  "Amount": 8
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Uncommon",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Neck",
+          "ItemID": 27
+        },
+        "Name": "Pearl Necklace",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 400000,
+              "Stats": {
+                "ModBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.1,
+                  "Max": 0.5,
+                  "RollStep": 0.1
+                },
+                "Luck": {
+                  "Min": 5,
+                  "QualityStep": 2,
+                  "Max": 8,
+                  "RollStep": 0.5
+                },
+                "InventorySize": {
+                  "Min": 10,
+                  "QualityStep": 10,
+                  "Max": 40,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Opal": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.25,
+                  "Amount": 1
+                },
+                "Jade": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Epic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Neck",
+          "ItemID": 51
+        },
+        "Name": "Opal Amulet",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 50000000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 50,
+                  "QualityStep": 25,
+                  "Max": 150,
+                  "RollStep": 5
+                },
+                "SizeBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.05,
+                  "Max": 0.25,
+                  "RollStep": 0.05
+                },
+                "Luck": {
+                  "Min": 30,
+                  "QualityStep": 10,
+                  "Max": 50,
+                  "RollStep": 0.5
+                },
+                "ModBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 1,
+                  "RollStep": 0.1
+                }
+              },
+              "Materials": {
+                "Meteoric Iron": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 8
+                },
+                "Vortessence": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                },
+                "Moonstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                },
+                "Catseye": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Mythic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Neck",
+          "ItemID": 60
+        },
+        "Name": "Celestial Rings",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 3000000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 20,
+                  "QualityStep": 5,
+                  "Max": 40,
+                  "RollStep": 1
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.1,
+                  "Max": 0.4,
+                  "RollStep": 0.05
+                },
+                "InventorySize": {
+                  "Min": 150,
+                  "QualityStep": 50,
+                  "Max": 200,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Osmium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Uranium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Aurorite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Legendary",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Neck",
+          "ItemID": 74
+        },
+        "Name": "Mass Accumulator",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 40000000,
+              "Stats": {
+                "SizeBoost": {
+                  "Min": -0.7,
+                  "QualityStep": 0.05,
+                  "Max": -0.6,
+                  "RollStep": 0.05
+                },
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 200,
+                  "RollStep": 5
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 200,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Uranium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 3
+                },
+                "Inferlume": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Starshine": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Mythic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Neck",
+          "ItemID": 88
+        },
+        "Name": "Phoenix Heart",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 200000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 200,
+                  "RollStep": 1
+                },
+                "Capacity": {
+                  "Min": 50,
+                  "QualityStep": 25,
+                  "Max": 100,
+                  "RollStep": 1
+                },
+                "SizeBoost": {
+                  "Min": 0.3,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.05
+                },
+                "DigAmount": {
+                  "Min": 100,
+                  "QualityStep": 15,
+                  "Max": 140,
+                  "RollStep": 1
+                },
+                "DigSpeed": {
+                  "Min": -0.5,
+                  "QualityStep": 0.025,
+                  "Max": -0.4,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Tourmaline": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                },
+                "Cobalt": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 10
+                },
+                "Frostshard": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Aquamarine": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                },
+                "Cryonic Artifact": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 149,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Neck",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Frostthorn Pendant",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 150000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 200,
+                  "QualityStep": 25,
+                  "Max": 300,
+                  "RollStep": 1
+                },
+                "ModBoost": {
+                  "Min": 0.5,
+                  "QualityStep": 0.1,
+                  "Max": 1.1,
+                  "RollStep": 0.05
+                }
+              },
+              "Materials": {
+                "Specterite": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 5
+                },
+                "Chrysoberyl": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Prismara": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 181,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Neck",
+          "Hidden": true,
+          "Rarity": "Mythic"
+        },
+        "Name": "Amulet of Life",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 50000000,
+              "Stats": {
+                "ShakeSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.02,
+                  "Max": 0.32,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.22,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 50,
+                  "QualityStep": 10,
+                  "Max": 100,
+                  "RollStep": 5
+                },
+                "DigSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.02,
+                  "Max": 0.32,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Vortessence": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Lost Soul": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 5
+                },
+                "Bone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 10
+                },
+                "Painite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "Rarity": "Mythic",
+          "Hidden": true,
+          "EquipmentType": "Neck",
+          "NameColor": null,
+          "Limited": true,
+          "ItemID": 221
+        },
+        "Name": "Amulet of Spirits",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1,
+              "CandyPrice": 300,
+              "Materials": {
+                "Catseye": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Emerald": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 3
+                },
+                "Diamond": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 2
+                },
+                "Bone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                }
+              },
+              "Stats": {
+                "Capacity": {
+                  "Min": 40,
+                  "QualityStep": 10,
+                  "Max": 60,
+                  "RollStep": 5
+                },
+                "SellBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.05
+                },
+                "Luck": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 60,
+                  "RollStep": 5
+                },
+                "ModBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.05
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "HalloweenLimited": true,
+          "Rarity": "Legendary",
+          "ItemType": "Equipment",
+          "EquipmentType": "Neck",
+          "NameColor": null,
+          "Limited": true,
+          "ItemID": 231
+        },
+        "Name": "Spider Bowtie",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 500000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 600,
+                  "QualityStep": 100,
+                  "Max": 800,
+                  "RollStep": 10
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 200,
+                  "RollStep": 5
+                },
+                "SellBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": -100,
+                  "QualityStep": 5,
+                  "Max": -70,
+                  "RollStep": 1
+                },
+                "DigSpeed": {
+                  "Min": -0.6,
+                  "QualityStep": 0.025,
+                  "Max": -0.5,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Star Garnet": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 3
+                },
+                "Bismuth": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 10
+                },
+                "Bloodstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Mythril": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 247,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Neck",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Venomshank",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1,
+              "Stats": {
+                "Luck": {
+                  "Min": 200,
+                  "QualityStep": 75,
+                  "Max": 300,
+                  "RollStep": 10
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 300,
+                  "RollStep": 5
+                },
+                "Capacity": {
+                  "Min": 200,
+                  "QualityStep": 50,
+                  "Max": 300,
+                  "RollStep": 10
+                },
+                "SizeBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 0.4,
+                  "RollStep": 0.01
+                },
+                "TimerMult": {
+                  "Min": -0.5,
+                  "QualityStep": 0,
+                  "Max": -0.5,
+                  "RollStep": 0.1
+                }
+              },
+              "OrnamentPrice": 2000,
+              "Materials": {
+                "North Star": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.6,
+                  "Amount": 1
+                },
+                "Frostshard": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 2
+                },
+                "Peppermint Prism": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 6
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "Hidden": false,
+          "Rarity": "Exotic",
+          "ChristmasLimited": true,
+          "NameColor": null,
+          "EquipmentType": "Neck",
+          "Limited": true,
+          "ItemID": 272
+        },
+        "Name": "Santa's Bag",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 2000000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 200,
+                  "QualityStep": 100,
+                  "Max": 400,
+                  "RollStep": 10
+                },
+                "InventorySize": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 200,
+                  "RollStep": 5
+                },
+                "Capacity": {
+                  "Min": 200,
+                  "QualityStep": 50,
+                  "Max": 400,
+                  "RollStep": 10
+                },
+                "SizeBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.15,
+                  "Max": 0.4,
+                  "RollStep": 0.01
+                },
+                "TimerMult": {
+                  "Min": -0.3,
+                  "QualityStep": 0,
+                  "Max": -0.3,
+                  "RollStep": 0.1
+                },
+                "ModBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.2,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Astral Spore": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                },
+                "Depleted Shard": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 10
+                },
+                "Singularium": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 1
+                },
+                "Sunstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 1.5,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 303,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Neck",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Meteor Core",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 300000000,
+              "Stats": {
+                "JumpPower": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 6,
+                  "RollStep": 0.5
+                },
+                "Luck": {
+                  "Min": 50,
+                  "QualityStep": 20,
+                  "Max": 100,
+                  "RollStep": 5
+                },
+                "ModBoost": {
+                  "Min": 0.3,
+                  "QualityStep": 0.1,
+                  "Max": 1,
+                  "RollStep": 0.01
+                },
+                "ShakeSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.4,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 0.7,
+                  "RollStep": 0.01
+                },
+                "WalkSpeed": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 3,
+                  "RollStep": 0.5
+                },
+                "DigSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.4,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Forgotten Totem": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Nautilus Shell": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 10
+                },
+                "Inferlume": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 2
+                },
+                "Painite": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 2
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "Rarity": "Exotic",
+          "Hidden": true,
+          "EquipmentType": "Neck",
+          "NameColor": null,
+          "Limited": true,
+          "ItemID": 403
+        },
+        "Name": "Waverider",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 140000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 20,
+                  "Max": 200,
+                  "RollStep": 1
+                },
+                "ModBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 0.5,
+                  "RollStep": 0.05
+                },
+                "ShakeAmount": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 2.5,
+                  "RollStep": 0.05
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.25,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 5,
+                  "QualityStep": 2,
+                  "Max": 10,
+                  "RollStep": 0.5
+                },
+                "InventorySize": {
+                  "Min": 50,
+                  "QualityStep": 20,
+                  "Max": 100,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Nautilus Shell": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 5
+                },
+                "Inferlume": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Ammonite Fossil": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "Rarity": "Mythic",
+          "Hidden": true,
+          "EquipmentType": "Neck",
+          "NameColor": null,
+          "Limited": true,
+          "ItemID": 404
+        },
+        "Name": "Shell Necklace",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 6000000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 1000,
+                  "QualityStep": 300,
+                  "Max": 1500,
+                  "RollStep": 10
+                }
+              },
+              "Materials": {
+                "Key of Life": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Agate": {
+                  "MinWeight": 0,
+                  "QualityStep": 1.5,
+                  "Amount": 5
+                },
+                "Prismara": {
+                  "MinWeight": 0,
+                  "QualityStep": 1.5,
+                  "Amount": 5
+                },
+                "Catseye": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 514,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Neck",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Guardian Pendant",
+        "ClassName": "Tool"
+      }
+    ],
+    "Ring": [
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 500,
+              "Stats": {
+                "Luck": {
+                  "Min": 0.3,
+                  "QualityStep": 0.1,
+                  "Max": 0.4,
+                  "RollStep": 0.05
+                }
+              },
+              "Materials": {
+                "Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Common",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 7
+        },
+        "Name": "Gold Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 10000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 1,
+                  "QualityStep": 2,
+                  "Max": 5,
+                  "RollStep": 1
+                }
+              },
+              "Materials": {
+                "Titanium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Common",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 16
+        },
+        "Name": "Titanium Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 45000,
+              "Stats": {
+                "Luck": {
+                  "Min": 2,
+                  "QualityStep": 0.4,
+                  "Max": 4.4,
+                  "RollStep": 0.2
+                },
+                "SizeBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.02,
+                  "Max": 0.1,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Platinum": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.25,
+                  "Amount": 5
+                },
+                "Ruby": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.2,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Rare",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 19
+        },
+        "Name": "Ruby Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 500000,
+              "Stats": {
+                "ShakeSpeed": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.2,
+                  "RollStep": 0.025
+                },
+                "Luck": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 4,
+                  "RollStep": 0.5
+                },
+                "DigSpeed": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.2,
+                  "RollStep": 0.025
+                }
+              },
+              "Materials": {
+                "Moonstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.6,
+                  "Amount": 1
+                },
+                "Iridium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.6,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Epic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 52
+        },
+        "Name": "Moon Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 150000,
+              "Stats": {
+                "ShakeAmount": {
+                  "Min": 0,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.1
+                },
+                "DigAmount": {
+                  "Min": 0.5,
+                  "QualityStep": 0.2,
+                  "Max": 2.2,
+                  "RollStep": 0.1
+                },
+                "InventorySize": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 30,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Meteoric Iron": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Rare",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 53
+        },
+        "Name": "Meteor Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 2000000,
+              "Stats": {
+                "ModBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.17,
+                  "RollStep": 0.01
+                },
+                "DigSpeed": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.17,
+                  "RollStep": 0.01
+                },
+                "SellBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.17,
+                  "RollStep": 0.01
+                },
+                "InventorySize": {
+                  "Min": 30,
+                  "QualityStep": 10,
+                  "Max": 60,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Opal": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 2
+                },
+                "Luminum": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Legendary",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 72
+        },
+        "Name": "Lightkeeper's Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1000000,
+              "Stats": {
+                "ShakeSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 3,
+                  "QualityStep": 1,
+                  "Max": 6,
+                  "RollStep": 1
+                },
+                "SellBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.1
+                }
+              },
+              "Materials": {
+                "Coral": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 10
+                },
+                "Silver Clamshell": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 5
+                },
+                "Golden Pearl": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Epic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 73
+        },
+        "Name": "Heart of the Ocean",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 20000,
+              "Stats": {
+                "ModBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.01,
+                  "Max": 0.11,
+                  "RollStep": 0.01
+                },
+                "InventorySize": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Smoky Quartz": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 4
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Uncommon",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 75
+        },
+        "Name": "Smoke Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 50000000,
+              "Stats": {
+                "SellBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.2,
+                  "RollStep": 0.1
+                },
+                "Luck": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 1
+                },
+                "DigAmount": {
+                  "Min": 5,
+                  "QualityStep": 2.5,
+                  "Max": 10,
+                  "RollStep": 0.5
+                },
+                "ShakeAmount": {
+                  "Min": 2,
+                  "QualityStep": 0.5,
+                  "Max": 3,
+                  "RollStep": 0.1
+                }
+              },
+              "Materials": {
+                "Ashvein": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 4
+                },
+                "Ruby": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 10
+                },
+                "Palladium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Painite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Mythic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 77
+        },
+        "Name": "Apocalypse Bringer",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 75000000,
+              "Stats": {
+                "SellBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                },
+                "ShakeAmount": {
+                  "Min": 1,
+                  "QualityStep": 0.25,
+                  "Max": 2,
+                  "RollStep": 0.05
+                },
+                "Capacity": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 1
+                },
+                "SizeBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 5,
+                  "QualityStep": 2.5,
+                  "Max": 10,
+                  "RollStep": 0.5
+                },
+                "ModBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                },
+                "InventorySize": {
+                  "Min": 15,
+                  "QualityStep": 5,
+                  "Max": 30,
+                  "RollStep": 5
+                },
+                "ShakeSpeed": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 6,
+                  "RollStep": 0.5
+                },
+                "DigSpeed": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Diamond": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Prismara": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                },
+                "Pink Diamond": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                },
+                "Borealite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 5
+                },
+                "Starshine": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Luminum": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Mythic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 89
+        },
+        "Name": "Prismatic Star",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 90000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 20,
+                  "QualityStep": 10,
+                  "Max": 60,
+                  "RollStep": 0.5
+                },
+                "ShakeAmount": {
+                  "Min": 0,
+                  "QualityStep": 0.25,
+                  "Max": 1,
+                  "RollStep": 0.05
+                },
+                "ShakeSpeed": {
+                  "Min": -0.3,
+                  "QualityStep": 0.02,
+                  "Max": -0.18,
+                  "RollStep": 0.01
+                },
+                "ModBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 2,
+                  "QualityStep": 1,
+                  "Max": 4,
+                  "RollStep": 0.5
+                },
+                "DigSpeed": {
+                  "Min": -0.3,
+                  "QualityStep": 0.02,
+                  "Max": -0.18,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Vortessence": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Volcanic Core": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Fire Opal": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Pyronium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 10
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Mythic",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 114
+        },
+        "Name": "Solar Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 60000000,
+              "Stats": {
+                "ShakeSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.02,
+                  "Max": 0.32,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 20,
+                  "QualityStep": 10,
+                  "Max": 40,
+                  "RollStep": 1
+                },
+                "SellBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.02,
+                  "Max": 0.16,
+                  "RollStep": 0.01
+                },
+                "DigSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.02,
+                  "Max": 0.32,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Tourmaline": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Cinnabar": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 2
+                },
+                "Mythril": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Starshine": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 155,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "Hidden": true,
+          "Rarity": "Mythic"
+        },
+        "Name": "Mythril Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 333000000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 100,
+                  "QualityStep": 25,
+                  "Max": 200,
+                  "RollStep": 5
+                },
+                "Luck": {
+                  "Min": 50,
+                  "QualityStep": 15,
+                  "Max": 80,
+                  "RollStep": 1
+                },
+                "DigAmount": {
+                  "Min": 20,
+                  "QualityStep": 10,
+                  "Max": 40,
+                  "RollStep": 1
+                },
+                "ShakeAmount": {
+                  "Min": 3,
+                  "QualityStep": 1,
+                  "Max": 6,
+                  "RollStep": 1
+                }
+              },
+              "Materials": {
+                "Voidstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Prismara": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 2
+                },
+                "Vortessence": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 160,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Vortex Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 75000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 20,
+                  "QualityStep": 10,
+                  "Max": 60,
+                  "RollStep": 1
+                },
+                "ModBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.4,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.22,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 5,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 1
+                },
+                "InventorySize": {
+                  "Min": 40,
+                  "QualityStep": 20,
+                  "Max": 70,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Chrysoberyl": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Painite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 2
+                },
+                "Firefly Stone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 5
+                },
+                "Glowmoss": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 5
+                },
+                "Lightshard": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 182,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "Hidden": true,
+          "Rarity": "Mythic"
+        },
+        "Name": "Ring of Thorns",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 400000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 50,
+                  "QualityStep": 25,
+                  "Max": 120,
+                  "RollStep": 1
+                },
+                "ShakeAmount": {
+                  "Min": 4,
+                  "QualityStep": 2,
+                  "Max": 12,
+                  "RollStep": 0.2
+                },
+                "Capacity": {
+                  "Min": 20,
+                  "QualityStep": 20,
+                  "Max": 120,
+                  "RollStep": 2
+                },
+                "SizeBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.01,
+                  "Max": 0.11,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 5,
+                  "QualityStep": 5,
+                  "Max": 25,
+                  "RollStep": 1
+                }
+              },
+              "Materials": {
+                "Chrysoberyl": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 3
+                },
+                "Painite": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 3
+                },
+                "Dinosaur Skull": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Specterite": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 5
+                },
+                "Umbrite": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 204,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Umbrite Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 5000000,
+              "Stats": {
+                "Capacity": {
+                  "Min": 10,
+                  "QualityStep": 2,
+                  "Max": 22,
+                  "RollStep": 1
+                },
+                "Luck": {
+                  "Min": 5,
+                  "QualityStep": 2,
+                  "Max": 10,
+                  "RollStep": 1
+                },
+                "WalkSpeed": {
+                  "Min": 0.5,
+                  "QualityStep": 0,
+                  "Max": 1,
+                  "RollStep": 0.1
+                },
+                "InventorySize": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Lapis Lazuli": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 5
+                },
+                "Lost Soul": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.4,
+                  "Amount": 1
+                },
+                "Rock Candy": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 10
+                },
+                "Bone": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 3
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "Rarity": "Legendary",
+          "Hidden": true,
+          "EquipmentType": "Ring",
+          "NameColor": null,
+          "Limited": true,
+          "ItemID": 220
+        },
+        "Name": "Ring of Harvest",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 80000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 20,
+                  "QualityStep": 10,
+                  "Max": 40,
+                  "RollStep": 1
+                },
+                "ShakeAmount": {
+                  "Min": 5,
+                  "QualityStep": 3,
+                  "Max": 15,
+                  "RollStep": 1
+                },
+                "Capacity": {
+                  "Min": 20,
+                  "QualityStep": 10,
+                  "Max": 60,
+                  "RollStep": 5
+                },
+                "DigAmount": {
+                  "Min": 10,
+                  "QualityStep": 10,
+                  "Max": 40,
+                  "RollStep": 1
+                },
+                "InventorySize": {
+                  "Min": 20,
+                  "QualityStep": 10,
+                  "Max": 40,
+                  "RollStep": 5
+                }
+              },
+              "Materials": {
+                "Diamond": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 5
+                },
+                "Chrysoberyl": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Diopside": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 10
+                },
+                "Bismuth": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Mercury": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 5
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 248,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "Hidden": true,
+          "Rarity": "Mythic"
+        },
+        "Name": "Purifying Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 400000000,
+              "Stats": {
+                "SellBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.22,
+                  "RollStep": 0.01
+                },
+                "ShakeSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.01,
+                  "Max": 0.21,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 150,
+                  "QualityStep": 25,
+                  "Max": 250,
+                  "RollStep": 1
+                },
+                "DigSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Astral Spore": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Vineheart": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Red Beryl": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 3
+                },
+                "Gloomcap": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 10
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 257,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Otherworldly Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1,
+              "Stats": {
+                "ShakeSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.025,
+                  "Max": 0.1,
+                  "RollStep": 0.01
+                },
+                "SellBoost": {
+                  "Min": 0,
+                  "QualityStep": 0.025,
+                  "Max": 0.1,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 5,
+                  "QualityStep": 2.5,
+                  "Max": 10,
+                  "RollStep": 0.1
+                },
+                "Capacity": {
+                  "Min": 5,
+                  "QualityStep": 5,
+                  "Max": 20,
+                  "RollStep": 1
+                }
+              },
+              "OrnamentPrice": 500,
+              "Materials": {
+                "Gold": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 20
+                },
+                "Peppermint Prism": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 2
+                },
+                "Candy Cane": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 10
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemType": "Equipment",
+          "Hidden": false,
+          "Rarity": "Legendary",
+          "ChristmasLimited": true,
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "Limited": true,
+          "ItemID": 274
+        },
+        "Name": "5 Gold Rings",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 4000000,
+              "Stats": {
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.1
+                },
+                "Luck": {
+                  "Min": 4,
+                  "QualityStep": 4,
+                  "Max": 8,
+                  "RollStep": 1
+                },
+                "DigSpeed": {
+                  "Min": 0,
+                  "QualityStep": 0.02,
+                  "Max": 0.12,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Cinnabar": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                },
+                "Fire Opal": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 1
+                },
+                "Pyrelith": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.3,
+                  "Amount": 10
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "Rarity": "Legendary",
+          "NameColor": null,
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "ItemID": 279
+        },
+        "Name": "Eye of Fire",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 5000000000,
+              "Stats": {
+                "SellBoost": {
+                  "Min": 0.5,
+                  "QualityStep": 0.1,
+                  "Max": 1.1,
+                  "RollStep": 0.01
+                },
+                "ShakeAmount": {
+                  "Min": 10,
+                  "QualityStep": 5,
+                  "Max": 30,
+                  "RollStep": 1
+                },
+                "Capacity": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 200,
+                  "RollStep": 1
+                },
+                "SizeBoost": {
+                  "Min": 0.5,
+                  "QualityStep": 0.1,
+                  "Max": 1.1,
+                  "RollStep": 0.01
+                },
+                "Luck": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 300,
+                  "RollStep": 1
+                },
+                "ModBoost": {
+                  "Min": 0.5,
+                  "QualityStep": 0.1,
+                  "Max": 1.1,
+                  "RollStep": 0.01
+                },
+                "ShakeSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 0.5,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 20,
+                  "QualityStep": 20,
+                  "Max": 80,
+                  "RollStep": 1
+                },
+                "DigSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 0.5,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Bloodstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                },
+                "Eternium": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                },
+                "Umbrite": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                },
+                "Astral Spore": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                },
+                "Vineheart": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                },
+                "Dinosaur Skull": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                },
+                "Cryonic Artifact": {
+                  "MinWeight": 0,
+                  "QualityStep": 3,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 281,
+          "Rarity": "Ascended",
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "NameColor": null,
+          "Hidden": true,
+          "OnlyOne": true
+        },
+        "Name": "Ring of Champions",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 2500000000,
+              "Stats": {
+                "ShakeAmount": {
+                  "Min": 10,
+                  "QualityStep": 2,
+                  "Max": 20,
+                  "RollStep": 1
+                },
+                "Capacity": {
+                  "Min": 100,
+                  "QualityStep": 50,
+                  "Max": 300,
+                  "RollStep": 5
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 20,
+                  "QualityStep": 15,
+                  "Max": 60,
+                  "RollStep": 1
+                },
+                "ModBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.5,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Adamantine": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Prismara": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 3
+                },
+                "Chrysoberyl": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 3
+                },
+                "Aquamarine": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 5
+                },
+                "Umbrite": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 294,
+          "Rarity": "Exotic",
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "NameColor": null,
+          "Hidden": true,
+          "OnlyOne": true
+        },
+        "Name": "Dredge Master's Ring",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 2800000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 125,
+                  "QualityStep": 40,
+                  "Max": 200,
+                  "RollStep": 1
+                },
+                "ModBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.01,
+                  "Max": 0.11,
+                  "RollStep": 0.01
+                },
+                "ShakeSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.04,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.05,
+                  "QualityStep": 0.01,
+                  "Max": 0.11,
+                  "RollStep": 0.01
+                },
+                "InventorySize": {
+                  "Min": 25,
+                  "QualityStep": 10,
+                  "Max": 50,
+                  "RollStep": 5
+                },
+                "DigSpeed": {
+                  "Min": 0.2,
+                  "QualityStep": 0.04,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Sunstone": {
+                  "MinWeight": 0,
+                  "QualityStep": 1.5,
+                  "Amount": 5
+                },
+                "Celestium": {
+                  "MinWeight": 0,
+                  "QualityStep": 0.5,
+                  "Amount": 1
+                },
+                "Eternium": {
+                  "MinWeight": 0,
+                  "QualityStep": 1,
+                  "Amount": 1
+                },
+                "Mythril": {
+                  "MinWeight": 0,
+                  "QualityStep": 1.5,
+                  "Amount": 10
+                }
+              },
+              "Catalyst": "Eternium"
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 315,
+          "Rarity": "Exotic",
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "ItemType": "Equipment",
+          "Hidden": true,
+          "Catalyst": "Eternium"
+        },
+        "Name": "Accretion Disk",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 10000000000,
+              "Stats": {
+                "JumpPower": {
+                  "Min": 1,
+                  "QualityStep": 0.5,
+                  "Max": 3,
+                  "RollStep": 0.5
+                },
+                "Luck": {
+                  "Min": 400,
+                  "QualityStep": 50,
+                  "Max": 500,
+                  "RollStep": 1
+                },
+                "ModBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.1,
+                  "Max": 0.6,
+                  "RollStep": 0.01
+                },
+                "ShakeSpeed": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.2,
+                  "RollStep": 0.01
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.3,
+                  "RollStep": 0.01
+                },
+                "WalkSpeed": {
+                  "Min": 1,
+                  "QualityStep": 0.2,
+                  "Max": 3,
+                  "RollStep": 0.1
+                },
+                "DigSpeed": {
+                  "Min": 0.1,
+                  "QualityStep": 0.02,
+                  "Max": 0.2,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Celestium": {
+                  "MinWeight": 0,
+                  "QualityStep": 5,
+                  "Amount": 1
+                },
+                "Starpiercer": {
+                  "MinWeight": 0,
+                  "QualityStep": 5,
+                  "Amount": 1
+                },
+                "Singularium": {
+                  "MinWeight": 0,
+                  "QualityStep": 5,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 326,
+          "Rarity": "Ascended",
+          "ItemType": "Equipment",
+          "EquipmentType": "Ring",
+          "NameColor": null,
+          "Hidden": true,
+          "OnlyOne": true
+        },
+        "Name": "Ring of the Stars",
+        "ClassName": "Tool"
+      },
+      {
+        "Children": [
+          {
+            "ModuleData": {
+              "Price": 1000000000,
+              "Stats": {
+                "Luck": {
+                  "Min": 125,
+                  "QualityStep": 50,
+                  "Max": 250,
+                  "RollStep": 1
+                },
+                "Capacity": {
+                  "Min": 40,
+                  "QualityStep": 10,
+                  "Max": 80,
+                  "RollStep": 1
+                },
+                "SizeBoost": {
+                  "Min": 0.1,
+                  "QualityStep": 0.05,
+                  "Max": 0.25,
+                  "RollStep": 0.01
+                },
+                "DigAmount": {
+                  "Min": 5,
+                  "QualityStep": 5,
+                  "Max": 30,
+                  "RollStep": 1
+                },
+                "SellBoost": {
+                  "Min": 0.2,
+                  "QualityStep": 0.05,
+                  "Max": 0.4,
+                  "RollStep": 0.01
+                }
+              },
+              "Materials": {
+                "Starpiercer": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 1
+                },
+                "Agate": {
+                  "MinWeight": 0,
+                  "QualityStep": 4,
+                  "Amount": 5
+                },
+                "Inferlume": {
+                  "MinWeight": 0,
+                  "QualityStep": 4,
+                  "Amount": 10
+                },
+                "Solarium": {
+                  "MinWeight": 0,
+                  "QualityStep": 2,
+                  "Amount": 1
+                }
+              }
+            },
+            "Attributes": [],
+            "Name": "EquipmentData",
+            "ClassName": "ModuleScript"
+          }
+        ],
+        "Attributes": {
+          "ItemID": 511,
+          "ItemType": "Equipment",
+          "NameColor": null,
+          "EquipmentType": "Ring",
+          "Hidden": true,
+          "Rarity": "Exotic"
+        },
+        "Name": "Sun's Gift",
+        "ClassName": "Tool"
+      }
+    ]
+  }
+}

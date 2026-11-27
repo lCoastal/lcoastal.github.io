@@ -10,6 +10,7 @@ const LIST = [
   { id: "locations", name: "Locations", desc: "Toughness, NPCs and every mineral that drops there" },
   { id: "eqload", name: "Equipment Loadouts", desc: "Rings, necklace and charm laid out like in game, with totals" },
   { id: "craftquality", name: "5-Star Crafter", desc: "Enter your ores and see your star rating and what you need for 5-star" },
+  { id: "reforge", name: "Reforge Odds", desc: "Chance of a perfect or chosen roll % when reforging, and what it costs" },
   { id: "eqcompare", name: "Equipment Compare", desc: "Put rings, necklaces and charms side by side and see which is best" },
   { id: "odds", name: "Luck Odds", desc: "Estimated chances per pan with your luck" },
   { id: "bestcap", name: "Best Luck Cap", desc: "The luck cap that finds each mineral most often, zone by zone" },

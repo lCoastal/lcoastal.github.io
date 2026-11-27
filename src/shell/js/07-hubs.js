@@ -108,10 +108,11 @@ const HUBS = [
   [
     "h-craft",
     "Crafting",
-    "What to farm for what you want to craft, and the ore weights for 5 stars",
+    "What to farm for what you want to craft, the ore weights for 5 stars, and reforge odds",
     [
       ["checklist", "Crafting Checklist"],
       ["craftquality", "5-Star Crafter"],
+      ["reforge", "Reforge Odds"],
     ],
   ],
 ];

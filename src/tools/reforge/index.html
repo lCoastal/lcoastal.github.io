@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Reforge Odds</title>
+
+%%COMMON%%
+<style data-file="style.css"></style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Reforge Odds</h1>
+    <p class="lede">Pick a piece of equipment and see your chance of rolling it perfectly (or to the roll % you want) each reforge, how many reforges that takes and what it costs. Reforges get more expensive every time.</p>
+  </header>
+
+  <section class="card">
+    <div class="grid">
+      <label class="fld"><span class="lab">Equipment</span><input id="item" type="search" placeholder="Type an item, e.g. Vortex Ring" aria-label="Equipment" autocomplete="off"></label>
+      <label class="fld"><span class="lab">Reforges you've already done on it</span><input type="number" id="done" min="0" step="1" inputmode="numeric" placeholder="0"><small>Each reforge costs more than the last, so this sets where your costs start.</small></label>
+      <label class="fld"><span class="lab">Money you can spend <span style="font-weight:500">(optional)</span></span><input type="text" id="bud" inputmode="decimal" placeholder="e.g. 50b or 2.5t" autocomplete="off"><small>Shows your chance within it. Without it, anything over $1T for a 90% chance counts as not realistic.</small></label>
+    </div>
+    <div class="top"><span class="lab">Goal</span><span class="chips" id="goal" role="group" aria-label="Goal"><button type="button" class="chip" data-goal="max">100% (every stat maxed)</button><button type="button" class="chip" data-goal="pct">At least a roll %</button></span>
+      <label class="fld inl" id="pctF"><input type="number" id="pct" min="0" max="100" step="0.1" inputmode="decimal" aria-label="Roll % you want"><span>% or better</span></label></div>
+  </section>
+
+  <section class="card" id="res"></section>
+
+  <section class="card"><h2>How it works</h2>
+    <ul class="hint" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px">
+      <li><b>Each stat rolls between its minimum and maximum in fixed steps,</b> and every step is equally likely. A stat that can land on 41 values has a 1 in 41 chance of its max. All stats have to max at once for 100%, so their chances multiply.</li>
+      <li><b>Stars don't change the odds.</b> Each star above 1★ moves the whole range up, so a 5★ roll has the same number of steps as a 1★ roll.</li>
+      <li><b>Roll %</b> is counted as the average of where each stat landed in its range (0% at the minimum, 100% at the maximum). Stats with only one possible value are left out.</li>
+      <li><b>Reforge cost:</b> the Nth reforge costs Price × (1 + 0.5 × N<sup>1.8</sup>), where N is how many reforges were done before it and Price is the item's crafting price, from community testing. Items bought with Candy or Ornaments are counted in that currency.</li>
+      <li><b>Mastery and gamepasses</b> aren't counted yet.</li>
+    </ul>
+  </section>
+  <p class="foot">Roll data from the game's equipment files. Made by @__coastal</p>
+</div>
+<script data-file="script.js"></script>
+</body>
+</html>
