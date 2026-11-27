@@ -8,7 +8,63 @@ const sNorm = (t) =>
   String(t || "")
     .toLowerCase()
     .replace(/[’‘`]/g, "'");
-const add = (name, type, sub, img, act) => IDX.push({ name, lc: sNorm(name), type, sub, img, act });
+const add = (name, type, sub, img, act, kw) =>
+  IDX.push({ name, lc: sNorm(name), type, sub, img, act, kw: kw ? sNorm(name + " " + sub + " " + kw).split(/[^a-z0-9%']+/) : null });
+// words people use for what they want to do, so a goal finds the right tool
+const KW = {
+  home: "start begin",
+  bestbuild: "best build goal loadout setup what to wear exotic mythic farm money rare finds per minute",
+  buildmaker: "best build stat priority weights loadout setup one tap strength speed",
+  calc: "stats stat panel total my stats luck capacity strength speed calculate",
+  rpm: "rolls per minute pans per minute digs shakes speed how fast time",
+  builds: "build guide sheet write share image",
+  buildcmp: "compare builds which build better versus vs",
+  odds: "chance chances odds drop rate how many pans find get mineral luck",
+  bestcap: "luck cap best luck too much luck zone where to pan",
+  mododds: "modifier chance odds lunar night mutation shiny glowing how many",
+  minmuts: "modifier value worth sell price museum boost mineral mutation",
+  weightrange: "weight heavy kg biggest smallest max weight size",
+  sizefinder: "size boost need weight kg target heavy",
+  pansize: "pan size how many minerals per pan capacity fit",
+  planner: "museum plan slots totals boosts",
+  boosts: "museum boost each mineral max weight value",
+  museumfind: "best museum fill goal optimise optimize",
+  museumopt: "improve museum better upgrade",
+  farmroute: "farm route where to farm zones museum order",
+  checklist: "craft crafting materials recipe ingredients what to farm need",
+  craftquality: "5 star five star quality ores craft weight stars",
+  reforge: "reforge reroll roll max perfect stats stars cost money budget god roll",
+  equipment: "rings necklace charm equipment stats recipe",
+  eqcompare: "compare rings necklaces charms which better",
+  eqload: "loadout equipment rings slots totals",
+  pans: "pan stats luck capacity passive",
+  shovels: "shovel dig strength dig speed toughness",
+  sluices: "sluice stats upgrades",
+  sluiceplan: "sluice upgrade points cost mad scientist",
+  mutations: "mutation enchant gear pan shovel",
+  runes: "rune runes loadout where",
+  items: "potion totem trinket effect duration buff",
+  minerals: "mineral value price drop rate recipe",
+  locations: "location zone area toughness where",
+  quests: "quest quests tracker steps",
+  dredge: "dredge master requests where to pan luck cap",
+  npcs: "npc who where quests",
+  events: "event clock timer next meteor shower timed area",
+  codes: "codes free redeem",
+  mechanics: "how it works explain mechanics luck capacity modifiers weight",
+  formulas: "formula formulas math equation",
+  testlog: "tests evidence data proof",
+  testdata: "check my data test verify",
+  "items:pot": "potion potions buff effect duration",
+  "items:tot": "totem totems buff",
+  "items:trn": "trinket trinkets",
+  "mutations:mut": "gear mutation equipment mutation multiplier",
+  "mutations:pan": "pan enchant enchants",
+  "mutations:sh": "shovel enchant enchants",
+  tierlist: "tier list rank ranking",
+  settings: "settings theme dark light colour color stats reset",
+};
+
 D.mins.forEach((m) => add(m.n, "Mineral", m.r, m.ic, () => ptOpen("mineral", m.n)));
 D.equip.forEach((x) =>
   add(x.n, "Equipment", x.r + " " + x.slot, D.eimg[x.img], () => callTool("equipment", "ptOpenItem", x.n)),
@@ -83,14 +139,23 @@ const X2 = D.x2 || {};
   add(r.n + " rune", "Rune", r.d, r.ic || "", () => callTool("runes", "ptOpenItem", r.n)),
 );
 (X2.events || []).forEach((e) => add(e.n, "Event", e.cat || "Event", "", () => show("events")));
-LIST.forEach((t) => add(t.name, "Tool", t.desc, "", () => show(t.id)));
+LIST.forEach((t) => add(t.name, "Tool", t.desc, "", () => show(t.id), KW[t.id] || " "));
 GROUPS.forEach((g) =>
-  g[4].filter((x) => x[2]).forEach((x) => add(entryName(x), "Tool", entryDesc(x), "", () => openHubTab(x[0], x[2]))),
+  g[4]
+    .filter((x) => x[2])
+    .forEach((x) => add(entryName(x), "Tool", entryDesc(x), "", () => openHubTab(x[0], x[2]), KW[x[0] + ":" + x[2]] || " ")),
 );
 const ESC = (s) =>
   String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 let hits = [],
   sel = 0;
+// a tool matches a goal when every word typed starts one of its words ("reroll odds", "how many pans")
+const STOP = new Set(["a", "an", "the", "to", "i", "my", "of", "for", "in", "do", "is", "can", "what", "it"]);
+function goalHit(x, q) {
+  if (!x.kw) return false;
+  const ws = q.split(/[^a-z0-9%']+/).filter((w) => w && !STOP.has(w));
+  return ws.length > 0 && ws.every((w) => x.kw.some((k) => k.startsWith(w)));
+}
 function search() {
   const q = sNorm(sIn.value.trim());
   if (!q) {
@@ -111,7 +176,9 @@ function search() {
               ? 3
               : (x.sub || "").toLowerCase().includes(q)
                 ? 4
-                : 9,
+                : goalHit(x, q)
+                  ? 4
+                  : 9,
   }))
     .filter((h) => h.s < 9)
     .sort(
