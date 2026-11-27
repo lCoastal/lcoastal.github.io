@@ -13,7 +13,7 @@ function model(b){
   return {items,digs,shakes,td,sr,dT,sT,T,ppm:60/T,mpm:items*60/T,rpp:b.luck*items,rpm:b.luck*items*60/T};
 }
 const big=v=>v>=1e9?fmt(v/1e9,2)+"B":v>=1e6?fmt(v/1e6,2)+"M":v>=1e4?fmt(v/1e3,1)+"k":fmt(v,0);
-const sec=v=>v<10?fmt(v,2)+" s":v<120?fmt(v,1)+" s":fmt(v/60,1)+" min";
+const sec=v=>v<10?fmt(v,2)+"s":v<120?fmt(v,1)+"s":fmt(v/60,1)+" min";
 const tile=(l,v,s)=>`<div class="tile"><span class="l">${l}</span><span class="v">${v}</span>${s?`<span class="s">${s}</span>`:""}</div>`;
 function read(){const b={luck:num("luck"),cap:num("cap"),dstr:num("dstr"),dspd:num("dspd"),sstr:num("sstr"),sspd:num("sspd"),dly:num("dly"),fix:num("fix")};
   if(!isFinite(b.dly))b.dly=0;if(!isFinite(b.fix))b.fix=1.15;if(!isFinite(b.luck))b.luck=1;return b}
@@ -27,7 +27,7 @@ function render(){
     $("tiles").innerHTML=tile("Rolls per minute",big(m.rpm),num("luck")>0?"luck × minerals per minute":"type your luck for rolls")+tile("Rolls per pan",big(m.rpp))+tile("Minerals per minute",fmt(m.mpm,0))+tile("Minerals per pan",fmt(m.items,0))+tile("Pans per minute",fmt(m.ppm,2))+tile("Time per pan",sec(m.T));
     $("steps").innerHTML=`<table class="t r"><tr><th>Step</th><th>Count</th><th>Each</th><th>Total</th><th>Share</th></tr>
       <tr><td>Digging</td><td>${fmt(m.digs,0)} digs</td><td>${sec(m.td)}</td><td>${sec(m.dT)}</td><td>${fmt(100*m.dT/m.T,0)}%</td></tr>
-      <tr><td>Shaking</td><td>${fmt(m.shakes,0)} shakes</td><td>${fmt(m.sr,1)} per s</td><td>${sec(m.sT)}</td><td>${fmt(100*m.sT/m.T,0)}%</td></tr>
+      <tr><td>Shaking</td><td>${fmt(m.shakes,0)} shakes</td><td>${fmt(m.sr,1)}/s</td><td>${sec(m.sT)}</td><td>${fmt(100*m.sT/m.T,0)}%</td></tr>
       <tr><td>Fixed</td><td></td><td></td><td>${sec(b.fix)}</td><td>${fmt(100*b.fix/m.T,0)}%</td></tr>
       <tr><td><b>Whole pan</b></td><td></td><td></td><td><b>${sec(m.T)}</b></td><td>100%</td></tr></table>`;
     const w=[];if(b.dspd>650)w.push("Dig Speed above about 600% hasn't been tested, so dig time may be shorter here than in game.");if(m.shakes>10)w.push(`This pan needs ${fmt(m.shakes,0)} shakes; the shake test was at 6 per pan, so shaking may take longer.`);
@@ -37,7 +37,7 @@ function render(){
     $("gain").innerHTML=`<table class="t r"><tr><th>+10% of</th><th>Rolls per minute</th><th>Change</th><th>Pans per minute</th></tr>${G.sort((a,c)=>c.p-a.p).map(g=>`<tr${g.p===best&&best>0?' class="best"':""}><td>${g.n}</td><td>${big(g.v)}</td><td>${g.p>=0?"+":""}${fmt(100*g.p,1)}%</td><td>${fmt(g.ppm,2)}</td></tr>`).join("")}</table>`;
   }
   const SP=[100,150,200,250,300,400,500,600,800,1000,1250,1500,2000];
-  $("speedTab").innerHTML=`<table class="t r"><tr><th>Speed</th><th>Time per dig</th><th>Shakes per second</th></tr>${SP.map(x=>`<tr${ok&&(Math.abs(x-b.dspd)<x*.08||Math.abs(x-b.sspd)<x*.08)?' class="best"':""}><td>${x}%</td><td>${fmt(digT(x),2)} s${x>650?" *":""}</td><td>${fmt(shakeRate(x),1)}</td></tr>`).join("")}</table><p class="hint">* Not tested above about 600% Dig Speed.</p>`;
+  $("speedTab").innerHTML=`<table class="t r"><tr><th>Speed</th><th>Time per dig</th><th>Shakes per second</th></tr>${SP.map(x=>`<tr${ok&&(Math.abs(x-b.dspd)<x*.08||Math.abs(x-b.sspd)<x*.08)?' class="best"':""}><td>${x}%</td><td>${fmt(digT(x),2)}s${x>650?" *":""}</td><td>${fmt(shakeRate(x),1)}</td></tr>`).join("")}</table><p class="hint">* Not tested above about 600% Dig Speed.</p>`;
 }
 F.forEach(k=>{$(k).value=S[k];$(k).addEventListener("input",e=>{S[k]=e.target.value;save();render()})});
 $("fromCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;

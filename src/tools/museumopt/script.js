@@ -183,7 +183,7 @@ function statTable(a,b2){const rows=STATS.map((s,i)=>[s,a[i],b2[i]]).filter(([,x
 let NEWB=null;
 function show(){const {b,cur,res,W,opts}=LAST;const o=$("out");
   const proof=res.done?"Every combination was checked, so this is the best possible."
-    :!res.finished?`Stopped after ${Math.round(res.ms/1000)} s, so this is the best it found, not proven best. Untick modifiers you don't need to make it faster.`
+    :!res.finished?`Stopped after ${Math.round(res.ms/1000)}s, so this is the best it found, not proven best. Untick modifiers you don't need to make it faster.`
     :"With this many modifiers ticked it only checked the strongest options for each rarity, so this is very likely but not proven best. Untick modifiers you don't need for a full check.";
   if(res.picks){NEWB=placed(b,res.picks);const nt=totalsOf(NEWB);
     const ch=[];ORDER.forEach(r=>NEWB[r].forEach((s,i)=>{const was=(b[r]||[])[i]||{m:null,u:"None"};if(was.m!==s.m||(was.u||"None")!==(s.u||"None"))ch.push({r,was,s})}));

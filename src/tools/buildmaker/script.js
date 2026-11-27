@@ -31,7 +31,7 @@ function drawForm(){
   $("tap").innerHTML=TAPOPT.map(([k,l])=>`<button type="button" class="chip" data-tap="${k}" aria-pressed="${S.tap===k}">${l}</button>`).join("");
   $("tapTxt").textContent=S.tap==="must"?"Only builds that fill the pan in one tap: Dig Strength"+(S.totem?" × 1.5":"")+" at least your Capacity.":S.tap==="prefer"?"A build that needs a second tap counts as if its luck and capacity were halved, a third tap as a third, and so on.":"Taps don't count. Use the per-minute rows above to count pan time instead.";
   ["digSp","shSp"].forEach(k=>{if(document.activeElement!==$(k))$(k).value=S[k]});
-  $("ratio").textContent=`About ${fmt(digSec(),2)} s a dig and ${fmt(shSec(),3)} s a shake, so 1 dig costs as much as ${fmt(digSec()/shSec(),1)} shakes`;
+  $("ratio").textContent=`About ${fmt(digSec(),2)}s a dig and ${fmt(shSec(),3)}s a shake, so 1 dig costs as much as ${fmt(digSec()/shSec(),1)} shakes`;
   $("totem").checked=!!S.totem;$("strFirst").checked=!!S.strFirst;
   $("cons").innerHTML=CONSOPT.map(([k,l])=>`<button type="button" class="chip" data-c="${k}" aria-pressed="${S.cons===k}">${l}</button>`).join("");
   drawPick();

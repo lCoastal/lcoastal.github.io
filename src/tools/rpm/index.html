@@ -29,7 +29,7 @@
         <label class="fld"><span class="lab">Extra time per dig (s)</span><input type="number" id="dly" min="0" step="0.05" inputmode="decimal" placeholder="0"></label>
         <label class="fld"><span class="lab">Fixed time per pan (s)</span><input type="number" id="fix" min="0" step="0.05" inputmode="decimal" placeholder="1.15"></label>
       </div>
-      <p class="hint">0 extra per dig is a perfect setup with no ping. Macros add some: one community test came out about 0.3 s slower per dig. The fixed time covers walking into the water and the pan settling; 1.15 s is the community's figure.</p>
+      <p class="hint">0 extra per dig is a perfect setup with no ping. Macros add some: one community test came out about 0.3s slower per dig. The fixed time covers walking into the water and the pan settling; 1.15 s is the community's figure.</p>
     </details>
   </section>
   <section class="card" id="out" hidden>
@@ -60,7 +60,7 @@
         <div class="fx"><span>Time per dig</span><code>143.9 × Dig Speed<sup>−0.9324</sup> s</code></div>
         <div class="fx"><span>Shakes</span><code>Capacity ÷ Shake Strength</code><em>rounded up, never more than Capacity</em></div>
         <div class="fx"><span>Shakes per second</span><code>23.514 × Shake Speed ÷ (442.88 + Shake Speed)</code></div>
-        <div class="fx sum"><span>Time per pan</span><code>digs × time per dig + shakes ÷ shakes per second + 1.15 s</code></div>
+        <div class="fx sum"><span>Time per pan</span><code>digs × time per dig + shakes ÷ shakes per second + 1.15s</code></div>
       </div>
       <div class="grp"><h3>Per minute</h3>
         <div class="fx"><span>Pans per minute</span><code>60 ÷ time per pan</code></div>
