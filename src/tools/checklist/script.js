@@ -40,11 +40,13 @@ function calc(){
     .sort((a,b)=>ORDER.indexOf(a.m?a.m.r:"Common")-ORDER.indexOf(b.m?b.m.r:"Common")||b.left-a.left||a.n.localeCompare(b.n));
   const tot=rows.reduce((s,r)=>s+r.q,0),got=rows.reduce((s,r)=>s+Math.min(r.q,r.have),0),done=rows.filter(r=>!r.left).length;
   return {rows,tot,got,done,cost,usedBy}}
+// materials you can't pan (no drop anywhere, like Feather of Ma'at): listed on their own, left out of the chart, effort and route
+const noPan=r=>!!r.m&&!(r.m.ch&&r.m.ch.length);
 // how hard one of a mineral is to get: its best (non-Void) drop odds, or a rarity guess if it has none
 const RW={Common:3,Uncommon:10,Rare:60,Epic:400,Legendary:5000,Mythic:2e5,Exotic:2e7,Ascended:1e8};
 function effort(n){const w=whereInfo(n);const m=MIN[n.toLowerCase()];if(w&&!w.voidOnly){const o=oneIn(w.best[2]);if(isFinite(o))return o}return RW[m?m.r:"Common"]||3}
 function summary(){const {rows,tot,got,done,cost}=calc();const mode=S.pm||"effort";
-  const wt=rows.reduce((s,r)=>s+r.q*effort(r.n),0),wg=rows.reduce((s,r)=>s+Math.min(r.q,r.have)*effort(r.n),0);
+  const pr=rows.filter(r=>!noPan(r));const wt=pr.reduce((s,r)=>s+r.q*effort(r.n),0),wg=pr.reduce((s,r)=>s+Math.min(r.q,r.have)*effort(r.n),0);
   const pct=mode==="effort"?(wt?wg/wt*100:0):(tot?got/tot*100:0);
   document.querySelectorAll("[data-pm]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pm===mode)));
   $("pLab").textContent=`Progress ${mode==="effort"?"by effort":"by item count"}: ${pct>=99.95||pct===0?fmt(pct,0):pct<0.1?"<0.1":fmt(pct,1)}%`;$("pbarW").setAttribute("aria-valuenow",pct.toFixed(1));
@@ -67,7 +69,7 @@ function pie(rows,mode){const on=S.pie!==false;const btn=$("pieBtn");btn.setAttr
     <ul class="leg">${parts.map((x,i)=>`<li data-pi="${i}"><i style="background:${PAL[x.ci%PAL.length]}"></i><span>${esc(x.n)}</span><span class="mono">${fmt(x.left,0)} left</span><b>${pctTxt(x.v/tot*100)}%</b></li>`).join("")}</ul>
     <p class="muted" style="margin:0;font-size:12.5px;grid-column:1/-1">${mode==="effort"?"Slices show how much of the remaining effort each material is.":"Slices show how many of each material are left."}</p>`}
 function pieParts(rows,mode){
-  const ranked=rows.filter(r=>r.left).map(r=>({n:r.n,left:r.left,eff:r.left*effort(r.n)})).sort((a,b)=>b.eff-a.eff||a.n.localeCompare(b.n));
+  const ranked=rows.filter(r=>r.left&&!noPan(r)).map(r=>({n:r.n,left:r.left,eff:r.left*effort(r.n)})).sort((a,b)=>b.eff-a.eff||a.n.localeCompare(b.n));
   ranked.forEach((x,i)=>x.ci=ranked.length>8?Math.min(i,7):i);
   let parts=ranked.map(x=>({n:x.n,left:x.left,ci:x.ci,v:mode==="effort"?x.eff:x.left}));
   if(parts.length>8){const rest=parts.slice(7);parts=parts.slice(0,7).concat([{n:`${rest.length} others`,left:rest.reduce((s,x)=>s+x.left,0),v:rest.reduce((s,x)=>s+x.v,0),ci:7,other:true}])}
@@ -94,11 +96,11 @@ function render(){
       <div class="ctl"><span class="step"><button type="button" data-dx="${i}" data-v="-1" aria-label="One fewer">−</button><input type="number" min="1" value="${e.q}" data-cx="${i}" aria-label="How many ${esc(e.n)}"><button type="button" data-dx="${i}" data-v="1" aria-label="One more">+</button></span></div></div>`}).join("")
     :'<p class="muted" style="margin:0">Nothing added yet. Add an item above, or open any item on the Equipment page and press “Add to crafting checklist”.</p>';
   const {rows,tot,got,done,cost,usedBy}=calc();summary();
-  const vis=rows.filter(r=>!S.hide||r.left);
+  const visAll=rows.filter(r=>!S.hide||r.left),vis=visAll.filter(r=>!noPan(r)),np=visAll.filter(noPan);
   $("mats").innerHTML=rows.length?`<table class="mat"><thead><tr><th>Material</th><th style="text-align:right">Need</th><th style="text-align:right">Have</th><th style="text-align:right">Left</th><th>Best place to farm</th></tr></thead><tbody>
     ${vis.map(r=>`<tr class="${r.left?"":"done"}"><td><div class="mn" data-mineral="${esc(r.n)}" title="Ctrl+click to open ${esc(r.n)}">${r.m&&r.m.ic?`<img src="${r.m.ic}" alt="" width="30" height="30" loading="lazy">`:""}<span><b>${esc(r.n)}</b><span class="rr" style="--rc:${rc(r.m?r.m.r:"common")}">${r.m?r.m.r:""}</span> <span class="used">${[...usedBy[r.n]].filter(u=>u!=="extra").join(", ")||"extra"}</span></span></div></td>
       <td class="n" data-l="Need">${fmt(r.q,0)}</td><td class="n" data-l="Have"><input type="number" min="0" value="${r.have}" data-have="${esc(r.n)}" aria-label="How many ${esc(r.n)} you have"></td>
-      <td class="n st ${r.left?"no":"ok"}" data-l="Left">${r.left?fmt(r.left,0):"✓ done"}</td><td class="w"><div class="where"${(whereInfo(r.n)||{}).hasVoid?` title="${VOID_TIP}"`:""}>${where(r.n)}</div></td></tr>`).join("")}</tbody></table>${vis.length<rows.length?`<p class="muted" style="font-size:12.5px;margin:8px 0 0">${rows.length-vis.length} finished material${rows.length-vis.length===1?"":"s"} hidden.</p>`:""}`
+      <td class="n st ${r.left?"no":"ok"}" data-l="Left">${r.left?fmt(r.left,0):"✓ done"}</td><td class="w"><div class="where"${(whereInfo(r.n)||{}).hasVoid?` title="${VOID_TIP}"`:""}>${where(r.n)}</div></td></tr>`).join("")}</tbody></table>${np.length?`<h3 class="npH">Can't be panned</h3><p class="muted" style="margin:0 0 6px;font-size:12.5px">These don't drop from panning anywhere, so they're not in the chart or the route.</p><table class="mat"><thead><tr><th>Material</th><th style="text-align:right">Need</th><th style="text-align:right">Have</th><th style="text-align:right">Left</th><th>How to get</th></tr></thead><tbody>${np.map(r=>`<tr class="${r.left?"":"done"}"><td><div class="mn" data-mineral="${esc(r.n)}">${r.m&&r.m.ic?`<img src="${r.m.ic}" alt="" width="30" height="30" loading="lazy">`:""}<span><b>${esc(r.n)}</b><span class="rr" style="--rc:${rc(r.m.r)}">${esc(r.m.r)}</span></span></div></td><td class="n" data-l="Need">${fmt(r.q,0)}</td><td class="n" data-l="Have"><input type="number" min="0" value="${r.have}" data-have="${esc(r.n)}" aria-label="How many ${esc(r.n)} you have"></td><td class="n st ${r.left?"no":"ok"}" data-l="Left">${r.left?fmt(r.left,0):"✓ done"}</td><td class="w"><div class="where">${esc(r.m.how||r.m.src||"Not from panning")}</div></td></tr>`).join("")}</tbody></table>`:""}${visAll.length<rows.length?`<p class="muted" style="font-size:12.5px;margin:8px 0 0">${rows.length-visAll.length} finished material${rows.length-visAll.length===1?"":"s"} hidden.</p>`:""}`
     :'<div class="empty">Your materials will show up here.</div>';
 }
 document.addEventListener("click",e=>{
@@ -118,15 +120,16 @@ document.addEventListener("change",e=>{const t=e.target;
   else return;save();render()});
 // ---- save the checklist as an image: what you're crafting, then the materials (follows Hide finished) ----
 $("toImg").onclick=()=>{const {rows,tot,got,done,cost}=calc();if(!S.goals.length&&!S.extra.length){ptToast("Add something to craft first");return}
-  const mode=S.pm||"effort";const wt=rows.reduce((s,r)=>s+r.q*effort(r.n),0),wg=rows.reduce((s,r)=>s+Math.min(r.q,r.have)*effort(r.n),0);const pct=mode==="effort"?(wt?wg/wt*100:0):(tot?got/tot*100:0);
+  const mode=S.pm||"effort";const pr=rows.filter(r=>!noPan(r));const wt=pr.reduce((s,r)=>s+r.q*effort(r.n),0),wg=pr.reduce((s,r)=>s+Math.min(r.q,r.have)*effort(r.n),0);const pct=mode==="effort"?(wt?wg/wt*100:0):(tot?got/tot*100:0);
   const sub=[`Progress ${pctTxt(pct)}% ${mode==="effort"?"by effort":"by item count"}`,`${done} / ${rows.length} materials ready`,`${fmt(got,0)} / ${fmt(tot,0)} items collected`];if(cost)sub.push(`$${fmt(cost,0)} in crafting fees`);
   const goals=S.goals.map(g=>{const x=EQ[g.n.toLowerCase()];const cr=g.c*(g.star===6?2:1);return {cells:[{t:g.n,b:true,ic:x&&P.eimg[x.img],sub:x?x.r+" "+x.slot:"",subcol:x?(RHEX[x.r]||"#98a2ad"):"#98a2ad"},{t:"×"+g.c,mono:true},{t:g.star+"★",mono:true,col:"#f2b53a"},{t:cr+" craft"+(cr===1?"":"s"),col:"#98a2ad"}]}})
     .concat(S.extra.map(e=>{const m=MIN[e.n.toLowerCase()];return {cells:[{t:e.n,b:true,ic:m&&m.ic,sub:(m?m.r+", ":"")+"extra material",subcol:m?(RHEX[m.r]||"#98a2ad"):"#98a2ad"},{t:"×"+e.q,mono:true},{t:"-",col:"#98a2ad"},{t:"",col:"#98a2ad"}]}}));
-  const vis=rows.filter(r=>!S.hide||r.left);
+  const visAll=rows.filter(r=>!S.hide||r.left),vis=visAll.filter(r=>!noPan(r)),npv=visAll.filter(noPan);
   const mats=vis.map(r=>{const w=whereInfo(r.n);const o=w?oneIn(w.best[2]):NaN;const place=!w?"-":(w.voidOnly?"Only in The Void":w.best[0]);
     return {cells:[{t:r.n,b:true,ic:r.m&&r.m.ic,sub:r.m?r.m.r:"",subcol:r.m?(RHEX[r.m.r]||"#98a2ad"):"#98a2ad"},{t:fmt(r.q,0),mono:true},{t:fmt(r.have,0),mono:true},{t:r.left?fmt(r.left,0):"✓ done",mono:!!r.left,b:!r.left,fs:r.left?14:13.5,col:r.left?"#e6e9ec":"#3cc2a8"},{t:place,wrap:true,sub:w&&isFinite(o)?"~1 in "+o.toLocaleString("en-US"):"",col:w?"#e6e9ec":"#98a2ad"}]}});
   const secs=[{h:"What you're crafting",cols:[{h:"Item",w:.5},{h:"How many",w:.15,al:"r"},{h:"Stars",w:.15,al:"r"},{h:"Crafts",w:.2,al:"r"}],rows:goals}];
-  if(mats.length)secs.push({h:"Materials"+(vis.length<rows.length?` (${rows.length-vis.length} finished hidden)`:""),cols:[{h:"Material",w:.32},{h:"Need",w:.1,al:"r"},{h:"Have",w:.1,al:"r"},{h:"Left",w:.12,al:"r"},{h:"Best place to farm",w:.36}],rows:mats});
+  if(mats.length)secs.push({h:"Materials"+(visAll.length<rows.length?` (${rows.length-visAll.length} finished hidden)`:""),cols:[{h:"Material",w:.32},{h:"Need",w:.1,al:"r"},{h:"Have",w:.1,al:"r"},{h:"Left",w:.12,al:"r"},{h:"Best place to farm",w:.36}],rows:mats});
+  if(npv.length)secs.push({h:"Can't be panned",cols:[{h:"Material",w:.32},{h:"Need",w:.1,al:"r"},{h:"Have",w:.1,al:"r"},{h:"Left",w:.12,al:"r"},{h:"How to get",w:.36}],rows:npv.map(r=>({cells:[{t:r.n,b:true,ic:r.m&&r.m.ic,sub:r.m.r,subcol:RHEX[r.m.r]||"#98a2ad"},{t:fmt(r.q,0),mono:true},{t:fmt(r.have,0),mono:true},{t:r.left?fmt(r.left,0):"✓ done",mono:!!r.left,b:!r.left,col:r.left?"#e6e9ec":"#3cc2a8"},{t:r.m.how||r.m.src||"Not from panning",col:"#98a2ad"}]}))});
   // the "What's left" chart, same slices and colours as on the page, with a legend naming each colour
   const pp=pieParts(rows,mode),ptot=pp.reduce((t,x)=>t+x.v,0);
   const pieO=pp.length?{h:"What's left",center:fmt(pp.reduce((t,x)=>t+x.left,0),0),centerSub:"items left",note:mode==="effort"?"Slices show how much of the remaining effort each material is.":"Slices show how many of each material are left.",
@@ -137,12 +140,12 @@ const RHEX={Ascended:"#ffd36b",Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b
 let ROUTE=null;
 function renderRoute(){const {rows}=calc();const left=rows.filter(r=>r.left>0);
   if(!left.length){$("rtSum").innerHTML="";$("rtStops").innerHTML=`<div class="empty">${rows.length?"Nothing left to farm. Everything's ready to craft.":"Add something to craft to get a route."}</div>`;$("rtIssues").innerHTML="";ROUTE=null;return}
-  const items=left.filter(r=>r.m).map(r=>({m:r.m,u:"None",c:r.left}));
+  const items=left.filter(r=>r.m&&!noPan(r)).map(r=>({m:r.m,u:"None",c:r.left}));
   const R=RT.plan(items);ROUTE=R;
   $("rtSum").innerHTML=RT.sumHTML(R,`<div><span class="lab">Materials to farm</span><b>${R.T.length}</b><span class="hint">${fmt(R.T.reduce((s,t)=>s+t.c,0),0)} items in total</span></div>`);
   $("rtStops").innerHTML=RT.stopsHTML(R,{tick:false});
   if(!R.zones.length)$("rtStops").innerHTML='<div class="empty">Nothing on your list can be farmed with these settings yet. See below for where each item drops.</div>';
-  const extra=left.filter(r=>!r.m).map(r=>`<b>${esc(r.n)}</b>: not a mineral, so it isn't on the route.`);
+  const extra=left.filter(r=>!r.m).map(r=>`<b>${esc(r.n)}</b>: not a mineral, so it isn't on the route.`).concat(left.filter(noPan).map(r=>`<b>${esc(r.n)}</b>: can't be panned, so it isn't on the route.`));
   $("rtIssues").innerHTML=[...R.issues,...extra].map(x=>`<li>${x}</li>`).join("")}
 $("rtSet").innerHTML=RT.settingsHTML(false);RT.bind($("rtSet"),renderRoute);
 $("copyRoute").onclick=async()=>{if(!ROUTE)return;const txt="Crafting farm route\n"+RT.routeText(ROUTE);let ok=false;
