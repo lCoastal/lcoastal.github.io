@@ -115,6 +115,7 @@ window.ptInstallImgTheme = (w) => {
           return d.get.call(this);
         },
         set(v) {
+          if (k === "fillStyle") this.__ptRaw = v;
           d.set.call(this, map(v));
         },
       });
@@ -123,6 +124,18 @@ window.ptInstallImgTheme = (w) => {
     const ft = C.fillText;
     C.fillText = function (text, x, y, maxW) {
       try {
+        // plain numbers drawn in the theme's teal (boost values, shares) come out white like the rest of the text
+        if (typeof text === "string" && /^[~+\-−]?\s*[\d.,]+\s*(%|×|x|kg)?$/.test(text.trim())) {
+          const raw = ptParseColor(this.__ptRaw || "");
+          if (raw && PT_TEALS.has(`${raw[0]},${raw[1]},${raw[2]}`)) {
+            const keep = this.fillStyle, keepRaw = this.__ptRaw;
+            this.fillStyle = "#e6e9ec";
+            const r = ft.apply(this, arguments);
+            FD.set.call(this, keep);
+            this.__ptRaw = keepRaw;
+            return r;
+          }
+        }
         if (w.ptNoImgColor || maxW != null || typeof text !== "string" || !/[A-Z]/.test(text)) return ft.apply(this, arguments);
         const px = parseFloat((String(this.font).match(/([\d.]+)px/) || [])[1] || 0);
         const cur = ptParseColor(this.fillStyle);

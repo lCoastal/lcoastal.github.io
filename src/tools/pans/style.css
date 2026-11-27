@@ -55,7 +55,7 @@ td.n.top{color:var(--accent);font-weight:700}
 td.pr{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;font-size:12px}
 td.pr small{display:block;font-family:var(--f-body);font-size:11px;color:var(--muted)}
 td.ps{font-size:12px;line-height:1.3;min-width:120px}
-td.ps em{font-style:normal;font-family:var(--f-mono);color:var(--accent)}
+td.ps em{font-style:normal;font-family:var(--f-mono);color:var(--fg)}
 td.ps .neg em{color:var(--neg)}
 td.ps .none,.none{color:var(--muted)}
 td.lc{font-size:12.5px;line-height:1.3;min-width:80px}
@@ -86,7 +86,7 @@ td.lc{font-size:12.5px;line-height:1.3;min-width:80px}
 .st small.up{color:var(--accent)}
 .st small.dn{color:var(--neg)}
 .pas{margin:0;padding-left:18px;font-size:14.5px}
-.pas em{font-style:normal;font-family:var(--f-mono);color:var(--accent)}
+.pas em{font-style:normal;font-family:var(--f-mono);color:var(--fg)}
 .pas .neg em{color:var(--neg)}
 table.upg{width:100%;border-collapse:collapse;font-size:13.5px}
 table.upg th{font:600 11px var(--f-body);color:var(--muted);text-align:left;padding:5px 10px 5px 0;border-bottom:1px solid var(--line);white-space:nowrap}

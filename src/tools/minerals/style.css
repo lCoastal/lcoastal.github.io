@@ -48,7 +48,7 @@ input.search{flex:1;min-width:180px}
 .val{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .val small{display:block;font-family:var(--f-body);font-size:11px;color:var(--muted)}
 .clip{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:13.5px}
-.clip em{font-style:normal;font-family:var(--f-mono);color:var(--accent)}
+.clip em{font-style:normal;font-family:var(--f-mono);color:var(--fg)}
 .clip .neg em{color:var(--neg)}
 .clip small{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
 .openbtn{font:600 12.5px var(--f-body);padding:5px 12px;border-radius:7px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;justify-self:end}
@@ -81,7 +81,7 @@ input.search{flex:1;min-width:180px}
 .psec{display:flex;flex-direction:column;gap:8px}
 .psec h3{margin:0;font:600 12px var(--f-body);color:var(--muted)}
 .mus2{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14.5px}
-.mus2 em{font-style:normal;font-family:var(--f-mono);color:var(--accent)}
+.mus2 em{font-style:normal;font-family:var(--f-mono);color:var(--fg)}
 .mus2 .neg em{color:var(--neg)}
 .mus2 .kg{color:var(--muted)}
 .tw{overflow-x:auto}

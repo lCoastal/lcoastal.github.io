@@ -37,7 +37,7 @@ td.n{vertical-align:middle}
 td.w,th.w{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
 .b{display:flex;flex-wrap:wrap;gap:4px 10px}
 .b span{white-space:nowrap}
-.b em{font-style:normal;font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--accent)}
+.b em{font-style:normal;font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--fg)}
 .b .neg em{color:var(--neg)}
 .top td.n::after{content:"most";margin-left:8px;font:600 10px var(--f-body);color:var(--bg);background:var(--rc);padding:1px 6px;border-radius:4px;vertical-align:2px}
 .empty{color:var(--muted);font-size:14px;padding:4px 0}
