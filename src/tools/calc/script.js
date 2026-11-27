@@ -1049,8 +1049,9 @@ document.addEventListener("change",e=>{const t=e.target;if(!t.dataset||!t.datase
 window.ptFindBuild=(c,sf,onProg)=>bfEngine(c,sf,onProg);
 window.ptConsumables=()=>CONS.map(c=>({n:c.n,fx:c.fx}));
 // the saved build card for any build (Build Maker shows it on the page)
-window.ptBuildImage=async(st,title)=>{const keep={bname:S.bname,isoOff:S.isoOff,only:S.only,brkLevel:S.brkLevel,brkHide:S.brkHide};
-  Object.assign(S,{bname:title||"",isoOff:[],only:null,brkLevel:0,brkHide:[]});try{return await buildImage(st,compute(st))}finally{Object.assign(S,keep)}};
+window.ptImgStats=()=>SHOW.slice();
+window.ptBuildImage=async(st,title,o)=>{const keep={bname:S.bname,isoOff:S.isoOff,only:S.only,brkLevel:S.brkLevel,brkHide:S.brkHide};
+  Object.assign(S,{bname:title||"",isoOff:[],only:null,brkLevel:0,brkHide:(o&&o.hide)||[]});try{return await buildImage(st,compute(st))}finally{Object.assign(S,keep)}};
 window.ptBuildTextOf=st=>{const keep=S;S=Object.assign(clone(keep),st);window.S=S;try{return buildSheetText()}finally{S=keep;window.S=keep}};
 window.ptUseBuild=(st,museum)=>{Object.assign(S,{pan:st.pan,panEn:st.panEn,shovel:st.shovel,shEn:st.shEn,trinket:st.trinket,slots:clone(st.slots)});if(museum){S.mus="custom";S.museumBoard=clone(st.museumBoard)}if(st.b&&"night" in st.b)S.b.night=st.b.night;if(st.rhy===false)S.rhy=false;save();all()};
 // a build's gear with your own boosts (for comparing builds fairly)

@@ -96,11 +96,15 @@ async function showRes(){const L=LAST;if(!L){$("resCard").hidden=true;return}$("
     ${buildHTML(R.st,cw,{skip:true})}
     ${rest.length?`<details class="own"><summary><b>Every other stat</b></summary><div class="sum">${rest.map(tile).join("")}</div></details>`:""}
     ${cw.ptWhyHTML?cw.ptWhyHTML(R):""}
-    <div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="saveImg">Save as image</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
+    ${imgStatsHTML(cw)}<div class="acts" style="margin-top:12px"><button type="button" class="btn pri" id="toSheet">Save as build sheet</button><button type="button" class="btn" id="saveImg">Save as image</button><button type="button" class="btn" id="share">Share link</button><button type="button" class="btn" id="use">Use in Stat Calculator</button><button type="button" class="btn" id="csv">Download as spreadsheet</button></div>`}
+// which stats the saved image shows (tap to hide or show)
+function imgStatsHTML(cw){if(!cw.ptImgStats)return "";const hide=S.imgHide||[];
+  return `<div class="imgst"><span class="lab">Stats in the image</span><div class="chips" id="imgSt" role="group" aria-label="Stats in the image">${cw.ptImgStats().map(s=>`<button type="button" class="chip pt-k" style="--kc:${statVar(s)}" data-ist="${s}" aria-pressed="${!hide.includes(s)}">${s}</button>`).join("")}</div></div>`}
 const consTxt=L=>L.cons==="pick"?(L.picked.length?L.picked.join(", "):"none ticked"):(CONSOPT.find(x=>x[0]===L.cons)||[,""])[1];
 const wTxt=()=>LAST.W.map(([s,w])=>`${s} ${w.toFixed(1)}`).join(", ")+(LAST.tap==="must"?", one tap only":LAST.tap==="prefer"?", one tap preferred":"");
 function sheetText(){return LAST.cw.ptBuildTextOf(LAST.R.st).replace(/^(Title:[^\n]*\n)/,`$1Subtitle: Build Maker: ${wTxt()}\n`)}
 document.addEventListener("click",async e=>{if(!LAST)return;
+  const ist=e.target.closest("[data-ist]");if(ist){const k=ist.dataset.ist,h=new Set(S.imgHide||[]);h.has(k)?h.delete(k):h.add(k);S.imgHide=[...h];save();ist.setAttribute("aria-pressed",String(!h.has(k)));return}
   if(e.target.closest("#toSheet")){try{window.parent.ptCallTool("builds","ptAddBuildText",sheetText());ptToast("Saved to Build Sheets")}catch(err){ptToast("Couldn't reach Build Sheets")}return}
   if(e.target.closest("#share")){const url=await ptCopyShare(sheetText());ptToast(url?"Share link copied":"Couldn't copy, your browser blocked it");return}
   if(e.target.closest("#csv")){const L=LAST;const head=[["Goal","Build Maker"],["Weights",wTxt()],["Consumables",consTxt(L)],["Events",[L.ev.meteor&&"Meteor Shower 2×",L.ev.weather&&"Weather 1.5×"].filter(Boolean).join(", ")||"none"],[]];
@@ -110,7 +114,7 @@ document.addEventListener("click",async e=>{if(!LAST)return;
     if(L.R.museum){head.push([],["Museum","Mineral","Modifier"]);L.cw.ptMusRows().forEach(([r])=>((st.museumBoard||{})[r]||[]).forEach((x,i)=>{if(x&&x.m)head.push([`${r} ${i+1}`,x.m,x.u||""])}))}
     if(L.R.assume){head.push([],["Assumes"]);L.R.assume.forEach(a=>head.push([a]))}
     if(await ptDownloadCSV("Build Maker",head))ptToast("Download started");return}
-  if(e.target.closest("#saveImg")){const L=LAST;if(!L.cw.ptBuildImage){ptToast("Couldn't draw the image");return}ptSaveImg("Build Maker build",()=>L.cw.ptBuildImage(L.R.st,"Build Maker build"));return}
+  if(e.target.closest("#saveImg")){const L=LAST;if(!L.cw.ptBuildImage){ptToast("Couldn't draw the image");return}ptSaveImg("Build Maker build",()=>L.cw.ptBuildImage(L.R.st,"Build Maker build",{hide:S.imgHide||[]}));return}
   if(e.target.closest("#use")){LAST.cw.ptUseBuild(LAST.R.st,LAST.R.museum);ptToast("Loaded into the Stat Calculator")}});
 drawW();drawForm();
 (async()=>{try{const cw=await window.parent.ptCalcWin();if(cw&&cw.ptWhyCSS)document.head.insertAdjacentHTML("beforeend",`<style>${cw.ptWhyCSS}</style>`)}catch(e){}})();
