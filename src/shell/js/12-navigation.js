@@ -18,23 +18,21 @@ function show(id) {
   Object.entries(frames).forEach(([k, fr]) => (fr.hidden = k !== id));
   document.getElementById("skel").hidden = !!f.dataset.ok;
   const hub = hubOf(id);
-  document.getElementById("curName").textContent = hub ? hub[1] : LIST.find((x) => x.id === id).name;
-  const navId = hub ? hub[0] : id;
-  document.querySelectorAll(".nav[id^='nav-']").forEach((n) => {
-    if (n.id === "nav-" + navId) n.setAttribute("aria-current", "page");
-    else n.removeAttribute("aria-current");
-  });
+  const curSub = (tid) => {
+    const h = hubOf(tid);
+    const e = h && h[3].find((x) => x[0] === tid && x[2]);
+    return e ? HUBSUB[tid] || e[2] : "";
+  };
+  const ent = GROUPS.flatMap((g) => g[4]).find((x) => x[0] === id && (!x[2] || x[2] === curSub(id)));
+  document.getElementById("curName").textContent = ent ? entryName(ent) : LIST.find((x) => x.id === id).name;
+  ptMarkNav(id, curSub(id));
   const gb = document.getElementById("gBtn");
   if (gb) gb.toggleAttribute("aria-current", id === "settings");
   if (gb && id === "settings") gb.setAttribute("aria-current", "page");
   // the tab strip for grouped tools
   const hb = document.getElementById("hubbar");
   if (hub) {
-    HUBLAST[hub[0]] = id;
-    try {
-      localStorage.setItem("pt-hubtab", JSON.stringify(HUBLAST));
-    } catch (e) {}
-    const col = (SECTIONS.find((sx) => sx[2].some((x) => x[0] === hub[0])) || [])[1] || "";
+    const col = (GROUPS.find((g) => g[0] === hub[0]) || [])[2] || "";
     hb.style.setProperty("--hc", col);
     hb.innerHTML = hub[3]
       .map(
@@ -65,8 +63,18 @@ function show(id) {
 }
 // some tabs open one part of a page (e.g. Potions and Totems are two parts of one page)
 let HUBSUB = {};
+// marks the current tool in the menu
+function ptMarkNav(id, sub) {
+  document.querySelectorAll(".nav[data-tool]").forEach((n) => {
+    if (n.dataset.tool === id && (!n.dataset.sub || n.dataset.sub === sub)) n.setAttribute("aria-current", "page");
+    else n.removeAttribute("aria-current");
+  });
+}
 window.ptSubChanged = (tid, sub) => {
   HUBSUB[tid] = sub;
+  ptMarkNav(tid, sub);
+  const ent = GROUPS.flatMap((g) => g[4]).find((x) => x[0] === tid && x[2] === sub);
+  if (ent && frames[tid] && !frames[tid].hidden) document.getElementById("curName").textContent = entryName(ent);
   document
     .querySelectorAll(`#hubbar [data-hub="${tid}"][data-sub]`)
     .forEach((b) => b.setAttribute("aria-selected", String(b.dataset.sub === sub)));

@@ -1,58 +1,4 @@
-// menu groups: [title, colour, [tool or hub id, game image (m: mineral, e: equipment, g: gear)]...]
-const SECTIONS = [
-  ["Start", "#94a3b8", [["home", "m:Gold"]]],
-  [
-    "Builds",
-    "#14b8a6",
-    [
-      ["h-build", "e:Guardian Pendant.png"],
-      ["calc", "e:Prismatic Star.png"],
-      ["rpm", "e:Speed Coil.png"],
-      ["builds", "e:Celestial Rings.png"],
-      ["buildcmp", "m:Gold"],
-    ],
-  ],
-  [
-    "Panning",
-    "#f59e0b",
-    [
-      ["h-luck", "m:Gold"],
-      ["h-weights", "m:Amethyst"],
-    ],
-  ],
-  ["Museum", "#a78bfa", [["h-museum", "m:Key of Life"]]],
-  [
-    "Gear & boosts",
-    "#60a5fa",
-    [
-      ["h-equip", "e:ringofchampions.png"],
-      ["h-gear", "g:MeteoricPan.png"],
-      ["h-muts", "m:Opal"],
-      ["h-boosts", "m:Aetherium"],
-      ["h-craft", "e:Gold Ring.png"],
-    ],
-  ],
-  [
-    "World",
-    "#4ade80",
-    [
-      ["minerals", "m:Amethyst"],
-      ["locations", "m:Azuralite"],
-      ["h-quests", "e:MeteorCore.png"],
-      ["events", "m:Starshine"],
-      ["codes", "m:Radiant Gold"],
-    ],
-  ],
-  ["Research", "#f472b6", [["h-research", "m:Aetherite"]]],
-  [
-    "More",
-    "#94a3b8",
-    [
-      ["tierlist", "m:Opal"],
-      ["settings", ""],
-    ],
-  ],
-];
+// the menu: every tool, grouped (groups are in 07-hubs.js)
 const navImg = (src) => {
   const D = window.PTDATA || {};
   const [k, n] = [src.slice(0, 1), src.slice(2)];
@@ -98,22 +44,24 @@ const navImg = (src) => {
     ptOpenWho(it);
   });
 }
-SECTIONS.forEach(([title, col, items]) => {
+GROUPS.forEach(([gid, title, col, tabs, items]) => {
   const g = document.createElement("div");
   g.className = "dgrp";
   g.style.setProperty("--gc", "var(--muted)");
   g.innerHTML = `<div class="dsec">${title}</div>`;
-  items.forEach(([id, ic]) => {
-    const h = HUBS.find((x) => x[0] === id);
-    const t = h ? { id, name: h[1], desc: h[2] } : LIST.find((x) => x.id === id);
-    if (!t) return;
+  items.forEach((x) => {
+    const [id, , sub] = x;
+    if (!LIST.some((t) => t.id === id)) return;
     const b = document.createElement("button");
     b.type = "button";
     b.className = "nav";
-    b.id = "nav-" + t.id;
-    b.innerHTML = `<span class="ntx"><b>${t.name}</b><span>${t.desc}</span></span>`;
+    b.id = "nav-" + id + (sub ? "-" + sub : "");
+    b.dataset.tool = id;
+    if (sub) b.dataset.sub = sub;
+    b.innerHTML = `<span class="ntx"><b>${entryName(x)}</b><span>${entryDesc(x)}</span></span>`;
     b.onclick = () => {
-      show(h ? (HUBLAST[h[0]] && h[3].some((x) => x[0] === HUBLAST[h[0]]) ? HUBLAST[h[0]] : h[3][0][0]) : t.id);
+      if (sub) openHubTab(id, sub);
+      else show(id);
       closeMenu();
     };
     g.appendChild(b);

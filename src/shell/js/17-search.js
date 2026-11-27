@@ -84,10 +84,8 @@ const X2 = D.x2 || {};
 );
 (X2.events || []).forEach((e) => add(e.n, "Event", e.cat || "Event", "", () => show("events")));
 LIST.forEach((t) => add(t.name, "Tool", t.desc, "", () => show(t.id)));
-HUBS.filter((h) => !LIST.some((t) => t.name === h[1])).forEach((h) =>
-  add(h[1], "Tool", h[2], "", () =>
-    show(HUBLAST[h[0]] && h[3].some((x) => x[0] === HUBLAST[h[0]]) ? HUBLAST[h[0]] : h[3][0][0]),
-  ),
+GROUPS.forEach((g) =>
+  g[4].filter((x) => x[2]).forEach((x) => add(entryName(x), "Tool", entryDesc(x), "", () => openHubTab(x[0], x[2]))),
 );
 const ESC = (s) =>
   String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);

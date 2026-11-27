@@ -1,29 +1,41 @@
-// tools that cover the same ground are grouped into one menu entry with tabs: [hub id, name, menu text, [tool id, tab label]...]
-const HUBS = [
+// menu groups: [group id, title, colour, tabs?, [tool id, tab label, sub page, menu name, menu text]...]
+// every tool is listed straight in the menu; groups with tabs show the same tools as a tab strip
+const GROUPS = [
+  ["g-start", "Start", "#94a3b8", false, [["home", "Home"]]],
   [
-    "h-build",
-    "Build Maker",
-    "Make a whole build: gear, pan, shovel, enchants and museum, for a goal or for how much each stat matters to you",
+    "g-build",
+    "Builds",
+    "#14b8a6",
+    true,
     [
-      ["bestbuild", "For a goal"],
-      ["buildmaker", "By stat priorities"],
+      ["bestbuild", "For a Goal"],
+      ["buildmaker", "By Stat Priorities"],
+      ["calc", "Stat Calculator"],
+      ["rpm", "Rolls per Minute"],
+      ["builds", "Build Sheets"],
+      ["buildcmp", "Compare Builds"],
     ],
   ],
   [
-    "h-research",
-    "Research",
-    "How the game works, the formulas, the tests behind them and a checker for your own data",
+    "g-odds",
+    "Odds & weights",
+    "#f59e0b",
+    true,
     [
-      ["mechanics", "How It Works"],
-      ["formulas", "Formulas"],
-      ["testlog", "Test Log"],
-      ["testdata", "Test Data Check"],
+      ["odds", "Luck Odds"],
+      ["bestcap", "Best Luck Cap"],
+      ["mododds", "Modifier Odds"],
+      ["minmuts", "Modifier Values"],
+      ["weightrange", "Weight Range"],
+      ["sizefinder", "Size Boost Finder"],
+      ["pansize", "Pan Size"],
     ],
   ],
   [
-    "h-museum",
+    "g-museum",
     "Museum",
-    "Plan, look up boosts, find the best setup and farm it",
+    "#a78bfa",
+    true,
     [
       ["planner", "Planner"],
       ["boosts", "Boosts"],
@@ -33,91 +45,87 @@ const HUBS = [
     ],
   ],
   [
-    "h-luck",
-    "Luck & Modifiers",
-    "What you find in a pan: drop odds, the best luck cap, modifier odds and what each modifier is worth",
-    [
-      ["odds", "Luck Odds"],
-      ["bestcap", "Best Luck Cap"],
-      ["mododds", "Modifier Odds"],
-      ["minmuts", "Modifier Values"],
-    ],
-  ],
-  [
-    "h-weights",
-    "Weights & Pan Size",
-    "How heavy minerals get, the Size Boost you need and how many fit in a pan",
-    [
-      ["weightrange", "Weight Range"],
-      ["sizefinder", "Size Boost Finder"],
-      ["pansize", "Pan Size"],
-    ],
-  ],
-  [
-    "h-muts",
-    "Gear Mutations & Enchants",
-    "Gear mutations, pan enchants and shovel enchants",
-    [
-      ["mutations", "Gear mutations", "mut"],
-      ["mutations", "Pan enchants", "pan"],
-      ["mutations", "Shovel enchants", "sh"],
-    ],
-  ],
-  [
-    "h-equip",
-    "Equipment",
-    "Every ring, necklace and charm, side-by-side compare and your loadouts",
-    [
-      ["equipment", "All equipment"],
-      ["eqcompare", "Equipment Compare"],
-      ["eqload", "Loadouts"],
-    ],
-  ],
-  [
-    "h-gear",
-    "Pans, Shovels & Sluices",
-    "Gear stats and the sluice upgrade planner",
-    [
-      ["pans", "Pans"],
-      ["shovels", "Shovels"],
-      ["sluices", "Sluices"],
-      ["sluiceplan", "Sluice upgrades"],
-    ],
-  ],
-  [
-    "h-boosts",
-    "Runes, Potions, Totems & Trinkets",
-    "Rune loadouts, potions, totems and trinkets",
-    [
-      ["runes", "Runes"],
-      ["items", "Potions", "pot"],
-      ["items", "Totems", "tot"],
-      ["items", "Trinkets", "trn"],
-    ],
-  ],
-  [
-    "h-quests",
-    "Quests & NPCs",
-    "Quest tracker, Dredge Master planner and NPCs",
-    [
-      ["quests", "Quests"],
-      ["dredge", "Dredge Master"],
-      ["npcs", "NPCs"],
-    ],
-  ],
-  [
-    "h-craft",
+    "g-craft",
     "Crafting",
-    "What to farm for what you want to craft, the ore weights for 5 stars, and reforge odds",
+    "#fb923c",
+    true,
     [
       ["checklist", "Crafting Checklist"],
       ["craftquality", "5-Star Crafter"],
       ["reforge", "Reforge Odds"],
     ],
   ],
+  [
+    "g-gear",
+    "Gear",
+    "#60a5fa",
+    true,
+    [
+      ["equipment", "Equipment"],
+      ["eqcompare", "Equipment Compare"],
+      ["eqload", "Loadouts"],
+      ["pans", "Pans"],
+      ["shovels", "Shovels"],
+      ["sluices", "Sluices"],
+      ["sluiceplan", "Sluice Upgrades"],
+    ],
+  ],
+  [
+    "g-boosts",
+    "Mutations & boosts",
+    "#c084fc",
+    true,
+    [
+      ["mutations", "Gear Mutations", "mut", "Gear Mutations", "Every equipment mutation and its multiplier"],
+      ["mutations", "Pan Enchants", "pan", "Pan Enchants", "Every pan enchant and what it does"],
+      ["mutations", "Shovel Enchants", "sh", "Shovel Enchants", "Every shovel enchant and what it does"],
+      ["runes", "Runes"],
+      ["items", "Potions", "pot", "Potions", "Every potion, its effect, duration and where to get it"],
+      ["items", "Totems", "tot", "Totems", "Every totem, its effect and where to get it"],
+      ["items", "Trinkets", "trn", "Trinkets", "Every trinket and what it does"],
+    ],
+  ],
+  [
+    "g-world",
+    "World",
+    "#4ade80",
+    true,
+    [
+      ["minerals", "Minerals"],
+      ["locations", "Locations"],
+      ["quests", "Quests"],
+      ["dredge", "Dredge Master"],
+      ["npcs", "NPCs"],
+      ["events", "Event Clock"],
+      ["codes", "Codes"],
+    ],
+  ],
+  [
+    "g-research",
+    "Research",
+    "#f472b6",
+    true,
+    [
+      ["mechanics", "How It Works"],
+      ["formulas", "Formulas"],
+      ["testlog", "Test Log"],
+      ["testdata", "Test Data Check"],
+    ],
+  ],
+  [
+    "g-more",
+    "More",
+    "#94a3b8",
+    false,
+    [
+      ["tierlist", "Tier List"],
+      ["settings", "Settings"],
+    ],
+  ],
 ];
+// groups with tabs, in the shape the tab strip uses: [id, title, text, [[tool, tab label, sub]...]]
+const HUBS = GROUPS.filter((g) => g[3]).map((g) => [g[0], g[1], "", g[4].map((x) => [x[0], x[1], x[2]])]);
 const hubOf = (id) => HUBS.find((h) => h[3].some((t) => t[0] === id));
-let HUBLAST = {};
-try {
-  HUBLAST = JSON.parse(localStorage.getItem("pt-hubtab") || "{}") || {};
-} catch (e) {}
+// what the menu, the top bar and search call each entry
+const entryName = (x) => x[3] || (LIST.find((t) => t.id === x[0]) || {}).name || x[1];
+const entryDesc = (x) => x[4] || (LIST.find((t) => t.id === x[0]) || {}).desc || "";
