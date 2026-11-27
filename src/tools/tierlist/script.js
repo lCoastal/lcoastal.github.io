@@ -13,7 +13,7 @@ const L=()=>S[S.k]||(S[S.k]={t:"",rows:{}});
 const T=(l=L())=>l.tiers&&l.tiers.length?l.tiers:(l.tiers=DEF.map(([t,c])=>({id:t,label:t,c})));
 const byN=()=>Object.fromEntries(POOLS[S.k].map(x=>[x.n,x]));
 const nid=()=>"r"+Date.now().toString(36)+Math.floor(Math.random()*1e4);
-let SELS=[],MULTI=false,EDIT=null,lpFired=false,lpT=null;
+let SHOWN=[],SELS=[],MULTI=false,EDIT=null,lpFired=false,lpT=null;
 const toggleSel=n=>{const i=SELS.indexOf(n);if(i>=0){SELS.splice(i,1);if(!SELS.length)MULTI=false}else SELS.push(n)};
 const itemHTML=x=>`<button type="button" class="it${SELS.includes(x.n)?" sel":""}" draggable="true" data-n="${esc(x.n)}" style="--rc:${rcol(x.r)}" title="${esc(x.n)}${x.r?` (${esc(x.r)})`:""}" aria-label="${esc(x.n)}${x.r?", "+esc(x.r):""}${SELS.includes(x.n)?", selected":""}"><img src="${x.ic}" alt=""><span><i>${esc(x.n)}</i></span></button>`;
 function render(){const l=L(),N=byN(),tiers=T(l);
@@ -33,6 +33,8 @@ function render(){const l=L(),N=byN(),tiers=T(l);
   const q=$("q").value.trim().toLowerCase();
   const left=POOLS[S.k].filter(x=>!seen.has(x.n)).sort((a,b)=>ORDR.indexOf(a.r)-ORDR.indexOf(b.r)||a.n.localeCompare(b.n));
   const shown=left.filter(x=>(!tf||x.slot===tf)&&(!rf.length||rf.includes(x.r))&&(!q||x.n.toLowerCase().includes(q)));
+  SHOWN=shown.map(x=>x.n);const allSel=SHOWN.length>0&&SHOWN.every(n=>SELS.includes(n));
+  $("selAll").textContent=allSel?"Clear selection":SHOWN.length&&SHOWN.length<left.length?`Select all ${SHOWN.length} shown`:"Select all";$("selAll").disabled=!SHOWN.length&&!SELS.length;
   $("pool").innerHTML=shown.map(itemHTML).join("")||`<span class="hint2">${left.length?"Nothing matches.":"Everything is ranked."}</span>`;
   $("pcnt").textContent=`${left.length} left`;
   $("selHint").textContent=MULTI?`${SELS.length} selected. Tap a row to move them together, tap an item to add or remove, or tap the pool to unrank them.`:(SELS.length===1?`Picked up ${SELS[0]}. Tap a row to drop it, or tap the pool to unrank it.`:"Tip: tap an item to pick it up, then tap a row to drop it. Hold Ctrl and click, or press and hold on a phone, to pick several at once.")}
@@ -51,6 +53,9 @@ const dropGroup=row=>{const names=SELS.slice();SELS=[];MULTI=false;moveMany(name
 document.addEventListener("click",e=>{
   if(lpFired){lpFired=false;return}// swallow the click that follows a long-press
   const k=e.target.closest("[data-k]");if(k){S.k=k.dataset.k;SELS=[];MULTI=false;EDIT=null;save();render();return}
+  // select every item the pool is showing (after the filters), or clear the selection
+  if(e.target.closest("#selAll")){const allSel=SHOWN.length>0&&SHOWN.every(n=>SELS.includes(n));
+    if(allSel){SELS=[];MULTI=false}else{SHOWN.forEach(n=>{if(!SELS.includes(n))SELS.push(n)});MULTI=SELS.length>0}render();return}
   const itM=e.target.closest(".it");
   // ctrl/cmd + click starts (or extends) a multi-selection
   if((e.ctrlKey||e.metaKey)&&itM){MULTI=true;toggleSel(itM.dataset.n);render();return}

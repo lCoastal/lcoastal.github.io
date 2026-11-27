@@ -45,3 +45,4 @@
 .bar .seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg);font-weight:600}
 .bar input[type=text]{height:36px;box-sizing:border-box}
 .bar .btn{height:36px;box-sizing:border-box}
+.pqr{display:flex;gap:8px;align-items:center;flex:1 1 320px;min-width:0}.pqr .btn{flex:none;white-space:nowrap}
