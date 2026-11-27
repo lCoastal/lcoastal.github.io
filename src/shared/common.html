@@ -199,7 +199,7 @@ async function ptTableImage(o){const F='"IBM Plex Sans","Segoe UI",system-ui,san
         c.fillStyle="#e6e9ec";c.fillText(b.t,W-PAD-10-c.measureText(b.t).width,y+19);y+=28});y+=6}
     if(CHN.length){c.fillStyle="#98a2ad";c.font=`13px ${F}`;CHN.forEach(l=>{c.fillText(l,PAD,y+14);y+=19});y+=8}
     y+=16}
-  if(o.note){const et=o.note;c.font=`600 13px ${F}`;const ew=Math.min(W-PAD*2,c.measureText(et).width+30),ex=PAD,ey=y;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(fit(et,ew-30),ex+22,ey+18.5)}
+  if(o.note){const et=o.note;c.font=`600 13px ${F}`;const ew=Math.min(W-PAD*2,c.measureText(et).width+28),ex=PAD,ey=y;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.fillText(fit(et,ew-28),ex+14,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 function ptToast(t){const d=document.createElement("div");d.className="ptoast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 // items in one full pan, measured: ≈20 at 400 capacity, ≈44 at 1,600, ≈87 at 5,462 (plain √capacity undercounts big pans)

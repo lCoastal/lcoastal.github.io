@@ -111,7 +111,7 @@ async function modImage(){const {mb,effAny,effWhich,q,sh,n}=calcAll();
     vals.forEach((v,i)=>{let x=cx(i+1);c.font=`14px ${FM}`;
       if(i===0){const t=trend(r.k);if(t){c.font=`12px ${F}`;c.fillStyle=t==="up"?"#3cc2a8":t==="dn"?"#ef7a66":"#98a2ad";const g=t==="up"?"▲":t==="dn"?"▼":"–";c.fillText(g,x-c.measureText(g).width,mid+4);x-=c.measureText(g).width+6;c.font=`14px ${FM}`}}
       c.fillStyle=i===0&&r.s>BASE[r.k]*1.05?"#3cc2a8":"#e6e9ec";c.fillText(v,x-c.measureText(v).width,mid+5)})});
-  y+=rows.length*RH+28;{const et="Estimates from a fitted model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
+  y+=rows.length*RH+28;{const et="Estimates from a fitted model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+28,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.fillText(et,ex+14,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptModImage=modImage;
 $("toImg").onclick=async()=>{let blob=null;try{blob=await modImage()}catch(e){console.error(e)}if(!blob){toast("Couldn't draw the image");return}

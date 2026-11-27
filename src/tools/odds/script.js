@@ -139,7 +139,7 @@ async function oddsImage(){const L=Math.max(1,effLuck()),pp=perPan(),pph=+S.pph>
     const vals=[cell(r.s.base),cell(r.s.eff),cell(r.p)];if(pph)vals.push([isFinite(r.pans)?hrs(r.pans):"-",""]);
     vals.forEach((v,i)=>{const x=cx(i+1);c.font=`14px ${FM}`;c.fillStyle=i===1&&r.s.eff>r.s.base?"#3cc2a8":"#e6e9ec";c.fillText(v[0],x-c.measureText(v[0]).width,v[1]?mid-3:mid+5);
       if(v[1]){c.font=`11.5px ${F}`;c.fillStyle="#98a2ad";c.fillText(v[1],x-c.measureText(v[1]).width,mid+14)}})});
-  y+=Math.max(1,rows.length)*RH+28;{const et="Estimates from a fitted luck model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+30,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.beginPath();c.arc(ex+13,ey+14,3,0,Math.PI*2);c.fill();c.fillText(et,ex+22,ey+18.5)}
+  y+=Math.max(1,rows.length)*RH+28;{const et="Estimates from a fitted luck model: enchants, events and weather aren't counted, so actual odds can differ.";c.font=`600 13px ${F}`;const ew=c.measureText(et).width+28,ex=PAD,ey=y-10;c.fillStyle="rgba(239,122,102,.14)";rr(ex,ey,ew,28,14);c.fill();c.strokeStyle="rgba(239,122,102,.65)";c.lineWidth=1;rr(ex,ey,ew,28,14);c.stroke();c.fillStyle="#ef7a66";c.fillText(et,ex+14,ey+18.5)}
   return await new Promise(res=>cv.toBlob(res,"image/png"))}
 window.ptOddsImage=oddsImage;
 $("toImg").onclick=async()=>{let blob=null;try{blob=await oddsImage()}catch(e){console.error(e)}if(!blob){toast("Couldn't draw the image");return}
