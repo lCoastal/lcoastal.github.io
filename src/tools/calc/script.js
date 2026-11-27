@@ -638,7 +638,7 @@ async function buildImage(st,r){
   if(boosts.length)y+=bRows.length*32+28;
   if(stats.length&&!DET){sec("Stats",y);y+=SECH;const sw=(IW-12*(SC-1))/SC;
     stats.forEach((k,i)=>{const x=PAD+(i%SC)*(sw+12),yy=y+Math.floor(i/SC)*(STH+12),col=statHex(k);card(x,yy,sw,STH);
-      c.fillStyle=col;c.beginPath();c.arc(x+22,yy+26,4,0,Math.PI*2);c.fill();c.font=`600 13px ${F}`;c.fillStyle=MU;c.fillText(fit(k,sw-50),x+34,yy+30.5);
+      c.font=`600 13px ${F}`;c.fillStyle=MU;c.fillText(fit(k,sw-36),x+18,yy+30.5);
       c.font=`600 28px ${FM}`;c.fillStyle=col;c.fillText(fit(fv(k,r.tot[k]||0),sw-40),x+18,yy+66);
       const flat=["Toughness","Inventory Size"].includes(k);c.font=`12px ${F}`;c.fillStyle=MU;if(LV===1)c.fillText(fit(flat?"from gear":`${fv(k,(r.base[k]||0)+(r.flat[k]||0))} × ${fmt(1+(r.pile[k]||0),2)}${k==="Luck"&&(r.ev||1)*(r.luckMult||1)!==1?` × ${fmt((r.ev||1)*(r.luckMult||1),2)}`:""}`,sw-36),x+18,yy+86)})}
   if(DET&&DET.length){sec("Stats",y);y+=SECH;const tv=(s2,v)=>PCT.has(s2)?fmt(v,1)+"%":fmt(v,s2==="Luck"||s2==="Capacity"?0:1);
