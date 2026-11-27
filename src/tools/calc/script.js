@@ -534,7 +534,7 @@ async function buildImage(st,r){
   const top2=[gOf("neck","Necklace"),gOf("charm","Charm")],rings=SLOTDEF.filter(d=>d[2]==="Ring").map(([k,l])=>gOf(k,l)).filter(g=>!g.empty);
   const gear=[...top2.filter(g=>!g.empty),...rings];
   const MODCOL={Perfect:"#5ef1e1",Treasured:"#ffd849",Entombed:"#40c8be",Lunar:"#ffe99b",Voidtorn:"#a35bff",Mutated:"#a07bff",Cosmic:"#ff5f9e",Electrified:"#ffeb0b",Iridescent:"#f36bff",Irradiated:"#67ff20",Crystalline:"#b7e6ff",Scorching:"#ff861c",Glowing:"#fff292",Pure:"#ffffff",Shiny:"#d4e7ff"};
-  const MROWS=board?MORDER.map(r=>({r,slots:Array.from({length:MSLOTS[r]},(_,i)=>{const sl=(board[r]||[])[i]||{};const mm=sl.m&&sl.m!=="Any"?MIN[String(sl.m).toLowerCase()]:null;return {m:sl.m||null,any:sl.m==="Any",ic:mm&&mm.ic,u:sl.u||"None"}})})):[];
+  const MROWS=board?MORDER.map(r=>({r,slots:Array.from({length:MSLOTS[r]},(_,i)=>{const sl=(board[r]||[])[i]||{};const mm=sl.m&&sl.m!=="Any"?MIN[String(sl.m).toLowerCase()]:null;return {m:sl.m||null,any:sl.m==="Any",ic:mm&&mm.ic,u:sl.u||"None",mu:mm&&mm.mu}})})):[];
   const boosts=[];const lab=k=>{if(BLAB[k])return BLAB[k];const e=document.querySelector(`[data-b="${k}"]`);return e?e.parentElement.textContent.trim():k};
   Object.entries(st.b||{}).forEach(([k,v])=>{if(v&&!runeCovers(st,k))boosts.push({t:lab(k),col:TX})});
   (st.pots||[]).forEach(n=>boosts.push({t:n,col:"#b880ee"}));(st.cons||[]).forEach(n=>boosts.push({t:n,col:"#e0a050"}));
@@ -554,11 +554,16 @@ async function buildImage(st,r){
   const shL=sh?[["Dig Strength",fmt(+sh.strength||0,2)],["Dig Speed",fmt((+sh.speed||0)*100,0)+"%"],["Toughness",fmt(+sh.toughness||0,0)],...pasL(sh)]:[];
   const HERO=Math.max(212,122+(Math.max(panL.length,shL.length)-1)*24+(st.trinket?46:24)),SC=4,STH=96,SECH=44,TOPH=104,RC=4,RH=98,MRH=58;
   const statRowsN=Math.ceil(stats.length/SC),ringRowsN=Math.ceil(rings.length/RC),hasTop=top2.some(g=>!g.empty);
+  // museum rows: each mineral's boosts and the weight for the max boost, wrapped under its name
+  const MLW=120,msw3=(IW-MLW-40-12*2)/3,mtw=msw3-40-14;
+  const musLines=q=>{if(!q.mu||q.any)return [];const seg=[...(q.mu.b||[]).map(([k,v])=>({t:`${k} ${v<0?"−":"+"}${fmt(Math.abs(v),2)}×`,col:statHex(k)})),...(q.mu.kg?[{t:`${fmt(q.mu.kg,0)} kg for max`,col:MU}]:[])];
+    m.font=`12.5px ${F}`;const L=[[]];let x=0;seg.forEach(g=>{const w=m.measureText(g.t).width;if(x&&x+w>mtw){L.push([]);x=0}L[L.length-1].push({...g,x});x+=w+m.measureText("   ").width});return L[0].length?L:[]};
+  const MLN=MROWS.map(row=>row.slots.map(musLines)),MRHs=MLN.map(r=>Math.max(MRH,50+Math.max(0,...r.map(l=>l.length))*18+8)),MRT=MRHs.reduce((a,b)=>a+b,0);
   const bRows=boosts.length?chipRows(boosts,IW-36,`13px ${F}`):[];
   const DROW=25,DCW=(IW-GAP)/2;
   const dH=d=>58+30+Math.max(1,d.F.length)*DROW+(d.fo1||!d.M.length?0:30+d.M.length*DROW)+(d.X.length?30+d.X.length*DROW:0)+10;
   let detH=0,dPos=[];if(DET){const col=[0,0];DET.forEach(d=>{const h=dH(d),c2=col[0]<=col[1]?0:1;dPos.push({c:c2,y:col[c2],h});col[c2]+=h+12});detH=Math.max(col[0],col[1])}
-  let H=PAD+(sub.length?88:62)+HERO+GAP+(stats.length?SECH+(DET?detH:statRowsN*(STH+12)):0)+(hasTop?SECH+TOPH+12:0)+(rings.length?SECH+ringRowsN*(RH+12):0)+(MROWS.length?SECH+MROWS.length*MRH+20:0)+(boosts.length?SECH+bRows.length*32+28:0)+PAD-4;
+  let H=PAD+(sub.length?88:62)+HERO+GAP+(stats.length?SECH+(DET?detH:statRowsN*(STH+12)):0)+(hasTop?SECH+TOPH+12:0)+(rings.length?SECH+ringRowsN*(RH+12):0)+(MROWS.length?SECH+MRT+28:0)+(boosts.length?SECH+bRows.length*32+28:0)+PAD-4;
   // ---- images ----
   const srcs=[pan&&G.img[pan.image],sh&&G.img[sh.image],...gear.map(g=>g.ic),...MROWS.flatMap(x=>x.slots.map(q=>q.ic))].filter(Boolean);
   const IMG={};await Promise.all([...new Set(srcs)].map(s=>new Promise(res=>{const i=new Image();i.onload=()=>{IMG[s]=i;res()};i.onerror=()=>res();i.src=s})));
@@ -617,9 +622,9 @@ async function buildImage(st,r){
       const xx=stars(g,x+86,yy+80,13);c.font=`13px ${F}`;c.fillStyle=MU;c.fillText("   ",xx,yy+80);mutTxt(g,xx+c.measureText("   ").width,yy+80,13,x+rw-16-xx-30)});
     y+=ringRowsN*(RH+12)}
   // museum: all 18 slots, by rarity. "ANY" = no mineral bonus, only the modifier counts
-  if(MROWS.length){sec(`Museum (${mt.n} of 18 filled)`,y);y+=SECH;card(PAD,y,IW,MROWS.length*MRH+8);
+  if(MROWS.length){sec(`Museum (${mt.n} of 18 filled)`,y);y+=SECH;card(PAD,y,IW,MRT+8);
     const LW=120,sw3=(IW-LW-40-12*2)/3;
-    MROWS.forEach((row,j)=>{const yy=y+4+j*MRH;if(j){c.strokeStyle=LINE;c.beginPath();c.moveTo(PAD+16,yy+.5);c.lineTo(PAD+IW-16,yy+.5);c.stroke()}
+    let oy=y+4;MROWS.forEach((row,j)=>{const yy=oy;oy+=MRHs[j];if(j){c.strokeStyle=LINE;c.beginPath();c.moveTo(PAD+16,yy+.5);c.lineTo(PAD+IW-16,yy+.5);c.stroke()}
       c.fillStyle=RHX[row.r]||TX;c.font=`700 14px ${F}`;c.fillText(row.r,PAD+20,yy+34);
       row.slots.forEach((q,i)=>{const x=PAD+20+LW+i*(sw3+12),ic=40,iy=yy+9;
         c.fillStyle=(RHX[row.r]||MU)+(q.m?"22":"0d");rr(x,iy,ic,ic,9);c.fill();
@@ -629,8 +634,9 @@ async function buildImage(st,r){
         if(!q.m){c.fillStyle=MU;c.font=`13px ${F}`;c.fillText("Empty",tx,yy+34);return}
         c.fillStyle=q.any?MU:TX;c.font=`600 14px ${F}`;c.fillText(fit(q.any?`Any ${row.r}`:q.m,tw),tx,yy+25);
         const u=q.u,ul=u==="None"?"No modifier":u==="Any"?"Any modifier":String(u).startsWith("Any of: ")?String(u).slice(8).split("/").join(" or "):u;
-        c.fillStyle=MODCOL[u]||MU;c.font=MODCOL[u]?`600 12.5px ${F}`:`12.5px ${F}`;c.fillText(fit(ul+(q.any&&u!=="None"&&u!=="Any"?" (modifier only)":""),tw),tx,yy+44)})});
-    y+=MROWS.length*MRH+20}
+        c.fillStyle=MODCOL[u]||MU;c.font=MODCOL[u]?`600 12.5px ${F}`:`12.5px ${F}`;c.fillText(fit(ul+(q.any&&u!=="None"&&u!=="Any"?" (modifier only)":""),tw),tx,yy+44);
+        c.font=`12.5px ${F}`;MLN[j][i].forEach((ln,li)=>ln.forEach(g=>{c.fillStyle=g.col;c.fillText(g.t,tx+g.x,yy+64+li*18)}))})});
+    y+=MRT+20}
   // boosts
   if(boosts.length){sec("Boosts",y);y+=SECH;card(PAD,y,IW,bRows.length*32+16);
     bRows.forEach((row,j)=>{let xx=PAD+18;row.forEach(ch=>{const yy=y+12+j*32;c.strokeStyle=ch.col+"88";c.lineWidth=1;rr(xx,yy,ch.w,24,12);c.stroke();c.fillStyle=ch.col+"14";rr(xx,yy,ch.w,24,12);c.fill();c.fillStyle=ch.col;c.font=`13px ${F}`;c.fillText(ch.t,xx+11,yy+16.5);xx+=ch.w+8})})}
