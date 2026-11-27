@@ -3,6 +3,18 @@ const $=id=>document.getElementById(id);
 // Each session: when, where, setup, how much was logged, what was tested, what it showed, what changed on the site.
 const TOPICS={lk:"Luck",my:"Rare minerals",cp:"Capacity",md:"Modifiers",wt:"Drop tables",kg:"Weights"};
 const S=[
+{id:"galaxis5-2711",date:"27/11/26",title:"Eruptions in Magma Furnace and Infernal Heart, single minerals 1.1× heavier, and weights up to 11,500 capacity",zone:"28 zones, mostly Lifespring Oasis",topics:["kg","lk","md"],kind:"wt",
+ setup:{Luck:"Caps 1 – 100,000, and 28,000 – 119,000 uncapped",Capacity:"4,904 – 11,513",["Size Boost"]:"8.4×, 8.8×, 14.8× and 33.3×",["Modifier Boost"]:"842%, 1,053% and 1,917%"},
+ amount:{Minerals:2794365,Pans:19818},
+ tested:["Each zone's factor and the heaviest roll in every zone","Volcanic eruptions: which zones, how much heavier, when","Minerals past 15.5: which ones and when","How weights spread from 9,800 to 11,500 capacity, and at Size Boost 33.3×","Luck caps, and uncapped luck","Modifier chance at 842% and 1,053% Modifier Boost"],
+ found:["Every zone's lightest was 0.75 × its factor again, in all 28 zones","Five Volcanic Eruptions, in Magma Furnace and Infernal Heart (before, only Windswept Beach): every mineral exactly 1.5× heavier (lightest 0.75 × 1.5, heaviest 17 × 1.5) and about 1.5× more minerals per pan. The game's text says 2× size; the logs say 1.5× every time. They started on the hour or half hour (00:00, 01:00, 07:00 and 13:30) and ended 15 minutes later",
+  "Minerals past 15.5 come from one mineral at a time: now and then one or a few minerals in a zone come out exactly 1.1× heavier for a while (lightest 0.825, about 20% of them past 15.5, top 17.05), while the rest of the same pans stay between 0.75 and 15.5. Diamond (84,000 logged) and Aetherite (43,000) never went past 15.5; Pyrelith did on 20%. It happened more while luck was capped (14% of mineral-minutes) than uncapped (5%). Cause unknown",
+  "Weights from 9,800 to 11,500 capacity fit the model within about 1.5% (typical, average and top 10%), so the fit holds well past the 9,245 it was checked to. It also holds at Size Boost 33.3×",
+  "Luck caps again behaved like 57% of their number (53–61% in 25 cap and zone pairs, 935,000 capped minerals). Uncapped luck came out at about 0.88× the luck shown in most zones; Enchanted Ruins, Magma Furnace, Sunset Beach, Windswept Beach and Overgrown Grotto came out much lower at high luck (0.3–0.7×), so their drop tables are off at high luck",
+  "1,053% Modifier Boost: 54% unmodified (toolkit 54%). 1,917%: 20% (toolkit 20%). 842%: 55% overall, 62% in the steadiest hours (toolkit 60%). Which modifier you get matched within about 20%",
+  "Minerals per pan can't be checked on this log: pans came every 2–3 seconds and the logger's pan numbers don't line up with real pans (1 to 7× √capacity in one pan)",
+  "3,907 rows were minerals that can't drop where they were logged, almost all the same 21 minerals coming back every third pan in Rotwood Swamp (storage), including every Entombed and Treasured one. 8,862 rows the logger couldn't read. Both left out"],
+ changed:["A Volcanic Eruption is now 1.5× heavier in Weight Range, Mechanics and Formulas (was 2×)","The 15.5 to 17 tail is explained as single minerals coming out 1.1× heavier","Every zone's measured count updated (7.9M minerals)"]},
 {id:"all-2611",date:"26/11/26",title:"Every log at once: pan size, weight, zone factors and modifiers",zone:"29 zones",topics:["kg","mods","pan"],kind:"wt",
  setup:{Luck:"10 – 150,000",Capacity:"5,592 – 9,245",["Modifier Boost"]:"475%, 1,081%, 1,661%, 1,831% and 1,917%"},
  amount:{Minerals:5121071,Pans:47128},
@@ -117,7 +129,8 @@ const OPEN=[
  "Why the modifier rate at the same boost is about 40% in some sessions and 52–57% in others (zone, weather or a totem?).",
  "The Void: fixed table (Voidstone 1 in 91.4M) or rotating pool (1 in 138M)?",
  "Modifier Boost above 16.6× and luck above 267,000 are untested.",
- "How weights spread below 1,856 or above 9,245 capacity, and whether a Volcanic Eruption stacks with the Solar Magnifier.",
+ "How weights spread below 1,856 or above 11,500 capacity, and whether a Volcanic Eruption stacks with the Solar Magnifier.",
+ "What makes a single mineral come out 1.1× heavier for a while, and why the game says an eruption doubles sizes when every logged one was 1.5×.",
  "Why zones change weights (×0.80 to ×1.20), and the factor for zones not logged yet (Meteor Falls is assumed ×1).",
  "How much the Solar Magnifier really changes weights: the toolkit and the official wiki say ×1.5, no log has shown it yet.",
 ];

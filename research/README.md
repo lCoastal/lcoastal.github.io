@@ -32,6 +32,7 @@ GitHub's website takes files up to 25 MB, and a repo file can't be bigger than 1
 | `research/logs/2026-11-20_galaxis.tsv.xz` | repo | 20/11 | GalaxisHub | 652,655 |
 | `research/logs/2026-11-22_galaxis.tsv.xz` | repo | 22/11 to 24/11 | GalaxisHub, 24 zones | 2,567,738 |
 | `research/logs/2026-11-24_galaxis.tsv.xz` | repo | 24/11 to 26/11 | GalaxisHub, 17 zones, the rest of the 22/11 log | 1,201,982; Windswept Beach eruption 05:30; 879 rows with UNKNOWN weight and modifier |
+| `research/logs/2026-11-26_galaxis.tsv.xz` | repo | 26/11 06:17 to 27/11 15:46 | GalaxisHub, 28 zones, luck caps 1 to 100,000, capacity 4,904 to 11,513 | 2,794,365; five eruptions in Magma Furnace and Infernal Heart; 8,862 rows UNKNOWN; repeating storage minerals in Rotwood Swamp |
 
 ## Notes for analysing
 

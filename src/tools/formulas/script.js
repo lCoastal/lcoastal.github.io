@@ -12,7 +12,7 @@ max ≈ 2.5 × √C`,
 ["Weight","Lightest and heaviest weight",
 `Wmin = 0.75 × B × (1 + S) × Z
 Wmax = 17 × B × (1 + S) × Z`,
-"Estimated from the lightest and heaviest rolls in our test logs, not confirmed. Most of the time the heaviest is 15.5 × B × (1 + S) × Z; 17 shows up only in stretches where about a quarter of minerals come out 1.1× heavier. Wmin = lightest weight (kg), Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = Size Boost as a number (1,476% = 14.76), Z = the zone's size factor (see below). With the Solar Magnifier multiply by 1.5."],
+"Estimated from the lightest and heaviest rolls in our test logs, not confirmed. Most of the time the heaviest is 15.5 × B × (1 + S) × Z; 17 shows up only for a mineral that is coming out 1.1× heavier at the time: now and then one or a few minerals in a zone do, each on its own. Wmin = lightest weight (kg), Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = Size Boost as a number (1,476% = 14.76), Z = the zone's size factor (see below). With the Solar Magnifier multiply by 1.5."],
 ["Weight","Maximum weight at a Size Boost",
 `Wmax = 17 × B × (1 + S) × Z`,
 "Best guess, from the heaviest rolls in our test logs (usually 15.5 instead of 17). Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = your Size Boost as a number (1,476% = 14.76), Z = the zone's size factor. With the Solar Magnifier multiply by 1.5."],
@@ -29,7 +29,7 @@ Z = 1.04  Astral Caverns, Deeproot Spring, Enchanted Ruins, Frozen Peak, Fungal 
 Z = 1.12  Abyssal Depth, Infernal Heart
 Z = 1.20  Timelocked Sanctuary
 Z = 1?    Not measured yet: North Pole, Seashell Beach, The Void, Tomb Vein I, II and III`,
-"Z = how much a zone multiplies every weight. Measured on 5.1 million minerals in 29 zones: a zone's lightest mineral is exactly 0.75 × its factor. Haunted Creek is from only 580 minerals, so it's the likeliest step rather than a sure one. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones)."],
+"Z = how much a zone multiplies every weight. Measured on 7.9 million minerals in 29 zones: a zone's lightest mineral is exactly 0.75 × its factor. Haunted Creek is from only 580 minerals, so it's the likeliest step rather than a sure one. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones)."],
 ["Luck","Luck from a luck cap",
 `L = 0.56 × cap`,
 "L = the luck a capped session actually pans at, cap = the cap you set. Measured on 326,000 capped minerals in 17 zones: every cap from 100 to 10,000 landed between 0.54 and 0.60. A cap only helps for minerals that get rarer with more luck; Best Luck Cap works out which."],

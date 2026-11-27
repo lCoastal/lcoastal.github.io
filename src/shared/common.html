@@ -221,18 +221,18 @@ function tieSpan(list,x,tot){let m=_TIE.get(list);if(!m){m=new Map();let c=0;lis
 // Weight = BaseWeight x (1 + Size Boost) x zone factor x k (x1.5 Solar Magnifier). Most k are between 0.75 and 15.5:
 // 26.1% small k~U(0.75,1.88); h(cap) skewed k=0.75+14.75*Beta(a,1.99); the rest k~U(0.75,15.5).
 // h = 0.533(1-e^-((cap-1797)/2266)), a = 4.24 + 0.000667 cap
-// At times about a quarter of minerals come out x1.1, so k reaches 17.0: about 1.6% of all minerals land between 15.5 and 17
-// (5.1M minerals; 1.4% on the first 2.57M),
+// At times single minerals come out x1.1 (one or a few minerals in a zone, each for a while: lightest 0.825, ~20% of them past 15.5),
+// so k reaches 17.0: about 1.6% of all minerals land between 15.5 and 17 (5.1M minerals; 2.6% on the 26/11 to 27/11 log),
 // thinning out towards 17 (WT_TAIL, a straight-line fade).
 const WT_MIN=.75,WT_TOP=15.5,WT_MAX=17,WT_TAIL=.016,WT_SMALL=.261,WT_SM_HI=1.88,WT_B=1.99;
-// zone size factor: every weight in a zone is multiplied by this. Measured 26/11/26 on every log so far (5.1M minerals, 29 zones):
+// zone size factor: every weight in a zone is multiplied by this. Measured on every log so far (7.9M minerals, 29 zones; last checked 27/11/26):
 // each zone's lightest roll is exactly 0.75 x its factor, and the factors come in steps (0.80, 0.88, 0.92, 0.96, 1.00, 1.04, 1.12, 1.20).
 // Haunted Creek is from only 580 minerals (lightest 0.82, so most likely the 0.80 step). Zones not listed count as 1.
 const ZONE_SIZE={"Rubble Creek Sands":0.8,"Rubble Creek Deposits":0.88,"Fortune River":0.92,"Magma Furnace":0.96,"Volcanic Sands":0.96,"Sunset Beach":0.96,"Windswept Beach":0.96,"Azuralite Oasis":0.96,"Fortune River Delta":1,"Frostbite River":1,"Frostbite Waterfall":1,"Lifespring Oasis":1,"Meteor Falls":1,"Mystic Floodplains":1,"Sandstone Stream":1,"Starfall River":1,"Volcanic Springs":1,"Crystal Cavern River":1,"Astral Caverns":1.04,"Deeproot Spring":1.04,"Enchanted Ruins":1.04,"Frozen Peak":1.04,"Fungal Marsh":1.04,"Rotwood Swamp":1.04,"Overgrown Grotto":1.04,"Abyssal Depth":1.12,"Infernal Heart":1.12,"Timelocked Sanctuary":1.2,"Haunted Creek":0.8};
 // zones with no weights logged yet: counted as 1 until a log covers them
 const ZONE_SIZE_TODO=["Tomb Vein I","Tomb Vein II","Tomb Vein III","The Void","North Pole","Seashell Beach"];
 // minerals logged per zone for the factors above
-const ZONE_SIZE_N={"Sandstone Stream":1167859,"Mystic Floodplains":960963,"Lifespring Oasis":409514,"Enchanted Ruins":315544,"Sunset Beach":267650,"Fungal Marsh":224460,"Frozen Peak":203707,"Timelocked Sanctuary":190505,"Meteor Falls":188580,"Rubble Creek Sands":157024,"Windswept Beach":142355,"Infernal Heart":120267,"Rotwood Swamp":112106,"Magma Furnace":92200,"Abyssal Depth":85632,"Fortune River":61418,"Volcanic Sands":56365,"Starfall River":51381,"Astral Caverns":50396,"Azuralite Oasis":46817,"Volcanic Springs":41657,"Rubble Creek Deposits":37724,"Deeproot Spring":33724,"Frostbite River":30554,"Fortune River Delta":24459,"Frostbite Waterfall":21732,"Crystal Cavern River":8446,"Overgrown Grotto":7258,"Haunted Creek":580};
+const ZONE_SIZE_N={"Sandstone Stream":1281354,"Lifespring Oasis":1115434,"Mystic Floodplains":985992,"Enchanted Ruins":463882,"Sunset Beach":379203,"Meteor Falls":337051,"Frozen Peak":311431,"Magma Furnace":290864,"Infernal Heart":278357,"Timelocked Sanctuary":262067,"Windswept Beach":250909,"Fungal Marsh":239244,"Rotwood Swamp":236953,"Rubble Creek Sands":215826,"Astral Caverns":177054,"Volcanic Sands":147010,"Abyssal Depth":145331,"Frostbite River":132951,"Starfall River":125854,"Fortune River":94509,"Fortune River Delta":79844,"Azuralite Oasis":77139,"Overgrown Grotto":62208,"Deeproot Spring":59014,"Volcanic Springs":42235,"Rubble Creek Deposits":39843,"Frostbite Waterfall":32397,"Crystal Cavern River":27909,"Haunted Creek":580};
 const zoneSize=loc=>loc?(ZONE_SIZE[baseLoc(loc)]??ZONE_SIZE[loc]??1):1;
 // <option>s for a zone picker: "Most zones" (x1) first, then every measured zone with its factor
 const zoneSizeOpts=sel=>`<option value="">Most zones (×1)</option>`+Object.keys(ZONE_SIZE).sort().map(z=>`<option value="${z}"${z===sel?" selected":""}>${z} (×${ZONE_SIZE[z].toFixed(2)})</option>`).join("");

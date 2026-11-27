@@ -1,12 +1,12 @@
 ---
 title: Prospecting findings
-date: 2026-11-26
+date: 2026-11-27
 tags: [findings, formulas, logs]
 ---
 
 # Prospecting findings
 
-Everything measured so far about Prospecting (Roblox): the formulas the toolkit at [lcoastal.github.io](https://lcoastal.github.io) uses, what the logs in this repo showed, and what's still open. Last updated 26/11/26, toolkit version 532.
+Everything measured so far about Prospecting (Roblox): the formulas the toolkit at [lcoastal.github.io](https://lcoastal.github.io) uses, what the logs in this repo showed, and what's still open. Last updated 27/11/26, toolkit version 592.
 
 **The toolkit's code is the final word.** If this file and the code disagree, the code wins: the weight model and zone factors are in [src/shared/common.html](../src/shared/common.html), the stat calculator in [src/tools/calc/script.js](../src/tools/calc/script.js), test write-ups in [src/tools/testlog/script.js](../src/tools/testlog/script.js).
 
@@ -35,6 +35,7 @@ Everything measured so far about Prospecting (Roblox): the formulas the toolkit 
 | `research/logs/2026-11-20_galaxis.tsv.xz` | GalaxisHub, 20/11 | 652,655 |
 | `research/logs/2026-11-22_galaxis.tsv.xz` | GalaxisHub, 22/11 to 24/11, 24 zones | 2,567,738 |
 | `research/logs/2026-11-24_galaxis.tsv.xz` | GalaxisHub, 24/11 to 26/11, 17 zones (the same session carried on) | 1,201,982 |
+| `research/logs/2026-11-26_galaxis.tsv.xz` | GalaxisHub, 26/11 to 27/11, 28 zones, luck caps 1 to 100,000, capacity 4,904 to 11,513 | 2,794,365 |
 
 Columns: `Time, Pan, Mineral, Mutation, Weight (kg), Luck, Size Boost, Modifier Boost, Capacity, Zone`. `Mutation` is the mineral's modifier (Iridescent, Glowing…; `None` if it has none). Size Boost and Modifier Boost are plain numbers (14.76 = 1,476%). The item ID column was dropped to save space. A few rows have `UNKNOWN` for weight and modifier where the logger couldn't read the item; skip them. Read them with [scripts/load.py](scripts/load.py).
 
@@ -49,48 +50,49 @@ weight = base weight × (1 + Size Boost) × zone factor × k   (× 1.5 with the 
 ```
 
 - **k is between 0.75 and 15.5 most of the time.** The lightest is exactly 0.75 in every zone.
+- **The 15.5 to 17 tail is one mineral at a time** (27/11 log, 2.79M minerals). Now and then one or a few minerals in a zone come out exactly 1.1× heavier for a while: lightest 0.825, about 20% of them past 15.5, top 17.05. The other minerals in the same pans stay between 0.75 and 15.5. Over the log, Diamond (84,000) and Aetherite (43,000) never passed 15.5, Pyrelith did on 20% and Bone on 19%. It happened more while luck was capped (14% of mineral-minutes) than uncapped (5%). This log had 2.6% past 15.5 overall, so the toolkit's 1.6% is an average that depends on what you pan. Cause unknown.
 - **k reaches 17.0 at times.** On all logs (5.1M minerals) 17.0 in every zone and 1.58% past 15.5; the toolkit uses 1.6%. The share past 15.5 varies a lot between zones (0.1% to 8.6%) and luck ranges, which fits it coming and going over time rather than following luck or the modifier. 18 rows past 17 were the same 6 Bloodstones logged three times with identical weights (minerals coming back from storage).
    In some stretches about a quarter of minerals come out 1.1× heavier (15.5 × 1.1 = 17.05). Across 2.57M minerals about 1.4% landed between 15.5 and 17. It switches on and off by time (10-minute windows go from 0% to 4.6%), doesn't depend on the modifier, and the lightest stays 0.75 while it's on. Cause unknown.
-- **The spread depends on capacity.** 26.1% are small (k evenly between 0.75 and 1.88). A share h(cap) is skewed heavy (k = 0.75 + 14.75 × Beta(a, 1.99)). The rest are even between 0.75 and 15.5. h = 0.533 × (1 − e^−((cap − 1797) / 2266)), a = 4.24 + 0.000667 × cap. Fitted on 1,856 to 7,240 capacity and confirmed within about 1% (median, mean, top 10%) from 6,692 to 8,638 capacity.
+- **The spread depends on capacity.** 26.1% are small (k evenly between 0.75 and 1.88). A share h(cap) is skewed heavy (k = 0.75 + 14.75 × Beta(a, 1.99)). The rest are even between 0.75 and 15.5. h = 0.533 × (1 − e^−((cap − 1797) / 2266)), a = 4.24 + 0.000667 × cap. Fitted on 1,856 to 7,240 capacity and confirmed within about 1% (median, mean, top 10%) from 6,692 to 8,638 capacity, and within about 1.5% from 9,750 to 11,513 capacity and at Size Boost 33.3× (27/11 log, 2.3M minerals).
 - **Below about 2,000 capacity minerals come out lighter than the model says.** The community's 1,001-capacity sample had a median of 0.67 kg where the model says 1.06.
-- **Volcanic eruption: everything 1.5× heavier while it lasts.** Seen twice, both in Windswept Beach: 19/11 from 13:00 to 13:20 (all 2,986 minerals), and 24/11 from 05:30 until you left the zone at 05:31 (7,208 minerals, switching on between one minute and the next). Lightest and heaviest both exactly 1.5×. That eruption is why Windswept Beach was once measured at 1.12 instead of 0.96. Which zones an eruption covers is unknown.
+- **Volcanic eruption: everything 1.5× heavier while it lasts**, and about 1.5× more minerals per pan. The game's text says 2× size; every logged eruption was exactly 1.5× (the toolkit uses 1.5× since version 592). On 26/11 to 27/11, five eruptions in Magma Furnace and Infernal Heart: 13:30 (both zones), 00:00, 01:00 and 07:00 (Magma Furnace), each starting on the hour or half hour and over 15 minutes later (00:15, 01:15). Not every half hour: Magma Furnace at 15:00 and 06:00 to 06:15 and Infernal Heart at 14:30 and 17:30 had none. Earlier, also twice in Windswept Beach: 19/11 from 13:00 to 13:20 (all 2,986 minerals), and 24/11 from 05:30 until you left the zone at 05:31 (7,208 minerals, switching on between one minute and the next). Lightest and heaviest both exactly 1.5×. That eruption is why Windswept Beach was once measured at 1.12 instead of 0.96. The game lists Volcanic Sands, Windswept Beach, Volcanic Springs, Magma Furnace and Infernal Heart; three of those are confirmed in logs.
 - **Museum max boost is at 200× base weight for every mineral** (Sandsteel at 150×). So the Size Boost a museum max needs is the same for every mineral and depends only on capacity: possible at all from 1,076% Size Boost (17× roll), and at 8,000 capacity 1 in 10 reach it at 1,273%, half at 1,670%.
 
 ## Zone weight factors
 
-Every weight in a zone is multiplied by its factor. Measured from each zone's lightest mineral (exactly 0.75 × factor) on all logs together (5.1M minerals, 29 zones, 26/11/26). Every zone matched its step to the second decimal: 0.80, 0.88, 0.92, 0.96, 1.00, 1.04, 1.12, 1.20.
+Every weight in a zone is multiplied by its factor. Measured from each zone's lightest mineral (exactly 0.75 × factor) on all logs together (7.9M minerals, 29 zones, 27/11/26). Every zone matched its step to the second decimal: 0.80, 0.88, 0.92, 0.96, 1.00, 1.04, 1.12, 1.20.
 
 | Zone | Factor | Minerals measured |
 |---|---|---|
 | Haunted Creek | ×0.80 | 580 (likeliest step) |
-| Rubble Creek Sands | ×0.80 | 157,024 |
-| Rubble Creek Deposits | ×0.88 | 37,724 |
-| Fortune River | ×0.92 | 61,418 |
-| Azuralite Oasis | ×0.96 | 46,817 |
-| Magma Furnace | ×0.96 | 92,200 |
-| Sunset Beach | ×0.96 | 267,650 |
-| Volcanic Sands | ×0.96 | 56,365 |
-| Windswept Beach | ×0.96 | 142,355 |
-| Crystal Cavern River | ×1.00 | 8,446 |
-| Fortune River Delta | ×1.00 | 24,459 |
-| Frostbite River | ×1.00 | 30,554 |
-| Frostbite Waterfall | ×1.00 | 21,732 |
-| Lifespring Oasis | ×1.00 | 409,514 |
-| Meteor Falls | ×1.00 | 188,580 |
-| Mystic Floodplains | ×1.00 | 960,963 |
-| Sandstone Stream | ×1.00 | 1,167,859 |
-| Starfall River | ×1.00 | 51,381 |
-| Volcanic Springs | ×1.00 | 41,657 |
-| Astral Caverns | ×1.04 | 50,396 |
-| Deeproot Spring | ×1.04 | 33,724 |
-| Enchanted Ruins | ×1.04 | 315,544 |
-| Frozen Peak | ×1.04 | 203,707 |
-| Fungal Marsh | ×1.04 | 224,460 |
-| Overgrown Grotto | ×1.04 | 7,258 |
-| Rotwood Swamp | ×1.04 | 112,106 |
-| Abyssal Depth | ×1.12 | 85,632 |
-| Infernal Heart | ×1.12 | 120,267 |
-| Timelocked Sanctuary | ×1.20 | 190,505 |
+| Rubble Creek Sands | ×0.80 | 215,826 |
+| Rubble Creek Deposits | ×0.88 | 39,843 |
+| Fortune River | ×0.92 | 94,509 |
+| Azuralite Oasis | ×0.96 | 77,139 |
+| Magma Furnace | ×0.96 | 290,864 |
+| Sunset Beach | ×0.96 | 379,203 |
+| Volcanic Sands | ×0.96 | 147,010 |
+| Windswept Beach | ×0.96 | 250,909 |
+| Crystal Cavern River | ×1.00 | 27,909 |
+| Fortune River Delta | ×1.00 | 79,844 |
+| Frostbite River | ×1.00 | 132,951 |
+| Frostbite Waterfall | ×1.00 | 32,397 |
+| Lifespring Oasis | ×1.00 | 1,115,434 |
+| Meteor Falls | ×1.00 | 337,051 |
+| Mystic Floodplains | ×1.00 | 985,992 |
+| Sandstone Stream | ×1.00 | 1,281,354 |
+| Starfall River | ×1.00 | 125,854 |
+| Volcanic Springs | ×1.00 | 42,235 |
+| Astral Caverns | ×1.04 | 177,054 |
+| Deeproot Spring | ×1.04 | 59,014 |
+| Enchanted Ruins | ×1.04 | 463,882 |
+| Frozen Peak | ×1.04 | 311,431 |
+| Fungal Marsh | ×1.04 | 239,244 |
+| Overgrown Grotto | ×1.04 | 62,208 |
+| Rotwood Swamp | ×1.04 | 236,953 |
+| Abyssal Depth | ×1.12 | 145,331 |
+| Infernal Heart | ×1.12 | 278,357 |
+| Timelocked Sanctuary | ×1.20 | 262,067 |
 | Tomb Vein I | ×1.00? | not measured yet |
 | Tomb Vein II | ×1.00? | not measured yet |
 | Tomb Vein III | ×1.00? | not measured yet |
@@ -110,7 +112,8 @@ Checked on all logs together (47,128 pans, capacity 5,592 to 9,245, 26/11/26):
 
 ## Luck
 
-- **Luck cap:** a capped session pans at about 0.56 × the cap (326,000 capped minerals, 17 zones, caps 100 to 10,000). The luck floor is 1.
+- **Luck cap:** a capped session pans at about 0.56 × the cap (326,000 capped minerals, 17 zones, caps 100 to 10,000). Re-checked on the 27/11 log: 0.57 (0.53 to 0.61) over 935,000 capped minerals, caps 5 to 100,000. The luck floor is 1.
+- **Uncapped luck** came out at about 0.88× the luck shown in most zones (27/11 log). Enchanted Ruins (0.26 to 0.45×), Magma Furnace (0.5 to 0.9×, lower at higher luck), Sunset Beach, Windswept Beach and Overgrown Grotto (0.6 to 0.8×) came out much lower at high luck, so those drop tables are off at high luck.
 - **Very rare minerals** (base odds about 1 in 18 million to 1 in 1.6 billion) drop about 1.9× more often than the roll model alone says (about 2.4M minerals, 11 zones).
 - **At 90k+ luck the model predicts too few mid-rare minerals.** Seen in the 22/11 log, not yet fixed.
 - **Nebula and Starcrusher** add +0.1 to the luck multiplier, like the museum does (not ×1.1).
@@ -123,6 +126,8 @@ Checked on all logs together (47,128 pans, capacity 5,592 to 9,245, 26/11/26):
 | Modifier Boost | Steady hours, unmodified | Hours | Old formula 1 − 0.9369^(boost ÷ 100) | Toolkit now | Community test |
 |---|---|---|---|---|---|
 | 475% | 73% (hourly 70 to 76%) | 16 | 73.4% | 73% | 71.3% (503%) |
+| 842% | 55% overall, 62% steadiest hours (47 to 63%) | 28 | 52.4% | 60% | |
+| 1,053% | 54% | 1 | 50.4% | 54% | |
 | 1,081% | 53% (50 to 53%) | 6 | 49.4% | 53% | 42.4% (1,012%) |
 | 1,661% | 25.5% | 1 | 33.9% | 27% | |
 | 1,831% | about 16% (4 to 17%) | 2 | 30.3% | 22% | |
@@ -157,6 +162,8 @@ Used by the toolkit's Rolls per Minute tool. Speeds in percent (100% is base).
 
 ## Things that skew logs
 
+- **Logger pan numbers at fast pans.** On the 27/11 log pans came every 2 to 3 seconds and one "pan" held anywhere from 1 to 7 × √capacity minerals, so pan sizes can't be checked on it.
+- **Storage coming back.** On the 27/11 log the same 21 minerals (36 rows, all the Entombed and Treasured ones) came back every third pan in Rotwood Swamp; 3,907 rows that can't drop there.
 - **Minerals that can't drop where they were logged.** 617 of 2.57M (0.02%), almost all in 24 "pans" out of 23,877, for example 104 Dinosaur Skulls in one Rotwood Swamp pan (it only drops in Infernal Heart, 1 in 54 million). These are minerals entering the inventory another way (storage, the museum, trades), logged as a pan. The toolkit's Test Data Check leaves them out and lists them.
 - **Firefly Zone minerals** (Firefly Stone in Enchanted Ruins and others) drop in their zone but the toolkit's drop rates don't include Firefly Zones yet.
 - **Eruptions** (×1.5 weight) and the **×1.1 stretches** (k up to 17) come and go; check by time window before trusting a zone's heaviest weights.
@@ -178,16 +185,16 @@ Raw numbers: [community/2026-11-25_tests.md](community/2026-11-25_tests.md).
 ## Open questions
 
 - Modifier chance at high boost: 4% (community) or 20% (our steady hours) unmodified at about 1,900%? Needs a clean log.
-- What causes the ×1.1 stretches (k up to 17)?
-- Which zones a Volcanic Eruption covers, and how often.
+- What makes a single mineral come out ×1.1 for a while (k up to 17)? It's one mineral at a time, more often while luck is capped.
+- Why the game says an eruption doubles size when every logged one was 1.5×, and whether Volcanic Sands and Volcanic Springs erupt (no log has been there during one).
 - Zone factors for Tomb Vein I, II and III, The Void, North Pole and Seashell Beach; more Haunted Creek (580 minerals so far).
 - The weight spread below about 1,800 capacity.
-- The luck model at 90k+ luck; Aurorite vs Moonstone in Fortune River Delta; Firefly Zone drop rates.
+- The luck model at 90k+ luck, especially Enchanted Ruins, Magma Furnace, Sunset Beach, Windswept Beach and Overgrown Grotto; Aurorite vs Moonstone in Fortune River Delta; Firefly Zone drop rates.
 - Dig time above about 600% Dig Speed; shakes per second when a pan needs many more than 6 shakes.
 
 ## Formulas page
 
-The toolkit's Formulas page as of version 532.
+The toolkit's Formulas page as of version 592.
 
 ### Pans
 
@@ -217,7 +224,7 @@ Wmin = 0.75 × B × (1 + S) × Z
 Wmax = 17 × B × (1 + S) × Z
 ```
 
-Estimated from the lightest and heaviest rolls in our test logs, not confirmed. Most of the time the heaviest is 15.5 × B × (1 + S) × Z; 17 shows up only in stretches where about a quarter of minerals come out 1.1× heavier. Wmin = lightest weight (kg), Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = Size Boost as a number (1,476% = 14.76), Z = the zone's size factor (see below). With the Solar Magnifier multiply by 1.5.
+Estimated from the lightest and heaviest rolls in our test logs, not confirmed. Most of the time the heaviest is 15.5 × B × (1 + S) × Z; 17 shows up only for a mineral that is coming out 1.1× heavier at the time: now and then one or a few minerals in a zone do, each on its own. Wmin = lightest weight (kg), Wmax = heaviest weight (kg), B = the mineral's base weight (kg), S = Size Boost as a number (1,476% = 14.76), Z = the zone's size factor (see below). With the Solar Magnifier multiply by 1.5.
 
 #### Maximum weight at a Size Boost
 
@@ -249,7 +256,7 @@ Z = 1.20  Timelocked Sanctuary
 Z = 1?    Not measured yet: North Pole, Seashell Beach, The Void, Tomb Vein I, II and III
 ```
 
-Z = how much a zone multiplies every weight. Measured on 5.1 million minerals in 29 zones: a zone's lightest mineral is exactly 0.75 × its factor. Haunted Creek is from only 580 minerals, so it's the likeliest step rather than a sure one. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones).
+Z = how much a zone multiplies every weight. Measured on 7.9 million minerals in 29 zones: a zone's lightest mineral is exactly 0.75 × its factor. Haunted Creek is from only 580 minerals, so it's the likeliest step rather than a sure one. Zones not listed count as 1. The best place to chase a heavy piece is Timelocked Sanctuary (20% heavier than most zones).
 
 ### Luck
 
@@ -289,7 +296,39 @@ part = how much of the max boost you get (×100 for %), W = the piece's weight (
 
 ## Test log
 
-The toolkit's Test Log as of version 532, newest first.
+The toolkit's Test Log as of version 592, newest first.
+
+### 27/11/26: Eruptions in Magma Furnace and Infernal Heart, single minerals 1.1× heavier, and weights up to 11,500 capacity
+
+Zone: 28 zones, mostly Lifespring Oasis
+
+Setup: Luck caps 1 – 100,000, and 28,000 – 119,000 uncapped; Capacity 4,904 – 11,513; Size Boost 8.4×, 8.8×, 14.8× and 33.3×; Modifier Boost 842%, 1,053% and 1,917%
+
+Amount: Minerals 2,794,365; Pans 19,818
+
+**Tested**
+- Each zone's factor and the heaviest roll in every zone
+- Volcanic eruptions: which zones, how much heavier, when
+- Minerals past 15.5: which ones and when
+- How weights spread from 9,800 to 11,500 capacity, and at Size Boost 33.3×
+- Luck caps, and uncapped luck
+- Modifier chance at 842% and 1,053% Modifier Boost
+
+**Found**
+- Every zone's lightest was 0.75 × its factor again, in all 28 zones
+- Five Volcanic Eruptions, in Magma Furnace and Infernal Heart (before, only Windswept Beach): every mineral exactly 1.5× heavier (lightest 0.75 × 1.5, heaviest 17 × 1.5) and about 1.5× more minerals per pan. The game's text says 2× size; the logs say 1.5× every time. They started on the hour or half hour (00:00, 01:00, 07:00 and 13:30) and ended 15 minutes later
+- Minerals past 15.5 come from one mineral at a time: now and then one or a few minerals in a zone come out exactly 1.1× heavier for a while (lightest 0.825, about 20% of them past 15.5, top 17.05), while the rest of the same pans stay between 0.75 and 15.5. Diamond (84,000 logged) and Aetherite (43,000) never went past 15.5; Pyrelith did on 20%. It happened more while luck was capped (14% of mineral-minutes) than uncapped (5%). Cause unknown
+- Weights from 9,800 to 11,500 capacity fit the model within about 1.5% (typical, average and top 10%), so the fit holds well past the 9,245 it was checked to. It also holds at Size Boost 33.3×
+- Luck caps again behaved like 57% of their number (53–61% in 25 cap and zone pairs, 935,000 capped minerals). Uncapped luck came out at about 0.88× the luck shown in most zones; Enchanted Ruins, Magma Furnace, Sunset Beach, Windswept Beach and Overgrown Grotto came out much lower at high luck (0.3–0.7×), so their drop tables are off at high luck
+- 1,053% Modifier Boost: 54% unmodified (toolkit 54%). 1,917%: 20% (toolkit 20%). 842%: 55% overall, 62% in the steadiest hours (toolkit 60%). Which modifier you get matched within about 20%
+- Minerals per pan can't be checked on this log: pans came every 2–3 seconds and the logger's pan numbers don't line up with real pans (1 to 7× √capacity in one pan)
+- 3,907 rows were minerals that can't drop where they were logged, almost all the same 21 minerals coming back every third pan in Rotwood Swamp (storage), including every Entombed and Treasured one. 8,862 rows the logger couldn't read. Both left out
+
+**Changed in the toolkit**
+- A Volcanic Eruption is now 1.5× heavier in Weight Range, Mechanics and Formulas (was 2×)
+- The 15.5 to 17 tail is explained as single minerals coming out 1.1× heavier
+- Every zone's measured count updated (7.9M minerals)
+
 
 ### 26/11/26: Every log at once: pan size, weight, zone factors and modifiers
 
