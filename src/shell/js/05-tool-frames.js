@@ -351,7 +351,7 @@ function ptFrameInit() {
         MU[m.n] = m;
       });
     } catch (e) {}
-    var COL = { Silver: "#a9b4be", Gold: "#d9a520", Diamond: "#5fc8e8", Granite: "#b08d64", Overclocked: "#6b8cff", Festive: "#e05555", Prismatic: "#d24fc0" };
+    var COL = { Silver: "#a9b4be", Gold: "#d9a520", Diamond: "#5fc8e8", Granite: "#b08d64", Overclocked: "#6b8cff", Festive: "#e05555", Prismatic: "#c05bd8" };
     var PCT = { "Shake Speed": 1, "Dig Speed": 1, "Size Boost": 1, "Modifier Boost": 1, "Sell Boost": 1 };
     var esc = function (t) {
       return String(t).replace(/[&<>"']/g, function (c) {

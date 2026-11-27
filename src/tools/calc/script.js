@@ -602,10 +602,9 @@ async function buildImage(st,r){
   y+=HERO+GAP;
   // equipment: necklace and charm as two big cards, then the rings
   const stars=(g,x,yy,fs)=>{c.font=`600 ${fs}px ${FM}`;c.fillStyle=GOLD;const t=g.st+"★";c.fillText(t,x,yy);return x+c.measureText(t).width};
-  // Prismatic is a rainbow mutation in-game, so it's drawn with a rainbow gradient instead of one flat colour
+  // mutation names in their colour (Prismatic pink, like everywhere else)
   const mutTxt=(g,x,yy,fs,w)=>{const none=g.mu==="None";c.font=none?`${fs}px ${F}`:`600 ${fs}px ${F}`;const t=fit(none?"No mutation":g.mu,w);
-    if(g.mu==="Prismatic"){const tw=c.measureText(t).width,gr=c.createLinearGradient(x,0,x+tw,0);["#ff6b6b","#ffb347","#ffe66d","#6ee7a8","#5ec8ff","#a78bfa","#f472b6"].forEach((col,i,arr)=>gr.addColorStop(i/(arr.length-1),col));c.fillStyle=gr}
-    else c.fillStyle=none?MU:(MUTHX[g.mu]||TX);c.fillText(t,x,yy)};
+    c.fillStyle=none?MU:(MUTHX[g.mu]||TX);c.fillText(t,x,yy)};
   if(hasTop){sec("Necklace & Charm",y);y+=SECH;const tw2=(IW-GAP)/2;
     top2.forEach((g,i)=>{const x=PAD+i*(tw2+GAP);card(x,y,tw2,TOPH,g.empty?null:RHX[g.r]);
       if(g.empty){label(g.slot,x+22,y+32);c.fillStyle=MU;c.font=`15px ${F}`;c.fillText("Empty",x+22,y+62);return}

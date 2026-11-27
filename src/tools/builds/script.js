@@ -26,7 +26,7 @@ const D=[
 const BY=Object.fromEntries(D.map(d=>[d[0].toLowerCase(),d]));
 const MODS={"Any":"","None":"","Perfect":"LCW","Treasured":"2L","Entombed":"2L","Lunar":"SPK","Voidtorn":"LC","Mutated":"LDM","Cosmic":"CA","Electrified":"SP","Iridescent":"L","Irradiated":"M","Crystalline":"W","Scorching":"D","Glowing":"P","Pure":"S","Shiny":"A"};
 const MODCOL={Perfect:"#5ef1e1",Treasured:"#ffd849",Entombed:"#40c8be",Lunar:"#ffe99b",Voidtorn:"#a35bff",Mutated:"#a07bff",Cosmic:"#ff5f9e",Electrified:"#ffeb0b",Iridescent:"#f36bff",Irradiated:"#67ff20",Crystalline:"#b7e6ff",Scorching:"#ff861c",Glowing:"#fff292",Pure:"#ffffff",Shiny:"#d4e7ff"};
-const EQMUT={"":"",Silver:"#d6d6d6",Gold:"#ffcc33",Diamond:"#7fd8ff",Granite:"#c8a27a",Overclocked:"#6b8cff",Festive:"#ff6b6b",Sunforged:"#ffc457",Prismatic:"#ff5fd2"};
+const EQMUT={"":"",Silver:"#d6d6d6",Gold:"#ffcc33",Diamond:"#7fd8ff",Granite:"#c8a27a",Overclocked:"#6b8cff",Festive:"#ff6b6b",Sunforged:"#ffc457",Prismatic:"#c05bd8"};
 const SUGGEST={
  charm:["Garden Glove","Jade Armband","Speed Coil","Lapis Armband","Gravity Coil","Lava Lantern","Guiding Light","Dragon Claw","Crown","Helm of the Round","Royal Federation Crown","Phoenix Wings","Cryogenic Preserver","Candy Sack","Bunny Ears","Santa Hat","Fossilized Crown","Antlers of Life","Excalibur","Pumpkin Lord","Starlight Wings","Timelocked Soul","Lunar Mask","Witch Hat","Dullahan's Curse","Clockwork","Nemes of the Pharaoh"],
  neck:["Amethyst Pendant","Pearl Necklace","Topaz Necklace","Opal Amulet","Mass Accumulator","Spider Bowtie","Phoenix Heart","Celestial Rings","Amulet of Spirits","Shell Necklace","Amulet of Life","Frostthorn Pendant","Waverider","Venomshank","Meteor Core","Santa's Bag","Guardian Pendant","Heart Scarab"],
