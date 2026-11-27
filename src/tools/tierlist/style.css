@@ -40,3 +40,8 @@
 .pooltop input{flex:1 1 220px;min-width:0}
 .cnt{font-size:12.5px;color:var(--muted)}
 @media (max-width:560px){.tier{grid-template-columns:62px minmax(0,1fr);min-height:84px}.tl{font-size:22px}.tl.long{font-size:13px}.tl.vlong{font-size:11px}.it{width:64px;padding:4px 2px 3px}.it img{width:40px;height:40px}.it span{font-size:9.5px}}
+/* top bar: the list type switch, the name box and the buttons all the same height */
+.bar .seg button{font:500 13px var(--f-body);padding:0 14px;height:34px;color:var(--fg);background:var(--panel)}
+.bar .seg button[aria-pressed="true"]{background:var(--accent);color:var(--bg);font-weight:600}
+.bar input[type=text]{height:36px;box-sizing:border-box}
+.bar .btn{height:36px;box-sizing:border-box}
