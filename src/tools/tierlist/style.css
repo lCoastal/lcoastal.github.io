@@ -47,3 +47,8 @@
 .bar .btn{height:36px;box-sizing:border-box}
 .pqr{display:flex;gap:8px;align-items:center;flex:1 1 320px;min-width:0}.pqr .btn{flex:none;white-space:nowrap}
 .cus{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cus input[type=color]{width:40px;height:34px;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--panel);cursor:pointer}.cus input[type=text]{width:110px;font-family:var(--f-mono,monospace)}.cus input.bad{border-color:var(--neg)}
+/* square tiles, like in the saved image */
+.it{width:84px;height:84px;aspect-ratio:1;box-sizing:border-box;justify-content:space-between;overflow:hidden}
+.it img{width:48px;height:48px;flex:none}
+.it span{height:auto;min-height:0;flex:1 1 auto}
+@media (max-width:560px){.it{width:68px;height:68px}.it img{width:36px;height:36px}}
