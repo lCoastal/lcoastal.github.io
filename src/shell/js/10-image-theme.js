@@ -107,6 +107,11 @@ window.ptInstallImgTheme = (w) => {
       const st = state();
       return st ? ptMapColor(v, st.light, st.accent) : v;
     };
+    // a colour the person picked themselves (a custom tier row colour) is drawn exactly, in any theme
+    C.ptFillExact = function (v) {
+      this.__ptRaw = v;
+      FD.set.call(this, v);
+    };
     ["fillStyle", "strokeStyle"].forEach((k) => {
       const d = Object.getOwnPropertyDescriptor(C, k);
       Object.defineProperty(C, k, {

@@ -6,10 +6,10 @@
 .tiers{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--sunk)}
 .tier{display:grid;grid-template-columns:76px minmax(0,1fr);min-height:96px;border-top:1px solid var(--line)}
 .tier:first-child{border-top:0}
-.tl{display:flex;align-items:center;justify-content:center;font:800 26px var(--f-body);color:#1a1d21;background:var(--tc);border:0;cursor:pointer;padding:4px;text-align:center;overflow-wrap:break-word;line-height:1.1;min-width:0}
+.tl{display:flex;align-items:center;justify-content:center;font:800 26px var(--f-body);color:var(--ti,#1a1d21);background:var(--tc);border:0;cursor:pointer;padding:4px;text-align:center;overflow-wrap:break-word;line-height:1.1;min-width:0}
 .tl.long{font-size:14px}.tl.vlong{font-size:12px}
 .tl:focus-visible{outline:2px solid var(--fg);outline-offset:-3px}
-.tier.editing .tl{box-shadow:inset 0 0 0 3px #1a1d21}
+.tier.editing .tl{box-shadow:inset 0 0 0 3px var(--ti,#1a1d21)}
 .rowbar{display:flex;gap:8px;flex-wrap:wrap}
 .btn.ghost{background:transparent;border-color:transparent;color:var(--accent)}
 .roweditor{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--panel)}
@@ -46,3 +46,4 @@
 .bar input[type=text]{height:36px;box-sizing:border-box}
 .bar .btn{height:36px;box-sizing:border-box}
 .pqr{display:flex;gap:8px;align-items:center;flex:1 1 320px;min-width:0}.pqr .btn{flex:none;white-space:nowrap}
+.cus{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cus input[type=color]{width:40px;height:34px;padding:2px;border:1px solid var(--line);border-radius:7px;background:var(--panel);cursor:pointer}.cus input[type=text]{width:110px;font-family:var(--f-mono,monospace)}.cus input.bad{border-color:var(--neg)}

@@ -12,6 +12,10 @@ const L=()=>S[S.k]||(S[S.k]={t:"",rows:{}});
 // each list keeps its own rows: [{id,label,c}]; older lists without them get S to D
 const T=(l=L())=>l.tiers&&l.tiers.length?l.tiers:(l.tiers=DEF.map(([t,c])=>({id:t,label:t,c})));
 const byN=()=>Object.fromEntries(POOLS[S.k].map(x=>[x.n,x]));
+// row colours: any hex code; the label text turns white on dark colours
+const hexOk=v=>{v=String(v).trim().replace(/^#?/,"#");if(/^#[0-9a-f]{3}$/i.test(v))v="#"+v.slice(1).split("").map(x=>x+x).join("");return /^#[0-9a-f]{6}$/i.test(v)?v.toLowerCase():null};
+const ink=c=>{const h=hexOk(c);if(!h)return "#1a1d21";const [r,g,b]=[1,3,5].map(i=>{const v=parseInt(h.slice(i,i+2),16)/255;return v<=.03928?v/12.92:((v+.055)/1.055)**2.4});return .2126*r+.7152*g+.0722*b<.18?"#ffffff":"#1a1d21"};
+const paintRow=t=>{const z=document.querySelector(`.tz[data-row="${CSS.escape(t.id)}"]`);const r=z&&z.closest(".tier");if(r){r.style.setProperty("--tc",t.c);r.style.setProperty("--ti",ink(t.c))}};
 const nid=()=>"r"+Date.now().toString(36)+Math.floor(Math.random()*1e4);
 let SHOWN=[],SELS=[],MULTI=false,EDIT=null,lpFired=false,lpT=null;
 const toggleSel=n=>{const i=SELS.indexOf(n);if(i>=0){SELS.splice(i,1);if(!SELS.length)MULTI=false}else SELS.push(n)};
@@ -21,7 +25,7 @@ function render(){const l=L(),N=byN(),tiers=T(l);
   $("ttl").value=l.t||"";
   // drop names that no longer exist, and anything ranked twice
   const seen=new Set();tiers.forEach(t=>{l.rows[t.id]=(l.rows[t.id]||[]).filter(n=>N[n]&&!seen.has(n)&&seen.add(n))});
-  $("tiers").innerHTML=tiers.map(t=>{const len=String(t.label).length;return `<div class="tier${SELS.length?" target":""}${EDIT===t.id?" editing":""}" style="--tc:${t.c}"><button type="button" class="tl${len>8?" vlong":len>3?" long":""}" data-edit="${esc(t.id)}" title="Edit this row" aria-label="Row ${esc(t.label)}, edit">${esc(t.label)||"&nbsp;"}</button><div class="tz" data-row="${esc(t.id)}">${l.rows[t.id].map(n=>itemHTML(N[n])).join("")}</div></div>`}).join("");
+  $("tiers").innerHTML=tiers.map(t=>{const len=String(t.label).length;return `<div class="tier${SELS.length?" target":""}${EDIT===t.id?" editing":""}" style="--tc:${t.c};--ti:${ink(t.c)}"><button type="button" class="tl${len>8?" vlong":len>3?" long":""}" data-edit="${esc(t.id)}" title="Edit this row" aria-label="Row ${esc(t.label)}, edit">${esc(t.label)||"&nbsp;"}</button><div class="tz" data-row="${esc(t.id)}">${l.rows[t.id].map(n=>itemHTML(N[n])).join("")}</div></div>`}).join("");
   drawEditor();
   const rars=ORDR.filter(r=>POOLS[S.k].some(x=>x.r===r));const rf=S.rf.filter(r=>rars.includes(r));
   $("rf").hidden=!rars.length;
@@ -42,6 +46,7 @@ function render(){const l=L(),N=byN(),tiers=T(l);
 function drawEditor(){const box=$("rowEd");const tiers=T();const i=tiers.findIndex(t=>t.id===EDIT);if(i<0){EDIT=null;box.hidden=true;return}const t=tiers[i];box.hidden=false;
   box.innerHTML=`<div class="reh"><span class="lab">Row name</span><input type="text" id="reName" maxlength="20" value="${esc(t.label)}" aria-label="Row name"><button type="button" class="btn" id="reDone">Done</button></div>
   <div class="swc" role="group" aria-label="Row colour">${PAL.map(c=>`<button type="button" style="--c:${c}" data-col="${c}" aria-label="Colour ${c}" aria-pressed="${t.c===c}"></button>`).join("")}</div>
+  <div class="cus"><span class="lab">Custom colour</span><input type="color" id="reCol" value="${hexOk(t.c)||"#ff7f7f"}" aria-label="Pick a custom colour"><input type="text" id="reHex" maxlength="7" spellcheck="false" autocomplete="off" placeholder="#ff8800" value="${esc(hexOk(t.c)||t.c)}" aria-label="Hex colour code"></div>
   <div class="reb"><button type="button" class="btn" id="reUp"${i===0?" disabled":""}>Move up</button><button type="button" class="btn" id="reDn"${i===tiers.length-1?" disabled":""}>Move down</button><button type="button" class="btn warn" id="reDel"${tiers.length<2?" disabled":""}>Delete row</button></div>`}
 function moveTo(n,row,before){const l=L();T(l).forEach(t=>{l.rows[t.id]=(l.rows[t.id]||[]).filter(x=>x!==n)});
   if(row){const a=l.rows[row]||(l.rows[row]=[]);const i=before?a.indexOf(before):-1;if(i>=0)a.splice(i,0,n);else a.push(n)}save();render()}
@@ -79,7 +84,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(SELS.length){SEL
 document.addEventListener("touchstart",e=>{const it=e.target.closest&&e.target.closest(".it");lpFired=false;clearTimeout(lpT);if(!it)return;const n=it.dataset.n;lpT=setTimeout(()=>{lpFired=true;MULTI=true;toggleSel(n);render();try{navigator.vibrate&&navigator.vibrate(15)}catch(x){}},420)},{passive:true});
 document.addEventListener("touchmove",()=>clearTimeout(lpT),{passive:true});
 document.addEventListener("touchend",()=>clearTimeout(lpT),{passive:true});
-document.addEventListener("input",e=>{if(e.target.id!=="reName")return;const t=T().find(x=>x.id===EDIT);if(!t)return;t.label=e.target.value;save();
+document.addEventListener("input",e=>{const id=e.target.id;if(id==="reCol"||id==="reHex"){const t=T().find(x=>x.id===EDIT);const h=hexOk(e.target.value);e.target.classList.toggle("bad",!h&&id==="reHex");if(!t||!h)return;t.c=h;save();paintRow(t);
+    if(id==="reCol")$("reHex").value=h;else $("reCol").value=h;document.querySelectorAll("#rowEd [data-col]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.col===h)));return}
+  if(e.target.id!=="reName")return;const t=T().find(x=>x.id===EDIT);if(!t)return;t.label=e.target.value;save();
   const b=document.querySelector(`[data-edit="${CSS.escape(EDIT)}"]`);if(b){b.textContent=t.label||" ";const n=t.label.length;b.classList.toggle("long",n>3&&n<=8);b.classList.toggle("vlong",n>8)}});
 $("rowEd").addEventListener("click",e=>{const tiers=T(),i=tiers.findIndex(t=>t.id===EDIT);if(i<0)return;const id=e.target.id;
   if(id==="reDone"){EDIT=null;render()}
@@ -132,10 +139,10 @@ async function tierImage(){const l=L(),N=byN();const LW=150,SZ=96,TH=SZ+30,G=8,P
   g.fillStyle="#12161b";g.fillRect(0,0,W,H);if(l.t){g.fillStyle="#f2f5f7";g.font=`800 ${tz}px ${F}`;g.fillText(l.t,24,66)}
   const pics=await Promise.all(rows.flatMap(r=>r.items).map(x=>loadImg(x.ic).then(i=>[x.n,i])));const PI=Object.fromEntries(pics);
   // row labels: big for one or two letters, smaller and wrapped onto lines for words
-  const label=(txt,cx,cy,h)=>{let z=txt.length<=2?48:txt.length<=4?36:26;g.fillStyle="#1a1d21";g.textAlign="center";const words=String(txt).split(/\s+/);let lines;
+  let cur="";const label=(txt,cx,cy,h)=>{let z=txt.length<=2?48:txt.length<=4?36:26;const ex=!PAL.includes(cur)&&g.ptFillExact;if(ex)g.ptFillExact(ink(cur));else g.fillStyle=ink(cur);g.textAlign="center";const words=String(txt).split(/\s+/);let lines;
     for(;z>=13;z-=2){g.font=`800 ${z}px ${F}`;lines=[];let cur="";words.forEach(w=>{const t=cur?cur+" "+w:w;if(g.measureText(t).width>LW-16&&cur){lines.push(cur);cur=w}else cur=t});if(cur)lines.push(cur);if(lines.every(x=>g.measureText(x).width<=LW-16)&&lines.length*z*1.15<=h-10)break}
     const lh=z*1.15,y0=cy-(lines.length-1)*lh/2+z*.36;lines.forEach((x,i)=>g.fillText(x,cx,y0+i*lh));g.textAlign="left"};
-  let y=top;rows.forEach((r,i)=>{const h=hs[i];g.fillStyle=r.c;g.fillRect(0,y,LW,h);label(r.t,LW/2,y+h/2,h);
+  let y=top;rows.forEach((r,i)=>{const h=hs[i];if(!PAL.includes(r.c)&&g.ptFillExact)g.ptFillExact(r.c);else g.fillStyle=r.c;g.fillRect(0,y,LW,h);cur=r.c;label(r.t,LW/2,y+h/2,h);
     g.fillStyle=i%2?"#1a2027":"#171c22";g.fillRect(LW,y,W-LW,h);
     // items left-aligned, wrapping onto a new line after COLS
     r.items.forEach((x,j)=>{const cx=LW+PAD+(j%per)*(SZ+G),cy=y+PAD+Math.floor(j/per)*(TH+G);g.fillStyle="#222a33";g.fillRect(cx,cy,SZ,TH);g.strokeStyle=RHX[x.r]||"#3cc2a8";g.lineWidth=3;g.strokeRect(cx+1.5,cy+1.5,SZ-3,TH-3);const im=PI[x.n];if(im)g.drawImage(im,cx+12,cy+8,SZ-24,SZ-24);
