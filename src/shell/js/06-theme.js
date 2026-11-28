@@ -75,12 +75,13 @@ const PT_COLOR_GROUPS = {
 };
 window.ptAccentCSS = () => {
   const a = PT_ACCENTS[SET.accent] || PT_ACCENTS.teal;
+  const plain = SET.color_all === false;
   const L = `--accent:${a[1]};--accent-fg:#ffffff`,
     D = `--accent:${a[2]};--accent-fg:#101418`;
   const neutral = Object.entries(PT_COLOR_GROUPS).flatMap(([key, properties]) =>
-    SET["color_" + key] === false ? properties.map(name => name + (name === "--pt-tier-ink" ? ":var(--panel)" : ":var(--muted)")) : []
+    plain || SET["color_" + key] === false ? properties.map(name => name + (name === "--pt-tier-ink" ? ":var(--panel)" : ":var(--muted)")) : []
   ).join(";");
-  return `:root:root{${neutral}}` + `:root:root{${L}}@media (prefers-color-scheme:dark){:root:root:not([data-theme="light"]){${D}}}:root:root[data-theme="dark"]{${D}}`;
+  return `:root:root{${neutral}}` + `:root:root{${L}}@media (prefers-color-scheme:dark){:root:root:not([data-theme="light"]){${D}}}:root:root[data-theme="dark"]{${D}}` + (plain ? `:root:root{--grp:var(--muted);--pos:var(--fg);--neg:var(--fg);--warn:var(--fg)}:root:root,:root:root[data-theme]{--accent:var(--fg);--accent-fg:var(--bg)}` : "");
 };
 function ptAccentInto(doc) {
   try {
@@ -92,7 +93,6 @@ function ptAccentInto(doc) {
       (doc.head || doc.documentElement).appendChild(st);
     }
     st.textContent = ptAccentCSS();
-    if (doc === document) doc.documentElement.style.filter = SET.color_all === false ? "grayscale(1)" : "";
   } catch (e) {}
 }
 let hostTheme = document.documentElement.getAttribute("data-theme");
