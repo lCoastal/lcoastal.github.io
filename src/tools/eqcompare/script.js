@@ -7,7 +7,7 @@ const NICHE=new Set(["Tomb Time","Trap Ward","Tomb Jar Finds","Lockpick Zone"]);
 // one switch for everything that isn't a main stat: craft cost, recipe, notes and the tomb stats
 if(S.extra==null)S.extra=false;
 S.show={cost:S.extra,recipe:S.extra,notes:S.extra,niche:S.extra};
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S,ptSkipDraftRoll))}catch(e){}};
 const EQ=(P.equip||[]).filter(x=>x.st&&x.st.length),EQB=Object.fromEntries(EQ.map(x=>[x.n,x]));
 S.items=(S.items||[]).map(x=>typeof x==="string"?{n:x,m:""}:x).filter(x=>x&&EQB[x.n]).slice(0,MAX);
 const MIC={};P.mins.forEach(m=>{MIC[m.n]=m.ic});
@@ -33,7 +33,12 @@ function render(){
   $("q").value=S.q;$("qv").textContent=S.q+"%";$("mut").value=S.mut;$("diff").checked=!!S.diff;
   const items=S.items.map(it=>EQB[it.n]);
   if(!items.length){$("out").innerHTML=`<div class="empty"><p>Add two or more pieces above to compare them.</p><p class="hint">Try: ${["Ring of Ra","Ring of Champions","Sun's Gift"].filter(n=>EQB[n]).map(n=>`<button type="button" class="chip" data-quick="${esc(n)}">${esc(n)}</button>`).join(" ")}</p></div>`;return}
-  const st=S.items.map((it,i)=>statsOf(items[i],mutOf(it)));
+  const measured=S.items.map(it=>ptEnteredStats(it,mutOf(it),S.star));
+  const st=S.items.map((it,i)=>{
+    const stats=statsOf(items[i],mutOf(it));
+    if(measured[i])for(const [name,line] of stats)line.v=measured[i][name];
+    return stats;
+  });
   // every stat any of them has, in a sensible order (luck first, then by how many items have it)
   const ORDER=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig Strength","Shake Strength","Dig Speed","Shake Speed","Walk Speed","Inventory Size","Toughness"];
   const allNames=[...new Set(st.flatMap(m=>[...m.keys()]))],hiddenN=allNames.filter(n=>NICHE.has(n)&&!S.show.niche).length;
@@ -46,13 +51,13 @@ function render(){
       return `<td class="${isBest?"best":""}"><b>${main}</b><small>${fv(n,r[0])} – ${fv(n,r[1])}</small></td>`}).join("")}</tr>`}).join("");
   const recipe=x=>(x.rec||[]).length?`<div class="rec">${x.rec.map(([q,m])=>`<span>${MIC[m]?`<img src="${MIC[m]}" alt="" loading="lazy">`:""}${q}× ${esc(m)}</span>`).join("")}</div>`:"-";
   const notes=x=>[ONE_ONLY(x.n)?"Only one can be worn":"",x.bp?esc(x.bp):"",x.ev?"Event or limited-time item":""].filter(Boolean).map(t=>`<div>${t}</div>`).join("")||"-";
-  $("out").innerHTML=`<div class="tw"><table class="cmp"><thead><tr><th class="corner" scope="col"><span>${items.length} of ${MAX}</span><small>${S.star}★, ${S.q}% quality</small></th>${head}</tr></thead>
+  $("out").innerHTML=`<div class="tw"><table class="cmp"><thead><tr><th class="corner" scope="col"><span>${items.length} of ${MAX}</span><small>${S.star}★, ${measured.some(Boolean)?"entered stats":S.q+"% quality"}</small></th>${head}</tr></thead>
     <tbody>${rows}
     ${[S.show.cost?`<th scope="row">Craft cost</th>${items.map(x=>`<td><b>${price(x)}</b></td>`).join("")}`:"",
        S.show.recipe?`<th scope="row">Recipe</th>${items.map(x=>`<td class="tl">${recipe(x)}</td>`).join("")}`:"",
        S.show.notes?`<th scope="row">Notes</th>${items.map(x=>`<td class="tl nt">${notes(x)}</td>`).join("")}`:""].filter(Boolean).map((r,i)=>`<tr${i===0?' class="sep"':""}>${r}</tr>`).join("")}
     </tbody></table></div>
-    <p class="hint">The big number is each stat at ${S.star}★ and ${S.q}% quality with each column's mutation; underneath is its full range at ${S.star}★. The best value in each row is highlighted.${hiddenN?` ${hiddenN} tomb stat${hiddenN>1?"s are":" is"} hidden.`:""}${items.length<2?" Add another piece to compare.":""}</p>`}
+    <p class="hint">${measured.some(Boolean)?"Entered values include mutations.":"Values include each column’s mutation at "+S.q+"% quality."} The range below each value is for ${S.star}★. The best value in each row is highlighted.${hiddenN?` ${hiddenN} tomb stat${hiddenN>1?"s are":" is"} hidden.`:""}${items.length<2?" Add another piece to compare.":""}</p>`}
 
 // controls
 $("mut").innerHTML=MUTS.map(m=>`<option value="${m[0]}">${m[0]==="None"?"No mutation":m[0]+" ×"+m[1]+(Object.keys(m[2]).length?" + "+Object.entries(m[2]).map(([k,v])=>v+" "+k).join(", "):"")}</option>`).join("");
@@ -75,3 +80,10 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-star],[dat
 function addItem(n){if(!EQB[n])return;if(S.items.length>=MAX){ptToast(`You can compare up to ${MAX} at once`);return}S.items.push({n,m:""});save();render()}
 makeAC({inp:$("add"),items:EQ.map(x=>({n:x.n,tag:(x.r+" "+x.slot).trim(),ic:img(x),col:rc(x.r)})),cur:()=>"",icon:()=>"",pick:x=>{addItem(x.n);$("add").value=""}});
 render();
+
+ptEquipmentEditor({
+  tool:"eqcompare",
+  entries:()=>S.items.map((item,i)=>({item,label:"Column "+(i+1),mutation:mutOf(item),stars:S.star,stats:ptEquipmentFields(EQB[item.n],MUT[mutOf(item)][2])})),
+  snapshot:()=>({items:S.items,star:S.star,mut:S.mut,q:S.q}),restore:data=>Object.assign(S,data),
+  maximum:()=>{S.q=100},refresh:()=>{save();render()}
+});

@@ -1,7 +1,4 @@
-// saved/copied pictures follow your theme (light or dark) and accent colour from Settings.
-// Every tool draws its pictures in the dark style with the teal accent; while a picture is drawn, each colour it
-// uses is translated: teal -> your accent, and in light theme dark greys -> light greys, light text -> dark text,
-// bright colours -> their darker light-theme versions. Shadows and dark see-through overlays are left alone.
+// Export colors follow light or dark mode. Semantic colors use a fixed palette.
 const PT_TEALS = new Set(["20,184,166", "45,212,191", "60,194,168", "15,124,107", "47,196,178", "42,157,143"]);
 const ptHex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
 function ptParseColor(s) {
@@ -38,14 +35,12 @@ function ptHslToRgb(h, s, l) {
   };
   return [f(h + 1 / 3), f(h), f(h - 1 / 3)].map((x) => Math.round(x * 255));
 }
-// light: is the window showing the light theme; accent: [light, dark] hex of the chosen accent
-function ptMapColor(s, light, accent) {
+function ptMapLightColor(s) {
   const c = ptParseColor(s);
   if (!c) return s;
   let [r, g, b, a] = c;
   const out = (rgb) => (a >= 1 ? `rgb(${rgb.join(",")})` : `rgba(${rgb.join(",")},${a})`);
-  if (PT_TEALS.has(`${r},${g},${b}`)) return out(ptHex(light ? accent[0] : accent[1]));
-  if (!light) return s;
+  if (PT_TEALS.has(`${r},${g},${b}`)) return out(ptHex("#0f7c6b"));
   const [h, sat, l] = ptRgbToHsl(r, g, b);
   if (a < 1 && l < 0.2) return s; // shadows / dark overlays
   // greys, including the dark blue-greys the pictures use for backgrounds: flip light and dark
@@ -94,19 +89,12 @@ window.ptInstallImgTheme = (w) => {
     if (!C || C.__ptTheme) return;
     C.__ptTheme = 1;
     const FD = Object.getOwnPropertyDescriptor(C, "fillStyle");
-    const state = () => {
-      if (w.ptNoImgTheme) return null; // a picture that copies the page as it looks (Build Sheets' sheet)
-      const t = w.document.documentElement.getAttribute("data-theme");
-      const light = t ? t === "light" : !w.matchMedia("(prefers-color-scheme: dark)").matches;
-      const a = PT_ACCENTS[SET.accent] || PT_ACCENTS.teal;
-      if (!light && SET.accent === "teal") return null; // the pictures' own style
-      return { light, accent: [a[1], a[2]] };
+    const isLight = () => {
+      if (w.ptNoImgTheme) return false; // Build Sheets supplies final colors from its export stylesheet.
+      const mode = w.document.documentElement.getAttribute("data-theme");
+      return mode ? mode === "light" : w.matchMedia("(prefers-color-scheme: light)").matches;
     };
-    const map = (v) => {
-      if (typeof v !== "string") return v;
-      const st = state();
-      return st ? ptMapColor(v, st.light, st.accent) : v;
-    };
+    const map = (v) => typeof v === "string" && isLight() ? ptMapLightColor(v) : v;
     // a colour the person picked themselves (a custom tier row colour) is drawn exactly, in any theme
     C.ptFillExact = function (v) {
       this.__ptRaw = v;
@@ -153,9 +141,7 @@ window.ptInstallImgTheme = (w) => {
         segs.forEach(([t, col]) => {
           if (!t) return;
           if (col) {
-            const st = state();
-            // light picture: its own light colour, set as is; dark: the dark colour (accent mapping doesn't touch these)
-            FD.set.call(this, st && st.light ? PT_NAMECOL_LIGHT[t] || col : col);
+            FD.set.call(this, isLight() ? PT_NAMECOL_LIGHT[t] || col : col);
           } else FD.set.call(this, fs);
           ft.call(this, t, cx, y);
           cx += this.measureText(t).width;

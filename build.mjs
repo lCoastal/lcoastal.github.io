@@ -55,6 +55,7 @@ function parts() {
   const mins = JSON.stringify(readJson("data/minerals-list.json"));
   return [
     entry("COMMON", jsString(read("shared/common.html"))),
+    entry("EQUIPMENT_ENTRY", jsString(read("shared/equipment-entry.html"))),
     entry("ROUTE", jsString(read("shared/route.html"))),
     entry("MINS", jsString(mins)),
   ].join("\n");

@@ -14,22 +14,22 @@ function randomName(){return ""}
 let D={list:[],cur:null,cmp:null};try{Object.assign(D,JSON.parse(localStorage.getItem("pt-eqload")||"{}"))}catch(e){}
 if(!Array.isArray(D.list)||!D.list.length){D.list=[blank()];D.cur=D.list[0].id}
 if(!D.list.some(l=>l.id===D.cur))D.cur=D.list[0].id;
-const save=()=>{try{localStorage.setItem("pt-eqload",JSON.stringify(D))}catch(e){}};
+const save=()=>{try{localStorage.setItem("pt-eqload",JSON.stringify(D,ptSkipDraftRoll))}catch(e){}};
 const L=()=>D.list.find(l=>l.id===D.cur);
 const owned=(l,k)=>{if(k==="neck"||k==="charm")return true;if(k==="r6"||k==="r7")return !!l.robux;return +k.slice(1)<Math.max(0,Math.min(6,+l.nRings||0))};
 // one stat line on an item at its stars, quality and mutation
 const valOf=(s,v)=>{const lo=v.l==="5"?s[1]:s[3],hi=v.l==="5"?s[2]:s[4];return (lo+(hi-lo)*(v.q??100)/100)*(MUT[v.m||"None"]||MUTS[0])[1]};
-function itemStats(v){const x=EB[v.n];if(!x)return [];const out=x.st.map(s=>[s[0],valOf(s,v),!!s[5]]);Object.entries((MUT[v.m||"None"]||MUTS[0])[2]).forEach(([n,a])=>{const o=out.find(z=>z[0]===n);if(o)o[1]+=a;else out.push([n,a,PCT.has(n)])});return out}
+function itemStats(v){const x=EB[v.n];if(!x)return [];const entered=ptEnteredStats(v);if(entered)return ptEquipmentFields(x,(MUT[v.m]||MUTS[0])[2]).map(([n,p])=>[n,entered[n],p]);const out=x.st.map(s=>[s[0],valOf(s,v),!!s[5]]);Object.entries((MUT[v.m||"None"]||MUTS[0])[2]).forEach(([n,a])=>{const o=out.find(z=>z[0]===n);if(o)o[1]+=a;else out.push([n,a,PCT.has(n)])});return out}
 function totals(l){const t={};SLOTS.forEach(([k])=>{const v=l.slots[k];if(!v||!v.n||!owned(l,k))return;itemStats(v).forEach(([n,a,p])=>{t[n]=t[n]||{v:0,p};t[n].v+=a})});return t}
 const ORDER=["Luck","Capacity","Size Boost","Sell Boost","Modifier Boost","Dig Strength","Dig Speed","Shake Strength","Shake Speed","Walk Speed","Inventory Size","Jump Power"];
 const sortStats=o=>Object.keys(o).sort((a,b)=>(ORDER.indexOf(a)+99)%99-(ORDER.indexOf(b)+99)%99||a.localeCompare(b));
 const valT=(a,p)=>(a<0?"−":"+")+fmt(Math.abs(a),2)+(p?"%":"");
-const starT=v=>(v.l==="5"?"5★":"6★")+((v.q??100)!==100?`, ${v.q}%`:"");
+const starT=v=>ptEnteredStats(v)?"Entered stats":(v.l==="5"?"5★":"6★")+((v.q??100)!==100?`, ${v.q}%`:"");
 function tile(l,k,label,kind,big){const own=owned(l,k);const v=l.slots[k];const x=v&&v.n?EB[v.n]:null;
   if(!own)return `<div class="tile lock${big?" big":""}" aria-label="${esc(label)} (not unlocked)"><span class="tk">${esc(label)}</span><span class="tag">Not unlocked</span></div>`;
   if(!x)return `<button type="button" class="tile empty${big?" big":""}" data-slot="${k}" aria-label="Pick a ${kind.toLowerCase()} for ${esc(label)}"><span class="tk">${esc(label)}</span><span class="plus">+</span><span class="tag">Empty</span></button>`;
   const mu=v.m&&v.m!=="None"?v.m:"";const img=IMG(x.n);
-  return `<button type="button" class="tile${big?" big":""}" data-slot="${k}" data-tipk="${k}" data-equip="${esc(x.n)}" style="--tc:${RHEX[x.r]||"#3a444d"};--mc:${MCOL[mu]||"#fff"}" aria-label="${esc(label)}: ${esc(x.n)}"><span class="tk">${esc(label)}</span><span class="st">${v.l==="5"?"5★":"6★"}, ${v.q??100}%</span>${img?`<img src="${img}" alt="">`:""}<span class="meta">${mu?`<span class="mu">${esc(mu)}</span>`:""}<span class="tn">${esc(x.n)}</span><span class="tag" style="color:${RHEX[x.r]}">${x.r}</span></span></button>`}
+  return `<button type="button" class="tile${big?" big":""}" data-slot="${k}" data-tipk="${k}" data-equip="${esc(x.n)}" style="--tc:${RHEX[x.r]||"#3a444d"};--mc:${MCOL[mu]||"#fff"}" aria-label="${esc(label)}: ${esc(x.n)}"><span class="tk">${esc(label)}</span><span class="st">${ptEnteredStats(v)?"Entered stats":(v.l==="5"?"5★":"6★")+", "+(v.q??100)+"%"}</span>${img?`<img src="${img}" alt="">`:""}<span class="meta">${mu?`<span class="mu">${esc(mu)}</span>`:""}<span class="tn">${esc(x.n)}</span><span class="tag" style="color:${RHEX[x.r]}">${x.r}</span></span></button>`}
 function render(){const l=L();
   $("sel").innerHTML=D.list.map(x=>`<option value="${x.id}"${x.id===l.id?" selected":""}>${esc(x.name||"Untitled loadout")}</option>`).join("");
   if(document.activeElement!==$("name"))$("name").value=l.name;if(document.activeElement!==$("notes"))$("notes").value=l.notes||"";
@@ -131,7 +131,7 @@ async function loadImage(){const l=L();const F='"IBM Plex Sans","Segoe UI",syste
     c.fillStyle="#98a2ad";c.font=`700 10px ${F}`;c.fillText(label,x+9,y+16);
     if(!own){c.fillStyle="#5d6670";c.font=`12px ${F}`;c.fillText("Not unlocked",x+9,y+h-12);return}
     if(!it){c.fillStyle="#5d6670";c.font=`12px ${F}`;c.fillText("Empty",x+9,y+h-12);return}
-    c.fillStyle="#ffd36b";c.font=`700 11px ${F}`;const stt=(v.l==="5"?"5★":"6★")+", "+(v.q??100)+"%";c.fillText(stt,x+w-9-c.measureText(stt).width,y+16);
+    c.fillStyle="#ffd36b";c.font=`700 11px ${F}`;const stt=ptEnteredStats(v)?"Entered stats":(v.l==="5"?"5★":"6★")+", "+(v.q??100)+"%";c.fillText(stt,x+w-9-c.measureText(stt).width,y+16);
     const mu=v.m&&v.m!=="None"?v.m:"";const ic=icons[k];
     if(big){if(ic)c.drawImage(ic,x+12,y+(h-84)/2+6,84,84);const tx=x+(ic?108:12);let ty=y+h/2-6;
       if(mu){c.fillStyle=MCOL[mu];c.font=`700 11px ${F}`;c.fillText(mu,tx,ty-16)}
@@ -155,3 +155,12 @@ $("bImg").onclick=async()=>{let blob=null;try{blob=await loadImage()}catch(e){co
   try{await window.parent.ptSave(nm+".png",blob);toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}};
 window.ptOpenFor=(kind,name)=>{const x=EB[name];if(!x)return;const l=L();const k=x.slot==="Necklace"?"neck":x.slot==="Charm"?"charm":(SLOTS.slice(2).find(([k])=>owned(l,k)&&!(l.slots[k]&&l.slots[k].n))||["r0"])[0];openPick(k)};
 render();
+
+ptEquipmentEditor({
+  tool:"eqload",
+  entries:()=>SLOTS.filter(([k])=>owned(L(),k)&&EB[L().slots[k]?.n]).map(([k,label])=>{
+    const item=L().slots[k];return {item,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EB[item.n],(MUT[item.m]||MUTS[0])[2])};
+  }),
+  snapshot:()=>L(),restore:data=>{const l={...data,id:blank().id};D.list.push(l);D.cur=l.id},
+  maximum:()=>Object.values(L().slots).forEach(v=>{if(v)v.q=100}),refresh:()=>{save();render()}
+});

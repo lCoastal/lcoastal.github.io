@@ -7,6 +7,7 @@
 <title>Stat Calculator</title>
 
 %%COMMON%%
+%%EQUIPMENT_ENTRY%%
 <style data-file="style.css"></style>
 </head>
 <body>
@@ -27,7 +28,8 @@
       <section class="card"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center"><h2>Jewelry <button type="button" class="rst" data-reset="jewelry">Reset</button></h2>
         <span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="seg" role="group" aria-label="Set every slot's stars"><button type="button" data-all="0">No ★</button><button type="button" data-all="5">All 5★</button><button type="button" data-all="6">All 6★</button></span><select id="allMut" data-ptmut aria-label="Set every slot's mutation"><option value="">Set all mutations…</option></select></span></div>
         <details class="hintd"><summary>How stars, quality and mutations work</summary><p class="hint">Stars set the stat range (0★ uses the same range as 5★), quality is where the roll lands inside it (0% worst, 100% best), and the mutation multiplies the result on top.<br>This is a planner, so quality is spread evenly over every stat. In game a 50% item isn't always 50% on each stat: it could be 100% luck and 0% sell boost, which still averages out to 50%.</p></details>
-        <div id="slots"></div></section>
+        <div id="slots"></div>
+<details id="equipment-entry"></details></section>
       <section class="card"><h2>Museum <button type="button" class="rst" data-reset="museum">Reset</button></h2>
         <div class="addrow"><span class="lab">From</span><select id="mus" aria-label="Museum boosts from"></select><button type="button" class="lnk" id="musCopy">Edit a copy here</button></div>
         <p class="hint" id="musTxt"></p><div id="musEd"></div></section>
