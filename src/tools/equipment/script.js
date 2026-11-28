@@ -80,6 +80,7 @@ function bpSection(x){if(!x.bp)return "";const qs=bpQuests(x);
     ${qs.map(q=>`<div class="bpq"><div class="bpqh"><b>${esc(q.n)}</b><span>${esc(q.npc||"")}${q.loc?`, <span class="lk" data-location="${esc(q.loc)}">${esc(q.loc)}</span>`:""}</span></div>
       ${q.steps&&q.steps.length?`<ol>${q.steps.map(t=>`<li>${esc(t)}</li>`).join("")}</ol>`:""}
       ${q.rw?`<div class="bprw"><span class="lab">Rewards</span> ${esc(q.rw)}</div>`:""}</div>`).join("")}</div>`}
+const limitedTag=x=>x.ev?'<span class="limited">Limited time</span>':"";
 const bpTag=x=>x.bp?`<span class="bp" title="${esc(x.bp)}">${BPI}Blueprint</span>`:"";
 $("q").oninput=()=>{st.q=$("q").value.trim().toLowerCase();render()};
 $("sort").onchange=()=>{st.sort=$("sort").value;st.rev=false;save();render()};
@@ -115,7 +116,7 @@ function render(){
   $("list").innerHTML=groups.some(g=>g[1].length)?groups.map(([r,rs,gc,skip])=>`<section class="grp${skip==="r"?"":" neutral"}" style="--rc:${gc}">${r?`<div class="gh"><b>${r}</b><span>${rs.length} ${rs.length===1?"item":"items"}</span></div>`:""}
     <table class="eq ${st.lvls.length>2?"many":st.lvls.length>1?"two":"one"}"><colgroup><col class="c-ic"><col class="c-nm"${st.lvls.length>1?` style="width:${st.lvls.length>2?15:18}%"`:""}><col class="c-st"${st.lvls.length>1?` style="width:auto"`:""}><col class="c-rc"${st.lvls.length>1?` style="width:210px"`:""}><col class="c-pr"><col class="c-t"></colgroup><thead><tr><th aria-label="Icon"></th><th>Name</th><th>${st.lvls.length===1?`Stats (${LVLN[st.lvl]})`:"Stats"}</th><th>Recipe</th><th style="text-align:center">Price</th><th aria-label="Favourite and owned"></th></tr></thead><tbody>
     ${rs.map(x=>`<tr tabindex="0" data-open="${x.i}"${skip==="r"?` style="--rc:${rc(x.r)};--nc:${rc(x.r)}"`:` class="plain" style="--rc:var(--line);--nc:${rc(x.r)}"`}><td class="ic"><div class="icon">${x.img?`<img src="${x.img}" alt="" width="36" height="36" loading="lazy">`:""}</div></td>
-      <td><div class="nm"><b>${esc(x.n)}</b><span>${skip==="slot"?"":x.slot}${skip==="r"?"":(skip==="slot"?"":", ")+"<span style=\"color:"+rc(x.r)+"\">"+x.r+"</span>"}${x.ev?", limited-time":""}</span>${ONE_ONLY.has(x.n)?`<span class="tags">${oneTag(x)}${bpTag(x)}</span>`:bpTag(x)}</div></td>
+      <td><div class="nm"><b>${esc(x.n)}</b><span>${skip==="slot"?"":x.slot}${skip==="r"?"":(skip==="slot"?"":", ")+"<span style=\"color:"+rc(x.r)+"\">"+x.r+"</span>"}</span>${(ONE_ONLY.has(x.n)||x.bp||x.ev)?`<span class="tags">${oneTag(x)}${bpTag(x)}${limitedTag(x)}</span>`:""}</div></td>
       <td class="sts-c"><div class="sts">${stHtml(x,hl)}</div></td>
       <td class="rec-c"><div class="rec">${x.rec.map(m=>matHtml(m)).join("")}</div></td>
       <td class="pr">${priceHtml(x)}</td><td class="t"><span class="tg">${tgHtml(x.n)}<button type="button" class="hidebtn" data-hide="${esc(x.n)}" title="Hide ${esc(x.n)}" aria-label="Hide ${esc(x.n)}"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path stroke="currentColor" stroke-width="1.5" d="M2.5 13.5l11-11"/></svg></button></span></td></tr>`).join("")}</tbody></table></section>`).join(""):'<div class="empty">Nothing matches these filters.</div>';
@@ -142,7 +143,7 @@ function showEquip(i){
   page.style.setProperty("--gc",rc(x.r));
   const others=E.filter(y=>y.slot===x.slot&&y!==x);
   page.innerHTML=`<div class="ph"><div class="icon">${x.img?`<img src="${window.ptBig?ptBig(x.img):x.img}" alt="" width="120" height="120">`:""}</div>
-      <div><span class="rr" style="--rc:${rc(x.r)}">${x.r} ${x.slot}${x.ev?", limited-time":""}</span><h2 id="pname">${esc(x.n)}</h2>${oneTag(x)}</div>
+      <div><span class="rr" style="--rc:${rc(x.r)}">${x.r} ${x.slot}</span><h2 id="pname">${esc(x.n)}</h2>${oneTag(x)} ${limitedTag(x)}</div>
       <div class="pv">${x.price==null?"-":x.cur==="$"?"$"+fmt(x.price):fmt(x.price)+" "+esc(x.cur)}<small>craft cost</small></div>
       <button type="button" class="btn" id="pclose">Close</button></div>
     ${x.d?`<p class="desc">${esc(x.d)}</p>`:""}
@@ -194,9 +195,9 @@ async function equipImage(){
   const lvl=st.lvls.map(l=>LVLN[l]).join(", ");
   // lay out each row first so we know the picture height
   const recLay=x=>{m.font=`13px ${F}`;const lines=[[]];let lx=0;const av=CW[3]-24;x.rec.forEach(([q,n,kg])=>{const t=`${q}× ${n}${kg?" +"+kg:""}`;const w=22+m.measureText(t).width+14;if(lx+w>av&&lines[lines.length-1].length){lines.push([]);lx=0}lines[lines.length-1].push({t,n,w});lx+=w});return lines};
-  const tagsOf=x=>[...(ONE_ONLY.has(x.n)?[["Only 1 can be worn","#f0a35a"]]:[]),...(x.bp&&st.bpTag?[["Blueprint","#7fb2ff"]]:[])];
+  const tagsOf=x=>[...(ONE_ONLY.has(x.n)?[["Only 1 can be worn","#f0a35a"]]:[]),...(x.bp&&st.bpTag?[["Blueprint","#7fb2ff"]]:[]),...(x.ev?[["Limited time","#c49bff"]]:[])];
   const G=groups.map(([title,rows,gc,skip])=>({title,skip,col:title==="Limited-time"?"#f0955f":skip==="r"?RHX[title]||"#3a424b":"#3a424b",rows:rows.map(x=>{const S=NL===1?statsAt(x,st.lvl):multiRows(x),R=recLay(x),T=tagsOf(x);
-    const subTxt=[skip==="slot"?"":x.slot,skip==="r"?"":x.r,x.ev?"limited-time":""].filter(Boolean).join(", ");
+    const subTxt=[skip==="slot"?"":x.slot,skip==="r"?"":x.r].filter(Boolean).join(", ");
     const nameH=24+(subTxt?18:0)+(T.length?24:0);const h=Math.max(70,(S.length+(NL>1?1:0))*21+18,R.length*26+18,nameH+18);return {x,S,R,T,subTxt,h}})}));
   const HEAD=66,GH=40,TH=30,GGAP=14;
   const H=PAD+HEAD+G.reduce((a,g)=>a+GH+TH+g.rows.reduce((b,r)=>b+r.h,0)+GGAP,0)-GGAP+PAD;
