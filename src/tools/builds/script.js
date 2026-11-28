@@ -680,16 +680,16 @@ document.getElementById("bImg").onclick=async()=>{
   box.innerHTML=sheetHTML(getB());const sh=box.firstElementChild;
   sh.querySelectorAll(".rtoggle").forEach(t=>t.remove());
   document.body.appendChild(box);
-  const cs=getComputedStyle(sh),page=cs.getPropertyValue("--bg").trim()||"#12161b",card=cs.getPropertyValue("--card").trim(),
-    line=cs.getPropertyValue("--line").trim(),acc=cs.getPropertyValue("--acc").trim()||"#3cc2a8",dim=cs.getPropertyValue("--dim").trim();
+  const cs=getComputedStyle(sh),page=cs.getPropertyValue("--bg").trim()||"#12161b",
+    line=cs.getPropertyValue("--line").trim(),dim=cs.getPropertyValue("--dim").trim();
   const frame=document.createElement("div");
   frame.style.cssText=`width:980px;box-sizing:border-box;padding:26px;background:${page};font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif`;
   box.appendChild(frame);frame.appendChild(sh);
-  sh.style.background=card;sh.style.border="1px solid "+line;sh.style.borderRadius="16px";
+  sh.style.border="1px solid "+line;sh.style.borderRadius="16px";
   const by=document.createElement("div");
-  by.style.cssText="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 2px 0;font-size:12.5px;color:"+dim;
+  by.style.cssText="display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px 2px 0;font-size:12.5px;color:"+dim;
   const pill=document.createElement("span");pill.textContent="Made by @__coastal";
-  pill.style.cssText=`display:inline-block;padding:4px 13px;border-radius:999px;border:1px solid ${acc};color:${acc};font:600 12.5px "IBM Plex Sans","Segoe UI",system-ui,sans-serif`;
+  pill.style.cssText=`font:600 12.5px "IBM Plex Sans","Segoe UI",system-ui,sans-serif`;
   const site=document.createElement("span");site.textContent="Prospecting Toolkit";
   by.appendChild(site);by.appendChild(pill);frame.appendChild(by);
   try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
