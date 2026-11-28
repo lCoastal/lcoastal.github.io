@@ -25,7 +25,7 @@
     <div class="srow stk"><div class="stx"><b>Theme</b><span>Auto follows your device or the app. Light and Dark always use that theme.</span></div><div class="seg" id="thm" role="group" aria-label="Theme"><button type="button" data-t="auto">Auto</button><button type="button" data-t="light">Light</button><button type="button" data-t="dark">Dark</button></div></div>
     <div class="srow stk"><div class="stx"><b>Accent colour</b><span>The colour of buttons, switches, links and highlights in every tool.</span><span class="accn" id="accN"></span></div><div class="sws" id="acc" role="radiogroup" aria-label="Accent colour"></div></div>
   </section>
-  <section class="card set"><h2>Colors</h2>
+  <details class="card set" id="colorSettings"><summary>Colors</summary>
     <div class="srow"><div class="stx"><b>All colors</b><span id="color_all_hint">Turn the entire toolkit grayscale. Your individual color choices are kept.</span></div><button type="button" class="sw" role="switch" data-k="color_all" aria-label="All colors" aria-describedby="color_all_hint"></button></div>
     <div class="srow"><div class="stx"><b>Rarity colors</b><span id="color_rarity_hint">Mineral and equipment rarity labels, borders and badges.</span></div><button type="button" class="sw" role="switch" data-k="color_rarity" aria-label="Rarity colors" aria-describedby="color_rarity_hint"></button></div>
     <div class="srow"><div class="stx"><b>Equipment mutation colors</b><span id="color_mutation_hint">Mutation labels, cards and picker options.</span></div><button type="button" class="sw" role="switch" data-k="color_mutation" aria-label="Equipment mutation colors" aria-describedby="color_mutation_hint"></button></div>
@@ -34,7 +34,7 @@
     <div class="srow"><div class="stx"><b>Event and limited-time colors</b><span id="color_event_hint">Event categories and limited-time badges.</span></div><button type="button" class="sw" role="switch" data-k="color_event" aria-label="Event and limited-time colors" aria-describedby="color_event_hint"></button></div>
     <div class="srow"><div class="stx"><b>Build comparison colors</b><span id="color_comparison_hint">Colors used to distinguish builds in Compare Builds.</span></div><button type="button" class="sw" role="switch" data-k="color_comparison" aria-label="Build comparison colors" aria-describedby="color_comparison_hint"></button></div>
     <div class="srow"><div class="stx"><b>Tier colors</b><span id="color_tier_hint">Custom tier labels and backgrounds in Tier List.</span></div><button type="button" class="sw" role="switch" data-k="color_tier" aria-label="Tier colors" aria-describedby="color_tier_hint"></button></div>
-  </section>
+  </details>
   <section class="card set"><h2>Display</h2>
     <div class="srow"><div class="stx"><b>Compact view</b><span>Tighter tables, cards and chips, so more fits on screen.</span></div><button type="button" class="sw" role="switch" data-k="compact" aria-label="Compact view"></button></div>
     <div class="srow"><div class="stx"><b>Short numbers</b><span>Shows big numbers in short form. On a computer, hover one to see the full number.</span><span class="ex pt-noshort" id="ex1"></span></div><button type="button" class="sw" role="switch" data-k="short" aria-label="Short numbers"></button></div>

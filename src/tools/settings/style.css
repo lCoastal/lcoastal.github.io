@@ -36,3 +36,6 @@ kbd.rec{border-color:var(--accent);color:var(--accent);animation:hkp 1s ease-in-
 .yf{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:600;color:var(--muted)}
 .yf input{width:130px;font:inherit;font-size:14px;font-weight:400;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:7px 9px}
 .yck{display:flex;align-items:center;gap:6px;font-size:14px;padding-bottom:8px}
+
+#colorSettings>summary{cursor:pointer;font-weight:700;color:var(--fg)}
+#colorSettings[open]>summary{margin-bottom:8px}

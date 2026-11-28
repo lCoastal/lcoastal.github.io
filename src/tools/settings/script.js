@@ -2,6 +2,11 @@
 const PW=window.parent;
 const get=()=>{try{return PW.ptSettings()}catch(e){return {compact:false,short:false,dec:2,scroll:true}}};
 const set=(k,v)=>{try{PW.ptSetSetting(k,v)}catch(e){}draw()};
+const colorSettings=document.getElementById("colorSettings");
+colorSettings.open=get().colorsOpen===true;
+colorSettings.addEventListener("toggle",()=>{
+  if(colorSettings.open!==!!get().colorsOpen)set("colorsOpen",colorSettings.open);
+});
 const UN=[["Qi",1e18],["Qa",1e15],["T",1e12],["B",1e9],["M",1e6]];
 const sh=(n,d)=>{for(const [u,x] of UN)if(n>=x){let v=(n/x).toFixed(d);if(v.includes("."))v=v.replace(/0+$/,"").replace(/\.$/,"");return v+u}return n.toLocaleString("en-US")};
 const ACC=(()=>{try{return PW.PT_ACCENTS}catch(e){return null}})()||{teal:["Teal","#0f7c6b","#3cc2a8"]};
