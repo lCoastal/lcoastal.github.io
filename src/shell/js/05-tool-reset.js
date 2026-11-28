@@ -1,6 +1,6 @@
 // "Reset this tool": puts one tool's inputs and view back to default. Saved builds, loadouts, boards and lists stay.
 const PT_RESET = {
-  builds: { keys: ["pbs-builds", "pbs-current", "pbs-fold", "pbs-hidep", "pbs-rings", "pbs-view"], what: "every build sheet, its name and the view" },
+  builds: { keys: ["pbs-current", "pbs-fold", "pbs-hidep", "pbs-rings", "pbs-view"], what: "the sheet selection and view (saved sheets stay)" },
   planner: { keys: ["mp-board", "mp-board-b", "mp-cmp", "mp-cmp-hide", "mp-cmp-names"], what: "the boards and comparison view (saved loadouts stay)" },
   boosts: { keys: ["mb-incmut", "mb-stat", "mb-zone", "mb-rar", "mb-pick", "mb-mpick", "mb-pickon", "mb-name"] },
   minerals: { keys: ["pm-filters"] },
@@ -21,7 +21,7 @@ const PT_RESET = {
   bestcap: { keys: ["pt-bestcap"] },
   buildcmp: { keys: ["pt-bcmp"] },
   dredge: { keys: ["pt-dredge"] },
-  eqload: { keys: ["pt-eqload"] },
+  eqload: { keys: ["pt-eqload"], keep: { "pt-eqload": ["list"] }, what: "the selection and comparison (saved loadouts stay)" },
   craftquality: { keys: ["c5-s"] },
   reforge: { keys: ["rf-s"] },
   eqcompare: { keys: ["eqc-s"] },
@@ -62,7 +62,7 @@ function ptAddReset(f, id) {
   b.className = "pt-rs";
   b.style.cssText =
     "flex-basis:auto;margin:4px auto 0;padding:3px 12px;border-radius:999px;border:1px solid var(--line,#8884);background:transparent;color:var(--muted,#888);font:500 12px/1.4 inherit;cursor:pointer";
-  const label = "Reset this tool";
+  const label = "Reset view and inputs";
   b.textContent = label;
   b.title = "Puts " + (R.what || "this tool's inputs and view") + " back to default";
   const wrap = d.createElement("div");

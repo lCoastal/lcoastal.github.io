@@ -648,7 +648,7 @@ document.getElementById("buildSel").addEventListener("change",e=>{cur=e.target.v
 const S1=(m,o)=>Object.assign({m,pick:1,join:"|",mark:"",span:1},o||{});
 document.getElementById("bNew").onclick=()=>{const b=blankBuild(randomName());B.push(b);cur=b.id;persist();renderAll();toast("New build added");document.getElementById("f-name").select()};
 document.getElementById("bDup").onclick=()=>{const c=JSON.parse(JSON.stringify(getB()));c.id=uid();c.name=(c.name||"Build")+" (copy)";B.push(c);cur=c.id;persist();renderAll();toast("Duplicated")};
-function delBtn(){const d=document.getElementById("bDel");d.textContent=armDel?"Confirm delete":"Delete";d.classList.toggle("warn",armDel)}
+function delBtn(){const d=document.getElementById("bDel");d.textContent=armDel?"Confirm delete":"Delete sheet";d.classList.toggle("warn",armDel)}
 document.getElementById("bDel").onclick=()=>{if(!armDel){armDel=true;delBtn();return}const n=getB().name;B=B.filter(b=>b.id!==cur);if(!B.length)B.push(blankBuild(randomName()));cur=B[0].id;armDel=false;delBtn();persist();renderAll();toast(`Deleted “${n}”`)};
 
 // ---------- download / import ----------

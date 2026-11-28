@@ -103,7 +103,7 @@ function openMineral(name,fromEl){
 }
 
 // ---- the mineral at your stats: shared luck / capacity / Size Boost / magnifier, worked out by the toolkit's formulas ----
-const OPEN=[["odds","Luck Odds"],["bestcap","Best Luck Cap"],["buildcmp","Compare Builds"],["weightrange","Weight Range"],["sizefinder","Size Boost Finder"],["dredge","Dredge Master"]];
+const OPEN=[["odds","Luck Odds"],["bestcap","Best Luck Cap"],["buildcmp","Compare Builds for a Mineral"],["weightrange","Weight Range"],["sizefinder","Size Boost Finder"],["dredge","Dredge Master"]];
 const nf=(v,d)=>Number(v).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:0});
 const oneInP=p=>!(p>0)?"-":p>=.5?nf(p*100,0)+"%":"1 in "+nf(Math.round(1/p),0);
 const kgf=v=>!isFinite(v)?"-":v>=1000?nf(v,0)+" kg":v>=100?nf(v,1)+" kg":nf(v,2)+" kg";

@@ -19,7 +19,7 @@ const own=n=>!!(Store.get(n)||{}).own;
 function fillSel(el,items,cur,blank){const list=items.filter(x=>!S.owned||own(x.name||x.n)||(x.name||x.n)===cur);
   el.innerHTML=(blank?`<option value="">${blank}</option>`:"")+list.map(x=>{const n=x.name||x.n;return `<option value="${esc(n)}"${n===cur?" selected":""}>${esc(n)}${x.r?", "+x.r:""}</option>`}).join("")}
 function buildSlots(){
-  $("slots").innerHTML=SLOTDEF.map(([k,l,slot])=>{const v=S.slots[k]||{};return `<div class="slot"><span class="sl">${l}</span>
+  $("slots").innerHTML=SLOTDEF.map(([k,l,slot])=>{const v=S.slots[k]||{};return `<div class="slot"><span class="sl">${l}<small data-source="${k}"></small><button type="button" class="qbtn" data-edit-slot="${k}" aria-label="Edit stats for ${l}">Edit stats</button></span>
     <button type="button" class="pick it" data-pick="${k}" aria-haspopup="listbox" aria-label="${l}"></button>
     <select data-lvl="${k}" aria-label="${l} stars"><option value="0">0★</option><option value="5">5★</option><option value="6">6★</option></select>
     <select data-mut="${k}" data-ptmut aria-label="${l} mutation">${MUTS.map(m=>`<option value="${m[0]}">${mutLabel(m)}</option>`).join("")}</select>
@@ -492,7 +492,13 @@ function renderSpread(){const v=spreadVals();let y={};try{y=window.parent.ptYou.
   $("spread").innerHTML=F.map(([k,n])=>{const same=String(y[k]??"")===v[k];return `<div class="sp1${same?" ok":""}"><small>${n}</small><b>${fmt(+v[k],k==="sb"?1:0)}</b><small class="now">${same?"Matches Your stats":y[k]?"Your stats: "+esc(fmt(+y[k],k==="sb"?1:0)):"Not set in Your stats"}</small></div>`}).join("")}
 
 document.addEventListener("click",e=>{if(!e.target.closest("#spSet"))return;try{window.parent.ptYou.set(spreadVals(),window)}catch(e){}renderSpread();toast("Your stats updated")});
-function render(){renderSpread();if(typeof fillProg==="function"&&$("progSum"))fillProg();
+function render(){
+  document.querySelectorAll("[data-source]").forEach(label=>{
+    const item=S.slots[label.dataset.source],used=!!item?.n;
+    label.textContent=used?(ptEnteredStats(item)?"Entered stats":(item.q??100)+"% quality"):"";
+    label.nextElementSibling.hidden=!used;
+  });
+  renderSpread();if(typeof fillProg==="function"&&$("progSum"))fillProg();
   renderIso();renderParts();renderUp();
   const r=compute(effState());
   const f=(s,v)=>PCT.has(s)?fmt(v,1)+"%":fmt(v,s==="Luck"||s==="Capacity"?0:1);
@@ -1094,11 +1100,16 @@ $("shareB").addEventListener("click",async()=>{const url=await ptCopyShare(build
 renderBf();
 all();
 
-ptEquipmentEditor({
+const editEquipmentSlot=ptEquipmentEditor({
   tool:"calc",
   entries:()=>SLOTDEF.filter(([k])=>EQB[S.slots[k]?.n]).map(([k,label])=>{
-    const item=S.slots[k];return {item,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EQB[item.n],MUT[item.m]||MUTS[0],item.l)};
+    const item=S.slots[k];return {item,slot:k,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EQB[item.n],MUT[item.m]||MUTS[0],item.l)};
   }),
   snapshot:()=>S.slots,restore:slots=>{S.slots=slots},
   maximum:()=>Object.values(S.slots).forEach(v=>{if(v)v.q=100}),refresh:()=>{save();all()}
+});
+
+document.getElementById("slots").addEventListener("click",event=>{
+  const edit=event.target.closest("[data-edit-slot]");
+  if(edit)editEquipmentSlot(edit.dataset.editSlot);
 });

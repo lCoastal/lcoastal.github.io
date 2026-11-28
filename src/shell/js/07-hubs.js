@@ -13,7 +13,7 @@ const GROUPS = [
       ["calc", "Stat Calculator"],
       ["rpm", "Rolls per Minute"],
       ["builds", "Build Sheets"],
-      ["buildcmp", "Compare Builds"],
+      ["buildcmp", "Compare Builds for a Mineral"],
     ],
   ],
   [
@@ -76,7 +76,7 @@ const GROUPS = [
     "#c084fc",
     true,
     [
-      ["mutations", "Gear Mutations", "mut", "Gear Mutations", "Every equipment mutation and its multiplier"],
+      ["mutations", "Equipment Mutations", "mut", "Equipment Mutations", "Every equipment mutation and its multiplier"],
       ["mutations", "Pan Enchants", "pan", "Pan Enchants", "Every pan enchant and what it does"],
       ["mutations", "Shovel Enchants", "sh", "Shovel Enchants", "Every shovel enchant and what it does"],
       ["runes", "Runes"],

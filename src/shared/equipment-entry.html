@@ -1,5 +1,6 @@
 <style>
 #equipment-entry{margin:12px 0;padding:10px 14px;border:1px solid var(--line);border-radius:10px}
+#equipment-entry [hidden]{display:none!important}
 #equipment-entry summary{cursor:pointer;font-weight:600}
 #equipment-entry .bar,#equipment-entry fieldset{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:10px 0}
 #equipment-entry fieldset{border:1px solid var(--line);border-radius:8px;padding:8px}
@@ -17,14 +18,14 @@ function ptEnteredStats(item, mutation=item.m, stars=item.l) {
 function ptSkipDraftRoll(key,value) { return key==="manualRoll" ? undefined : value; }
 
 // Each tool owns its draft. Only Save loadout persists the entered rolls.
-function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum}) {
+function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum,managePresets=true}) {
   const root=document.getElementById("equipment-entry");
-  root.innerHTML=`<summary>Equipment stats and saved loadouts</summary>
+  root.innerHTML=`<summary>${managePresets?"Equipment stats and saved loadouts":"Equipment stats"}</summary>
     <div class="bar"><button type="button" class="btn" data-max>Assume 100% quality</button>
     <button type="button" class="btn" data-edit>Enter final stats</button></div>
     <form hidden><p>Enter each value shown on the equipment, including its mutation.</p>
     <div data-fields></div><button class="btn" type="submit">Apply entered stats</button></form>
-    <div class="bar"><input aria-label="Equipment loadout name" placeholder="Loadout name" maxlength="60">
+    <div class="bar" ${managePresets?"":"hidden"}><input aria-label="Equipment loadout name" placeholder="Loadout name" maxlength="60">
     <button type="button" class="btn" data-save>Save loadout</button>
     <select aria-label="Saved equipment stats"></select><button type="button" class="btn" data-load>Load</button></div>
     <p class="hint" role="status"></p>`;
@@ -34,8 +35,10 @@ function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum}) {
   function list(){select.replaceChildren(...presets().map((s,i)=>new Option(s.name,String(i))));root.querySelector("[data-load]").disabled=!select.length}
   const fields=root.querySelector("[data-fields]");
   let editing=[];
+  let selectedSlot=null;
+  const selection=()=>entries().filter(e=>selectedSlot===null||e.slot===selectedSlot);
   function edit(){
-    editing=entries();fields.replaceChildren();
+    editing=selection();fields.replaceChildren();
     if(!editing.length){status.textContent="Choose equipment first.";form.hidden=true;return}
     for(const e of editing){
       const group=document.createElement("fieldset"),legend=document.createElement("legend");
@@ -57,9 +60,13 @@ function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum}) {
   }
   function signature(es){return JSON.stringify(es.map(e=>[e.label,ptRollKey(e.item,e.mutation,e.stars)]))}
   let opened="";
-  root.querySelector("[data-edit]").onclick=()=>{edit();opened=signature(editing)};
+  function openEditor(slot=null){
+    selectedSlot=slot;root.open=true;edit();opened=signature(editing);
+    if(slot!==null)form.querySelector("input")?.focus();
+  }
+  root.querySelector("[data-edit]").onclick=()=>openEditor();
   form.onsubmit=event=>{
-    event.preventDefault();const current=entries();
+    event.preventDefault();const current=selection();
     if(signature(current)!==opened){edit();opened=signature(editing);status.textContent="Equipment changed. Enter the values for this selection.";return}
     current.forEach((e,i)=>{const values=Object.fromEntries([...fields.children[i].querySelectorAll("input")].map(input=>[input.dataset.stat,input.valueAsNumber]));
       e.item.manualRoll={key:ptRollKey(e.item,e.mutation,e.stars),values};
@@ -74,7 +81,8 @@ function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum}) {
     try{localStorage.setItem(key,JSON.stringify(all));list();select.selectedIndex=all.length-1;status.textContent="Saved "+name+"."}catch{status.textContent="Could not save this loadout."}
   };
   root.querySelector("[data-load]").onclick=()=>{const saved=presets()[select.value];if(saved){restore(saved.data);form.hidden=true;refresh();status.textContent="Loaded "+saved.name+"."}};
-  root.addEventListener("toggle",()=>{if(root.open)list()});list();
+  if(managePresets){root.addEventListener("toggle",()=>{if(root.open)list()});list()}
+  return openEditor;
 }
 function ptEquipmentFields(piece, mutation, stars) {
   const [,multiplier,additions]=mutation;

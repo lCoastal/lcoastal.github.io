@@ -46,7 +46,7 @@ const SUF=["","K","M","B","T","Qa","Qi"];
 const money=v=>{if(!isFinite(v))return "-";const neg=v<0;v=Math.abs(v);return (neg?"-$":"$")+(v>=100?Math.round(v):Number(v.toFixed(2))).toLocaleString("en-US",{maximumFractionDigits:2})};
 // rarity order: most common first is "ascending"; non-panning ones go after, rarest-feeling by sell value
 const rareKey=m=>m.one?m.one:1e9+(100-m.sell);
-// the mutations the filters and sort currently show (the page and the saved image use the same list)
+// the modifiers the filters and sort currently show (the page and the saved image use the same list)
 function shownMuts(){const t=$("q").value.trim().toLowerCase();
   let rows=MUTS.filter(x=>(!S.kind||x.kind===S.kind)&&(!t||(x.n+" "+x.how+" "+x.look+" "+x.stats.join(" ")+" "+x.kind).toLowerCase().includes(t)));
   const cmp={rare:(a,b)=>rareKey(b)-rareKey(a)||b.sell-a.sell,sell:(a,b)=>b.sell-a.sell||a.i-b.i,name:(a,b)=>a.n.localeCompare(b.n)}[S.sort];
@@ -56,7 +56,7 @@ function render(){
   [...$("kinds").children].forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===S.kind)));
   const nat=S.sort==="name"?1:S.sort==="sell"?-1:-1;const d=nat*(S.rev?-1:1);
   $("dir").innerHTML=d>0?"<b>↑</b> Ascending":"<b>↓</b> Descending";$("dir").title="Click to sort "+(d>0?"descending":"ascending");
-  $("pinfo").innerHTML=m?`<span data-mineral="${esc(m.n)}" class="lk">${esc(m.n)}</span> is ${esc(m.r)} and sells for ${money(per)} per kg, so ${fmt(kg,2)} kg is ${money(per*kg)} with no mutation. Museum values below follow its rarity.`:(S.min?"No mineral by that name. Pick one from the list.":"Pick a mineral to see sell prices. Museum values follow the rarity on the right.");
+  $("pinfo").innerHTML=m?`<span data-mineral="${esc(m.n)}" class="lk">${esc(m.n)}</span> is ${esc(m.r)} and sells for ${money(per)} per kg, so ${fmt(kg,2)} kg is ${money(per*kg)} with no modifier. Museum values below follow its rarity.`:(S.min?"No mineral by that name. Pick one from the list.":"Pick a mineral to see sell prices. Museum values follow the rarity on the right.");
   const rows=shownMuts();
   const card=x=>{const mv=MULT[S.rar]*x.f;
     return `<article class="m" style="--mc:var(--m-${String(x.n).toLowerCase()},${x.c})"><div class="mh"><b>${esc(x.n)}</b><span class="tag">${esc(x.kind)}</span></div>
@@ -65,7 +65,7 @@ function render(){
     <div class="mus">${x.stats.length?x.stats.map(s=>`<span${window.ptK&&ptK(s)?` style="--kc:${ptK(s)}"`:""}>${esc(s)} <em>+${+(mv).toFixed(4)}×</em></span>`).join(""):'<span style="color:var(--muted);border-color:var(--line)">No museum boost</span>'}</div>
     <p class="row"><span class="lab">How to get</span>${esc(x.how)}</p>
     ${x.look?`<p class="look">${esc(x.look)}</p>`:""}</article>`};
-  if(!rows.length){$("list").innerHTML='<div class="empty">No mutations match.</div>';return}
+  if(!rows.length){$("list").innerHTML='<div class="empty">No modifiers match.</div>';return}
   $("list").innerHTML=S.sort==="rare"&&!S.kind
     ?(S.rev?[...KINDS].reverse():KINDS).map(k=>{const g=rows.filter(x=>x.kind===k);return g.length?`<p class="grp">${k}, ${esc(KIND_NOTE[k])}</p><div class="grid">${g.map(card).join("")}</div>`:""}).join("")
     :`<div class="grid">${rows.map(card).join("")}</div>`;
@@ -80,14 +80,14 @@ $("kinds").onclick=e=>{const b=e.target.closest("[data-k]");if(!b)return;S.kind=
 $("sort").onchange=()=>{S.sort=$("sort").value;S.rev=false;save();render()};
 $("dir").onclick=()=>{S.rev=!S.rev;save();render()};
 $("q").oninput=render;
-$("toImg").onclick=()=>{const rows=shownMuts();if(!rows.length){ptToast("No mutations match, nothing to save");return}
+$("toImg").onclick=()=>{const rows=shownMuts();if(!rows.length){ptToast("No modifiers match, nothing to save");return}
   const m=curMin(),kg=Math.max(0,+S.kg||0),per=m?num(m.v):null,q=$("q").value.trim();
-  const cols=[{h:"Mutation",w:.17},{h:"Sells for",w:.09,al:"r"},m?{h:`${fmt(kg,2)} kg ${m.n}`,w:.13,al:"r"}:null,{h:"Chance",w:.12,al:"r"},{h:`Museum (${S.rar})`,w:m?.22:.26},{h:"How to get",w:m?.27:.36}].filter(Boolean);
+  const cols=[{h:"Modifier",w:.17},{h:"Sells for",w:.09,al:"r"},m?{h:`${fmt(kg,2)} kg ${m.n}`,w:.13,al:"r"}:null,{h:"Chance",w:.12,al:"r"},{h:`Museum (${S.rar})`,w:m?.22:.26},{h:"How to get",w:m?.27:.36}].filter(Boolean);
   const row=x=>{const mv=MULT[S.rar]*x.f;return {cells:[{t:x.n,b:true,col:x.c,sub:x.kind},{t:fmt(x.sell,2)+"×",mono:true}].concat(m?[{t:money(per*kg*x.sell),mono:true}]:[]).concat([{t:x.one?"~1 in "+fmt(x.one,0):"-",mono:true},x.stats.length?{chips:x.stats.map(st=>({t:`${st} +${+(mv).toFixed(4)}×`,col:statHex(st)}))}:{t:"No museum boost",col:"#98a2ad",fs:12.5},{t:x.how,wrap:true,fs:12.5}])}};
   const grouped=S.sort==="rare"&&!S.kind;
   const list=grouped?(S.rev?[...KINDS].reverse():KINDS).flatMap(k=>{const g=rows.filter(x=>x.kind===k);return g.length?[{group:k+", "+KIND_NOTE[k]}].concat(g.map(row)):[]}):rows.map(row);
-  const sub=[`${rows.length} mutation${rows.length===1?"":"s"}`];if(S.kind)sub.push(S.kind);if(q)sub.push(`matching "${q}"`);sub.push(`museum values for ${S.rar}`);if(m)sub.push(`${fmt(kg,2)} kg ${m.n} sells for ${money(per*kg)} with no mutation`);
-  ptSaveImg(m?`${m.n} mutations`:"Mineral mutations",()=>ptTableImage({title:m?`Mutations on ${m.n}`:"Mineral mutations",tic:m&&m.ic,sub,sections:[{cols,rows:list}]}))};
+  const sub=[`${rows.length} modifier${rows.length===1?"":"s"}`];if(S.kind)sub.push(S.kind);if(q)sub.push(`matching "${q}"`);sub.push(`museum values for ${S.rar}`);if(m)sub.push(`${fmt(kg,2)} kg ${m.n} sells for ${money(per*kg)} with no modifier`);
+  ptSaveImg(m?`${m.n} modifiers`:"Mineral modifiers",()=>ptTableImage({title:m?`Modifiers on ${m.n}`:"Mineral modifiers",tic:m&&m.ic,sub,sections:[{cols,rows:list}]}))};
 window.ptFind=n=>{$("q").value=n;S.kind="";render()};
 $("toOdds").onclick=()=>{try{window.parent.show("mododds")}catch(e){}};
 render();

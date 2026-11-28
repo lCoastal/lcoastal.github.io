@@ -12,9 +12,32 @@ const SLOTS=[["neck","Necklace","Necklace"],["charm","Charm","Charm"],...Array.f
 const blank=n=>({id:"l"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:n||randomName(),notes:"",nRings:6,robux:false,slots:{}});
 function randomName(){return ""}
 let D={list:[],cur:null,cmp:null};try{Object.assign(D,JSON.parse(localStorage.getItem("pt-eqload")||"{}"))}catch(e){}
-if(!Array.isArray(D.list)||!D.list.length){D.list=[blank()];D.cur=D.list[0].id}
+// Import the earlier separately named stat presets into the loadout picker once.
+if(!Array.isArray(D.list))D.list=[];
+try{
+  const key="pt-equipment-presets-eqload",old=JSON.parse(localStorage.getItem(key)||"[]");
+  if(old.length){
+    const migrated=old.filter(p=>p?.data?.slots).map(p=>({...blank(),...p.data,name:p.name,id:blank().id}));
+    D.list.push(...migrated);
+    localStorage.setItem("pt-eqload",JSON.stringify(D));
+    localStorage.removeItem(key);
+  }
+}catch(e){}
+if(!D.list.length){D.list=[blank()];D.cur=D.list[0].id}
 if(!D.list.some(l=>l.id===D.cur))D.cur=D.list[0].id;
-const save=()=>{try{localStorage.setItem("pt-eqload",JSON.stringify(D,ptSkipDraftRoll))}catch(e){}};
+let saved=structuredClone(D.list);
+function save(){
+  const existing=new Set(D.list.map(l=>l.id));
+  saved=saved.filter(l=>existing.has(l.id));
+  try{localStorage.setItem("pt-eqload",JSON.stringify({cur:D.cur,cmp:D.cmp,list:saved}));return true}
+  catch(e){toast("Could not save loadouts in this browser");return false}
+}
+$("bSave").onclick=()=>{
+  if(!document.querySelector("#equipment-entry form").hidden){toast("Apply the entered stats before saving.");return}
+  const copy=structuredClone(L()),i=saved.findIndex(l=>l.id===copy.id);
+  if(i<0)saved.push(copy);else saved[i]=copy;
+  if(save())toast("Loadout saved");
+};
 const L=()=>D.list.find(l=>l.id===D.cur);
 const owned=(l,k)=>{if(k==="neck"||k==="charm")return true;if(k==="r6"||k==="r7")return !!l.robux;return +k.slice(1)<Math.max(0,Math.min(6,+l.nRings||0))};
 // one stat line on an item at its stars, quality and mutation
@@ -77,8 +100,8 @@ $("sel").onchange=()=>{D.cur=$("sel").value;if(D.cmp===D.cur)D.cmp=null;save();r
 $("bNew").onclick=()=>{const n=blank();const c=L();n.nRings=c.nRings;n.robux=c.robux;D.list.push(n);D.cur=n.id;save();render();$("name").focus();$("name").select()};
 $("bDup").onclick=()=>{const c=JSON.parse(JSON.stringify(L()));c.id=blank().id;c.name=(c.name||"Loadout")+" (copy)";D.list.push(c);D.cur=c.id;save();render();toast("Duplicated")};
 let armDel=false,delT=null;
-$("bDel").onclick=()=>{if(!armDel){armDel=true;$("bDel").textContent="Click again to delete";clearTimeout(delT);delT=setTimeout(()=>{armDel=false;$("bDel").textContent="Delete"},3000);return}
-  armDel=false;$("bDel").textContent="Delete";const gone=L().name;D.list=D.list.filter(l=>l.id!==D.cur);if(!D.list.length)D.list=[blank()];D.cur=D.list[0].id;if(!D.list.some(l=>l.id===D.cmp))D.cmp=null;save();render();toast(`Deleted "${gone}"`)};
+$("bDel").onclick=()=>{if(!armDel){armDel=true;$("bDel").textContent="Click again to delete";clearTimeout(delT);delT=setTimeout(()=>{armDel=false;$("bDel").textContent="Delete loadout"},3000);return}
+  armDel=false;$("bDel").textContent="Delete loadout";const gone=L().name;D.list=D.list.filter(l=>l.id!==D.cur);if(!D.list.length)D.list=[blank()];D.cur=D.list[0].id;if(!D.list.some(l=>l.id===D.cmp))D.cmp=null;save();render();toast(`Deleted "${gone}"`)};
 $("name").oninput=()=>{L().name=$("name").value;save();const o=$("sel").querySelector(`option[value="${D.cur}"]`);if(o)o.textContent=$("name").value||"Untitled loadout";renderCmp()};
 
 $("notes").oninput=()=>{L().notes=$("notes").value;save()};
@@ -157,7 +180,7 @@ window.ptOpenFor=(kind,name)=>{const x=EB[name];if(!x)return;const l=L();const k
 render();
 
 ptEquipmentEditor({
-  tool:"eqload",
+  tool:"eqload",managePresets:false,
   entries:()=>SLOTS.filter(([k])=>owned(L(),k)&&EB[L().slots[k]?.n]).map(([k,label])=>{
     const item=L().slots[k];return {item,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EB[item.n],MUT[item.m]||MUTS[0],item.l)};
   }),

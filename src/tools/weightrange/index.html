@@ -18,7 +18,7 @@
   <section class="card">
     <div class="inputs">
       <label class="fld"><span class="lab">Mineral or zone</span><input type="text" id="min" placeholder="e.g. Gold or Meteor Falls" autocomplete="off"></label>
-      <label class="fld"><span class="lab">Size Boost (panel %)</span><input type="number" id="sb" min="0" inputmode="decimal"></label>
+      <label class="fld"><span class="lab">Size Boost (%)</span><input type="number" id="sb" min="0" inputmode="decimal" aria-describedby="sbHint"><small id="sbHint">Enter 1476 for 1,476%.</small></label>
       <label class="fld"><span class="lab">Pan capacity</span><input type="number" id="cap" min="1" inputmode="numeric"></label>
       <button type="button" class="btn" id="fromCalc">Use my Stat Calculator stats</button>
     </div>
@@ -55,7 +55,7 @@
       <li><b>Zones:</b> each zone multiplies every weight by its factor (table above). A zone's lightest mineral is exactly 0.75 × its factor, which is how the factors were measured.</li>
       <li><b>Capacity matters:</b> about a quarter of minerals always come out small, near the lightest weight. The rest are spread evenly at low capacity, and the bigger your pan, the more of them lean towards the heavy end. The heaviest possible doesn't change.</li>
       <li><b>What doesn't matter:</b> luck, the modifier, which mineral it is and where in the pan it lands make no difference.</li>
-      <li>Size Boost as a number: 1,476% is 14.76. The Solar Magnifier is ×1.5 on the final weight, and a Volcanic Eruption makes every mineral 1.5× heavier in its zones (the game says 2×, but every eruption logged so far was exactly 1.5×).</li>
+      <li>The Solar Magnifier is ×1.5 on the final weight, and a Volcanic Eruption makes every mineral 1.5× heavier in its zones (the game says 2×, but every eruption logged so far was exactly 1.5×).</li>
     </ul>
   </section>
   <p class="foot">Data from the <a href="https://prospecting.miraheze.org/wiki/Main_Page">Prospecting Wiki</a>, Last edited 24/11/26, Made by @__coastal</p>

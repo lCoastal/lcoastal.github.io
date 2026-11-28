@@ -15,7 +15,7 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Prospecting Equipment</h1>
+    <h1>Equipment</h1>
     <p class="lede">Every ring, necklace and charm with its stats, recipe and price.<br>Open one for its full stats at 5★, 6★, Prismatic and Sunforged, to compare it, or to add it to your crafting checklist.</p>
   </header>
   <section class="filters" aria-label="Filters">
@@ -33,7 +33,7 @@
       <button type="button" class="chip" id="moreF" aria-expanded="false"></button>
       <button type="button" class="chip" id="fFav" aria-pressed="false">★ Favourites</button>
       <button type="button" class="chip" id="fOwn" aria-pressed="false">✓ Owned</button>
-      <button type="button" class="chip" id="fEv" aria-pressed="true"></button>
+      <div id="fEv" role="group" aria-label="Limited-time items"><span>Limited-time items</span> <button type="button" class="chip" data-mode="show">Show</button> <button type="button" class="chip" data-mode="sep">Group at bottom</button> <button type="button" class="chip" data-mode="hide">Hide</button></div>
       <button type="button" class="chip" id="fBpTag" aria-pressed="true" title="Show or hide the Blueprint tag on items">Blueprint tags</button>
       <button type="button" class="chip" id="unhide" hidden></button>
       <select id="fBp" aria-label="Filter by blueprint"><option value="">Blueprint: any</option><option value="yes">Needs a blueprint</option><option value="no">No blueprint needed</option></select>

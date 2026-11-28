@@ -7,7 +7,7 @@ const MC={Silver:"#a9b4be",Gold:"#d9a520",Diamond:"#5fc8e8",Granite:"#8d8d86",Ov
 const TABS=[["mut","p-mut"],["pan","p-pan"],["sh","p-sh"]];
 let tab="mut";try{tab=localStorage.getItem("pmu-tab")||"mut"}catch(e){}
 // each part is its own tab in the site's top bar, so the heading changes with it
-const PAGEINFO={mut:["Gear Mutations","Every equipment mutation, what it does and how likely you are to roll it at the Mutation Forge."],pan:["Pan Enchants","Every pan enchant and what it does.<br>Pick your pan to see what each enchant would give it."],sh:["Shovel Enchants","Every shovel enchant and what it does."]};
+const PAGEINFO={mut:["Equipment Mutations","Every equipment mutation, what it does and how likely you are to roll it at the Mutation Forge."],pan:["Pan Enchants","Every pan enchant and what it does.<br>Pick your pan to see what each enchant would give it."],sh:["Shovel Enchants","Every shovel enchant and what it does."]};
 function setTab(t){if(!TABS.some(x=>x[0]===t))t="mut";tab=t;$("ttl").textContent=PAGEINFO[t][0];document.querySelector(".lede").innerHTML=PAGEINFO[t][1];document.title=PAGEINFO[t][0];try{window.parent.ptSubChanged&&window.parent.ptSubChanged("mutations",t)}catch(e){}TABS.forEach(([k,p])=>{$("tab-"+k).setAttribute("aria-selected",String(k===t));$("tab-"+k).tabIndex=k===t?0:-1;$(p).hidden=k!==t});try{localStorage.setItem("pmu-tab",t)}catch(e){}}
 document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.closest("[role=tab]");if(b)setTab(b.id.slice(4))});
 document.querySelector(".tabs").addEventListener("keydown",e=>{const i=TABS.findIndex(t=>t[0]===tab);if(e.key==="ArrowRight"||e.key==="ArrowLeft"){const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length][0];setTab(n);$("tab-"+n).focus()}});
@@ -96,7 +96,7 @@ document.addEventListener("click",e=>{const o=e.target.closest("[data-ofmt]");if
 // ---- save each tab as an image ----
 const MUTHEX={...MC,None:"#98a2ad"};
 const chipsOf=e=>{const out=[];Object.entries(e.m).forEach(([k,v])=>out.push({t:`${v}× Pan ${k}`,col:"#e6e9ec"}));Object.entries(e.a).forEach(([k,v])=>out.push({t:`${v>0?"+":"−"}${Math.abs(v)}${PCTS.has(k)?"%":""} ${k}`,col:v>0?statHex(k):"#ef7a66"}));return out};
-$("imgMut").onclick=()=>ptSaveImg("Gear mutations",()=>ptTableImage({title:"Gear mutations",sub:["Multiplies every stat on the item","one mutation per item, kept when you reforge or merge"],
+$("imgMut").onclick=()=>ptSaveImg("Equipment mutations",()=>ptTableImage({title:"Equipment mutations",sub:["Multiplies every stat on the item","one mutation per item, kept when you reforge or merge"],
   sections:[{h:"What each mutation does",cols:[{h:"Mutation",w:.22},{h:"Stats",w:.1,al:"c"},{h:"Extra bonus",w:.48},{h:"Note",w:.2}],
     rows:X.muts.map(m=>({cells:[{t:m.n,b:true,col:MC[m.n]||"#e6e9ec",dot:MC[m.n]||"#3cc2a8"},{t:"×"+m.x,mono:true,al:"r"},Object.keys(m.a).length?{chips:Object.entries(m.a).map(([k,v])=>({t:`+${v}${PCTS.has(k)?"%":""} ${k}`,col:statHex(k)}))}:{t:"All stats",col:"#98a2ad"},{t:m.ev||"",col:"#98a2ad",wrap:true}]}))}],
   note:"A Prismatic Catalyst applies Prismatic directly, and a Festive Catalyst applies Festive."}));

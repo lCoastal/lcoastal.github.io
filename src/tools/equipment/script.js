@@ -18,7 +18,6 @@ try{Object.assign(st,JSON.parse(localStorage.getItem("pe-f")||"{}"),{q:""})}catc
 const save=()=>{try{localStorage.setItem("pe-f",JSON.stringify(st))}catch(e){}};
 // limited-time items: click to cycle Show → Separate area at the bottom → Hide
 if(!st.evMode)st.evMode=st.ev===false?"hide":"show";
-const EVM={show:["Show limited","Limited-time items are mixed in with everything else. Click to move them to their own area at the bottom."],sep:["Limited at the bottom","Limited-time items have their own area at the bottom. Click to hide them."],hide:["Hide limited","Limited-time items are hidden. Click to show them again."]};
 const $=id=>document.getElementById(id);
 // value levels shown in the list: pick as many as you like (always kept in 5★ → Sunforged order)
 if(!Array.isArray(st.lvls))st.lvls=[st.lvl||"6"];st.lvls=LKEYS.filter(k=>st.lvls.includes(k));if(!st.lvls.length)st.lvls=["6"];st.lvl=st.lvls[0];
@@ -63,7 +62,7 @@ slotsEl.onclick=e=>{const b=e.target.closest("[data-slot]");if(!b)return;st.slot
 drawFilters();
 rarsEl.onclick=e=>{const b=e.target.closest("[data-rar]");if(!b)return;const v=b.dataset.rar;st.rars=v?(st.rars.includes(v)?st.rars.filter(x=>x!==v):[...st.rars,v]):[];if(st.rars.length===ORDER.length)st.rars=[];save();drawRars();render()};
 [["fFav","fav"],["fOwn","own"],["fBpTag","bpTag"]].forEach(([id,k])=>{$(id).setAttribute("aria-pressed",String(st[k]));$(id).onclick=()=>{st[k]=!st[k];$(id).setAttribute("aria-pressed",String(st[k]));save();render()}});
-$("fEv").onclick=()=>{st.evMode={show:"sep",sep:"hide",hide:"show"}[st.evMode]||"show";save();render()};
+$("fEv").onclick=e=>{const b=e.target.closest("[data-mode]");if(b){st.evMode=b.dataset.mode;save();render()}};
 $("unhide").onclick=()=>{const n=st.hidden.length;st.hidden=[];save();render();toast(`Unhid ${n} item${n===1?"":"s"}`)};
 $("fBp").value=st.bp;$("fBp").onchange=()=>{st.bp=$("fBp").value;save();render()};
 const BPI='<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" d="M2.5 2.5h8l3 3v8h-11z M5 6.5h6 M5 9h6 M5 11.5h4"/></svg>';
@@ -99,7 +98,7 @@ const RNAT=-1;
 let LAST=[];
 function render(){
   const t=st.q;const all=Store.all();
-  {const b=$("fEv");b.innerHTML=`<span class="evw">${Object.entries(EVM).map(([k,v])=>`<span${k===st.evMode?"":` aria-hidden="true" style="visibility:hidden"`}>${v[0]}</span>`).join("")}</span>`;b.title=EVM[st.evMode][1];b.setAttribute("aria-pressed",String(st.evMode!=="hide"))}
+  $("fEv").querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===st.evMode)));
   let rows=E.filter(x=>(!st.slots.length||st.slots.includes(x.slot))&&(!st.stats.length||(st.match==="any"?st.stats.some(n=>x.st.some(s=>s[0]===n)):st.stats.every(n=>x.st.some(s=>s[0]===n))))&&(!st.rars.length||st.rars.includes(x.r))&&!st.hidden.includes(x.n)&&(st.evMode!=="hide"||!x.ev)&&(!st.fav||(all[x.n]||{}).fav)&&(!st.own||(all[x.n]||{}).own)&&(!st.bp||(st.bp==="yes")===!!x.bp)
     &&(!t||(x.n+" "+x.slot+" "+x.st.map(s=>s[0]).join(" ")+" "+x.rec.map(r=>r[1]).join(" ")).toLowerCase().includes(t)));
   const sorter={rarity:(a,b)=>a.i-b.i,type:(a,b)=>ORDER.indexOf(a.r)-ORDER.indexOf(b.r)||a.i-b.i,price:(a,b)=>(a.cur!=="$")-(b.cur!=="$")||(a.price??0)-(b.price??0),name:(a,b)=>a.n.localeCompare(b.n)}[st.sort];

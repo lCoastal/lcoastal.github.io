@@ -219,3 +219,5 @@ table.out th.bkc{text-align:center}
 #upBody .iso{flex-direction:column;align-items:flex-start;gap:5px;margin-bottom:12px}#upBody .isoc{row-gap:7px}#upBody #upList{margin-top:4px}
 @media (max-width:420px){.upi.pth .upnum{grid-column:1;grid-row:1}.upi.pth .upn{grid-column:2}
 .uptot{grid-template-columns:minmax(0,1fr) auto}.uptot>.upb{grid-column:1/-1;justify-self:start}}
+
+.slot .sl small,.slot .sl [data-edit-slot]{display:block;font-size:11px;margin-top:3px}
