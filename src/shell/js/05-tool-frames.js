@@ -618,30 +618,12 @@ function ptDeclutter() {
     ".pt-more{display:block;background:none;border:0;padding:0;margin:4px 0 0;color:var(--accent);font:600 12.5px var(--f-body,inherit);cursor:pointer;align-self:flex-start}" +
     ".pt-how>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}.pt-how>summary::-webkit-details-marker{display:none}" +
     ".pt-how>summary{flex-direction:column;align-items:flex-start;gap:0}.pt-how>summary h2{margin:0}.pt-how>summary:after{content:'Read more';margin:4px 0 0;font:600 12.5px var(--f-body,inherit);color:var(--accent)}.pt-how[open]>summary:after{content:'Show less'}.pt-how[open]>summary{margin-bottom:10px}" +
-    ".hintd>summary{list-style:none}.hintd>summary::-webkit-details-marker{display:none}.hintd>summary:after{content:'Read more';display:block;margin:4px 0 0;font:600 12.5px var(--f-body,inherit);color:var(--accent)}.hintd[open]>summary:after{content:'Show less'}" +
-    ".disc .pt-more,.pt-warn .pt-more{color:var(--neg,#d33)}" +
-    ".pt-warn{margin:0 0 12px;padding:8px 12px;border:1px solid color-mix(in srgb,var(--neg,#d33) 45%,transparent);border-radius:8px;background:color-mix(in srgb,var(--neg,#d33) 7%,transparent);font-size:13.5px}" +
-    ".pt-warn>b{display:block;color:var(--neg,#d33)}.pt-warn>p{display:none;margin:6px 0 2px;line-height:1.5}.pt-warn.pt-open>p{display:block}";
+    ".hintd>summary{list-style:none}.hintd>summary::-webkit-details-marker{display:none}.hintd>summary:after{content:'Read more';display:block;margin:4px 0 0;font:600 12.5px var(--f-body,inherit);color:var(--accent)}.hintd[open]>summary:after{content:'Show less'}" ;
   function go() {
     try {
       var st = document.createElement("style");
       st.textContent = css;
       document.head.appendChild(st);
-      // the big red warning box becomes one line
-      document.querySelectorAll('[role="alert"]').forEach(function (a) {
-        if (!/STILL AN ESTIMATE/i.test(a.textContent)) return;
-        var parts = a.querySelectorAll(":scope > div");
-        var d = document.createElement("div");
-        d.className = "pt-warn";
-        d.innerHTML = '<b>Odds here use an estimated luck formula</b><p></p><button type="button" class="pt-more">Read more</button>';
-        d.querySelector("p").innerHTML = parts[1] ? parts[1].innerHTML : "";
-        var wb = d.querySelector(".pt-more");
-        wb.onclick = function () {
-          var o = d.classList.toggle("pt-open");
-          wb.textContent = o ? "Show less" : "Read more";
-        };
-        a.replaceWith(d);
-      });
       // long notes and intros: two lines, then "Read more"
       document.querySelectorAll("p.disc, header .lede").forEach(function (p) {
         if (p.textContent.length < 230) return;
