@@ -67,6 +67,13 @@ $("saveLo").onclick=()=>{if(!Object.values(plain()).some(r=>r.some(s=>s.m))){toa
 $("toImg").onclick=async()=>{const name=loName();
   let blob=null;try{blob=await window.parent.ptMuseumImage(name,plain())}catch(e){}if(!blob){toast("Couldn't draw the image");return}
   try{await window.parent.ptSave(name.replace(/[\\/:*?"<>|]+/g," ")+".png",blob);toast((()=>{try{return window.parent.ptImgMsg()}catch(e){return "Image saved"}})())}catch(e){const c=e&&e.code;if(c!=="declined")toast(c==="rate_limited"?"A save prompt is already open":"Couldn't save the image here")}};
+// the museum as plain text: one line per rarity, then the totals
+$("cpTxt").onclick=async()=>{const b=plain();if(!Object.values(b).some(r=>r.some(x=>x.m))){toast("Pick at least one goal first");return}
+  const r4=v=>Math.round(v*1000)/1000,t=last.totals;
+  const txt=(loName()?loName()+"\n\n":"")+ORDER.map(r=>r+": "+b[r].map(x=>x.m?x.m+(x.u&&x.u!=="None"?" ("+x.u+")":""):"empty").join(", ")).join("\n")+
+    "\n\nTotal: "+STATS.filter(s=>t[s]).map(s=>s+" "+r4(1+t[s])+"×").join(", ");
+  let ok=false;try{await navigator.clipboard.writeText(txt);ok=true}catch(e){try{const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}}
+  toast(ok?"Copied the museum as text":"Couldn't copy here")};
 window.ptFinderImage=()=>{const goal=Object.entries(S.w).filter(([,v])=>v).map(([k])=>k);return window.parent.ptMuseumImage(loName(),plain())};
 $("toPlanner").onclick=()=>{try{window.parent.ptSendMuseum("planner",plain(),loName())}catch(e){toast("Couldn't reach the Museum Planner")}};
 $("toCalc").onclick=()=>{try{window.parent.ptSendMuseum("calc",plain())}catch(e){toast("Couldn't reach the Stat Calculator")}};
