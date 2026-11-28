@@ -676,8 +676,10 @@ document.getElementById("bImg").onclick=async()=>{
   // draw it off-screen at a comfortable width so the picture looks the same whatever your window size,
   // and sit the card on a padded page so it keeps its rounded corners
   const box=document.createElement("div");box.style.cssText="position:fixed;left:-10000px;top:0;width:980px;pointer-events:none";
+  box.className="sheet-export";
   box.innerHTML=sheetHTML(getB());const sh=box.firstElementChild;
   sh.querySelectorAll(".rtoggle").forEach(t=>t.remove());
+  document.body.appendChild(box);
   const cs=getComputedStyle(sh),page=cs.getPropertyValue("--bg").trim()||"#12161b",card=cs.getPropertyValue("--card").trim(),
     line=cs.getPropertyValue("--line").trim(),acc=cs.getPropertyValue("--acc").trim()||"#3cc2a8",dim=cs.getPropertyValue("--dim").trim();
   const frame=document.createElement("div");
@@ -690,7 +692,6 @@ document.getElementById("bImg").onclick=async()=>{
   pill.style.cssText=`display:inline-block;padding:4px 13px;border-radius:999px;border:1px solid ${acc};color:${acc};font:600 12.5px "IBM Plex Sans","Segoe UI",system-ui,sans-serif`;
   const site=document.createElement("span");site.textContent="Prospecting Toolkit";
   by.appendChild(site);by.appendChild(pill);frame.appendChild(by);
-  document.body.appendChild(box);
   try{if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     plainColours(frame);
     window.ptNoImgTheme=true;let cv;try{cv=await html2canvas(frame,{backgroundColor:page,scale:2,useCORS:true,logging:false})}finally{window.ptNoImgTheme=false}
