@@ -1,6 +1,5 @@
 
 /* Layout: your stats, the three things the Dredge Master wants, then the plan (fewest stops that still finish fast) */
-.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
 .disc b{font-weight:700}
 .inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;align-items:end}
 .fld{display:flex;flex-direction:column;gap:4px;min-width:0}

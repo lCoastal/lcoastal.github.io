@@ -86,6 +86,10 @@ input[type=search],input[type=text],input[type=number],select{padding:7px 10px;b
 .noimg{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:8px;background:var(--sunk);color:var(--muted);font-weight:700}
 .rings{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
 @media (max-width:760px){.rings{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Warning callouts use the same spacing and theme colors across tools. */
+.pt-warn{margin:0 0 12px;padding:12px 14px;border:1px solid color-mix(in srgb,var(--neg) 55%,var(--line));border-radius:10px;background:color-mix(in srgb,var(--neg) 8%,var(--panel));color:var(--fg);font-size:13px;line-height:1.5}
+.pt-warn>strong,.pt-warn>b{display:block;color:var(--neg);font-size:14px}
+.pt-warn>p{margin:4px 0 0}
 </style>
 <script>
 const P=(()=>{try{return window.parent.PTDATA||null}catch(e){return null}})()||{mins:[],gear:{pans:[],shovels:[],sluices:[],img:{},upg:{}},equip:[],eimg:{},codes:{},locs:[],reqs:{},mods:[]};

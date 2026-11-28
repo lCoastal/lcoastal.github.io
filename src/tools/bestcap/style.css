@@ -1,6 +1,5 @@
 
 /* Layout: search + filters on top, then every mineral with each zone it drops in and the luck cap that finds it most often */
-.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
 .disc b{font-weight:700}
 .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .bar input[type=search]{flex:1 1 240px;min-width:0}

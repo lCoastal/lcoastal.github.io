@@ -12,7 +12,6 @@ table.o td{padding:7px 10px;border-bottom:1px dashed var(--line);text-align:righ
 table.o td:first-child{font-family:var(--f-body);white-space:normal;min-width:150px;padding-right:22px}
 table.o tr:last-child td{border-bottom:0}
 table.o .up{color:var(--accent)}
-.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
 .disc b{font-weight:700}
 .pc2{display:block;font-size:11.5px;color:var(--muted)}
 /* in "Both" mode the 1 in text is only a little bigger than the % under it */

@@ -1,5 +1,4 @@
 
-.disc{margin:0;padding:9px 13px;border:1px solid color-mix(in srgb,var(--neg) 55%,transparent);border-radius:8px;background:color-mix(in srgb,var(--neg) 8%,transparent);color:var(--neg);font-size:13px}
 .disc b{font-weight:700}
 
 /* Layout: paste box + your stats on top, a summary strip, then numbered stops in the order to farm them */
