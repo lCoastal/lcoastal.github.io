@@ -39,7 +39,6 @@ const PT_RESET = {
   bestbuild: { keys: ["pt-bestbuild"], what: "the goal, choices and assumptions (your owned ticks stay)" },
   buildmaker: { keys: ["pt-buildmaker"], what: "the weights, consumables, events and choices" },
   // these keep nothing between visits, so a reset just reloads them: searches, filters and open sections clear
-  home: { keys: [], what: "the page" },
   npcs: { keys: [], what: "the search and filters" },
   events: { keys: [], what: "the view" },
   formulas: { keys: [], what: "the search" },

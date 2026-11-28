@@ -1,16 +1,18 @@
 // your luck, capacity, Size Boost, magnifier, modifier boost and pans per hour, shared by every tool that asks for them
 window.ptYou = {
-  get: () => {
+  get: (scope) => {
+    if (SET.shareStats === false && !scope) return {};
     try {
-      return JSON.parse(localStorage.getItem("pt-you") || "{}") || {};
+      return JSON.parse(localStorage.getItem(SET.shareStats === false && scope === "minerals" ? "pt-you-minerals" : "pt-you") || "{}") || {};
     } catch (e) {
       return {};
     }
   },
-  set: (p, from) => {
-    const o = Object.assign(window.ptYou.get(), p);
+  set: (p, from, scope) => {
+    if (SET.shareStats === false && !scope) return;
+    const o = Object.assign(window.ptYou.get(scope), p);
     try {
-      localStorage.setItem("pt-you", JSON.stringify(o));
+      localStorage.setItem(SET.shareStats === false && scope === "minerals" ? "pt-you-minerals" : "pt-you", JSON.stringify(o));
     } catch (e) {}
     clearTimeout(window.ptYou._t);
     window.ptYou._t = setTimeout(() => {

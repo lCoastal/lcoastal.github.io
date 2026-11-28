@@ -1,5 +1,4 @@
 const LIST = [
-  { id: "home", name: "Home", desc: "Start here: find a build, check your stats, plan your museum" },
   { id: "builds", name: "Build Sheets", desc: "Write full builds in the guide layout" },
   { id: "bestbuild", name: "Build for a Goal", desc: "Pick a mineral or goal, get a whole build for it as a build sheet" },
   { id: "rpm", name: "Rolls per Minute", desc: "Minerals and luck rolls per pan and per minute from your stats" },

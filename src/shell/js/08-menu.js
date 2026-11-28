@@ -70,7 +70,7 @@ function drawQuick() {
 window.ptToolSeen = (id, sub) => {
   CURNAV = [id, sub || ""];
   const x = ENTRIES.find((e) => e[0] === id && (!e[2] || e[2] === sub));
-  if (!x || id === "home") return;
+  if (!x) return;
   const k = entKey(x);
   if (RTOOLS[0] === k) return;
   RTOOLS = [k, ...RTOOLS.filter((r) => r !== k)].slice(0, 12);

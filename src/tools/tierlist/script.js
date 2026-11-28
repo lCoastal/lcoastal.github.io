@@ -25,7 +25,7 @@ function render(){const l=L(),N=byN(),tiers=T(l);
   $("ttl").value=l.t||"";
   // drop names that no longer exist, and anything ranked twice
   const seen=new Set();tiers.forEach(t=>{l.rows[t.id]=(l.rows[t.id]||[]).filter(n=>N[n]&&!seen.has(n)&&seen.add(n))});
-  $("tiers").innerHTML=tiers.map(t=>{const len=String(t.label).length;return `<div class="tier${SELS.length?" target":""}${EDIT===t.id?" editing":""}" style="--tc:${t.c};--ti:${ink(t.c)}"><button type="button" class="tl${len>8?" vlong":len>3?" long":""}" data-edit="${esc(t.id)}" title="Edit this row" aria-label="Row ${esc(t.label)}, edit">${esc(t.label)||"&nbsp;"}</button><div class="tz" data-row="${esc(t.id)}">${l.rows[t.id].map(n=>itemHTML(N[n])).join("")}</div></div>`}).join("");
+  $("tiers").innerHTML=tiers.map(t=>{const len=String(t.label).length;return `<div class="tier${SELS.length?" target":""}${EDIT===t.id?" editing":""}" style="--tc:var(--pt-no-tier,${t.c});--ti:var(--pt-tier-ink,${ink(t.c)})"><button type="button" class="tl${len>8?" vlong":len>3?" long":""}" data-edit="${esc(t.id)}" title="Edit this row" aria-label="Row ${esc(t.label)}, edit">${esc(t.label)||"&nbsp;"}</button><div class="tz" data-row="${esc(t.id)}">${l.rows[t.id].map(n=>itemHTML(N[n])).join("")}</div></div>`}).join("");
   drawEditor();
   const rars=ORDR.filter(r=>POOLS[S.k].some(x=>x.r===r));const rf=S.rf.filter(r=>rars.includes(r));
   $("rf").hidden=!rars.length;

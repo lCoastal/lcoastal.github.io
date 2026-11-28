@@ -14,6 +14,15 @@ function syncCompact(f) {
 // settings, shared by every tool and changed from the Settings tool
 let SET = {
   nerdy: false,
+  shareStats: true,
+  color_all: true,
+  color_rarity: true,
+  color_mutation: true,
+  color_modifier: true,
+  color_stat: true,
+  color_event: true,
+  color_comparison: true,
+  color_tier: true,
   short: false,
   dec: 2,
   scroll: true,
@@ -41,6 +50,7 @@ window.ptSetSetting = (k, v) => {
     try {
       localStorage.setItem("pt-settings", JSON.stringify(SET));
     } catch (e) {}
+    if (k === "shareStats" && v) window.ptYou.set({});
     if (k === "nerdy") syncResearchMenu();
     if (k === "rtools") drawQuick();
     if (k === "recent") {
@@ -57,7 +67,7 @@ window.ptSetSetting = (k, v) => {
         } catch (e) {}
       });
     if (k === "theme") applyTheme();
-    if (k === "accent") {
+    if (k === "accent" || k.startsWith("color_")) {
       ptAccentInto(document);
       [...Object.values(frames), ...Object.values(pops)].forEach((f) => {
         try {

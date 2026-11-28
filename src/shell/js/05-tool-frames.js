@@ -443,7 +443,7 @@ function ptFrameInit() {
         if (isCur) cur = n;
         var cls = (isCur ? " cur" : "") + (o.disabled || (g && g.disabled) ? " off" : "") + (mut ? " mu" : "");
         var m = mut && MU[o.value],
-          col = mut ? COL[o.value] : o.style.color;
+          col = mut && COL[o.value] ? "var(--pt-no-mutation," + COL[o.value] + ")" : o.style.color;
         h +=
           "<li role='option' data-i='" + n++ + "' data-o='" + oi + "' data-v='" + esc(o.value) + "'" + (cls ? " class='" + cls.trim() + "'" : "") + "><span" + (col ? " style='color:" + esc(col) + "'" : "") + ">" + esc(mut ? (m ? o.value : "No mutation") : o.text) + "</span>" + (m ? "<small>×" + nf(m.x) + "</small>" : "") + "</li>";
       });

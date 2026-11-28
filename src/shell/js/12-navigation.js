@@ -105,12 +105,12 @@ document.getElementById("hubbar").addEventListener("keydown", (e) => {
   }
 });
 document.getElementById("gBtn").onclick = () => show("settings");
-// the "Prospecting Toolkit" name in the top bar goes home
+// the toolkit title opens the default tool
 {
   const br = document.querySelector(".brand small");
   if (br) {
     br.style.cursor = "pointer";
-    br.title = "Home";
-    br.onclick = () => show("home");
+    br.title = "Build Sheets";
+    br.onclick = () => show("builds");
   }
 }

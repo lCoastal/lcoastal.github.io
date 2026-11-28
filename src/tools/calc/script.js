@@ -225,9 +225,9 @@ function renderParts(){const B=clone(S);(S.isoOff||[]).forEach(g=>Object.assign(
   const sv=(s,v)=>(v<0?"−":"+")+tv(s,Math.abs(v));
   const row=(x,txt,neg)=>`<div class="pt${x.key&&S.only===x.key?" on":""}"${x.key?` role="button" tabindex="0" data-only="${esc(x.key)}" aria-pressed="${S.only===x.key}"`:""}><b>${esc(x.label)}${x.sub?` <small>${esc(x.sub)}</small>`:""}</b><span class="lk2" style="color:${neg?"var(--neg,#c53030)":"var(--accent)"}">${txt}</span></div>`;
   const lv=brkLvl();
-  const cards=lv===1?D.stats.map(({s,flatT,mult,xm,total,fo1})=>`<div class="bks bksemi"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b></div><div class="sem"><div><small>Flat points</small><b>${tv(s,flatT)}</b></div><div><small>Multiplier</small><b>${fo1?"-":"×"+mxf(mult)}</b></div>${xm!==1?`<div><small>Events &amp; tools</small><b>×${fmt(xm,2)}</b></div>`:""}<div class="semt"><small>Total</small><b style="color:${statHex(s)}">${tv(s,total)}</b></div></div></div>`).join(""):D.stats.map(({s,flatT,mult,xm,total,F,M,X,fo1})=>{
+  const cards=lv===1?D.stats.map(({s,flatT,mult,xm,total,fo1})=>`<div class="bks bksemi"><div class="bkst"><b style="color:var(--pt-no-stat,${statHex(s)})">${esc(s)}</b></div><div class="sem"><div><small>Flat points</small><b>${tv(s,flatT)}</b></div><div><small>Multiplier</small><b>${fo1?"-":"×"+mxf(mult)}</b></div>${xm!==1?`<div><small>Events &amp; tools</small><b>×${fmt(xm,2)}</b></div>`:""}<div class="semt"><small>Total</small><b style="color:var(--pt-no-stat,${statHex(s)})">${tv(s,total)}</b></div></div></div>`).join(""):D.stats.map(({s,flatT,mult,xm,total,F,M,X,fo1})=>{
     const formula=fo1||(mult===1&&xm===1)?"":`${tv(s,flatT)} × ${mxf(mult)}${xm!==1?` × ${fmt(xm,2)}`:""} = `;
-    return `<div class="bks"><div class="bkst"><b style="color:${statHex(s)}">${esc(s)}</b><span>${formula}<em>${tv(s,total)}</em></span></div>
+    return `<div class="bks"><div class="bkst"><b style="color:var(--pt-no-stat,${statHex(s)})">${esc(s)}</b><span>${formula}<em>${tv(s,total)}</em></span></div>
       <div class="bksub"><span>Flat points</span><span>${tv(s,flatT)}</span></div>${F.length?F.map(o=>row(o.x,sv(s,o.v),o.v<0)).join(""):'<p class="bkn">None</p>'}
       ${fo1||!M.length?"":`<div class="bksub"><span>Multiplier (from ×1)</span><span>×${mxf(mult)}</span></div>${M.map(o=>row(o.x,(o.v<0?"−":"+")+mxf(Math.abs(o.v))+"×",o.v<0)).join("")}`}
       ${X.length?`<div class="bksub"><span>Multiplies the total</span><span>×${fmt(xm,2)}</span></div>${X.map(o=>row(o.x,"×"+fmt(o.v,2),o.v<1)).join("")}`:""}</div>`}).join("");
@@ -317,7 +317,7 @@ const UCSTATS=["Luck","Capacity","Size Boost","Modifier Boost","Sell Boost","Dig
 const ucW=()=>{const w=S.upW||{Luck:1};const o={};UCSTATS.forEach(s=>{if(+w[s]>0)o[s]=+w[s]});return Object.keys(o).length?o:{Luck:1}};
 function upGoal(){if(S.upGoal==="Custom")return ["Custom",ucW()];const g=UGOALS.find(g=>g[0]===S.upGoal)||UGOALS[0];return g}
 function renderUcw(){const el=$("upCustom");const on=S.upGoal==="Custom";el.hidden=!on;if(!on){el.innerHTML="";return}const w=S.upW||{Luck:1};
-  el.innerHTML=UCSTATS.map(s=>{const v=+w[s]||0;return `<label><span style="color:${statHex(s)}">${esc(s)}</span><input type="range" min="0" max="5" step="0.5" value="${v}" data-ucw="${esc(s)}" aria-label="${esc(s)} weight"><span class="v${v>0?" on":""}">${v?fmt(v,1).replace(/\.0$/,""):"off"}</span></label>`}).join("")+`<p class="hint" id="ucwH">${ucHint()}</p>`}
+  el.innerHTML=UCSTATS.map(s=>{const v=+w[s]||0;return `<label><span style="color:var(--pt-no-stat,${statHex(s)})">${esc(s)}</span><input type="range" min="0" max="5" step="0.5" value="${v}" data-ucw="${esc(s)}" aria-label="${esc(s)} weight"><span class="v${v>0?" on":""}">${v?fmt(v,1).replace(/\.0$/,""):"off"}</span></label>`}).join("")+`<p class="hint" id="ucwH">${ucHint()}</p>`}
 function ucHint(){const e=Object.entries(ucW()).sort((a,b)=>b[1]-a[1]);if(e.length<2)return `Only ${esc(e[0][0])} counts. Raise another stat to weigh them against each other.`;
   const [a,b]=[e[0],e[e.length-1]];return `With these weights, +10% ${esc(a[0])} counts as much as +${fmt(10*a[1]/b[1],0)}% ${esc(b[0])}.`}
 document.addEventListener("input",e=>{const r=e.target.closest&&e.target.closest("[data-ucw]");if(!r)return;S.upW=Object.assign({Luck:1},S.upW||{},{[r.dataset.ucw]:+r.value});
@@ -487,11 +487,11 @@ function toastUp(msg){let d=document.querySelector(".uptoast");if(!d){d=document
 
 // stats spread: the four "Your stats" numbers this build gives, in the same rounding Settings uses
 function spreadVals(){const t=compute(S).tot;return {luck:String(Math.round(t.Luck||0)),cap:String(Math.round(t.Capacity||0)),sb:String(Math.round((t["Size Boost"]||0)*10)/10),mb:String(Math.round(t["Modifier Boost"]||0))}}
-function renderSpread(){const v=spreadVals();let y={};try{y=window.parent.ptYou.get()||{}}catch(e){}
+function renderSpread(){const v=spreadVals();let y={};try{y=window.parent.ptYou.get("settings")||{}}catch(e){}
   const F=[["luck","Luck",""],["cap","Pan capacity",""],["sb","Size Boost %","%"],["mb","Modifier Boost %","%"]];
   $("spread").innerHTML=F.map(([k,n])=>{const same=String(y[k]??"")===v[k];return `<div class="sp1${same?" ok":""}"><small>${n}</small><b>${fmt(+v[k],k==="sb"?1:0)}</b><small class="now">${same?"Matches Your stats":y[k]?"Your stats: "+esc(fmt(+y[k],k==="sb"?1:0)):"Not set in Your stats"}</small></div>`}).join("")}
 
-document.addEventListener("click",e=>{if(!e.target.closest("#spSet"))return;try{window.parent.ptYou.set(spreadVals(),window)}catch(e){}renderSpread();toast("Your stats updated")});
+document.addEventListener("click",e=>{if(!e.target.closest("#spSet"))return;try{window.parent.ptYou.set(spreadVals(),window,"settings")}catch(e){}renderSpread();toast("Your stats updated")});
 function render(){
   document.querySelectorAll("[data-source]").forEach(label=>{
     const item=S.slots[label.dataset.source],used=!!item?.n;

@@ -52,7 +52,7 @@ function tile(l,k,label,kind,big){const own=owned(l,k);const v=l.slots[k];const 
   if(!own)return `<div class="tile lock${big?" big":""}" aria-label="${esc(label)} (not unlocked)"><span class="tk">${esc(label)}</span><span class="tag">Not unlocked</span></div>`;
   if(!x)return `<button type="button" class="tile empty${big?" big":""}" data-slot="${k}" aria-label="Pick a ${kind.toLowerCase()} for ${esc(label)}"><span class="tk">${esc(label)}</span><span class="plus">+</span><span class="tag">Empty</span></button>`;
   const mu=v.m&&v.m!=="None"?v.m:"";const img=IMG(x.n);
-  return `<button type="button" class="tile${big?" big":""}" data-slot="${k}" data-tipk="${k}" data-equip="${esc(x.n)}" style="--tc:${RHEX[x.r]||"#3a444d"};--mc:${MCOL[mu]||"#fff"}" aria-label="${esc(label)}: ${esc(x.n)}"><span class="tk">${esc(label)}</span><span class="st">${ptEnteredStats(v)?"Entered stats":(v.l==="5"?"5★":"6★")+", "+(v.q??100)+"%"}</span>${img?`<img src="${img}" alt="">`:""}<span class="meta">${mu?`<span class="mu">${esc(mu)}</span>`:""}<span class="tn">${esc(x.n)}</span><span class="tag" style="color:${RHEX[x.r]}">${x.r}</span></span></button>`}
+  return `<button type="button" class="tile${big?" big":""}" data-slot="${k}" data-tipk="${k}" data-equip="${esc(x.n)}" style="--tc:var(--pt-no-rarity,${RHEX[x.r]||"#3a444d"});--mc:var(--pt-no-mutation,${MCOL[mu]||"#fff"})" aria-label="${esc(label)}: ${esc(x.n)}"><span class="tk">${esc(label)}</span><span class="st">${ptEnteredStats(v)?"Entered stats":(v.l==="5"?"5★":"6★")+", "+(v.q??100)+"%"}</span>${img?`<img src="${img}" alt="">`:""}<span class="meta">${mu?`<span class="mu">${esc(mu)}</span>`:""}<span class="tn">${esc(x.n)}</span><span class="tag" style="color:var(--pt-no-rarity,${RHEX[x.r]})">${x.r}</span></span></button>`}
 function render(){const l=L();
   $("sel").innerHTML=D.list.map(x=>`<option value="${x.id}"${x.id===l.id?" selected":""}>${esc(x.name||"Untitled loadout")}</option>`).join("");
   if(document.activeElement!==$("name"))$("name").value=l.name;if(document.activeElement!==$("notes"))$("notes").value=l.notes||"";
@@ -65,7 +65,7 @@ function render(){const l=L();
   renderCmp()}
 // ---- hover card with the item's stats ----
 const tip=$("tip");
-function tipHTML(v){const x=EB[v.n];const mu=v.m&&v.m!=="None"?v.m:"";return `<b style="color:${RHEX[x.r]}">${mu?`<span style="color:${MCOL[mu]}">${esc(mu)}</span> `:""}${esc(x.n)}</b><small>${x.r} ${esc(x.slot)}, ${starT(v)}${ONE_ONLY.has(x.n)?", only 1 can be worn":""}</small>${itemStats(v).map(([n,a,p])=>`<div class="ln"><span style="color:${statHex(n)}">${esc(n)}</span><span>${valT(a,p)}</span></div>`).join("")}`}
+function tipHTML(v){const x=EB[v.n];const mu=v.m&&v.m!=="None"?v.m:"";return `<b style="color:var(--pt-no-rarity,${RHEX[x.r]})">${mu?`<span style="color:var(--pt-no-mutation,${MCOL[mu]})">${esc(mu)}</span> `:""}${esc(x.n)}</b><small>${x.r} ${esc(x.slot)}, ${starT(v)}${ONE_ONLY.has(x.n)?", only 1 can be worn":""}</small>${itemStats(v).map(([n,a,p])=>`<div class="ln"><span style="color:var(--pt-no-stat,${statHex(n)})">${esc(n)}</span><span>${valT(a,p)}</span></div>`).join("")}`}
 // in the picker, show an option's stats at the stars, quality and mutation picked above
 const pickV=n=>({n,l:$("pkL").value,q:Math.max(0,Math.min(100,+$("pkP").value||0)),m:$("pkM").value});
 document.addEventListener("mouseover",e=>{const o=e.target.closest("[data-tipn]");if(o){tip.innerHTML=tipHTML(pickV(o.dataset.tipn));tip.style.display="block";return}

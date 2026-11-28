@@ -13,7 +13,7 @@ document.querySelector(".tabs").addEventListener("click",e=>{const b=e.target.cl
 document.querySelector(".tabs").addEventListener("keydown",e=>{const i=TABS.findIndex(t=>t[0]===tab);if(e.key==="ArrowRight"||e.key==="ArrowLeft"){const n=TABS[(i+(e.key==="ArrowRight"?1:TABS.length-1))%TABS.length][0];setTab(n);$("tab-"+n).focus()}});
 window.ptOpenTab=t=>setTab(t);
 // gear mutations
-$("mcards").innerHTML=X.muts.map(m=>`<div class="mc" style="--mc:${MC[m.n]||"var(--accent)"}"><b>${esc(m.n)}</b><span class="x">×${m.x}</span><small>${Object.entries(m.a).map(([k,v])=>`+${v}${PCTS.has(k)?"%":""} ${esc(k)}`).join(", ")||"all stats"}${m.ev?`, ${esc(m.ev)}`:""}</small></div>`).join("");
+$("mcards").innerHTML=X.muts.map(m=>`<div class="mc" style="--mc:var(--pt-no-mutation,${MC[m.n]||"var(--accent)"})"><b>${esc(m.n)}</b><span class="x">×${m.x}</span><small>${Object.entries(m.a).map(([k,v])=>`+${v}${PCTS.has(k)?"%":""} ${esc(k)}`).join(", ")||"all stats"}${m.ev?`, ${esc(m.ev)}`:""}</small></div>`).join("");
 const order=["Prismatic","Overclocked","Granite","Diamond","Gold","Silver","None"];
 // the table above follows one rule: each catalyst has a 25% chance to roll a mutation (Silver 50, Gold 20, Diamond 9,
 // Granite 4.5, Overclocked 4.5, Prismatic 2 out of 90) and you keep the best one rolled. That gives the custom column.

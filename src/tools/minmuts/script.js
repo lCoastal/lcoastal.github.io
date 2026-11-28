@@ -59,7 +59,7 @@ function render(){
   $("pinfo").innerHTML=m?`<span data-mineral="${esc(m.n)}" class="lk">${esc(m.n)}</span> is ${esc(m.r)} and sells for ${money(per)} per kg, so ${fmt(kg,2)} kg is ${money(per*kg)} with no modifier. Museum values below follow its rarity.`:(S.min?"No mineral by that name. Pick one from the list.":"Pick a mineral to see sell prices. Museum values follow the rarity on the right.");
   const rows=shownMuts();
   const card=x=>{const mv=MULT[S.rar]*x.f;
-    return `<article class="m" style="--mc:var(--m-${String(x.n).toLowerCase()},${x.c})"><div class="mh"><b>${esc(x.n)}</b><span class="tag">${esc(x.kind)}</span></div>
+    return `<article class="m" style="--mc:var(--m-${String(x.n).toLowerCase()},var(--pt-no-modifier,${x.c}))"><div class="mh"><b>${esc(x.n)}</b><span class="tag">${esc(x.kind)}</span></div>
     <div class="nums"><div><span class="lab">Sells for</span><b>${fmt(x.sell,2)}×</b></div><div><span class="lab">${m?esc(fmt(kg,2))+" kg "+esc(m.n):"Chance"}</span><b>${m?money(per*kg*x.sell):x.one?'~1 in '+fmt(x.one,0):"-"}</b></div></div>
     ${m&&x.one?`<p class="row"><span class="lab">Chance</span>~1 in ${fmt(x.one,0)} per mineral</p>`:""}
     <div class="mus">${x.stats.length?x.stats.map(s=>`<span${window.ptK&&ptK(s)?` style="--kc:${ptK(s)}"`:""}>${esc(s)} <em>+${+(mv).toFixed(4)}×</em></span>`).join(""):'<span style="color:var(--muted);border-color:var(--line)">No museum boost</span>'}</div>

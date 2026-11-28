@@ -107,7 +107,7 @@ const OPEN=[["odds","Luck Odds"],["bestcap","Best Luck Cap"],["buildcmp","Compar
 const nf=(v,d)=>Number(v).toLocaleString("en-US",{maximumFractionDigits:d,minimumFractionDigits:0});
 const oneInP=p=>!(p>0)?"-":p>=.5?nf(p*100,0)+"%":"1 in "+nf(Math.round(1/p),0);
 const kgf=v=>!isFinite(v)?"-":v>=1000?nf(v,0)+" kg":v>=100?nf(v,1)+" kg":nf(v,2)+" kg";
-const youGet=()=>{try{return window.parent.ptYou.get()}catch(e){return {}}};
+const youGet=()=>{try{return window.parent.ptYou.get("minerals")}catch(e){return {}}};
 let CUR=null;
 async function youDraw(){const m=CUR;if(!m)return;const out=document.getElementById("yOut");if(!out)return;
   let r=null;try{r=await window.parent.ptMineralStats(m.n)}catch(e){}
@@ -120,11 +120,11 @@ async function youDraw(){const m=CUR;if(!m)return;const out=document.getElementB
   out.innerHTML=(hasL&&hasC&&best?T("Best zone for you",esc(best.z),`${oneInP(best.pan)} per pan`):T("Best zone for you","-","Type your luck and capacity"))
     +(r.wt?T("Weight",`${kgf(r.wt.lo)} – ${kgf(r.wt.hi)}`,`typical ${kgf(r.wt.mid)}, top 1% from ${kgf(r.wt.top)}`):T("Weight","-","No base weight listed"))}
 function youWire(m){CUR=m;const y=youGet(),I={yLuck:"luck",yCap:"cap",ySb:"sb"};
-  Object.entries(I).forEach(([id,k])=>{const el=document.getElementById(id);el.value=y[k]??"";el.addEventListener("input",()=>{try{window.parent.ptYou.set({[k]:el.value},window)}catch(e){}clearTimeout(youWire.t);youWire.t=setTimeout(youDraw,200)})});
-  const mg=document.getElementById("yMag");mg.checked=!!y.mag;mg.onchange=()=>{try{window.parent.ptYou.set({mag:mg.checked},window)}catch(e){}youDraw()};
+  Object.entries(I).forEach(([id,k])=>{const el=document.getElementById(id);el.value=y[k]??"";el.addEventListener("input",()=>{try{window.parent.ptYou.set({[k]:el.value},window,"minerals")}catch(e){}clearTimeout(youWire.t);youWire.t=setTimeout(youDraw,200)})});
+  const mg=document.getElementById("yMag");mg.checked=!!y.mag;mg.onchange=()=>{try{window.parent.ptYou.set({mag:mg.checked},window,"minerals")}catch(e){}youDraw()};
   document.getElementById("yCalc").onclick=async()=>{let t=null;try{t=await window.parent.ptGetTotals()}catch(e){}if(!t)return;
     const p={luck:String(Math.round(t.Luck||0)||""),cap:String(Math.round(t.Capacity||0)||""),sb:String(Math.round((t["Size Boost"]||0)*10)/10)};
-    try{window.parent.ptYou.set(p,window)}catch(e){}document.getElementById("yLuck").value=p.luck;document.getElementById("yCap").value=p.cap;document.getElementById("ySb").value=p.sb;youDraw()};
+    try{window.parent.ptYou.set(p,window,"minerals")}catch(e){}document.getElementById("yLuck").value=p.luck;document.getElementById("yCap").value=p.cap;document.getElementById("ySb").value=p.sb;youDraw()};
   document.querySelectorAll(".yopen [data-tool]").forEach(b=>b.onclick=()=>{const id=b.dataset.tool;closeMineral();try{window.parent.ptCallTool(id,"ptOpenFor","mineral",m.n)}catch(e){}});
   youDraw()}
 window.ptYouChanged=()=>{if(scrim.hidden||!CUR)return;const y=youGet();[["yLuck","luck"],["yCap","cap"],["ySb","sb"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el&&document.activeElement!==el)el.value=y[k]??""});const mg=document.getElementById("yMag");if(mg)mg.checked=!!y.mag;youDraw()};

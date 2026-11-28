@@ -1,7 +1,6 @@
 // menu groups: [group id, title, colour, tabs?, [tool id, tab label, sub page, menu name, menu text]...]
 // every tool is listed straight in the menu; groups with tabs show the same tools as a tab strip
 const GROUPS = [
-  ["g-start", "Start", "#94a3b8", false, [["home", "Home"]]],
   [
     "g-build",
     "Builds",

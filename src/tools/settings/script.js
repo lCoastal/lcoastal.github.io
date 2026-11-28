@@ -47,10 +47,10 @@ document.addEventListener("click",e=>{const s=e.target.closest(".sw[data-k]");if
 draw();
 
 // your stats, shared with every calculator
-const yGet=()=>{try{return PW.ptYou.get()}catch(e){return {}}};
+const yGet=()=>{try{return PW.ptYou.get("settings")}catch(e){return {}}};
 const yDraw=()=>{const y=yGet();document.querySelectorAll("[data-y]").forEach(el=>{const k=el.dataset.y;if(el.type==="checkbox")el.checked=!!y[k];else if(document.activeElement!==el)el.value=y[k]??""})};
-document.querySelectorAll("[data-y]").forEach(el=>el.addEventListener(el.type==="checkbox"?"change":"input",()=>{try{PW.ptYou.set({[el.dataset.y]:el.type==="checkbox"?el.checked:el.value},window)}catch(e){}}));
+document.querySelectorAll("[data-y]").forEach(el=>el.addEventListener(el.type==="checkbox"?"change":"input",()=>{try{PW.ptYou.set({[el.dataset.y]:el.type==="checkbox"?el.checked:el.value},window,"settings")}catch(e){}}));
 document.getElementById("yCalc").onclick=async()=>{let t=null;try{t=await PW.ptGetTotals()}catch(e){}if(!t)return;
-  try{PW.ptYou.set({luck:String(Math.round(t.Luck||0)||""),cap:String(Math.round(t.Capacity||0)||""),sb:String(Math.round((t["Size Boost"]||0)*10)/10),mb:String(Math.round(t["Modifier Boost"]||0))},window)}catch(e){}yDraw()};
-document.getElementById("yClr").onclick=()=>{try{PW.ptYou.set({luck:"",cap:"",sb:"",mb:"",pph:"",mag:false},window)}catch(e){}yDraw()};
+  try{PW.ptYou.set({luck:String(Math.round(t.Luck||0)||""),cap:String(Math.round(t.Capacity||0)||""),sb:String(Math.round((t["Size Boost"]||0)*10)/10),mb:String(Math.round(t["Modifier Boost"]||0))},window,"settings")}catch(e){}yDraw()};
+document.getElementById("yClr").onclick=()=>{try{PW.ptYou.set({luck:"",cap:"",sb:"",mb:"",pph:"",mag:false},window,"settings")}catch(e){}yDraw()};
 window.ptYouChanged=yDraw;window.ptRefresh=yDraw;yDraw();

@@ -8,11 +8,79 @@ window.PT_ACCENTS = {
   orange: ["Orange", "#c2410c", "#fb923c"],
   gold: ["Gold", "#9a6b00", "#facc15"],
 };
+
+const PT_COLOR_GROUPS = {
+  "rarity": [
+    "--c-common",
+    "--c-uncommon",
+    "--c-rare",
+    "--c-epic",
+    "--c-legendary",
+    "--c-mythic",
+    "--c-exotic",
+    "--c-ascended",
+    "--pt-no-rarity"
+  ],
+  "mutation": [
+    "--pt-no-mutation"
+  ],
+  "modifier": [
+    "--m-perfect",
+    "--m-treasured",
+    "--m-entombed",
+    "--m-lunar",
+    "--m-voidtorn",
+    "--m-mutated",
+    "--m-cosmic",
+    "--m-electrified",
+    "--m-iridescent",
+    "--m-irradiated",
+    "--m-crystalline",
+    "--m-scorching",
+    "--m-glowing",
+    "--m-pure",
+    "--m-shiny",
+    "--m-sunforged",
+    "--m-prismatic",
+    "--m-overclocked",
+    "--m-festive",
+    "--pt-no-modifier"
+  ],
+  "stat": [
+    "--k-luck",
+    "--k-cap",
+    "--k-size",
+    "--k-digstr",
+    "--k-digspd",
+    "--k-sell",
+    "--k-walk",
+    "--k-mod",
+    "--k-shkstr",
+    "--k-shkspd",
+    "--k-inv",
+    "--k-jump",
+    "--pt-no-stat"
+  ],
+  "event": [
+    "--ev",
+    "--pt-no-event"
+  ],
+  "comparison": [
+    "--pt-no-comparison"
+  ],
+  "tier": [
+    "--pt-tier-ink",
+    "--pt-no-tier"
+  ]
+};
 window.ptAccentCSS = () => {
   const a = PT_ACCENTS[SET.accent] || PT_ACCENTS.teal;
   const L = `--accent:${a[1]};--accent-fg:#ffffff`,
     D = `--accent:${a[2]};--accent-fg:#101418`;
-  return `:root:root{${L}}@media (prefers-color-scheme:dark){:root:root:not([data-theme="light"]){${D}}}:root:root[data-theme="dark"]{${D}}`;
+  const neutral = Object.entries(PT_COLOR_GROUPS).flatMap(([key, properties]) =>
+    SET["color_" + key] === false ? properties.map(name => name + (name === "--pt-tier-ink" ? ":var(--panel)" : ":var(--muted)")) : []
+  ).join(";");
+  return `:root:root{${neutral}}` + `:root:root{${L}}@media (prefers-color-scheme:dark){:root:root:not([data-theme="light"]){${D}}}:root:root[data-theme="dark"]{${D}}`;
 };
 function ptAccentInto(doc) {
   try {
@@ -24,6 +92,7 @@ function ptAccentInto(doc) {
       (doc.head || doc.documentElement).appendChild(st);
     }
     st.textContent = ptAccentCSS();
+    if (doc === document) doc.documentElement.style.filter = SET.color_all === false ? "grayscale(1)" : "";
   } catch (e) {}
 }
 let hostTheme = document.documentElement.getAttribute("data-theme");

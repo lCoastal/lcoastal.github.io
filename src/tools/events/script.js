@@ -42,7 +42,7 @@ $("tz").textContent=`Times are shown in your local time (${Intl.DateTimeFormat()
 let onlyReg=false;
 function render(){const q=$("q").value.trim().toLowerCase();$("onlyReg").setAttribute("aria-pressed",String(onlyReg));
   const groups={};EV.filter(e=>(!onlyReg||/Regular/.test(e.cat))&&(!q||(e.n+" "+e.d+" "+e.fx.join(" ")).toLowerCase().includes(q))).forEach(e=>(groups[e.cat||"Other"]=groups[e.cat||"Other"]||[]).push(e));
-  const COL={"Regular Events":"var(--accent)","Limited-Time Events":"var(--ev)","Admin-Exclusive Events":"var(--c-exotic)"};
+  const COL={"Regular Events":"var(--pt-no-event,var(--accent))","Limited-Time Events":"var(--ev)","Admin-Exclusive Events":"var(--pt-no-event,var(--c-exotic))"};
   $("evs").innerHTML=Object.entries(groups).map(([c,es])=>`<p class="grp">${esc(c)}</p><div class="ev">${es.map(e=>`<div class="e" style="border-top:3px solid ${COL[c]||"var(--line)"}"><b>${esc(e.n)}</b>${e.d?`<p>${esc(e.d)}</p>`:""}${e.fx.length?`<ul>${e.fx.map(f=>`<li${f.startsWith("  ")?' style="margin-left:14px;list-style:circle"':""}>${esc(f.trim())}</li>`).join("")}</ul>`:""}</div>`).join("")}</div>`).join("")||'<div class="empty">No events match.</div>'}
 $("q").oninput=render;$("onlyReg").onclick=()=>{onlyReg=!onlyReg;render()};
 render();tick();setInterval(tick,1000);

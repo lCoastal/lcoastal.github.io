@@ -107,8 +107,8 @@ const TUT_TEXT="Title: Tutorial\nSubtitle: How a build sheet is written. Make a 
 // ---------- the sheet: pictures, names and readable layout ----------
 const RHX={Exotic:"#f17ad6",Mythic:"#f0687f",Legendary:"#f2b53a",Epic:"#b880ee",Rare:"#68a6f0",Uncommon:"#6cc46e",Common:"#a3adb8"};
 const cvar=(pre,name,hex)=>`var(--${pre}-${String(name).toLowerCase().replace(/[^a-z0-9]+/g,"")},${hex})`;
-const RC=r=>cvar("rh",r,RHX[r]||"#a3adb8");const SC2=s=>cvar("sh",s,SHX[s]||"#e8ecf0");
-const MC=m=>cvar("mc",m,MODCOL[m]||"#e8ecf0");const EC=m=>cvar("eq",m,EQMUT[m]||"#e8ecf0");
+const RC=r=>`var(--pt-no-rarity,${cvar("rh",r,RHX[r]||"#a3adb8")})`;const SC2=s=>`var(--pt-no-stat,${cvar("sh",s,SHX[s]||"#e8ecf0")})`;
+const MC=m=>`var(--pt-no-modifier,${cvar("mc",m,MODCOL[m]||"#e8ecf0")})`;const EC=m=>`var(--pt-no-mutation,${cvar("eq",m,EQMUT[m]||"#e8ecf0")})`;
 const PDATA=(()=>{try{return window.parent.PTDATA||null}catch(e){return null}})();
 const normN=s=>String(s||"").toLowerCase().replace(/[’‘`]/g,"'").replace(/[^a-z0-9]/g,"");
 const PICS=(()=>{const out={Equipment:[],Pan:[],Shovel:[],Rune:[]};if(!PDATA)return out;
@@ -766,7 +766,7 @@ const SGINFO=(()=>{const D=(()=>{try{return window.parent.PTDATA||{}}catch(e){re
   // equipment mutations: hovering one shows what it does to the item (stats multiplied, plus any flat bonus)
   const MPCT=new Set(["Shake Speed","Dig Speed","Size Boost","Modifier Boost","Sell Boost"]);
   put("dl-mut","No mutation","","");I["dl-mut"][k("No mutation")].html=`<b>No mutation</b><span class="eqh">The item's normal stats</span>`;I["dl-mut"][k("No mutation")].plain=true;
-  (E.muts||[]).forEach(m=>{put("dl-mut",m.n,"","");const e=I["dl-mut"][k(m.n)];e.plain=true;e.col=EQMUT[m.n]||"";
+  (E.muts||[]).forEach(m=>{put("dl-mut",m.n,"","");const e=I["dl-mut"][k(m.n)];e.plain=true;e.col=EQMUT[m.n]?EC(m.n):"";
     const pct=Math.round((m.x-1)*100);
     e.html=`<b style="color:${e.col||"inherit"}">${esc(m.n)}</b><span class="eql"><span>Item's stats</span><span>×${nf(m.x)} (+${pct}%)</span></span>${Object.entries(m.a||{}).map(([n,v])=>`<span class="eql"><span style="color:${SC(n)||"inherit"}">${esc(n)}</span><span>+${nf(v)}${MPCT.has(n)?"%":""} flat</span></span>`).join("")}${m.ev?`<span class="eqh" style="margin-top:4px">${esc(m.ev)}</span>`:""}`});
   return {I,k,LST}})();
@@ -789,7 +789,7 @@ function sgOpen(inp){if(SGPICK)return;const list=inp.dataset.sg;let all=SGLISTS[
 function sgFocus(i){if(!SGX)return;const li=[...SGX.querySelectorAll("li")];if(!li.length)return;SGA=(i+li.length)%li.length;li.forEach((x,j)=>x.classList.toggle("on",j===SGA));const el=li[SGA];el.scrollIntoView({block:"nearest"});
   const f=sgInfo(SGI.dataset.sg,el.dataset.v);const d=SGX.querySelector(".det");if(d){const rune=SGI.dataset.sg==="dl-rune";d.hidden=!f||(rune&&!f.det);if(f&&f.html!=null){d.hidden=false;d.innerHTML=f.html}else if(f)d.innerHTML=rune?`<b>${esc(el.dataset.v)}</b><span style="color:var(--muted)">${esc(f.det)}</span>`:`<b>${esc(el.dataset.v)}</b>${esc(f.sub||"")}${f.det?`<br><span style="color:var(--muted)">${esc(f.det)}</span>`:""}`}}
 // picking closes the list (and keeps it closed while the pick is saved); "Clear" empties the slot and its mutation
-function sgPick(v){const inp=SGI;if(inp&&inp.dataset.sg==="dl-mut"){if(v==="No mutation")v="";inp.style.color=EQMUT[v]||""}const clr=v==="Clear"&&(inp.dataset.sg==="dl-rune"||SGCLR.has(inp.dataset.sg));if(clr)v="";inp.value=v;sgClose();SGPICK=true;
+function sgPick(v){const inp=SGI;if(inp&&inp.dataset.sg==="dl-mut"){if(v==="No mutation")v="";inp.style.color=EQMUT[v]?EC(v):""}const clr=v==="Clear"&&(inp.dataset.sg==="dl-rune"||SGCLR.has(inp.dataset.sg));if(clr)v="";inp.value=v;sgClose();SGPICK=true;
   try{inp.dispatchEvent(new Event("input",{bubbles:true}));inp.dispatchEvent(new Event("change",{bubbles:true}));
     if(clr){const ms=document.getElementById(inp.id.replace(/-name(-\d+)?$/,"-mut$1"));if(ms&&ms!==inp&&(ms.tagName==="SELECT"||ms.dataset.sg==="dl-mut")&&ms.value){ms.value="";ms.style.color="";ms.dispatchEvent(new Event("input",{bubbles:true}));ms.dispatchEvent(new Event("change",{bubbles:true}))}}}
   finally{SGPICK=false}sgTitle(inp);const n=document.getElementById(inp.id);if(n&&n===document.activeElement)n.blur()}
