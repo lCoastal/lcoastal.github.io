@@ -131,7 +131,7 @@ function drawInputs(){const so=sources();if(!so.some(x=>x[0]===S.src))S.src="A";
   // can-afford-to-lose sliders, one per boosted stat, flat value 0..current
   const boosted=STATS.map((s,i)=>[s,i]).filter(([,i])=>t&&Math.abs(t[i])>1e-9);
   $("lose").innerHTML=boosted.length?boosted.map(([s,i])=>{const mx=r4(Math.max(0,t[i])),val=r4(Math.max(0,Math.min(mx,+(S.lose[s]||0))));
-    return `<div class="lrow" data-stat="${esc(s)}"><span class="ls">${esc(s)}</span><input type="range" class="lrng" min="0" max="${mx}" step="any" value="${val}" aria-label="${esc(s)} you can lose"><input type="number" class="lnum" min="0" max="${mx}" step="any" value="${val||""}" placeholder="0"><span class="lmax">/ ${mx}</span></div>`}).join(""):`<p class="hint" style="margin:0">Fill your museum to set loss limits.</p>`;
+    return `<div class="lrow" data-stat="${esc(s)}"><span class="ls">${esc(s)}</span><input type="range" class="lrng" min="0" max="${mx}" step="any" value="${val}" aria-label="${esc(s)} you can lose"><input type="number" class="lnum" min="0" max="${mx}" step="any" value="${val||""}" placeholder="0"><span class="lmax" title="Your museum now, and the lowest you allow">${fxT(t[i])}${val?` → ${fxT(t[i]-val)}`:""}</span></div>`}).join(""):`<p class="hint" style="margin:0">Fill your museum to set loss limits.</p>`;
   $("curSum").innerHTML=b&&filled(b)?STATS.map((s,i)=>Math.abs(t[i])>1e-9?`<span>${s} <b>${fxT(t[i])}</b></span>`:"").join("")+`<span>${filled(b)} of 18 displays</span>`:`<p class="hint">${S.src==="paste"?"Paste a setup above.":"That museum is empty. Fill it in the Museum Planner first."}</p>`}
 $("src").onchange=e=>{S.src=e.target.value;save();drawInputs()};
 $("paste").oninput=e=>{S.paste=e.target.value;save();drawInputs()};
@@ -141,6 +141,7 @@ $("prio").addEventListener("click",e=>{const btn=e.target.closest("[data-stat]")
 $("lose").addEventListener("input",e=>{const row=e.target.closest(".lrow");if(!row)return;const s=row.dataset.stat,mx=+e.target.max||0;let v=Math.max(0,Math.min(mx,+e.target.value||0));
   if(+e.target.value>mx)e.target.value=mx;
   const rng=row.querySelector(".lrng"),num=row.querySelector(".lnum");if(e.target===rng)num.value=v||"";else rng.value=v;
+  const cur=mx;row.querySelector(".lmax").textContent=fxT(cur)+(v?" → "+fxT(cur-v):"");
   if(v>0)S.lose[s]=v;else delete S.lose[s];save()});
 $("skips").addEventListener("click",e=>{const b=e.target.closest("[data-unskip]");if(!b)return;S.skip=S.skip.filter(x=>x!==b.dataset.unskip);save();drawInputs()});
 makeAC({inp:$("skipIn"),free:true,items:MINS.filter(m=>m.mu).map(m=>({n:m.n,tag:m.r,ic:m.ic,col:rc(m.r)})),pick:x=>{if(!S.skip.includes(x.n))S.skip.push(x.n);$("skipIn").value="";save();drawInputs()}});
