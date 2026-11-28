@@ -47,10 +47,12 @@ function drawQuick() {
     const v = JSON.parse(localStorage.getItem("pt-settings") || "{}").rtools;
     if (v !== undefined && +v >= 0) lim = +v;
   } catch (e) {}
-  const rec = RTOOLS.filter((k) => !PINS.includes(k)).slice(0, lim);
-  quick.hidden = !PINS.length && !rec.length;
+  const visible = (k) => SET.nerdy || !researchTools.has(entByKey(k)[0]);
+  const pins = PINS.filter(visible);
+  const rec = RTOOLS.filter((k) => visible(k) && !PINS.includes(k)).slice(0, lim);
+  quick.hidden = !pins.length && !rec.length;
   quick.innerHTML =
-    (PINS.length ? `<div class="dsec">Pinned</div>${PINS.map((k) => navHTML(entByKey(k))).join("")}` : "") +
+    (pins.length ? `<div class="dsec">Pinned</div>${pins.map((k) => navHTML(entByKey(k))).join("")}` : "") +
     (rec.length
       ? `<div class="dsec">Recent tools<button type="button" class="rclr" data-rtclr>Clear</button></div>${rec.map((k) => navHTML(entByKey(k))).join("")}`
       : "");
@@ -137,6 +139,7 @@ drawer.addEventListener("click", (e) => {
 GROUPS.forEach(([gid, title, col, tabs, items]) => {
   const g = document.createElement("div");
   g.className = "dgrp";
+  g.id = gid;
   g.style.setProperty("--gc", "var(--muted)");
   g.innerHTML =
     `<div class="dsec">${title}</div>` +
@@ -146,4 +149,8 @@ GROUPS.forEach(([gid, title, col, tabs, items]) => {
       .join("");
   drawer.appendChild(g);
 });
-drawQuick();
+const researchTools = new Set(GROUPS.find(([id]) => id === "g-research")[4].map(([tool]) => tool));
+function syncResearchMenu() {
+  document.getElementById("g-research").hidden = !SET.nerdy;
+  drawQuick();
+}

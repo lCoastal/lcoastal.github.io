@@ -32,7 +32,7 @@ function show(id) {
   if (gb && id === "settings") gb.setAttribute("aria-current", "page");
   // the tab strip for grouped tools
   const hb = document.getElementById("hubbar");
-  if (hub) {
+  if (hub && (hub[0] !== "g-research" || SET.nerdy)) {
     const col = (GROUPS.find((g) => g[0] === hub[0]) || [])[2] || "";
     hb.style.setProperty("--hc", col);
     hb.innerHTML = hub[3]

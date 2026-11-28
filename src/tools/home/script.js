@@ -1,4 +1,6 @@
 const $=id=>document.getElementById(id);
+window.ptRefresh=()=>{document.querySelector('[data-go="mechanics"]').hidden=!window.parent.ptSettings?.().nerdy};
+window.ptRefresh();
 const go=id=>{try{window.parent.ptOpenTool(id)}catch(e){}};
 document.addEventListener("click",e=>{const f=e.target.closest("[data-fid]");if(f){try{window.parent.ptCallTool("builds","ptOpenFeatured",f.dataset.fid)}catch(err){}return}
   const g=e.target.closest("[data-go]");if(!g)return;if(g.dataset.feat){try{window.parent.ptCallTool("builds","ptOpenFeatured","")}catch(err){}return}go(g.dataset.go)});

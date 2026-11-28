@@ -13,6 +13,7 @@ function syncCompact(f) {
 }
 // settings, shared by every tool and changed from the Settings tool
 let SET = {
+  nerdy: false,
   short: false,
   dec: 2,
   scroll: true,
@@ -25,6 +26,7 @@ let SET = {
 try {
   Object.assign(SET, JSON.parse(localStorage.getItem("pt-settings") || "{}"));
 } catch (e) {}
+syncResearchMenu();
 window.ptSettings = () => Object.assign({ compact: COMPACT }, SET);
 window.ptSetSetting = (k, v) => {
   if (k === "compact") {
@@ -39,6 +41,7 @@ window.ptSetSetting = (k, v) => {
     try {
       localStorage.setItem("pt-settings", JSON.stringify(SET));
     } catch (e) {}
+    if (k === "nerdy") syncResearchMenu();
     if (k === "rtools") drawQuick();
     if (k === "recent") {
       RECENT = RECENT.slice(0, +v);
