@@ -13,7 +13,7 @@ window.S=null;let S={pan:"Rusty Pan",shovel:"Rusty Shovel",slots:{},mus:"board",
 window.S=S;try{const s=JSON.parse(localStorage.getItem("pcalc")||"null");if(s)S=Object.assign(S,s,{b:Object.assign({},s.b),n:Object.assign(S.n,s.n)})}catch(e){}
 {const seen=new Set();Object.keys(S.slots).sort().forEach(k=>{const v=S.slots[k];if(v&&["Dredge Master's Ring","Ring of Champions","Ring of the Stars","Scarab Signet","Embalmer's Ring","Ring of Ra"].includes(v.n)){if(seen.has(v.n))v.n="";else seen.add(v.n)}})}
 window.S=S;Object.values(S.slots).forEach(v=>{if(v&&v.l==="p"){v.l="6";v.m="Prismatic"}});
-const save=()=>{try{localStorage.setItem("pcalc",JSON.stringify(S))}catch(e){}};
+const save=()=>{try{localStorage.setItem("pcalc",JSON.stringify(S,ptSkipDraftRoll))}catch(e){}};
 const own=n=>!!(Store.get(n)||{}).own;
 // tool selects
 function fillSel(el,items,cur,blank){const list=items.filter(x=>!S.owned||own(x.name||x.n)||(x.name||x.n)===cur);
@@ -23,7 +23,7 @@ function buildSlots(){
     <button type="button" class="pick it" data-pick="${k}" aria-haspopup="listbox" aria-label="${l}"></button>
     <select data-lvl="${k}" aria-label="${l} stars"><option value="0">0★</option><option value="5">5★</option><option value="6">6★</option></select>
     <select data-mut="${k}" data-ptmut aria-label="${l} mutation">${MUTS.map(m=>`<option value="${m[0]}">${mutLabel(m)}</option>`).join("")}</select>
-    <span class="qw"><button type="button" class="qbtn" data-qopen="${k}" title="Quality: where the roll lands (100% = best). Click to change"${(v.q??100)!==100||v.l==="5"||v.l==="0"?" hidden":""}>100%</button><input type="number" min="0" max="100" data-q="${k}" value="${v.q??100}" aria-label="${l} quality %" title="Quality %"${(v.q??100)!==100||v.l==="5"||v.l==="0"?"":" hidden"}></span></div>`}).join("");
+    <span class="qw"><button type="button" class="qbtn" data-qopen="${k}" title="Quality: where the roll lands (100% = best). Click to change"${(v.q??100)!==100||v.l==="5"||v.l==="0"?" hidden":""}>${ptEnteredStats(v)?"Entered stats":"100%"}</button><input type="number" min="0" max="100" data-q="${k}" value="${v.q??100}" aria-label="${l} quality %" title="Quality %"${(v.q??100)!==100||v.l==="5"||v.l==="0"?"":" hidden"}></span></div>`}).join("");
   SLOTDEF.forEach(([k,,slot])=>{const v=S.slots[k]||{};document.querySelector(`[data-lvl="${k}"]`).value=v.l==="5"||v.l==="0"?v.l:"6";document.querySelector(`[data-mut="${k}"]`).value=v.m||"None"})}
 function fillTools(){}
 // museum sources: the planner's current board plus every saved loadout
@@ -67,9 +67,9 @@ function compute(S0){const S=S0||window.S;
   if(sh){base["Dig Strength"]+=num(sh.strength)||0;base["Dig Speed"]+=(num(sh.speed)||0)*100;base.Toughness=(num(sh.toughness)||0)+(se&&se.tough?se.tough:0);if(se&&!se.tough&&!STREAK[se.n])notes.push(`${se.n}: ${se.d}`);const p=passive(sh.passive);toolLuck+=p.lm-1;if(/25% buffs from Totems/i.test(sh.passive||""))totemMult=1.25}
   // Embalmer's Salt: +0.25% sell value per item panned, up to +100%. Counted as maxed out, added like gear.
   if(S.trinket==="Embalmer's Salt")base["Sell Boost"]+=100;
-  SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
+  SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const entered=ptEnteredStats(v);if(entered){for(const [n,value] of Object.entries(entered))if(n in base)base[n]+=value;return}const mu=MUT[v.m||"None"]||MUTS[0];x.st.forEach(s=>{const n=s[0];if(!(n in base))return;base[n]+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});Object.entries(mu[2]).forEach(([n,a])=>base[n]+=a)});
   // at night, pieces with Night Luck (Dullahan's Curse) add it to their luck, scaled by stars, roll and mutation like any stat
-  if(S.b.night)SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const s=x.st.find(s=>s[0]==="Night Luck");if(!s)return;const mu=MUT[v.m||"None"]||MUTS[0];base.Luck+=eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});
+  if(S.b.night)SLOTDEF.forEach(([k])=>{const v=S.slots[k];if(!v||!v.n)return;const x=EQB[v.n];if(!x)return;const s=x.st.find(s=>s[0]==="Night Luck");if(!s)return;const mu=MUT[v.m||"None"]||MUTS[0];base.Luck+=ptEnteredStats(v)?.["Night Luck"]??eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])});
   const flat=Object.fromEntries(STATS.map(s=>[s,0]));flat.Luck=Math.max(0,+S.n.flatLuck||0);
   // permanent quest luck (flat points): Lighthouse +3, Ancient +5, Spirits +50, Dredge Master +3 a quest, login Experience +5 a point
   flat.Luck+=(S.b.lighthouse?3:0)+(S.b.ancient?5:0)+(S.b.spirits?50:0)+3*Math.max(0,+S.n.dredge||0)+5*Math.max(0,+S.n.xp||0)+(TOMB[+S.n.tomb||0]||0);flat["Dig Strength"]=Math.max(0,+S.n.flatDig||0);
@@ -530,7 +530,7 @@ async function buildImage(st,r){
   const disp=[];if(board)Object.entries(board).forEach(([rar,arr])=>(arr||[]).forEach(sl=>{if(sl&&sl.m){const m=MIN[String(sl.m).toLowerCase()];disp.push({n:sl.m,ic:m&&m.ic,r:m?m.r:rar,any:sl.m==="Any"})}}));
   const RO=["Ascended","Exotic","Mythic","Legendary","Epic","Rare","Uncommon","Common"];disp.sort((a,b)=>RO.indexOf(a.r)-RO.indexOf(b.r));
   const musStats=Object.entries(mt.t).filter(([,v])=>Math.abs(v)>1e-9).sort((a,b)=>b[1]-a[1]);
-  const gOf=(k,l)=>{const v=(st.slots||{})[k];if(!v||!v.n)return {slot:l,empty:true};const x=EQB[v.n];return {slot:l,n:v.n,ic:x&&P.eimg[x.img],r:x?x.r:"",st:v.l==="0"?0:v.l==="5"?5:6,mu:v.m||"None",q:v.q??100}};
+  const gOf=(k,l)=>{const v=(st.slots||{})[k];if(!v||!v.n)return {slot:l,empty:true};const x=EQB[v.n];return {slot:l,n:v.n,ic:x&&P.eimg[x.img],r:x?x.r:"",st:v.l==="0"?0:v.l==="5"?5:6,mu:v.m||"None",entered:!!ptEnteredStats(v),q:v.q??100}};
   const top2=[gOf("neck","Necklace"),gOf("charm","Charm")],rings=SLOTDEF.filter(d=>d[2]==="Ring").map(([k,l])=>gOf(k,l)).filter(g=>!g.empty);
   const gear=[...top2.filter(g=>!g.empty),...rings];
   const MODCOL={Perfect:"#5ef1e1",Treasured:"#ffd849",Entombed:"#40c8be",Lunar:"#ffe99b",Voidtorn:"#a35bff",Mutated:"#a07bff",Cosmic:"#ff5f9e",Electrified:"#ffeb0b",Iridescent:"#f36bff",Irradiated:"#67ff20",Crystalline:"#b7e6ff",Scorching:"#ff861c",Glowing:"#fff292",Pure:"#ffffff",Shiny:"#d4e7ff"};
@@ -612,7 +612,7 @@ async function buildImage(st,r){
       c.font=`700 19px ${FD}`;c.fillStyle=RHX[g.r]||TX;c.fillText(fit(g.n,tw),tx,y+56);
       c.font=`13px ${F}`;c.fillStyle=MU;c.fillText(g.r,tx,y+82);let xx=tx+c.measureText(g.r+"   ").width;xx=stars(g,xx,y+82,13);
       c.font=`13px ${F}`;c.fillStyle=MU;c.fillText("   ",xx,y+82);xx+=c.measureText("   ").width;mutTxt(g,xx,y+82,13,x+tw2-20-xx-60);
-      c.textAlign="right";c.font=`600 13px ${FM}`;c.fillStyle=g.q>=100?TX:MU;c.fillText(g.q+"% quality",x+tw2-20,y+82);c.textAlign="left"});
+      c.textAlign="right";c.font=`600 13px ${FM}`;c.fillStyle=g.q>=100?TX:MU;c.fillText(g.entered?"Entered stats":g.q+"% quality",x+tw2-20,y+82);c.textAlign="left"});
     y+=TOPH+12}
   if(rings.length){sec(`Rings (${rings.length} of 8)`,y);y+=SECH;const rw=(IW-12*(RC-1))/RC;
     rings.forEach((g,i)=>{const x=PAD+(i%RC)*(rw+12),yy=y+Math.floor(i/RC)*(RH+12);card(x,yy,rw,RH,RHX[g.r]);
@@ -675,7 +675,7 @@ const sgn=(s,d)=>(d>0?"+":d<0?"−":"±")+fv(s,Math.abs(d));
 function itemStats(k,it){if(!it)return [];
   if(it.kind==="pan"){const x=it.x;return [["Luck",num(x.luck)],["Capacity",num(x.capacity)],["Shake Strength",num(x.strength)],["Shake Speed",String(x.speed).includes("%")?num(x.speed):num(x.speed)*100],...(x.passive?[["Passive",x.passive]]:[])]}
   if(it.kind==="shovel"){const x=it.x;return [["Dig Strength",num(x.strength)],["Dig Speed",num(x.speed)*100],["Toughness",num(x.toughness)],...(x.passive?[["Passive",x.passive]]:[])]}
-  const v=S.slots[k]||{};const mu=MUT[v.m||"None"]||MUTS[0];const out=it.x.st.map(s=>[s[0],eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])]);Object.entries(mu[2]).forEach(([n,a])=>{const o=out.find(z=>z[0]===n);if(o)o[1]+=a;else out.push([n,a])});return out}
+  const v=S.slots[k]||{};const entered=ptEnteredStats({...v,n:it.x.n});if(entered)return Object.entries(entered);const mu=MUT[v.m||"None"]||MUTS[0];const out=it.x.st.map(s=>[s[0],eqVal(s,(v.l==="5"||v.l==="0"?"5":"6"),v.q??100,mu[1])]);Object.entries(mu[2]).forEach(([n,a])=>{const o=out.find(z=>z[0]===n);if(o)o[1]+=a;else out.push([n,a])});return out}
 function deltaRows(a,b){return SHOW.map(s=>[s,a.tot[s],b.tot[s]]).filter(([s,x,y])=>Math.abs(y-x)>1e-9)}
 function previewHtml(k,it,mode){
   const cur=compute(S);
@@ -877,7 +877,7 @@ document.addEventListener("change",e=>{const t=e.target;
   else if(t.dataset.lvl){(S.slots[t.dataset.lvl]=S.slots[t.dataset.lvl]||{}).l=t.value}
   else if(t.dataset.mut){(S.slots[t.dataset.mut]=S.slots[t.dataset.mut]||{}).m=t.value}
   else if(t.id==="allMut"){if(!t.value)return;SLOTDEF.forEach(([k])=>{(S.slots[k]=S.slots[k]||{}).m=t.value;document.querySelector(`[data-mut="${k}"]`).value=t.value});t.value=""}
-  else if(t.dataset.q){(S.slots[t.dataset.q]=S.slots[t.dataset.q]||{}).q=Math.min(100,Math.max(0,+t.value||0))}
+  else if(t.dataset.q){if(S.slots[t.dataset.q])delete S.slots[t.dataset.q].manualRoll;(S.slots[t.dataset.q]=S.slots[t.dataset.q]||{}).q=Math.min(100,Math.max(0,+t.value||0))}
   else if(t.dataset.b){S.b[t.dataset.b]=t.checked}
   else if(t.dataset.n){S.n[t.dataset.n]=+t.value||0}
   else return;save();render()});
@@ -1093,3 +1093,12 @@ document.addEventListener("click",e=>{["shMenu","bsMenu"].forEach(id=>{const m=$
 $("shareB").addEventListener("click",async()=>{const url=await ptCopyShare(buildSheetText());ptToast(url?"Share link copied: it opens this build as a build sheet":"Couldn't copy, your browser blocked it")});
 renderBf();
 all();
+
+ptEquipmentEditor({
+  tool:"calc",
+  entries:()=>SLOTDEF.filter(([k])=>EQB[S.slots[k]?.n]).map(([k,label])=>{
+    const item=S.slots[k];return {item,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EQB[item.n],(MUT[item.m]||MUTS[0])[2])};
+  }),
+  snapshot:()=>S.slots,restore:slots=>{S.slots=slots},
+  maximum:()=>Object.values(S.slots).forEach(v=>{if(v)v.q=100}),refresh:()=>{save();all()}
+});

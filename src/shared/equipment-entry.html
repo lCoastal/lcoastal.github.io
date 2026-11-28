@@ -1,0 +1,80 @@
+<style>
+#equipment-entry{margin:12px 0;padding:10px 14px;border:1px solid var(--line);border-radius:10px}
+#equipment-entry summary{cursor:pointer;font-weight:600}
+#equipment-entry .bar,#equipment-entry fieldset{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:10px 0}
+#equipment-entry fieldset{border:1px solid var(--line);border-radius:8px;padding:8px}
+#equipment-entry .fld{display:grid;gap:3px;font-size:12px}
+#equipment-entry input[type=number]{width:9em}
+</style>
+<script>
+function ptRollKey(item, mutation, stars) {
+  return JSON.stringify([item.n, mutation || "None", stars || "6"]);
+}
+function ptEnteredStats(item, mutation=item.m, stars=item.l) {
+  const roll=item.manualRoll;
+  return roll && roll.key===ptRollKey(item,mutation,stars) ? roll.values : null;
+}
+function ptSkipDraftRoll(key,value) { return key==="manualRoll" ? undefined : value; }
+
+// Each tool owns its draft. Only Save loadout persists the entered rolls.
+function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum}) {
+  const root=document.getElementById("equipment-entry");
+  root.innerHTML=`<summary>Equipment stats and saved loadouts</summary>
+    <div class="bar"><button type="button" class="btn" data-max>Assume 100% quality</button>
+    <button type="button" class="btn" data-edit>Enter final stats</button></div>
+    <form hidden><p>Enter each value shown on the equipment, including its mutation.</p>
+    <div data-fields></div><button class="btn" type="submit">Apply entered stats</button></form>
+    <div class="bar"><input aria-label="Equipment loadout name" placeholder="Loadout name" maxlength="60">
+    <button type="button" class="btn" data-save>Save loadout</button>
+    <select aria-label="Saved equipment stats"></select><button type="button" class="btn" data-load>Load</button></div>
+    <p class="hint" role="status"></p>`;
+  const form=root.querySelector("form"),status=root.querySelector("[role=status]"),select=root.querySelector("select");
+  const key="pt-equipment-presets-"+tool;
+  function presets() {try{return JSON.parse(localStorage.getItem(key)||"[]")}catch{return []}}
+  function list(){select.replaceChildren(...presets().map((s,i)=>new Option(s.name,String(i))));root.querySelector("[data-load]").disabled=!select.length}
+  const fields=root.querySelector("[data-fields]");
+  let editing=[];
+  function edit(){
+    editing=entries();fields.replaceChildren();
+    if(!editing.length){status.textContent="Choose equipment first.";form.hidden=true;return}
+    for(const e of editing){
+      const group=document.createElement("fieldset"),legend=document.createElement("legend");
+      legend.textContent=e.label+" · "+e.item.n+" · "+(e.mutation||"None");group.appendChild(legend);
+      const current=ptEnteredStats(e.item,e.mutation,e.stars);
+      for(const [name,pct] of e.stats){
+        const label=document.createElement("label"),input=document.createElement("input");
+        label.className="fld";label.append(name+(pct?" (%)":""));
+        input.type="number";input.step="any";input.required=true;input.dataset.stat=name;input.value=current?.[name]??"";
+        label.appendChild(input);group.appendChild(label);
+      }
+      fields.appendChild(group);
+    }
+    form.hidden=false;status.textContent="";
+  }
+  function signature(es){return JSON.stringify(es.map(e=>[e.label,ptRollKey(e.item,e.mutation,e.stars)]))}
+  let opened="";
+  root.querySelector("[data-edit]").onclick=()=>{edit();opened=signature(editing)};
+  form.onsubmit=event=>{
+    event.preventDefault();const current=entries();
+    if(signature(current)!==opened){edit();opened=signature(editing);status.textContent="Equipment changed. Enter the values for this selection.";return}
+    current.forEach((e,i)=>{const values=Object.fromEntries([...fields.children[i].querySelectorAll("input")].map(input=>[input.dataset.stat,input.valueAsNumber]));
+      e.item.manualRoll={key:ptRollKey(e.item,e.mutation,e.stars),values};
+    });
+    form.hidden=true;refresh();status.textContent="Entered stats applied to this tool.";
+  };
+  root.querySelector("[data-max]").onclick=()=>{entries().forEach(e=>delete e.item.manualRoll);maximum();form.hidden=true;refresh();status.textContent="Using 100% quality."};
+  root.querySelector("[data-save]").onclick=()=>{
+    if(!form.hidden){status.textContent="Apply the entered stats before saving.";return}
+    const input=root.querySelector("input[maxlength]"),name=input.value.trim();if(!name||!entries().length){status.textContent="Choose equipment and enter a loadout name.";return}
+    const all=presets();all.push({name,data:snapshot()});
+    try{localStorage.setItem(key,JSON.stringify(all));list();select.selectedIndex=all.length-1;status.textContent="Saved "+name+"."}catch{status.textContent="Could not save this loadout."}
+  };
+  root.querySelector("[data-load]").onclick=()=>{const saved=presets()[select.value];if(saved){restore(saved.data);form.hidden=true;refresh();status.textContent="Loaded "+saved.name+"."}};
+  root.addEventListener("toggle",()=>{if(root.open)list()});list();
+}
+function ptEquipmentFields(piece, additions) {
+  const fields=new Map(piece.st.map(s=>[s[0],!!s[5]]));
+  for(const name of Object.keys(additions))if(!fields.has(name))fields.set(name,/Boost|Speed/.test(name));
+  return [...fields];
+}
+</script>

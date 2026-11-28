@@ -97,6 +97,8 @@
       TOOLS[k]
         .split("%%COMMON%%")
         .join(PT_PARTS.COMMON)
+        .split("%%EQUIPMENT_ENTRY%%")
+        .join(PT_PARTS.EQUIPMENT_ENTRY)
         .split("%%ROUTE%%")
         .join(PT_PARTS.ROUTE)
         .split("%%MINS%%")
