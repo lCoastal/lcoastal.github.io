@@ -115,7 +115,7 @@ function compute(S0){const S=S0||window.S;
   if((S.runes||[]).includes("Equalizer")){const a=(tot["Dig Speed"]+tot["Shake Speed"])/2;tot["Dig Speed"]=a;tot["Shake Speed"]=a}
   return {base,flat,pile,tot,ev,luckMult,mt,notes,trk,totemMult,toughness:base.Toughness}}
 // ---- isolate parts: which groups count, and what each single part adds ----
-const GROUPS=[["tools","Tools"],["jewelry","Jewelry"],["museum","Museum"],["boosts","Boosts"],["events","Events"]];
+const GROUPS=[["tools","Tools"],["jewelry","Equipment"],["museum","Museum"],["boosts","Boosts"],["events","Events"]];
 function strip(st,g){const t=clone(st);
   if(g==="tools"){t.pan="";t.shovel="";t.panEn="";t.shEn="";t.trinket="";t.trkMax=false}
   else if(g==="jewelry"){t.slots={}}
@@ -1097,7 +1097,7 @@ all();
 ptEquipmentEditor({
   tool:"calc",
   entries:()=>SLOTDEF.filter(([k])=>EQB[S.slots[k]?.n]).map(([k,label])=>{
-    const item=S.slots[k];return {item,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EQB[item.n],(MUT[item.m]||MUTS[0])[2])};
+    const item=S.slots[k];return {item,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EQB[item.n],MUT[item.m]||MUTS[0],item.l)};
   }),
   snapshot:()=>S.slots,restore:slots=>{S.slots=slots},
   maximum:()=>Object.values(S.slots).forEach(v=>{if(v)v.q=100}),refresh:()=>{save();all()}

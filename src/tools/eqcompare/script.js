@@ -83,7 +83,7 @@ render();
 
 ptEquipmentEditor({
   tool:"eqcompare",
-  entries:()=>S.items.map((item,i)=>({item,label:"Column "+(i+1),mutation:mutOf(item),stars:S.star,stats:ptEquipmentFields(EQB[item.n],MUT[mutOf(item)][2])})),
+  entries:()=>S.items.map((item,i)=>({item,label:"Column "+(i+1),mutation:mutOf(item),stars:S.star,stats:ptEquipmentFields(EQB[item.n],MUT[mutOf(item)],S.star)})),
   snapshot:()=>({items:S.items,star:S.star,mut:S.mut,q:S.q}),restore:data=>Object.assign(S,data),
   maximum:()=>{S.q=100},refresh:()=>{save();render()}
 });

@@ -19,7 +19,7 @@ const L=()=>D.list.find(l=>l.id===D.cur);
 const owned=(l,k)=>{if(k==="neck"||k==="charm")return true;if(k==="r6"||k==="r7")return !!l.robux;return +k.slice(1)<Math.max(0,Math.min(6,+l.nRings||0))};
 // one stat line on an item at its stars, quality and mutation
 const valOf=(s,v)=>{const lo=v.l==="5"?s[1]:s[3],hi=v.l==="5"?s[2]:s[4];return (lo+(hi-lo)*(v.q??100)/100)*(MUT[v.m||"None"]||MUTS[0])[1]};
-function itemStats(v){const x=EB[v.n];if(!x)return [];const entered=ptEnteredStats(v);if(entered)return ptEquipmentFields(x,(MUT[v.m]||MUTS[0])[2]).map(([n,p])=>[n,entered[n],p]);const out=x.st.map(s=>[s[0],valOf(s,v),!!s[5]]);Object.entries((MUT[v.m||"None"]||MUTS[0])[2]).forEach(([n,a])=>{const o=out.find(z=>z[0]===n);if(o)o[1]+=a;else out.push([n,a,PCT.has(n)])});return out}
+function itemStats(v){const x=EB[v.n];if(!x)return [];const entered=ptEnteredStats(v);if(entered)return ptEquipmentFields(x,MUT[v.m]||MUTS[0],v.l).map(([n,p])=>[n,entered[n],p]);const out=x.st.map(s=>[s[0],valOf(s,v),!!s[5]]);Object.entries((MUT[v.m||"None"]||MUTS[0])[2]).forEach(([n,a])=>{const o=out.find(z=>z[0]===n);if(o)o[1]+=a;else out.push([n,a,PCT.has(n)])});return out}
 function totals(l){const t={};SLOTS.forEach(([k])=>{const v=l.slots[k];if(!v||!v.n||!owned(l,k))return;itemStats(v).forEach(([n,a,p])=>{t[n]=t[n]||{v:0,p};t[n].v+=a})});return t}
 const ORDER=["Luck","Capacity","Size Boost","Sell Boost","Modifier Boost","Dig Strength","Dig Speed","Shake Strength","Shake Speed","Walk Speed","Inventory Size","Jump Power"];
 const sortStats=o=>Object.keys(o).sort((a,b)=>(ORDER.indexOf(a)+99)%99-(ORDER.indexOf(b)+99)%99||a.localeCompare(b));
@@ -159,7 +159,7 @@ render();
 ptEquipmentEditor({
   tool:"eqload",
   entries:()=>SLOTS.filter(([k])=>owned(L(),k)&&EB[L().slots[k]?.n]).map(([k,label])=>{
-    const item=L().slots[k];return {item,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EB[item.n],(MUT[item.m]||MUTS[0])[2])};
+    const item=L().slots[k];return {item,label,mutation:item.m,stars:item.l,stats:ptEquipmentFields(EB[item.n],MUT[item.m]||MUTS[0],item.l)};
   }),
   snapshot:()=>L(),restore:data=>{const l={...data,id:blank().id};D.list.push(l);D.cur=l.id},
   maximum:()=>Object.values(L().slots).forEach(v=>{if(v)v.q=100}),refresh:()=>{save();render()}

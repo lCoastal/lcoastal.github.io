@@ -41,11 +41,15 @@ function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum}) {
       const group=document.createElement("fieldset"),legend=document.createElement("legend");
       legend.textContent=e.label+" · "+e.item.n+" · "+(e.mutation||"None");group.appendChild(legend);
       const current=ptEnteredStats(e.item,e.mutation,e.stars);
-      for(const [name,pct] of e.stats){
+      for(const [name,pct,low,high] of e.stats){
         const label=document.createElement("label"),input=document.createElement("input");
         label.className="fld";label.append(name+(pct?" (%)":""));
         input.type="number";input.step="any";input.required=true;input.dataset.stat=name;input.value=current?.[name]??"";
-        label.appendChild(input);group.appendChild(label);
+        const range=document.createElement("small");
+        range.className="hint";
+        const format=value=>Number(value.toFixed(5)).toString()+(pct?"%":"");
+        range.textContent=low===high?"Fixed at "+format(low):"Range "+format(low)+" to "+format(high);
+        label.append(input,range);group.appendChild(label);
       }
       fields.appendChild(group);
     }
@@ -72,9 +76,17 @@ function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum}) {
   root.querySelector("[data-load]").onclick=()=>{const saved=presets()[select.value];if(saved){restore(saved.data);form.hidden=true;refresh();status.textContent="Loaded "+saved.name+"."}};
   root.addEventListener("toggle",()=>{if(root.open)list()});list();
 }
-function ptEquipmentFields(piece, additions) {
-  const fields=new Map(piece.st.map(s=>[s[0],!!s[5]]));
-  for(const name of Object.keys(additions))if(!fields.has(name))fields.set(name,/Boost|Speed/.test(name));
-  return [...fields];
+function ptEquipmentFields(piece, mutation, stars) {
+  const [,multiplier,additions]=mutation;
+  const lowIndex=stars==="0"||stars==="5"?1:3;
+  const fields=piece.st.map(stat=>{
+    const name=stat[0],bonus=additions[name]??0;
+    const a=stat[lowIndex]*multiplier+bonus,b=stat[lowIndex+1]*multiplier+bonus;
+    return [name,!!stat[5],Math.min(a,b),Math.max(a,b)];
+  });
+  for(const [name,value] of Object.entries(additions)){
+    if(!fields.some(([stat])=>stat===name))fields.push([name,/Boost|Speed/.test(name),value,value]);
+  }
+  return fields;
 }
 </script>
