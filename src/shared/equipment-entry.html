@@ -48,7 +48,7 @@ function ptEquipmentEditor({tool,entries,snapshot,restore,refresh,maximum}) {
         const range=document.createElement("small");
         range.className="hint";
         const format=value=>Number(value.toFixed(5)).toString()+(pct?"%":"");
-        range.textContent=low===high?"Fixed at "+format(low):"Range "+format(low)+" to "+format(high);
+        range.textContent=low===high?"Fixed at "+format(low):format(low)+" to "+format(high);
         label.append(input,range);group.appendChild(label);
       }
       fields.appendChild(group);
